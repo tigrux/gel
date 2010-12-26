@@ -1,0 +1,51 @@
+
+[def primes [top]
+    [var sieve [list 2]]
+    [var n 3]
+    [def undivisible [i] [% n i]]
+    [while [<= n top]
+        [if [all undivisible sieve]
+            [= sieve [+ sieve [list n]]]
+        ]
+        [= n [+ n 2]]
+    ]
+    sieve
+]
+
+[var i 0]
+[for iter [primes 100]
+    [print "Primes[" i "]=" iter]
+    [= i [+ i 1]]
+]
+
+
+[def fact [n]
+    [var result 1]
+    [if [> n 0]
+        [= result
+            [* n [fact [- n 1]]]
+        ]
+    ]
+    result
+]
+
+[var n 10]
+[print "factorial of " n " is " [fact n]]
+
+
+[def fib [n]
+    [case n
+        0 0
+        1 1
+          [+ [fib [- n 1]] [fib [- n 2]]]
+    ]
+]
+
+[var i 0]
+[while [le i 10]
+    [print "fibonacci[" i "] = " [fib i]]
+    [= i [+ i 1]]
+]
+
+[quit]
+
