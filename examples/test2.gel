@@ -5,7 +5,9 @@
     [def undivisible [i] [% n i]]
     [while [<= n top]
         [if [all undivisible sieve]
-            [= sieve [+ sieve [list n]]]
+            [= sieve
+                [+ sieve [list n]]
+            ]
         ]
         [= n [+ n 2]]
     ]
@@ -46,6 +48,7 @@
     [print "fibonacci[" i "] = " [fib i]]
     [= i [+ i 1]]
 ]
+
 
 [quit]
 

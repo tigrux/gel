@@ -73,23 +73,23 @@ gboolean gel_value_copy(const GValue *src_value, GValue *dest_value)
 {
     g_return_val_if_fail(src_value != NULL, FALSE);
     g_return_val_if_fail(dest_value != NULL, FALSE);
-    if(dest_value == NULL)
-        return FALSE;
+    gboolean result = TRUE;
 
     if(G_IS_VALUE(dest_value))
     {
-        if(g_value_transform(src_value, dest_value))
-            return TRUE;
-        else
+        if(!g_value_transform(src_value, dest_value))
         {
             g_warning("Cannot assign from %s to %s",
                 G_VALUE_TYPE_NAME(src_value), G_VALUE_TYPE_NAME(dest_value));
-            return FALSE;
+            result = FALSE;
         }
     }
-    g_value_init(dest_value, G_VALUE_TYPE(src_value));
-    g_value_copy(src_value, dest_value);
-    return TRUE;
+    else
+    {
+        g_value_init(dest_value, G_VALUE_TYPE(src_value));
+        g_value_copy(src_value, dest_value);
+    }
+    return result;
 }
 
 

@@ -42,8 +42,8 @@ void let_(GClosure *self, GValue *return_value,
 
 static
 void var_(GClosure *self, GValue *return_value,
-             guint n_values, const GValue *values,
-             GelContext *context, gpointer marshal_data)
+          guint n_values, const GValue *values,
+          GelContext *context, gpointer marshal_data)
 {
     const gchar *symbol = NULL;
     GValue *value = NULL;
@@ -484,8 +484,8 @@ void and_(GClosure *self, GValue *return_value,
 
 static
 void or_(GClosure *self, GValue *return_value,
-            guint n_values, const GValue *values,
-            GelContext *context, gpointer marshal_data)
+         guint n_values, const GValue *values,
+         GelContext *context, gpointer marshal_data)
 {
     const guint n_args = 1;
     if(n_values >= n_args)
@@ -545,8 +545,8 @@ void any_(GClosure *self, GValue *return_value,
 
 static
 void all_(GClosure *self, GValue *return_value,
-            guint n_values, const GValue *values,
-            GelContext *context, gpointer marshal_data)
+          guint n_values, const GValue *values,
+          GelContext *context, gpointer marshal_data)
 {
     GList *list = NULL;
     GClosure *closure = NULL;
@@ -592,6 +592,7 @@ void head_(GClosure *self, GValue *return_value,
     gel_value_list_free(list);
 }
 
+
 static
 void tail_(GClosure *self, GValue *return_value,
            guint n_values, const GValue *values,
@@ -621,11 +622,11 @@ void tail_(GClosure *self, GValue *return_value,
     gel_value_list_free(list);
 }
 
-//
+
 static
 void len_(GClosure *self, GValue *return_value,
-           guint n_values, const GValue *values,
-           GelContext *context, gpointer marshal_data)
+          guint n_values, const GValue *values,
+          GelContext *context, gpointer marshal_data)
 {
     GList *list = NULL;
     GValueArray *array = NULL;
@@ -643,7 +644,6 @@ void len_(GClosure *self, GValue *return_value,
     gel_value_list_free(list);
 }
 
-//
 
 void branch(guint n_values, const GValue *values, GelContext *outer,
             GValue *return_value, const GValue *case_value)
@@ -770,8 +770,8 @@ void list_(GClosure *self, GValue *return_value,
 
 static
 void for_(GClosure *self, GValue *return_value,
-         guint n_values, const GValue *values,
-         GelContext *context, gpointer marshal_data)
+          guint n_values, const GValue *values,
+          GelContext *context, gpointer marshal_data)
 {
     const gchar *symbol;
     GValueArray *array;
@@ -853,7 +853,7 @@ void if_(GClosure *self, GValue *return_value,
 static
 void str_(GClosure *self, GValue *return_value,
           guint n_values, const GValue *values,
-           GelContext *context, gpointer marshal_data)
+          GelContext *context, gpointer marshal_data)
 {
     const guint n_args = 1;
     if(n_values == n_args)
@@ -894,6 +894,7 @@ void type_(GClosure *self, GValue *return_value,
     else
         gel_warning_needs_n_arguments(n_args);
 }
+
 
 static
 void add_(GClosure *self, GValue *return_value,
@@ -944,6 +945,7 @@ void mod_(GClosure *self, GValue *return_value,
         gel_values_mod);
 }
 
+
 static
 void gt_(GClosure *self, GValue *return_value,
             guint n_values, const GValue *values,
@@ -955,8 +957,8 @@ void gt_(GClosure *self, GValue *return_value,
 
 static
 void ge_(GClosure *self, GValue *return_value,
-            guint n_values, const GValue *values,
-            GelContext *context, gpointer marshal_data)
+         guint n_values, const GValue *values,
+         GelContext *context, gpointer marshal_data)
 {
     logic(self, return_value, n_values, values, context, gel_values_ge);
 }
@@ -964,8 +966,8 @@ void ge_(GClosure *self, GValue *return_value,
 
 static
 void eq_(GClosure *self, GValue *return_value,
-            guint n_values, const GValue *values,
-            GelContext *context, gpointer marshal_data)
+         guint n_values, const GValue *values,
+         GelContext *context, gpointer marshal_data)
 {
     logic(self, return_value, n_values, values, context, gel_values_eq);
 }
@@ -973,8 +975,8 @@ void eq_(GClosure *self, GValue *return_value,
 
 static
 void le_(GClosure *self, GValue *return_value,
-            guint n_values, const GValue *values,
-            GelContext *context, gpointer marshal_data)
+         guint n_values, const GValue *values,
+         GelContext *context, gpointer marshal_data)
 {
     logic(self, return_value, n_values, values, context, gel_values_le);
 }
@@ -982,8 +984,8 @@ void le_(GClosure *self, GValue *return_value,
 
 static
 void lt_(GClosure *self, GValue *return_value,
-            guint n_values, const GValue *values,
-            GelContext *context, gpointer marshal_data)
+         guint n_values, const GValue *values,
+         GelContext *context, gpointer marshal_data)
 {
     logic(self, return_value, n_values, values, context, gel_values_lt);
 }
@@ -991,8 +993,8 @@ void lt_(GClosure *self, GValue *return_value,
 
 static
 void ne_(GClosure *self, GValue *return_value,
-            guint n_values, const GValue *values,
-            GelContext *context, gpointer marshal_data)
+         guint n_values, const GValue *values,
+         GelContext *context, gpointer marshal_data)
 {
     logic(self, return_value, n_values, values, context, gel_values_ne);
 }

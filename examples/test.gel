@@ -7,7 +7,6 @@
 
 [var box [new GtkVBox]]
 [set window "child" box]
-
 [set box "border-width" 12]
 
 [var button [new GtkButton]]

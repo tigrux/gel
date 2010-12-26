@@ -132,7 +132,7 @@ gboolean gel_context_eval_array(GelContext *self,
 
 
 gboolean gel_context_eval_value(GelContext *self,
-                            const GValue *value, GValue *dest_value)
+                                const GValue *value, GValue *dest_value)
 {
     g_return_val_if_fail(self != NULL, FALSE);
     g_return_val_if_fail(dest_value != NULL, FALSE);
