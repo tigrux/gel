@@ -32,7 +32,7 @@
 ]
 
 [var n 10]
-[print "factorial of " n " is " [fact n]]
+[print "Factorial of " n " is " [fact n]]
 
 
 [def fib [n]
@@ -45,7 +45,7 @@
 
 [var i 0]
 [while [le i 10]
-    [print "fibonacci[" i "] = " [fib i]]
+    [print "Fibonacci[" i "] = " [fib i]]
     [= i [+ i 1]]
 ]
 
