@@ -2,9 +2,8 @@
 [def primes [top]
     [var sieve [list 2]]
     [var n 3]
-    [def undivisible [i] [% n i]]
     [while [<= n top]
-        [if [all undivisible sieve]
+        [if [all [lambda [i] [% n i]] sieve]
             [= sieve
                 [+ sieve [list n]]
             ]
@@ -16,7 +15,7 @@
 
 [var i 0]
 [for iter [primes 100]
-    [print "Primes[" i "]=" iter]
+    [print "Primes[" i "] = " iter]
     [= i [+ i 1]]
 ]
 
