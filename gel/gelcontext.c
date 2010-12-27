@@ -47,6 +47,10 @@ void gel_context_invoke_closure(GelContext *self, GClosure *closure,
                                 guint n_values, GValue *values,
                                 GValue *dest_value)
 {
+    g_return_if_fail(self != NULL);
+    g_return_if_fail(closure != NULL);
+    g_return_if_fail(dest_value != NULL);
+
     if(gel_closure_is_pure(closure))
     {
         GValueArray *array = g_value_array_new(n_values);
@@ -73,6 +77,8 @@ void gel_context_invoke_type(GelContext *self, GType type,
                              guint n_values, GValue *values,
                              GValue *dest_value)
 {
+    g_return_if_fail(self != NULL);
+    g_return_if_fail(type != G_TYPE_INVALID);
     g_return_if_fail(dest_value != NULL);
 
     register guint i;
@@ -97,7 +103,9 @@ gboolean gel_context_eval_array(GelContext *self,
 {
     g_return_val_if_fail(self != NULL, FALSE);
     g_return_val_if_fail(dest_value != NULL, FALSE);
+    g_return_val_if_fail(array != NULL, FALSE);
     g_return_val_if_fail(array->n_values > 0, FALSE);
+
     gboolean result = FALSE;
 
     if(G_VALUE_HOLDS_STRING(array->values + 0))
@@ -135,7 +143,9 @@ gboolean gel_context_eval_value(GelContext *self,
                                 const GValue *value, GValue *dest_value)
 {
     g_return_val_if_fail(self != NULL, FALSE);
+    g_return_val_if_fail(value != NULL, FALSE);
     g_return_val_if_fail(dest_value != NULL, FALSE);
+
     gboolean result = FALSE;
 
     if(G_VALUE_HOLDS(value, G_TYPE_STRING))
@@ -165,6 +175,10 @@ gboolean gel_context_eval_params(GelContext *self, GList **list,
                                  const gchar *format,
                                  guint *n_values, const GValue **values, ...)
 {
+    g_return_val_if_fail(self != NULL, FALSE);
+    g_return_val_if_fail(n_values != NULL, FALSE);
+    g_return_val_if_fail(values != NULL, FALSE);
+
     guint n_args = 0;
     register guint i;
     for(i = 0; format[i] != 0; i++)
@@ -333,6 +347,7 @@ gboolean gel_context_eval_params(GelContext *self, GList **list,
 GValue* gel_context_find_symbol(const GelContext *self, const gchar *name)
 {
     g_return_val_if_fail(self != NULL, NULL);
+    g_return_val_if_fail(name != NULL, NULL);
 
     GValue *symbol = (GValue*)g_hash_table_lookup(
         self->priv->symbols, name);
@@ -345,6 +360,8 @@ GValue* gel_context_find_symbol(const GelContext *self, const gchar *name)
 void gel_context_add_symbol(GelContext *self, const gchar *name, GValue *value)
 {
     g_return_if_fail(self != NULL);
+    g_return_if_fail(name != NULL);
+    g_return_if_fail(value != NULL);
     g_hash_table_insert(self->priv->symbols, g_strdup(name), value);
 }
 
@@ -352,8 +369,10 @@ void gel_context_add_symbol(GelContext *self, const gchar *name, GValue *value)
 void gel_context_add_object(GelContext *self, const gchar *name, GObject *obj)
 {
     g_return_if_fail(self != NULL);
+    g_return_if_fail(name != NULL);
     g_return_if_fail(obj != NULL);
-    g_return_if_fail(G_OBJECT(obj));
+    g_return_if_fail(G_IS_OBJECT(obj));
+
     GValue *value = gel_value_new_of_type(G_OBJECT_TYPE(obj));
     g_value_take_object(value, obj);
     gel_context_add_symbol(self, name, value);
@@ -363,6 +382,7 @@ void gel_context_add_object(GelContext *self, const gchar *name, GObject *obj)
 void gel_context_remove_symbol(GelContext *self, const gchar *name)
 {
     g_return_if_fail(self != NULL);
+    g_return_if_fail(name != NULL);
     g_hash_table_remove(self->priv->symbols, name);
 }
 

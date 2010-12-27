@@ -61,7 +61,6 @@ GType gel_value_list_get_type(void)
 
 gchar* gel_value_list_to_string(const GList *list)
 {
-
     GString *buffer_string = g_string_new("[");
     const register GList *iter;
     for(iter = list; iter != NULL; iter = iter->next)

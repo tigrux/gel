@@ -15,6 +15,8 @@ struct _GelClosure
 static
 void gel_closure_finalize(GelContext *context, GelClosure *closure)
 {
+    g_return_if_fail(context != NULL);
+
     g_strfreev(closure->vars);
     g_value_array_free(closure->code);
 }
@@ -55,6 +57,10 @@ void gel_closure_marshal(GelClosure *closure, GValue *return_value,
 
 GClosure* gel_closure_new(GelContext *context, gchar **vars, GValueArray *code)
 {
+    g_return_val_if_fail(context != NULL, NULL);
+    g_return_val_if_fail(vars != NULL, NULL);
+    g_return_val_if_fail(code != NULL, NULL);
+
     GClosure *closure =
         g_closure_new_object(sizeof(GelClosure), G_OBJECT(context));
 
@@ -72,6 +78,7 @@ GClosure* gel_closure_new(GelContext *context, gchar **vars, GValueArray *code)
 
 gboolean gel_closure_is_pure(GClosure *closure)
 {
+    g_return_val_if_fail(closure != NULL, FALSE);
     return closure->marshal == (GClosureMarshal)gel_closure_marshal;
 }
 
