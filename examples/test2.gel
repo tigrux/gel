@@ -1,6 +1,6 @@
 
 [def primes-less-than [top]
-    [var sieve [list 2]]
+    [var sieve [array 2]]
     [var n 3]
     [while [<= n top]
         [if [all [lambda [i] [% n i]] sieve]

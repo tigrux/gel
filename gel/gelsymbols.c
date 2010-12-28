@@ -861,9 +861,9 @@ void do_(GClosure *self, GValue *return_value,
 
 
 static
-void list_(GClosure *self, GValue *return_value,
-           guint n_values, const GValue *values,
-           GelContext *context, gpointer marshal_data)
+void array_(GClosure *self, GValue *return_value,
+            guint n_values, const GValue *values,
+            GelContext *context, gpointer marshal_data)
 {
     GValueArray *array = g_value_array_new(n_values);
     register guint i;
@@ -1171,7 +1171,7 @@ void gel_context_add_default_symbols(GelContext *self)
         CLOSURE(case),
         CLOSURE(cond),
         CLOSURE(do),
-        CLOSURE(list),
+        CLOSURE(array),
         CLOSURE(for),
         CLOSURE(while),
         CLOSURE(if),
