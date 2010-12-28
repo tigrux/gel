@@ -211,12 +211,14 @@ GClosure* new_closure(GelContext *context,
                       guint n_values, const GValue *values)
 {
     const guint n_vars = vars_array->n_values;
-    gchar **vars = (gchar**)g_new0(gchar*, n_vars + 1);
+    gchar **const vars = (gchar**)g_new0(gchar*, n_vars + 1);
     gchar *invalid_arg_name = NULL;
+    const GValue *const vars_array_values = vars_array->values;
     register guint i;
+
     for(i = 0; i < n_vars; i++)
     {
-        GValue *value = vars_array->values + i;
+        const GValue *const value = vars_array_values + i;
         if(G_VALUE_HOLDS_STRING(value))
             vars[i] = g_value_dup_string(value);
         else
@@ -444,10 +446,10 @@ void logic(GClosure *self, GValue *return_value,
     {
         GValue tmp1 = {0};
         GValue tmp2 = {0};
-
+        const GValue *const i_value = values + i;
         result = values_function(
-            gel_context_eval_value(context, values + i, &tmp1),
-            gel_context_eval_value(context, values + i+1, &tmp2));
+            gel_context_eval_value(context, i_value, &tmp1),
+            gel_context_eval_value(context, i_value+1, &tmp2));
 
         if(G_IS_VALUE(&tmp1))
             g_value_unset(&tmp1);
@@ -575,11 +577,12 @@ void any_(GClosure *self, GValue *return_value,
         return;
 
     gboolean result = FALSE;
+    const GValue *const array_values = array->values;
     register guint i;
     for(i = 0; i < array->n_values && !result; i++)
     {
         GValue value = {0};
-        g_closure_invoke(closure, &value, 1, array->values + i, context);
+        g_closure_invoke(closure, &value, 1, array_values + i, context);
         result = gel_value_to_boolean(&value);
         g_value_unset(&value);
     }
@@ -614,11 +617,13 @@ void all_(GClosure *self, GValue *return_value,
         return;
 
     gboolean result = TRUE;
+    const guint last = array->n_values;
+    const GValue *const array_values = array->values;
     register guint i;
-    for(i = 0; i < array->n_values && result; i++)
+    for(i = 0; i < last && result; i++)
     {
         GValue value = {0};
-        g_closure_invoke(closure, &value, 1, array->values + i, context);
+        g_closure_invoke(closure, &value, 1, array_values + i, context);
         result = gel_value_to_boolean(&value);
         g_value_unset(&value);
     }
@@ -700,9 +705,11 @@ void tail_(GClosure *self, GValue *return_value,
     {
         const guint tail_len = array->n_values - 1;
         GValueArray *tail = g_value_array_new(tail_len);
+
+        const GValue *const array_values = array->values;
         register guint i;
         for(i = 1; i <= tail_len; i++)
-            g_value_array_append(tail, array->values + i);
+            g_value_array_append(tail, array_values + i);
 
         GValue tmp_value = {0};
         GValue *result_value =
@@ -730,8 +737,8 @@ void len_(GClosure *self, GValue *return_value,
     GList *list = NULL;
     GValueArray *array = NULL;
 
-    if(!gel_context_eval_params(context, __FUNCTION__, &list, "A", &n_values, &values,
-            &array))
+    if(!gel_context_eval_params(context, __FUNCTION__, &list,
+          "A", &n_values, &values, &array))
         return;
 
     GValue tmp_value = {0};
@@ -904,11 +911,13 @@ void for_(GClosure *self, GValue *return_value,
             &symbol, &array))
         return;
 
+    const guint last = array->n_values;
+    const GValue *const array_values = array->values;
     register guint i;
-    for(i = 0; i < array->n_values; i++)
+    for(i = 0; i < last; i++)
     {
         GelContext *inner = gel_context_new_with_outer(context);
-        gel_context_add_symbol(inner, symbol, gel_value_dup(array->values + i));
+        gel_context_add_symbol(inner, symbol, gel_value_dup(array_values + i));
         do_(self, return_value, n_values, values,
             inner, marshal_data);
         gel_context_unref(inner);

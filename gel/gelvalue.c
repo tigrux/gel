@@ -272,10 +272,14 @@ gboolean gel_values_simple_add(const GValue *l_value, const GValue *r_value,
 
                 GValueArray *array = g_value_array_new(l_n_values + r_n_values);
                 register guint i;
+
+                const GValue *const l_array_values = l_array->values;
                 for(i = 0; i < l_n_values; i++)
-                    g_value_array_append(array, l_array->values + i);
+                    g_value_array_append(array, l_array_values + i);
+
+                const GValue *const r_array_values = r_array->values;
                 for(i = 0; i < r_n_values; i++)
-                    g_value_array_append(array, r_array->values + i);
+                    g_value_array_append(array, r_array_values + i);
                 g_value_take_boxed(dest_value, array);
                 return TRUE;
             }

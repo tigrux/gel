@@ -44,7 +44,7 @@ void gel_context_unref(GelContext *self)
 
 static
 void gel_context_invoke_closure(GelContext *self, GClosure *closure,
-                                guint n_values, GValue *values,
+                                guint n_values, const GValue *values,
                                 GValue *dest_value)
 {
     g_return_if_fail(self != NULL);
@@ -75,7 +75,7 @@ void gel_context_invoke_closure(GelContext *self, GClosure *closure,
 
 static
 void gel_context_invoke_type(GelContext *self, GType type,
-                             guint n_values, GValue *values,
+                             guint n_values, const GValue *values,
                              GValue *dest_value)
 {
     g_return_if_fail(self != NULL);
@@ -190,7 +190,7 @@ gboolean gel_context_eval_params(GelContext *self, const gchar *func,
     guint n_args = 0;
     register guint i;
     for(i = 0; format[i] != 0; i++)
-        if(strchr("asOASCV", format[i]) != NULL)
+        if(strchr("asASOCV", format[i]) != NULL)
             n_args++;
 
     gboolean exact = (strchr(format, '*') == NULL);
@@ -207,8 +207,8 @@ gboolean gel_context_eval_params(GelContext *self, const gchar *func,
         return FALSE;
     }
 
-    gboolean parsed = TRUE;
-    gboolean pending = FALSE;
+    register gboolean parsed = TRUE;
+    register gboolean pending = FALSE;
     va_list args;
 
     GList *o_list = *list;
@@ -362,10 +362,11 @@ GValue* gel_context_find_symbol(const GelContext *self, const gchar *name)
     g_return_val_if_fail(self != NULL, NULL);
     g_return_val_if_fail(name != NULL, NULL);
 
+    GelContextPrivate *const self_priv = self->priv;
     GValue *symbol = (GValue*)g_hash_table_lookup(
-        self->priv->symbols, name);
-    if(symbol == NULL && self->priv->outer != NULL)
-        symbol = gel_context_find_symbol(self->priv->outer, name);
+        self_priv->symbols, name);
+    if(symbol == NULL && self_priv->outer != NULL)
+        symbol = gel_context_find_symbol(self_priv->outer, name);
     return symbol;
 }
 
@@ -462,12 +463,13 @@ GObject *gel_context_constructor(GType type,
     GObjectClass *parent_class = G_OBJECT_CLASS(gel_context_parent_class);
     GObject *obj = parent_class->constructor(type, n_properties, properties);
     GelContext *self = GEL_CONTEXT(obj);
+    GelContextPrivate *const self_priv = self->priv;
 
-    self->priv->symbols = g_hash_table_new_full(
+    self_priv->symbols = g_hash_table_new_full(
         g_str_hash, g_str_equal,
         (GDestroyNotify)g_free, (GDestroyNotify)gel_value_free);
 
-    if(self->priv->outer == NULL)
+    if(self_priv->outer == NULL)
         gel_context_add_default_symbols(self);
     return obj;
 }

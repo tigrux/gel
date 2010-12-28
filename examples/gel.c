@@ -15,10 +15,11 @@ void init(GValueArray *array)
     g_signal_connect(G_OBJECT(context), "quit", (GCallback)quit, context);
 
     const guint last = array->n_values;
+    const GValue *const array_values = array->values;
     register guint i;
     for(i = 0; i < last; i++)
     {
-        const GValue *iter_value = array->values + i;
+        const GValue *const iter_value = array_values + i;
         gchar *value_string = gel_value_to_string(iter_value);
         g_print("%s ?\n", value_string);
         g_free(value_string);

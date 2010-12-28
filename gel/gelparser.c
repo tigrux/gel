@@ -219,12 +219,13 @@ gchar* gel_value_array_to_string(const GValueArray *array)
     if(n_values > 0)
     {
         const guint last = n_values - 1;
+        const GValue *const array_values = array->values;
         register guint i;
         for(i = 0; i <= last; i++)
         {
             GValue string_value = {0};
             g_value_init(&string_value, G_TYPE_STRING);
-            if(g_value_transform(array->values + i, &string_value))
+            if(g_value_transform(array_values + i, &string_value))
             {
                 g_string_append(buffer_string,
                     g_value_get_string(&string_value));

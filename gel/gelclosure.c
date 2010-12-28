@@ -33,20 +33,22 @@ void gel_closure_marshal(GelClosure *closure, GValue *return_value,
     GelContext *outer = (GelContext*)closure->closure.data;
     GelContext *context = gel_context_new_with_outer(outer);
 
+    gchar **const closure_vars = closure->vars;
     register guint i;
     for(i = 0; i < n_vars; i++)
         gel_context_add_symbol(context,
-            closure->vars[i], gel_value_dup(param_values + i));
+            closure_vars[i], gel_value_dup(param_values + i));
 
     const guint n_values = closure->code->n_values;
     if(n_values > 0)
     {
         const guint last = n_values - 1;
+        const GValue *const closure_code_values = closure->code->values;
         for(i = 0; i <= last; i++)
         {
             GValue tmp_value = {0};
             const GValue *value = gel_context_eval_value(context,
-                closure->code->values + i, &tmp_value);
+                closure_code_values + i, &tmp_value);
             if(i == last && return_value != NULL)
                 gel_value_copy(value, return_value);
             if(G_IS_VALUE(&tmp_value))
