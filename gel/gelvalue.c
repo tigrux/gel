@@ -82,6 +82,7 @@ gboolean gel_value_copy(const GValue *src_value, GValue *dest_value)
 {
     g_return_val_if_fail(src_value != NULL, FALSE);
     g_return_val_if_fail(dest_value != NULL, FALSE);
+    g_return_val_if_fail(G_IS_VALUE(src_value), FALSE);
 
     gboolean result = TRUE;
 
@@ -120,6 +121,7 @@ gchar* gel_value_to_string(const GValue *value)
 
     gchar *result = NULL;
     GValue string_value = {0};
+
     g_value_init(&string_value, G_TYPE_STRING);
     if(g_value_transform(value, &string_value))
     {

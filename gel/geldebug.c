@@ -9,63 +9,66 @@ const gchar* plural(guint n)
 }
 
 
-void gel_warning_needs_at_least_n_arguments(guint n)
+void gel_warning_needs_at_least_n_arguments(const gchar *func, guint n)
 {
-    g_warning("Needs at least %u argument%s", n, plural(n));
+    g_warning("%s: Needs at least %u argument%s", func, n, plural(n));
 }
 
 
-void gel_warning_needs_n_arguments(guint n)
+void gel_warning_needs_n_arguments(const gchar *func, guint n)
 {
-    g_warning("Needs %u argument%s", n, plural(n));
+    g_warning("%s: %u argument%s", func, n, plural(n));
 }
 
 
-void gel_warning_no_such_property(const gchar *prop_name)
+void gel_warning_no_such_property(const gchar *func, const gchar *prop_name)
 {
-    g_warning("No such property '%s'", prop_name);
+    g_warning("%s: No such property '%s'", func, prop_name);
 }
 
 
-void gel_warning_value_not_of_type(const GValue *value, GType type)
+void gel_warning_value_not_of_type(const gchar *func,
+                                   const GValue *value, GType type)
 {
     gchar *value_string = gel_value_to_string(value);
-    g_warning("'%s' is not of type '%s'", value_string, g_type_name(type));
+    g_warning("%s: '%s' is not of type '%s'", func,
+        value_string, g_type_name(type));
     g_free(value_string);
 }
 
 
-void gel_warning_unknown_symbol(const gchar *symbol)
+void gel_warning_unknown_symbol(const gchar *func, const gchar *symbol)
 {
-    g_warning("Unknown symbol '%s'", symbol);
+    g_warning("%s: Unknown symbol '%s'", func, symbol);
 }
 
 
-void gel_warning_type_not_instantiatable(GType type)
+void gel_warning_type_not_instantiatable(const gchar *func, GType type)
 {
-    g_print("Type %s is not instantiatable", g_type_name(type));
+    g_print("%s: Type %s is not instantiatable", func, g_type_name(type));
 }
 
 
-void gel_warning_invalid_value_for_property(const GValue *value,
+void gel_warning_invalid_value_for_property(const gchar *func,
+                                            const GValue *value,
                                             const GParamSpec *pspec)
 {
     gchar *value_string = gel_value_to_string(value);
-    g_print("'%s' of type '%s' is invalid for property '%s' of type '%s'",
-        value_string, G_VALUE_TYPE_NAME(value),
+    g_print("%s: '%s' of type '%s' is invalid for property '%s' of type '%s'",
+        func, value_string, G_VALUE_TYPE_NAME(value),
         pspec->name, g_type_name(pspec->value_type));
     g_free(value_string);
 }
 
 
-void gel_warning_type_name_invalid(const gchar *name)
+void gel_warning_type_name_invalid(const gchar *func, const gchar *name)
 {
-    g_warning("'%s' is not a registered type", name);
+    g_warning("%s: '%s' is not a registered type", func, name);
 }
 
 
-void gel_warning_invalid_argument_name(const gchar *name)
+void gel_warning_invalid_argument_name(const gchar *func, const gchar *name)
 {
-    g_warning("'%s' is an invalid argument name", name);
+    g_warning("%s: '%s' is an invalid argument name", func, name);
 }
 

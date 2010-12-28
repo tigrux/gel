@@ -1,12 +1,10 @@
 
-[def primes [top]
+[def primes_less_than [top]
     [var sieve [list 2]]
     [var n 3]
     [while [<= n top]
         [if [all [lambda [i] [% n i]] sieve]
-            [= sieve
-                [+ sieve [list n]]
-            ]
+            [append sieve n]
         ]
         [= n [+ n 2]]
     ]
@@ -14,37 +12,36 @@
 ]
 
 [var i 0]
-[for iter [primes 100]
+[for iter [primes_less_than 100]
     [print "Primes[" i "] = " iter]
     [= i [+ i 1]]
 ]
 
 
-[def fact [n]
-    [var result 1]
-    [if [> n 0]
-        [= result
-            [* n [fact [- n 1]]]
-        ]
+[def factorial [n]
+    [cond
+        [<= n 0]
+            1
+        [> n 0]
+            [* n [factorial [- n 1]]]
     ]
-    result
 ]
 
 [var n 10]
-[print "Factorial of " n " is " [fact n]]
+[print "Factorial of " n " is " [factorial n]]
 
 
-[def fib [n]
+[def fibonacci [n]
     [case n
         0 0
         1 1
-          [+ [fib [- n 1]] [fib [- n 2]]]
+          [+ [fibonacci [- n 1]] [fibonacci [- n 2]]]
     ]
 ]
 
 [var i 0]
 [while [le i 10]
-    [print "Fibonacci[" i "] = " [fib i]]
+    [print "Fibonacci[" i "] = " [fibonacci i]]
     [= i [+ i 1]]
 ]
 

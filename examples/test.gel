@@ -17,6 +17,7 @@
 [set box "child" entry]
 
 [var counter 0]
+
 [def button-clicked [widget]
     [print "Previous label " [get widget "label"]]
     [set widget "label" "Thanks!"]

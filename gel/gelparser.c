@@ -222,10 +222,9 @@ gchar* gel_value_array_to_string(const GValueArray *array)
         register guint i;
         for(i = 0; i <= last; i++)
         {
-            GValue *iter_value = array->values + i;
             GValue string_value = {0};
             g_value_init(&string_value, G_TYPE_STRING);
-            if(g_value_transform(iter_value, &string_value))
+            if(g_value_transform(array->values + i, &string_value))
             {
                 g_string_append(buffer_string,
                     g_value_get_string(&string_value));

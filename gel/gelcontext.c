@@ -57,10 +57,11 @@ void gel_context_invoke_closure(GelContext *self, GClosure *closure,
         register guint i;
         for(i = 0; i < n_values; i++)
         {
-            GValue arg_value = {0};
-            gel_context_eval_value(self, values+i, &arg_value);
-            g_value_array_append(array, &arg_value);
-            g_value_unset(&arg_value);
+            GValue tmp_value = {0};
+            g_value_array_append(array,
+                gel_context_eval_value(self, values+i, &tmp_value));
+            if(G_IS_VALUE(&tmp_value))
+                g_value_unset(&tmp_value);
         }
 
         g_closure_invoke(
@@ -98,15 +99,15 @@ void gel_context_invoke_type(GelContext *self, GType type,
 
 
 static
-gboolean gel_context_eval_array(GelContext *self,
-                                const GValueArray *array, GValue *dest_value)
+const GValue* gel_context_eval_array(GelContext *self, const GValueArray *array,
+                                     GValue *dest_value)
 {
-    g_return_val_if_fail(self != NULL, FALSE);
-    g_return_val_if_fail(dest_value != NULL, FALSE);
-    g_return_val_if_fail(array != NULL, FALSE);
-    g_return_val_if_fail(array->n_values > 0, FALSE);
+    g_return_val_if_fail(self != NULL, NULL);
+    g_return_val_if_fail(dest_value != NULL, NULL);
+    g_return_val_if_fail(array != NULL, NULL);
+    g_return_val_if_fail(array->n_values > 0, NULL);
 
-    gboolean result = FALSE;
+    const GValue *result_value = NULL;
 
     if(G_VALUE_HOLDS_STRING(array->values + 0))
     {
@@ -116,63 +117,70 @@ gboolean gel_context_eval_array(GelContext *self,
         {
             gel_context_invoke_type(self, type,
                 array->n_values - 1, array->values + 1, dest_value);
-            result = TRUE;
+            result_value = dest_value;
         }
     }
 
-    GValue first_value = {0};
-    if(!result && gel_context_eval_value(self, array->values + 0, &first_value))
+    if(result_value == NULL)
     {
-        if(G_VALUE_HOLDS(&first_value, G_TYPE_CLOSURE))
+        GValue tmp_value = {0};
+        const GValue *first_value =
+            gel_context_eval_value(self, array->values + 0, &tmp_value);
+
+        if(G_VALUE_HOLDS(first_value, G_TYPE_CLOSURE))
         {
-            GClosure *closure = (GClosure*)g_value_get_boxed(&first_value);
+            GClosure *closure = (GClosure*)g_value_get_boxed(first_value);
             gel_context_invoke_closure(self, closure,
                 array->n_values - 1, array->values + 1, dest_value);
-            result = TRUE;
+            result_value = dest_value;
         }
         else
-            gel_warning_value_not_of_type(&first_value, G_TYPE_CLOSURE);
+            gel_warning_value_not_of_type(__FUNCTION__,
+                first_value, G_TYPE_CLOSURE);
+
+        if(G_IS_VALUE(&tmp_value))
+            g_value_unset(&tmp_value);
     }
-    if(G_IS_VALUE(&first_value))
-        g_value_unset(&first_value);
-    return result;
+
+    return result_value;
 }
 
 
-gboolean gel_context_eval_value(GelContext *self,
-                                const GValue *value, GValue *dest_value)
+const GValue* gel_context_eval_value(GelContext *self,
+                                     const GValue *value, GValue *dest_value)
 {
-    g_return_val_if_fail(self != NULL, FALSE);
-    g_return_val_if_fail(value != NULL, FALSE);
-    g_return_val_if_fail(dest_value != NULL, FALSE);
+    g_return_val_if_fail(self != NULL, NULL);
+    g_return_val_if_fail(value != NULL, NULL);
+    g_return_val_if_fail(dest_value != NULL, NULL);
 
-    gboolean result = FALSE;
+    const GValue *result_value = NULL;
 
     if(G_VALUE_HOLDS(value, G_TYPE_STRING))
     {
         const gchar *symbol_name = g_value_get_string(value);
         GValue *symbol_value = gel_context_find_symbol(self, symbol_name);
-        if(symbol_value != NULL && dest_value != NULL)
-            result = gel_value_copy(symbol_value, dest_value);
+        if(symbol_value != NULL)
+            result_value = symbol_value;
         else
-            gel_warning_unknown_symbol(symbol_name);
+            gel_warning_unknown_symbol(__FUNCTION__, symbol_name);
     }
     else
     if(G_VALUE_HOLDS(value, G_TYPE_VALUE_ARRAY))
     {
         GValueArray *array = (GValueArray*)g_value_get_boxed(value);
-        result = gel_context_eval_array(self, array, dest_value);
+        result_value = gel_context_eval_array(self, array, dest_value);
     }
 
-    if(dest_value != NULL && !G_IS_VALUE(dest_value))
-        gel_value_copy(value, dest_value);
-    return result;
+    if(result_value == NULL)
+        result_value = value;
+
+    return result_value;
 }
 
 
 
-gboolean gel_context_eval_params(GelContext *self, GList **list,
-                                 const gchar *format,
+gboolean gel_context_eval_params(GelContext *self, const gchar *func,
+                                 GList **list, const gchar *format,
                                  guint *n_values, const GValue **values, ...)
 {
     g_return_val_if_fail(self != NULL, FALSE);
@@ -182,20 +190,20 @@ gboolean gel_context_eval_params(GelContext *self, GList **list,
     guint n_args = 0;
     register guint i;
     for(i = 0; format[i] != 0; i++)
-        if(strchr("OaAsSCV", format[i]) != NULL)
+        if(strchr("asOASCV", format[i]) != NULL)
             n_args++;
 
     gboolean exact = (strchr(format, '*') == NULL);
 
     if(exact && n_args != *n_values)
     {
-        gel_warning_needs_n_arguments(n_args);
+        gel_warning_needs_n_arguments(func, n_args);
         return FALSE;
     }
 
     if(!exact && n_args > *n_values)
     {
-        gel_warning_needs_at_least_n_arguments(n_args);
+        gel_warning_needs_at_least_n_arguments(func, n_args);
         return FALSE;
     }
 
@@ -208,27 +216,13 @@ gboolean gel_context_eval_params(GelContext *self, GList **list,
     const GValue *o_values = *values;
 
     va_start(args, values);
-    while(*format != 0 && *n_values >= 0 && parsed)
+    while(*format != 0 && *n_values >= 0 && parsed && !pending)
     {
         GValue *value = NULL;
+        const GValue *result_value = NULL;
+
         switch(*format)
         {
-            case 'O':
-                value = gel_value_new();
-                gel_context_eval_value(self, *values, value);
-                if(G_VALUE_HOLDS_OBJECT(value))
-                {
-                    *list = g_list_append(*list, value);
-                    GObject **obj = va_arg(args, GObject **);
-                    *obj = (GObject*)g_value_get_object(value);
-                }
-                else
-                {
-                    gel_warning_value_not_of_type(value, G_TYPE_OBJECT);
-                    gel_value_free(value);
-                    parsed = FALSE;
-                }
-                break;
             case 'a':
                 if(G_VALUE_HOLDS(*values, G_TYPE_VALUE_ARRAY))
                 {
@@ -237,23 +231,8 @@ gboolean gel_context_eval_params(GelContext *self, GList **list,
                 }
                 else
                 {
-                    gel_warning_value_not_of_type(value, G_TYPE_VALUE_ARRAY);
-                    parsed = FALSE;
-                }
-                break;
-            case 'A':
-                value = gel_value_new();
-                gel_context_eval_value(self, *values, value);
-                if(G_VALUE_HOLDS(value, G_TYPE_VALUE_ARRAY))
-                {
-                    GValueArray **a = va_arg(args, GValueArray **);
-                    *a = (GValueArray*)g_value_get_boxed(value);
-                    *list = g_list_append(*list, value);
-                }
-                else
-                {
-                    gel_warning_value_not_of_type(value, G_TYPE_VALUE_ARRAY);
-                    gel_value_free(value);
+                    gel_warning_value_not_of_type(func,
+                        value, G_TYPE_VALUE_ARRAY);
                     parsed = FALSE;
                 }
                 break;
@@ -265,55 +244,83 @@ gboolean gel_context_eval_params(GelContext *self, GList **list,
                 }
                 else
                 {
-                    gel_warning_value_not_of_type(value, G_TYPE_STRING);
+                    gel_warning_value_not_of_type(func,
+                        value, G_TYPE_STRING);
+                    parsed = FALSE;
+                }
+                break;
+            case 'O':
+                value = gel_value_new();
+                result_value = gel_context_eval_value(self, *values, value);
+                if(G_VALUE_HOLDS_OBJECT(result_value))
+                {
+                    GObject **obj = va_arg(args, GObject **);
+                    *obj = (GObject*)g_value_get_object(result_value);
+                }
+                else
+                {
+                    gel_warning_value_not_of_type(func,
+                        result_value, G_TYPE_OBJECT);
+                    parsed = FALSE;
+                }
+                break;
+            case 'A':
+                value = gel_value_new();
+                result_value = gel_context_eval_value(self, *values, value);
+                if(G_VALUE_HOLDS(result_value, G_TYPE_VALUE_ARRAY))
+                {
+                    GValueArray **a = va_arg(args, GValueArray **);
+                    *a = (GValueArray*)g_value_get_boxed(result_value);
+                }
+                else
+                {
+                    gel_warning_value_not_of_type(func,
+                        result_value, G_TYPE_VALUE_ARRAY);
                     parsed = FALSE;
                 }
                 break;
             case 'S':
                 value = gel_value_new();
-                gel_context_eval_value(self, *values, value);
-                if(G_VALUE_HOLDS_STRING(value))
+                result_value = gel_context_eval_value(self, *values, value);
+                if(G_VALUE_HOLDS_STRING(result_value))
                 {
                     const gchar **s = va_arg(args, const gchar **);
-                    *s = g_value_get_string(value);
-                    *list = g_list_append(*list, value);
+                    *s = g_value_get_string(result_value);
                 }
                 else
                 {
-                    gel_warning_value_not_of_type(value, G_TYPE_STRING);
-                    gel_value_free(value);
+                    gel_warning_value_not_of_type(func,
+                        result_value, G_TYPE_STRING);
                     parsed = FALSE;
                 }
                 break;
             case 'C':
                 value = gel_value_new();
-                gel_context_eval_value(self, *values, value);
-                if(G_VALUE_HOLDS(value, G_TYPE_CLOSURE))
+                result_value = gel_context_eval_value(self, *values, value);
+                if(G_VALUE_HOLDS(result_value, G_TYPE_CLOSURE))
                 {
-                    *list = g_list_append(*list, value);
                     GClosure **closure = va_arg(args, GClosure **);
-                    *closure = (GClosure*)g_value_get_boxed(value);
+                    *closure = (GClosure*)g_value_get_boxed(result_value);
                 }
                 else
                 {
-                    gel_warning_value_not_of_type(value, G_TYPE_STRING);
-                    gel_value_free(value);
+                    gel_warning_value_not_of_type(func,
+                        result_value, G_TYPE_STRING);
                     parsed = FALSE;
                 }
                 break;
             case 'V':
                 value = gel_value_new();
-                gel_context_eval_value(self, *values, value);
-                if(G_IS_VALUE(value))
+                result_value = gel_context_eval_value(self, *values, value);
+                if(G_IS_VALUE(result_value))
                 {
-                    GValue **v = va_arg(args, GValue **);
-                    *v = value;
-                    *list = g_list_append(*list, value);
+                    const GValue **v = va_arg(args, const GValue **);
+                    *v = result_value;
                 }
                 else
                 {
-                    gel_warning_value_not_of_type(value, G_TYPE_VALUE);
-                    gel_value_free(value);
+                    gel_warning_value_not_of_type(func,
+                        result_value, G_TYPE_VALUE);
                     parsed = FALSE;
                 }
                 break;
@@ -322,14 +329,20 @@ gboolean gel_context_eval_params(GelContext *self, GList **list,
                 break;
         }
 
+        if(value != NULL)
+        {
+            if(parsed && result_value == value)
+                *list = g_list_append(*list, value);
+            else
+                gel_value_free(value);
+        }
+
         if(parsed && !pending)
         {
             format++;
             (*values)++;
             (*n_values)--;
         }
-        else
-            break;
     }
     va_end(args);
 

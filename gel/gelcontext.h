@@ -46,11 +46,11 @@ void gel_context_add_object(GelContext *self, const gchar *name, GObject *obj);
 void gel_context_add_default_symbols(GelContext *self);
 void gel_context_remove_symbol(GelContext *self, const gchar *name);
 
-gboolean gel_context_eval_value(GelContext *self,
-                                const GValue *value, GValue *dest_value);
+const GValue* gel_context_eval_value(GelContext *self,
+                                     const GValue *value, GValue *dest_value);
 
-gboolean gel_context_eval_params(GelContext *self, GList **list,
-                                 const gchar *format,
+gboolean gel_context_eval_params(GelContext *self, const gchar *func,
+                                 GList **list, const gchar *format,
                                  guint *n_values, const GValue **values, ...);
 
 

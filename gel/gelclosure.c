@@ -44,11 +44,13 @@ void gel_closure_marshal(GelClosure *closure, GValue *return_value,
         const guint last = n_values - 1;
         for(i = 0; i <= last; i++)
         {
-            GValue value = {0};
-            gel_context_eval_value(context, closure->code->values + i, &value);
+            GValue tmp_value = {0};
+            const GValue *value = gel_context_eval_value(context,
+                closure->code->values + i, &tmp_value);
             if(i == last && return_value != NULL)
-                gel_value_copy(&value, return_value);
-            g_value_unset(&value);
+                gel_value_copy(value, return_value);
+            if(G_IS_VALUE(&tmp_value))
+                g_value_unset(&tmp_value);
         }
     }
     gel_context_unref(context);

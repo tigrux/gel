@@ -23,12 +23,17 @@ void init(GValueArray *array)
         g_print("%s ?\n", value_string);
         g_free(value_string);
 
-        GValue dest_value = {0};
-        gel_context_eval_value(context, iter_value, &dest_value);
-        value_string = gel_value_to_string(&dest_value);
-        g_print("= %s\n\n", value_string);
-        g_free(value_string);
-        g_value_unset(&dest_value);
+        GValue tmp_value = {0};
+        const GValue *value =
+            gel_context_eval_value(context, iter_value, &tmp_value);
+        if(G_IS_VALUE(value))
+        {
+            value_string = gel_value_to_string(value);
+            g_print("= %s\n\n", value_string);
+            g_free(value_string);
+        }
+        if(G_IS_VALUE(&tmp_value))
+            g_value_unset(&tmp_value);
     }
     g_value_array_free(array);
 }
