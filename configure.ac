@@ -19,11 +19,16 @@ PKG_CHECK_MODULES(GTK, gtk+-2.0)
 AC_SUBST(GTK_CFLAGS)
 AC_SUBST(GTK_LIBS)
 
+GTK_DOC_CHECK([1.14],[--flavour no-tmpl])
+
 AC_CONFIG_FILES([
 	Makefile
 	gel/Makefile
 	examples/Makefile
 	gel-0.1.pc
+	docs/Makefile
+	docs/reference/Makefile
+	docs/reference/gel/Makefile
 	])
 
 AC_OUTPUT
