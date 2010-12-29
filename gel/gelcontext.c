@@ -148,6 +148,25 @@ const GValue* gel_context_eval_array(GelContext *self, const GValueArray *array,
 }
 
 
+gboolean gel_context_eval(GelContext *self, 
+                          const GValue *value, GValue *dest_value)
+{
+    g_return_val_if_fail(self != NULL, FALSE);
+    g_return_val_if_fail(value != NULL, FALSE);
+    g_return_val_if_fail(dest_value != NULL, FALSE);
+
+    const GValue *result_value =
+        gel_context_eval_value(self, value, dest_value);
+    if(G_IS_VALUE(result_value))
+    {
+        if(result_value != dest_value)
+            gel_value_copy(result_value, dest_value);
+        return TRUE;
+    }
+    return FALSE;
+}
+
+
 const GValue* gel_context_eval_value(GelContext *self,
                                      const GValue *value, GValue *dest_value)
 {

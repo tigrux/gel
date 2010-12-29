@@ -26,17 +26,14 @@ void init(GValueArray *array)
         g_print("%s ?\n", escaped_string);
         g_free(escaped_string);
 
-        GValue tmp_value = {0};
-        const GValue *value =
-            gel_context_eval_value(context, iter_value, &tmp_value);
-        if(G_IS_VALUE(value))
+        GValue result_value = {0};
+        if(gel_context_eval(context, iter_value, &result_value))
         {
-            value_string = gel_value_to_string(value);
+            value_string = gel_value_to_string(&result_value);
+            g_value_unset(&result_value);
             g_print("= %s\n\n", value_string);
             g_free(value_string);
         }
-        if(G_IS_VALUE(&tmp_value))
-            g_value_unset(&tmp_value);
     }
     g_value_array_free(array);
 }
