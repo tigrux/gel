@@ -53,7 +53,7 @@ void gel_context_invoke_closure(GelContext *self, GClosure *closure,
 
     if(gel_closure_is_pure(closure))
     {
-        GValueArray *array = g_value_array_new(n_values);
+        GValueArray *const array = g_value_array_new(n_values);
         register guint i;
         for(i = 0; i < n_values; i++)
         {
@@ -65,7 +65,7 @@ void gel_context_invoke_closure(GelContext *self, GClosure *closure,
         }
 
         g_closure_invoke(
-            closure, dest_value, array->n_values, array->values, self);
+            closure, dest_value, n_values, array->values, self);
         g_value_array_free(array);
     }
     else
@@ -105,18 +105,20 @@ const GValue* gel_context_eval_array(GelContext *self, const GValueArray *array,
     g_return_val_if_fail(self != NULL, NULL);
     g_return_val_if_fail(dest_value != NULL, NULL);
     g_return_val_if_fail(array != NULL, NULL);
-    g_return_val_if_fail(array->n_values > 0, NULL);
+    const guint array_n_values = array->n_values;
+    g_return_val_if_fail(array_n_values > 0, NULL);
 
     const GValue *result_value = NULL;
+    const GValue *const array_values = array->values;
 
-    if(G_VALUE_HOLDS_STRING(array->values + 0))
+    if(G_VALUE_HOLDS_STRING(array_values + 0))
     {
-        const gchar *type_name = g_value_get_string(array->values + 0);
+        const gchar *type_name = g_value_get_string(array_values + 0);
         GType type = g_type_from_name(type_name);
         if(type != G_TYPE_INVALID)
         {
             gel_context_invoke_type(self, type,
-                array->n_values - 1, array->values + 1, dest_value);
+                array_n_values -1 , array_values + 1, dest_value);
             result_value = dest_value;
         }
     }
@@ -125,13 +127,13 @@ const GValue* gel_context_eval_array(GelContext *self, const GValueArray *array,
     {
         GValue tmp_value = {0};
         const GValue *first_value =
-            gel_context_eval_value(self, array->values + 0, &tmp_value);
+            gel_context_eval_value(self, array_values + 0, &tmp_value);
 
         if(G_VALUE_HOLDS(first_value, G_TYPE_CLOSURE))
         {
             GClosure *closure = (GClosure*)g_value_get_boxed(first_value);
             gel_context_invoke_closure(self, closure,
-                array->n_values - 1, array->values + 1, dest_value);
+                array_n_values - 1, array_values + 1, dest_value);
             result_value = dest_value;
         }
         else
