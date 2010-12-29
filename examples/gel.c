@@ -21,8 +21,10 @@ void init(GValueArray *array)
     {
         const GValue *const iter_value = array_values + i;
         gchar *value_string = gel_value_to_string(iter_value);
-        g_print("%s ?\n", value_string);
+        gchar *escaped_string = g_strescape(value_string, NULL);
         g_free(value_string);
+        g_print("%s ?\n", escaped_string);
+        g_free(escaped_string);
 
         GValue tmp_value = {0};
         const GValue *value =

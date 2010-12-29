@@ -19,7 +19,7 @@
     [= i [+ i 1]]
 ]
 
-[print "The first prime is " [nth first-primes 0]]
+[print "\nThe first prime is " [nth first-primes 0]]
 [print "The last prime is " [nth first-primes -1]]
 
 
