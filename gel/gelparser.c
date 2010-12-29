@@ -6,36 +6,30 @@
 GType gel_value_array_get_type(void);
 
 
-GValueArray* gel_parse_file(const gchar *file, GError *error)
+static
+GValueArray* gel_parse_strings(const char *first, ...)
 {
-    gchar *content;
-    gsize content_len;
-    if(!g_file_get_contents(file, &content, &content_len, &error))
-        return NULL;
+    GValueArray *array = g_value_array_new(ARRAY_N_PREALLOCATED);
+    va_list vl;
 
-    GValueArray *array = gel_parse_string(content, content_len);
-    g_free(content);
-    return array;
-}
-
-
-GValueArray* gel_parse_string(const gchar *text, guint text_len)
-{
-    GScanner *scanner = g_scanner_new(NULL);
-
-    scanner->config->cset_identifier_nth =
-        (gchar*)G_CSET_a_2_z G_CSET_A_2_Z "_-0123456789";
-    scanner->config->scan_identifier_1char = TRUE;
-    g_scanner_input_text(scanner, text, text_len);
-
-    GValueArray *array = gel_parse_scanner(scanner);
-    g_scanner_destroy(scanner);
+    register const char *arg;
+    va_start(vl, first);
+    for(arg = first; arg != NULL; arg = va_arg(vl, const char*))
+    {
+        GValue value = {0};
+        g_value_init(&value, G_TYPE_STRING);
+        g_value_set_string(&value, arg);
+        g_value_array_append(array, &value);
+        g_value_unset(&value);
+    }
+    va_end(vl);
 
     return array;
 }
 
 
-static const gchar *scanner_errors[] = {
+static
+const gchar *scanner_errors[] = {
     "Unknown error",
     "Unexpected end of file",
     "Unterminated string constant",
@@ -47,6 +41,7 @@ static const gchar *scanner_errors[] = {
 };
 
 
+static
 GValueArray* gel_parse_scanner(GScanner *scanner)
 {
     GValueArray *array = NULL;
@@ -187,27 +182,36 @@ GValueArray* gel_parse_scanner(GScanner *scanner)
 }
 
 
-GValueArray* gel_parse_strings(const char *first, ...)
+GValueArray* gel_parse_file(const gchar *file, GError *error)
 {
-    GValueArray *array = g_value_array_new(ARRAY_N_PREALLOCATED);
-    va_list vl;
+    gchar *content;
+    gsize content_len;
+    if(!g_file_get_contents(file, &content, &content_len, &error))
+        return NULL;
 
-    register const char *arg;
-    va_start(vl, first);
-    for(arg = first; arg != NULL; arg = va_arg(vl, const char*))
-    {
-        GValue value = {0};
-        g_value_init(&value, G_TYPE_STRING);
-        g_value_set_string(&value, arg);
-        g_value_array_append(array, &value);
-        g_value_unset(&value);
-    }
-    va_end(vl);
+    GValueArray *array = gel_parse_string(content, content_len);
+    g_free(content);
+    return array;
+}
+
+
+GValueArray* gel_parse_string(const gchar *text, guint text_len)
+{
+    GScanner *scanner = g_scanner_new(NULL);
+
+    scanner->config->cset_identifier_nth =
+        (gchar*)G_CSET_a_2_z G_CSET_A_2_Z "_-0123456789";
+    scanner->config->scan_identifier_1char = TRUE;
+    g_scanner_input_text(scanner, text, text_len);
+
+    GValueArray *array = gel_parse_scanner(scanner);
+    g_scanner_destroy(scanner);
 
     return array;
 }
 
 
+static
 gchar* gel_value_array_to_string(const GValueArray *array)
 {
     GString *buffer_string = g_string_new("[");
