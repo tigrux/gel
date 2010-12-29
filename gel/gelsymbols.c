@@ -363,11 +363,14 @@ void print_(GClosure *self, GValue *return_value,
             GValue tmp_value = {0};
             const GValue *value =
                 gel_context_eval_value(context, values + i, &tmp_value);
-            gchar *value_string = gel_value_to_string(value);
+            if(G_IS_VALUE(value))
+            {
+                gchar *value_string = gel_value_to_string(value);
+                g_print("%s", value_string);
+                g_free(value_string);
+            }
             if(G_IS_VALUE(&tmp_value))
                 g_value_unset(&tmp_value);
-            g_print("%s", value_string);
-            g_free(value_string);
         }
         g_print("\n");
     }
@@ -666,6 +669,35 @@ void append_(GClosure *self, GValue *return_value,
         if(G_IS_VALUE(&tmp))
             g_value_unset(&tmp);
     }
+
+    gel_value_list_free(list);
+}
+
+
+static
+void nth_(GClosure *self, GValue *return_value,
+          guint n_values, const GValue *values,
+          GelContext *context, gpointer marshal_data)
+{
+    GList *list = NULL;
+    GValueArray *array = NULL;
+    glong index = 0;
+
+    if(!gel_context_eval_params(context, __FUNCTION__, &list,
+            "AI", &n_values, &values, &array, &index))
+        return;
+
+    const guint array_n_values = array->n_values;
+    if(index < 0)
+        index += array_n_values;
+
+    if(index < 0 || index >= array_n_values)
+    {
+        g_warning("%s: Index out of bounds", __FUNCTION__);
+        return;
+    }
+
+    gel_value_copy(array->values + index, return_value);
 
     gel_value_list_free(list);
 }
@@ -1197,6 +1229,7 @@ void gel_context_add_default_symbols(GelContext *self)
         CLOSURE(any),
         CLOSURE(all),
         CLOSURE(append),
+        CLOSURE(nth),
         CLOSURE(head),
         CLOSURE(tail),
         CLOSURE(len),

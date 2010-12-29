@@ -192,7 +192,7 @@ gboolean gel_context_eval_params(GelContext *self, const gchar *func,
     guint n_args = 0;
     register guint i;
     for(i = 0; format[i] != 0; i++)
-        if(strchr("asASOCV", format[i]) != NULL)
+        if(strchr("asASIOCV", format[i]) != NULL)
             n_args++;
 
     gboolean exact = (strchr(format, '*') == NULL);
@@ -293,6 +293,21 @@ gboolean gel_context_eval_params(GelContext *self, const gchar *func,
                 {
                     gel_warning_value_not_of_type(func,
                         result_value, G_TYPE_STRING);
+                    parsed = FALSE;
+                }
+                break;
+            case 'I':
+                value = gel_value_new();
+                result_value = gel_context_eval_value(self, *values, value);
+                if(G_VALUE_HOLDS_LONG(result_value))
+                {
+                    glong *i = va_arg(args, glong *);
+                    *i = g_value_get_long(result_value);
+                }
+                else
+                {
+                    gel_warning_value_not_of_type(func,
+                        result_value, G_TYPE_LONG);
                     parsed = FALSE;
                 }
                 break;

@@ -11,11 +11,16 @@
     sieve
 ]
 
+[var first-primes [primes-less-than 100]]
+
 [var i 0]
-[for iter [primes-less-than 100]
+[for iter first-primes
     [print "Primes[" i "] = " iter]
     [= i [+ i 1]]
 ]
+
+[print "The first prime is " [nth first-primes 0]]
+[print "The last prime is " [nth first-primes -1]]
 
 
 [def factorial [n]
