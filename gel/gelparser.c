@@ -1,9 +1,7 @@
 #include <gelparser.h>
-#include <gelvaluelist.h>
-#include <gelvalue.h>
 
 #define GEL_TYPE_VALUE_ARRAY (gel_value_array_get_type())
-
+#define ARRAY_N_PREALLOCATED 8
 
 GType gel_value_array_get_type(void);
 
@@ -51,40 +49,38 @@ static const gchar *scanner_errors[] = {
 
 GValueArray* gel_parse_scanner(GScanner *scanner)
 {
-    GList *list = NULL;
+    GValueArray *array = NULL;
     gint sign = 1;
 
     register gboolean parsing = TRUE;
     while(parsing)
     {
-        GValue *value = NULL;
+        GValue value = {0};
         GTokenType token = g_scanner_peek_next_token(scanner);
 
         switch(token)
         {
             case G_TOKEN_IDENTIFIER:
                 g_scanner_get_next_token(scanner);
-                value = gel_value_new_of_type(G_TYPE_STRING);
-                g_value_set_string(value, scanner->value.v_identifier);
+                g_value_init(&value, G_TYPE_STRING);
+                g_value_set_string(&value, scanner->value.v_identifier);
                 break;
             case G_TOKEN_FLOAT:
                 g_scanner_get_next_token(scanner);
-                value = gel_value_new_of_type(G_TYPE_DOUBLE);
-                g_value_set_double(value, scanner->value.v_float * sign);
+                g_value_init(&value, G_TYPE_DOUBLE);
+                g_value_set_double(&value, scanner->value.v_float * sign);
                 sign = 1;
                 break;
             case G_TOKEN_INT:
                 g_scanner_get_next_token(scanner);
-                value = gel_value_new_of_type(G_TYPE_LONG);
-                g_value_set_long(value, scanner->value.v_int * sign);
+                g_value_init(&value, G_TYPE_LONG);
+                g_value_set_long(&value, scanner->value.v_int * sign);
                 sign = 1;
                 break;
             case '[':
                 g_scanner_get_next_token(scanner);
-                value = gel_value_new_of_type(GEL_TYPE_VALUE_ARRAY);
-                g_value_take_boxed(
-                    value,
-                    gel_parse_scanner(scanner));
+                g_value_init(&value, GEL_TYPE_VALUE_ARRAY);
+                g_value_take_boxed(&value, gel_parse_scanner(scanner));
                 break;
             case ']':
                 g_scanner_get_next_token(scanner);
@@ -93,63 +89,68 @@ GValueArray* gel_parse_scanner(GScanner *scanner)
                 break;
             case G_TOKEN_STRING:
                 g_scanner_get_next_token(scanner);
-                value = gel_value_new_of_type(GEL_TYPE_VALUE_ARRAY);
-                g_value_take_boxed(
-                    value,
-                    gel_parse_strings(
-                        "quote", scanner->value.v_string, NULL));
+                g_value_init(&value, GEL_TYPE_VALUE_ARRAY);
+                g_value_take_boxed(&value,
+                    gel_parse_strings("quote", scanner->value.v_string, NULL));
                 break;
             case '=':
                 g_scanner_get_next_token(scanner);
-                value = gel_value_new_from_static_string("let");
+                g_value_init(&value, G_TYPE_STRING);
+                g_value_set_static_string(&value, "let");
                 break;
             case '+':
                 g_scanner_get_next_token(scanner);
-                value = gel_value_new_from_static_string("add");
+                g_value_init(&value, G_TYPE_STRING);
+                g_value_set_static_string(&value, "add");
                 break;
             case '*':
                 g_scanner_get_next_token(scanner);
-                value = gel_value_new_from_static_string("mul");
+                g_value_init(&value, G_TYPE_STRING);
+                g_value_set_static_string(&value, "mul");
                 break;
             case '/':
                 g_scanner_get_next_token(scanner);
-                value = gel_value_new_from_static_string("div");
+                g_value_init(&value, G_TYPE_STRING);
+                g_value_set_static_string(&value, "div");
                 break;
             case '%':
                 g_scanner_get_next_token(scanner);
-                value = gel_value_new_from_static_string("mod");
+                g_value_init(&value, G_TYPE_STRING);
+                g_value_set_static_string(&value, "mod");
                 break;
             case '&':
                 g_scanner_get_next_token(scanner);
-                value = gel_value_new_from_static_string("and");
+                g_value_init(&value, G_TYPE_STRING);
+                g_value_set_static_string(&value, "and");
                 break;
             case '|':
                 g_scanner_get_next_token(scanner);
-                value = gel_value_new_from_static_string("or");
+                g_value_init(&value, G_TYPE_STRING);
+                g_value_set_static_string(&value, "or");
                 break;
             case '<':
                 g_scanner_get_next_token(scanner);
-                value = gel_value_new_of_type(G_TYPE_STRING);
+                g_value_init(&value, G_TYPE_STRING);
                 token = g_scanner_peek_next_token(scanner);
                 if(token == '=')
                 {
                     g_scanner_get_next_token(scanner);
-                    g_value_set_static_string(value, "le");
+                    g_value_set_static_string(&value, "le");
                 }
                 else
-                 g_value_set_static_string(value, "lt");
+                    g_value_set_static_string(&value, "lt");
                 break;
             case '>':
                 g_scanner_get_next_token(scanner);
-                value = gel_value_new_of_type(G_TYPE_STRING);
+                g_value_init(&value, G_TYPE_STRING);
                 token = g_scanner_peek_next_token(scanner);
                 if(token == '=')
                 {
                     g_scanner_get_next_token(scanner);
-                    g_value_set_static_string(value, "ge");
+                    g_value_set_static_string(&value, "ge");
                 }
                 else
-                    g_value_set_static_string(value, "gt");
+                    g_value_set_static_string(&value, "gt");
                 break;
             case '-':
                 g_scanner_get_next_token(scanner);
@@ -157,7 +158,10 @@ GValueArray* gel_parse_scanner(GScanner *scanner)
                 if(token == G_TOKEN_INT || token == G_TOKEN_FLOAT)
                     sign = -sign;
                 else
-                    value = gel_value_new_from_static_string("sub");
+                {
+                    g_value_init(&value, G_TYPE_STRING);
+                    g_value_set_static_string(&value, "sub");
+                }
                 break;
             case G_TOKEN_ERROR:
                 g_scanner_get_next_token(scanner);
@@ -170,34 +174,36 @@ GValueArray* gel_parse_scanner(GScanner *scanner)
                 g_scanner_get_next_token(scanner);
         }
 
-        if(value != NULL)
-            list = g_list_append(list, value);
+        if(G_IS_VALUE(&value))
+        {
+            if(array == NULL)
+                array = g_value_array_new(ARRAY_N_PREALLOCATED);
+            g_value_array_append(array, &value);
+            g_value_unset(&value);
+        }
     }
 
-
-    GValueArray *array = gel_value_list_to_array(list);
-    gel_value_list_free(list);
     return array;
 }
 
 
 GValueArray* gel_parse_strings(const char *first, ...)
 {
-    GList *list = NULL;
+    GValueArray *array = g_value_array_new(ARRAY_N_PREALLOCATED);
     va_list vl;
 
     register const char *arg;
     va_start(vl, first);
     for(arg = first; arg != NULL; arg = va_arg(vl, const char*))
     {
-        GValue *value = gel_value_new_of_type(G_TYPE_STRING);
-        g_value_set_string(value, arg);
-        list = g_list_append(list, value);
+        GValue value = {0};
+        g_value_init(&value, G_TYPE_STRING);
+        g_value_set_string(&value, arg);
+        g_value_array_append(array, &value);
+        g_value_unset(&value);
     }
     va_end(vl);
 
-    GValueArray *array = gel_value_list_to_array(list);
-    gel_value_list_free(list);
     return array;
 }
 
