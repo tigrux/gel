@@ -238,7 +238,8 @@ gchar* gel_value_array_to_string(const GValueArray *array)
 
 
 static
-void gel_value_array_to_string_transform(const GValue *src_value, GValue *dest_value)
+void gel_value_array_to_string_transform(const GValue *src_value,
+                                         GValue *dest_value)
 {
     const GValueArray *array = (GValueArray*)g_value_get_boxed(src_value);
     g_value_take_string(dest_value, gel_value_array_to_string(array));
