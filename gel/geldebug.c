@@ -72,3 +72,9 @@ void gel_warning_invalid_argument_name(const gchar *func, const gchar *name)
     g_warning("%s: '%s' is an invalid argument name", func, name);
 }
 
+
+void gel_warning_index_out_of_bounds(const gchar *func)
+{
+    g_warning("%s: Index out of bounds", func);
+}
+

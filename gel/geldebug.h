@@ -25,5 +25,7 @@ void gel_warning_type_name_invalid(const gchar *func, const gchar *name);
 
 void gel_warning_invalid_argument_name(const gchar *func, const gchar *name);
 
+void gel_warning_index_out_of_bounds(const gchar *func);
+
 
 #endif

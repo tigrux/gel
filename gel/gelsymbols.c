@@ -693,11 +693,40 @@ void nth_(GClosure *self, GValue *return_value,
 
     if(index < 0 || index >= array_n_values)
     {
-        g_warning("%s: Index out of bounds", __FUNCTION__);
+        gel_warning_index_out_of_bounds(__FUNCTION__);
         return;
     }
 
     gel_value_copy(array->values + index, return_value);
+
+    gel_value_list_free(list);
+}
+
+
+static
+void remove_(GClosure *self, GValue *return_value,
+             guint n_values, const GValue *values,
+             GelContext *context, gpointer marshal_data)
+{
+    GList *list = NULL;
+    GValueArray *array = NULL;
+    glong index = 0;
+
+    if(!gel_context_eval_params(context, __FUNCTION__, &list,
+            "AI", &n_values, &values, &array, &index))
+        return;
+
+    const guint array_n_values = array->n_values;
+    if(index < 0)
+        index += array_n_values;
+
+    if(index < 0 || index >= array_n_values)
+    {
+        gel_warning_index_out_of_bounds(__FUNCTION__);
+        return;
+    }
+
+    g_value_array_remove(array, index);
 
     gel_value_list_free(list);
 }
@@ -1230,6 +1259,7 @@ void gel_context_add_default_symbols(GelContext *self)
         CLOSURE(all),
         CLOSURE(append),
         CLOSURE(nth),
+        CLOSURE(remove),
         CLOSURE(head),
         CLOSURE(tail),
         CLOSURE(len),
