@@ -51,6 +51,14 @@ GValue* gel_value_new_closure_from_marshall(GClosureMarshal value_marshal,
 }
 
 
+GValue* gel_value_new_from_static_string(const gchar *value_string)
+{
+    GValue *value = gel_value_new_of_type(G_TYPE_STRING);
+    g_value_set_static_string(value, value_string);
+    return value;
+}
+
+
 GValue* gel_value_new_from_boolean(gboolean value_boolean)
 {
     GValue *value = gel_value_new_of_type(G_TYPE_BOOLEAN);

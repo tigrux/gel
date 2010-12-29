@@ -101,38 +101,31 @@ GValueArray* gel_parse_scanner(GScanner *scanner)
                 break;
             case '=':
                 g_scanner_get_next_token(scanner);
-                value = gel_value_new_of_type(G_TYPE_STRING);
-                g_value_set_static_string(value, "let");
+                value = gel_value_new_from_static_string("let");
                 break;
             case '+':
                 g_scanner_get_next_token(scanner);
-                value = gel_value_new_of_type(G_TYPE_STRING);
-                g_value_set_static_string(value, "add");
+                value = gel_value_new_from_static_string("add");
                 break;
             case '*':
                 g_scanner_get_next_token(scanner);
-                value = gel_value_new_of_type(G_TYPE_STRING);
-                g_value_set_static_string(value, "mul");
+                value = gel_value_new_from_static_string("mul");
                 break;
             case '/':
                 g_scanner_get_next_token(scanner);
-                value = gel_value_new_of_type(G_TYPE_STRING);
-                g_value_set_static_string(value, "div");
+                value = gel_value_new_from_static_string("div");
                 break;
             case '%':
                 g_scanner_get_next_token(scanner);
-                value = gel_value_new_of_type(G_TYPE_STRING);
-                g_value_set_static_string(value, "mod");
+                value = gel_value_new_from_static_string("mod");
                 break;
             case '&':
                 g_scanner_get_next_token(scanner);
-                value = gel_value_new_of_type(G_TYPE_STRING);
-                g_value_set_static_string(value, "and");
+                value = gel_value_new_from_static_string("and");
                 break;
             case '|':
                 g_scanner_get_next_token(scanner);
-                value = gel_value_new_of_type(G_TYPE_STRING);
-                g_value_set_static_string(value, "or");
+                value = gel_value_new_from_static_string("or");
                 break;
             case '<':
                 g_scanner_get_next_token(scanner);
@@ -164,10 +157,7 @@ GValueArray* gel_parse_scanner(GScanner *scanner)
                 if(token == G_TOKEN_INT || token == G_TOKEN_FLOAT)
                     sign = -sign;
                 else
-                {
-                    value = gel_value_new_of_type(G_TYPE_STRING);
-                    g_value_set_static_string(value, "sub");
-                }
+                    value = gel_value_new_from_static_string("sub");
                 break;
             case G_TOKEN_ERROR:
                 g_scanner_get_next_token(scanner);

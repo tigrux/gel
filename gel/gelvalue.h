@@ -9,6 +9,7 @@ GValue* gel_value_new_of_type(GType type);
 GValue* gel_value_new_from_closure(GClosure *closure);
 GValue* gel_value_new_closure_from_marshall(GClosureMarshal value_marshal,
                                             GObject *self);
+GValue* gel_value_new_from_static_string(const gchar *value_string);
 GValue* gel_value_new_from_boolean(gboolean value_boolean);
 GValue* gel_value_new_from_pointer(gpointer value_pointer);
 GValue *gel_value_dup(const GValue *value);
