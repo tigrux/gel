@@ -7,7 +7,6 @@
 #include <geldebug.h>
 #include <gelparser.h>
 #include <gelvalue.h>
-#include <gelvaluelist.h>
 
 
 #endif

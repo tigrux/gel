@@ -3,6 +3,18 @@
 #define GEL_TYPE_VALUE_ARRAY (gel_value_array_get_type())
 #define ARRAY_N_PREALLOCATED 8
 
+
+/**
+ * SECTION:gelparser
+ * @short_description: Functions to convert input into data ready to be evaluated
+ * @title: GelParser
+ * @include: gel.h
+ *
+ * Functions to convert input (plain text or files) into #GValueArray.
+ * The resulting #GValueArray can be used to feed a #GelContext.
+ */
+
+
 GType gel_value_array_get_type(void);
 
 
@@ -182,6 +194,15 @@ GValueArray* gel_parse_scanner(GScanner *scanner)
 }
 
 
+/**
+ * gel_parse_file:
+ * @file: path to a file
+ * @error: #GError to be filled if an error happens.
+ *
+ * Reads the content of @file and then pass the content to #gel_parse_string
+ *
+ * Returns: A #GValueArray with the parsed value literals
+ */
 GValueArray* gel_parse_file(const gchar *file, GError *error)
 {
     gchar *content;
@@ -195,6 +216,20 @@ GValueArray* gel_parse_file(const gchar *file, GError *error)
 }
 
 
+/**
+ * gel_parse_string:
+ * @text: content to parse
+ * @text_len: length of the content to parse, or -1 if it is zero terminated.
+ *
+ * Uses a #GScanner to parse @content, operators are replaced with their
+ * corresponding functions (add for +, mul for *, etc). Characters [ ] are
+ * used to build array literals. Integers are considered #glong literals,
+ * strings are #gchararray literals and floats are #gdouble literals.
+ *
+ * #gel_context_eval_value considers array literals as closure's invokes.
+ *
+ * Returns: A #GValueArray with the parsed value literals.
+ */
 GValueArray* gel_parse_string(const gchar *text, guint text_len)
 {
     GScanner *scanner = g_scanner_new(NULL);

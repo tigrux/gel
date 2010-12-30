@@ -3,12 +3,20 @@
 #include <gelcontext.h>
 #include <gelvalue.h>
 #include <gelclosure.h>
-#include <gelvaluelist.h>
 #include <geldebug.h>
 
 #define GEL_CONTEXT_GET_PRIVATE(o) \
     (G_TYPE_INSTANCE_GET_PRIVATE((o), GEL_TYPE_CONTEXT, GelContextPrivate))
 
+
+/**
+ * SECTION:gelcontext
+ * @short_description: Class used to keep symbols and evaluate values.
+ * @title: GelContext
+ * @include: gel.h
+ *
+ * #GelContext is a class where symbols are stored and evaluated.
+ */
 
 struct _GelContextPrivate
 {
@@ -23,18 +31,44 @@ enum
 };
 
 
+enum
+{
+    QUIT,
+    LAST_SIGNAL
+};
+
+
+/**
+ * gel_context_new:
+ *
+ * Returns: A new created GelContext, with no outer assigned.
+ *
+ */
 GelContext* gel_context_new(void)
 {
     return (GelContext*)g_object_new(GEL_TYPE_CONTEXT,  NULL);
 }
 
 
+/**
+ * gel_context_new_with_outer:
+ * @outer: The outer context.
+ *
+ * Returns: A new created #GelContext, with @outer as the outer context.
+ *
+ */
 GelContext* gel_context_new_with_outer(GelContext *outer)
 {
     return (GelContext*)g_object_new(GEL_TYPE_CONTEXT, "outer", outer, NULL);
 }
 
 
+/**
+ * gel_context_unref:
+ * @self: context.
+ *
+ * Unrefs @self
+ */
 void gel_context_unref(GelContext *self)
 {
     g_return_if_fail(self != NULL);
@@ -51,7 +85,7 @@ void gel_context_invoke_closure(GelContext *self, GClosure *closure,
     g_return_if_fail(closure != NULL);
     g_return_if_fail(dest_value != NULL);
 
-    if(gel_closure_is_pure(closure))
+    if(gel_closure_is_gel(closure))
     {
         GValueArray *const array = g_value_array_new(n_values);
         register guint i;
@@ -148,6 +182,17 @@ const GValue* gel_context_eval_array(GelContext *self, const GValueArray *array,
 }
 
 
+/**
+ * gel_context_eval:
+ * @self: context
+ * @value: value to evaluate
+ * @dest_value: destination value
+ *
+ * Evaluates @value, stores the result in @dest_value
+ *
+ * Returns: #TRUE if @dest_value was written, #FALSE otherwise.
+ *
+ */
 gboolean gel_context_eval(GelContext *self, 
                           const GValue *value, GValue *dest_value)
 {
@@ -167,12 +212,26 @@ gboolean gel_context_eval(GelContext *self,
 }
 
 
+/**
+ * gel_context_eval_value:
+ * @self: context
+ * @value: value to evaluate
+ * @tmp_value: value where a result may be written.
+ *
+ * Evaluates the given value.
+ * If @value matches a symbol, returns the corresponding value.
+ * If @value is a literal (number or string), returns @value itself.
+ * If not, then @value is evaluated and the result stored in @tmp_value.
+ *
+ * Returns: The value with the result.
+ *
+ */
 const GValue* gel_context_eval_value(GelContext *self,
-                                     const GValue *value, GValue *dest_value)
+                                     const GValue *value, GValue *tmp_value)
 {
     g_return_val_if_fail(self != NULL, NULL);
     g_return_val_if_fail(value != NULL, NULL);
-    g_return_val_if_fail(dest_value != NULL, NULL);
+    g_return_val_if_fail(tmp_value != NULL, NULL);
 
     const GValue *result_value = NULL;
 
@@ -189,7 +248,7 @@ const GValue* gel_context_eval_value(GelContext *self,
     if(G_VALUE_HOLDS(value, G_TYPE_VALUE_ARRAY))
     {
         GValueArray *array = (GValueArray*)g_value_get_boxed(value);
-        result_value = gel_context_eval_array(self, array, dest_value);
+        result_value = gel_context_eval_array(self, array, tmp_value);
     }
 
     if(result_value == NULL)
@@ -199,7 +258,60 @@ const GValue* gel_context_eval_value(GelContext *self,
 }
 
 
-
+/**
+ * gel_context_eval_params:
+ * @self: context to use
+ * @func: name of the invoker function, usually __FUNCTION__
+ * @list: pointer to a list to keep temporary values
+ * @format: string describing types to get
+ * @n_values: pointer to the number of values in @values
+ * @values: pointer to an array of values
+ * @...: list of pointers to store the retrieved variables
+ *
+ * Convenience method to be used in implementation of new closures.
+ *
+ * Each character in @format indicates the type of variable you are parsing.
+ * Posible formats are: asASIOCV
+ *
+ * <itemizedlist>
+ *   <listitem><para>
+ *     a: get a literal array (#GValueArray *).
+ *   </para></listitem>
+ *   <listitem><para>
+ *     s: get a literal string (#gchararray).
+ *   </para></listitem>
+ *   <listitem><para>
+ *     A: evaluate and get an array (#GValueArray *).
+ *   </para></listitem>
+ *   <listitem><para>
+ *     S: evaluate and get a string (#gchararray).
+ *   </para></listitem>
+ *   <listitem><para>
+ *     I: evaluate and get an integer (#glong).
+ *   </para></listitem>
+ *   <listitem><para>
+ *     O: evaluate and get an object (#GObject *).
+ *   </para></listitem>
+ *   <listitem><para>
+ *     C: evaluate and get a closure (#GClosure *).
+ *   </para></listitem>
+ *   <listitem><para>
+ *     V: evaluate and get a value (#GValue *).
+ *   </para></listitem>
+ *   <listitem><para>
+ *     *: Do not check for exact number or arguments.
+ *   </para></listitem>
+ * </itemizedlist>
+ *
+ * On success, @n_values will be decreased and @values repositioned
+ * to match the first remaining argument,
+ * @list must be disposed with #gel_value_list_free.
+ *
+ * On failure , @n_values and @values are left untouched.
+ * 
+ * Returns: #TRUE on sucess, #FALSE otherwise.
+ *
+ */
 gboolean gel_context_eval_params(GelContext *self, const gchar *func,
                                  GList **list, const gchar *format,
                                  guint *n_values, const GValue **values, ...)
@@ -393,6 +505,17 @@ gboolean gel_context_eval_params(GelContext *self, const gchar *func,
 }
 
 
+/**
+ * gel_context_find_symbol:
+ * @self: context
+ * @name: name of the symbol to lookup
+ *
+ * If @context has a definition for @name, then returns its value.
+ * If not, then it queries the outer context.
+ * The returned value is owned by the context so it should not be freed.
+ *
+ * Returns: The value corresponding to @name, or #NULL if could not find it.
+ */
 GValue* gel_context_find_symbol(const GelContext *self, const gchar *name)
 {
     g_return_val_if_fail(self != NULL, NULL);
@@ -407,6 +530,15 @@ GValue* gel_context_find_symbol(const GelContext *self, const gchar *name)
 }
 
 
+/**
+ * gel_context_add_symbol:
+ * @self: context
+ * @name: name of the symbol to add
+ * @value: value of the symbol to add
+ *
+ * Adds a new symbol to @context with the name given by @name.
+ * The context takes ownership of @value so it should not be freed or unset.
+ */
 void gel_context_add_symbol(GelContext *self, const gchar *name, GValue *value)
 {
     g_return_if_fail(self != NULL);
@@ -416,27 +548,54 @@ void gel_context_add_symbol(GelContext *self, const gchar *name, GValue *value)
 }
 
 
-void gel_context_add_object(GelContext *self, const gchar *name, GObject *obj)
+/**
+ * gel_context_add_object:
+ * @self: context
+ * @name: name of the symbol to add
+ * @object: object to add
+ *
+ * A wrapper for #gel_context_add_symbol.
+ * @context takes ownership of @object so it should not be unreffed.
+ */
+void gel_context_add_object(GelContext *self, const gchar *name,
+                            GObject *object)
 {
     g_return_if_fail(self != NULL);
     g_return_if_fail(name != NULL);
-    g_return_if_fail(obj != NULL);
-    g_return_if_fail(G_IS_OBJECT(obj));
+    g_return_if_fail(object != NULL);
+    g_return_if_fail(G_IS_OBJECT(object));
 
-    GValue *value = gel_value_new_of_type(G_OBJECT_TYPE(obj));
-    g_value_take_object(value, obj);
+    GValue *value = gel_value_new_of_type(G_OBJECT_TYPE(object));
+    g_value_take_object(value, object);
     gel_context_add_symbol(self, name, value);
 }
 
 
-void gel_context_remove_symbol(GelContext *self, const gchar *name)
+/**
+ * gel_context_remove_symbol:
+ * @self: context
+ * @name: name of the symbol to remove
+ *
+ * Removes the symbol gived by @name.
+ *
+ * Returns: #TRUE is the symbol was removed, #FALSE otherwise.
+ */
+gboolean gel_context_remove_symbol(GelContext *self, const gchar *name)
 {
-    g_return_if_fail(self != NULL);
-    g_return_if_fail(name != NULL);
-    g_hash_table_remove(self->priv->symbols, name);
+    g_return_val_if_fail(self != NULL, FALSE);
+    g_return_val_if_fail(name != NULL, FALSE);
+    return g_hash_table_remove(self->priv->symbols, name);
 }
 
 
+/**
+ * gel_context_get_outer:
+ * @self: context
+ *
+ * Retrieves @self's outer context
+ *
+ * Returns: the outer context, or #NULL if @self is the outermost context.
+ */
 GelContext* gel_context_get_outer(const GelContext* self)
 {
     g_return_val_if_fail(self != NULL, NULL);
@@ -488,7 +647,7 @@ static void gel_context_set_property(GObject *object, guint property_id,
 
 
 static
-gpointer gel_context_parent_class = NULL;
+gpointer gel_context_parent_class;
 
 
 static
@@ -520,6 +679,9 @@ void gel_context_finalize(GObject *obj)
 }
 
 
+static guint gel_context_signals[LAST_SIGNAL];
+
+
 static
 void gel_context_class_init(GelContextClass * klass)
 {
@@ -532,6 +694,12 @@ void gel_context_class_init(GelContextClass * klass)
     g_object_class->constructor = gel_context_constructor;
     g_object_class->finalize = gel_context_finalize;
 
+/**
+ * GelContext:outer:
+ *
+ * The outer context, or NULL if this is the outermost context.
+ *
+ */
     g_object_class_install_property(g_object_class,
         GEL_CONTEXT_OUTER,
         g_param_spec_object(
@@ -547,7 +715,16 @@ void gel_context_class_init(GelContextClass * klass)
                 | G_PARAM_WRITABLE
                 | G_PARAM_CONSTRUCT_ONLY)));
 
-    g_signal_new("quit",
+/**
+ * GelContext::quit
+ * @context: The context that received the signal
+ *
+ * Signal emitted when the predefined
+ * function <function>[quit]</function> is invoked.
+ * [quit] is automatically provided as part of the default symbols.
+ *
+ */
+    gel_context_signals[QUIT] = g_signal_new("quit",
         GEL_TYPE_CONTEXT,
         G_SIGNAL_RUN_LAST, 0,
         NULL, NULL,

@@ -10,13 +10,11 @@
   </bookinfo>
 
   <chapter>
-    <title>gel</title>
-     <xi:include href="xml/gelcontext.xml"/>
+    <title>GEL</title>
+        <xi:include href="xml/gelcontext.xml"/>
     <xi:include href="xml/gelclosure.xml"/>
-    <xi:include href="xml/geldebug.xml"/>
     <xi:include href="xml/gelparser.xml"/>
     <xi:include href="xml/gelvalue.xml"/>
-    <xi:include href="xml/gelvaluelist.xml"/>
 
   </chapter>
   <chapter id="object-tree">

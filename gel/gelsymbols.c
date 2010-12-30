@@ -1,8 +1,8 @@
 #include <gelvalue.h>
+#include <gelvalueprivate.h>
 #include <gelcontext.h>
 #include <gelclosure.h>
 #include <geldebug.h>
-#include <gelvaluelist.h>
 
 
 static
@@ -1220,7 +1220,7 @@ void ne_(GClosure *self, GValue *return_value,
 
 #define CLOSURE(S) \
     {#S, \
-     gel_value_new_closure_from_marshall((GClosureMarshal)S##_, G_OBJECT(self))}
+     gel_value_new_closure_from_marshal((GClosureMarshal)S##_, G_OBJECT(self))}
 
 
 void gel_context_add_default_symbols(GelContext *self)

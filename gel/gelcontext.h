@@ -19,20 +19,24 @@
     (G_TYPE_INSTANCE_GET_CLASS((obj), GEL_TYPE_CONTEXT, GelContextClass))
 
 
-GType gel_context_get_type(void);
-
+typedef struct _GelContext GelContext;
+typedef struct _GelContextClass GelContextClass;
 typedef struct _GelContextPrivate GelContextPrivate;
 
-typedef struct _GelContext
+struct _GelContext
 {
     GObject parent_instance;
+    /*< private >*/
     GelContextPrivate *priv;
-} GelContext;
+};
 
-typedef struct _GelContextClass
+struct _GelContextClass
 {
+    /*< private >*/
     GObjectClass parent_class;
-} GelContextClass;
+};
+
+GType gel_context_get_type(void);
 
 GelContext* gel_context_new(void);
 GelContext* gel_context_new_with_outer(GelContext *outer);
@@ -42,14 +46,15 @@ GValue* gel_context_find_symbol(const GelContext *self, const gchar *name);
 GelContext* gel_context_get_outer(const GelContext *self);
 
 void gel_context_add_symbol(GelContext *self, const gchar *name, GValue *value);
-void gel_context_add_object(GelContext *self, const gchar *name, GObject *obj);
+void gel_context_add_object(GelContext *self, const gchar *name,
+                            GObject *object);
 void gel_context_add_default_symbols(GelContext *self);
-void gel_context_remove_symbol(GelContext *self, const gchar *name);
+gboolean gel_context_remove_symbol(GelContext *self, const gchar *name);
 
 gboolean gel_context_eval(GelContext *self,
                           const GValue *value, GValue *dest_value);
 const GValue* gel_context_eval_value(GelContext *self,
-                                     const GValue *value, GValue *dest_value);
+                                     const GValue *value, GValue *tmp_value);
 gboolean gel_context_eval_params(GelContext *self, const gchar *func,
                                  GList **list, const gchar *format,
                                  guint *n_values, const GValue **values, ...);
