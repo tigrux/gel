@@ -1222,7 +1222,153 @@ void ne_(GClosure *self, GValue *return_value,
     {#S, \
      gel_value_new_closure_from_marshal((GClosureMarshal)S##_, G_OBJECT(self))}
 
-
+/**
+ * gel_context_add_default_symbols:
+ * @self: context
+ *
+ * Adds a bunch of predefined functions and symbols to @self.
+ * This method is automatically called for contexts created with
+ * #gel_context_new.
+ *
+ * Current default symbols are:
+ * <itemizedlist>
+ *   <listitem><para>
+ *    [quit]
+ *   </para></listitem>
+ *   <listitem><para>
+ *    [let symbol value]
+ *   </para></listitem>
+ *   <listitem><para>
+ *    [var symbol value]
+ *   </para></listitem>
+ *   <listitem><para>
+ *    [new typename]
+ *   </para></listitem>
+ *   <listitem><para>
+ *    [quote literal]
+ *   </para></listitem>
+ *   <listitem><para>
+ *    [get object property]
+ *   </para></listitem>
+ *   <listitem><para>
+ *    [set object property value]
+ *   </para></listitem>
+ *   <listitem><para>
+ *    [def name [args...] code...]
+ *   </para></listitem>
+ *   <listitem><para>
+ *    [lambda [args...] code...]
+ *   </para></listitem>
+ *   <listitem><para>
+ *    [connect object signal callback]
+ *   </para></listitem>
+ *   <listitem><para>
+ *    [print values...]
+ *   </para></listitem>
+ *   <listitem><para>
+ *    [case value ifeq_1 then_1 ... ifeq_n then_n default]
+ *   </para></listitem>
+ *   <listitem><para>
+ *    [cond test_1 value_1 ... test_n value_n default]
+ *   </para></listitem>
+ *   <listitem><para>
+ *    [do code...]
+ *   </para></listitem>
+ *   <listitem><para>
+ *    [array values...]
+ *   </para></listitem>
+ *   <listitem><para>
+ *    [for iter array code...]
+ *   </para></listitem>
+ *   <listitem><para>
+ *    [while test ...]
+ *   </para></listitem>
+ *   <listitem><para>
+ *    [if test code...]
+ *   </para></listitem>
+ *   <listitem><para>
+ *    [str value]
+ *   </para></listitem>
+ *   <listitem><para>
+ *    [type value]
+ *   </para></listitem>
+ *   <listitem><para>
+ *    [add values...]
+ *   </para></listitem>
+ *   <listitem><para>
+ *    [sub values...]
+ *   </para></listitem>
+ *   <listitem><para>
+ *    [mul values...]
+ *   </para></listitem>
+ *   <listitem><para>
+ *    [div values...]
+ *   </para></listitem>
+ *   <listitem><para>
+ *    [mod values...]
+ *   </para></listitem>
+ *   <listitem><para>
+ *    [and values...]
+ *   </para></listitem>
+ *   <listitem><para>
+ *    [not value]
+ *   </para></listitem>
+ *   <listitem><para>
+ *    [or values...]
+ *   </para></listitem>
+ *   <listitem><para>
+ *    [any function array]
+ *   </para></listitem>
+ *   <listitem><para>
+ *    [all function array]
+ *   </para></listitem>
+ *   <listitem><para>
+ *    [append array values...]
+ *   </para></listitem>
+ *   <listitem><para>
+ *    [nth array index]
+ *   </para></listitem>
+ *   <listitem><para>
+ *    [remove array index]
+ *   </para></listitem>
+ *   <listitem><para>
+ *    [head array]
+ *   </para></listitem>
+ *   <listitem><para>
+ *    [tail array]
+ *   </para></listitem>
+ *   <listitem><para>
+ *    [len array]
+ *   </para></listitem>
+ *   <listitem><para>
+ *    [gt values...]
+ *   </para></listitem>
+ *   <listitem><para>
+ *    [ge values...]
+ *   </para></listitem>
+ *   <listitem><para>
+ *    [eq values...]
+ *   </para></listitem>
+ *   <listitem><para>
+ *    [lt values...]
+ *   </para></listitem>
+ *   <listitem><para>
+ *    [le values...]
+ *   </para></listitem>
+ *   <listitem><para>
+ *    [ne values...]
+ *   </para></listitem>
+ *   <listitem><para>
+ *    TRUE
+ *   </para></listitem>
+ *   <listitem><para>
+ *    FALSE
+ *   </para></listitem>
+ *   <listitem><para>
+ *    NULL
+ *   </para></listitem>
+ * </itemizedlist>
+ */
 void gel_context_add_default_symbols(GelContext *self)
 {
     struct Symbol {const gchar *name; GValue *value;} symbols[] =
