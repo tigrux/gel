@@ -33,7 +33,9 @@ gboolean gel_values_##op(const GValue *v1, const GValue *v2) \
 /**
  * gel_value_new:
  *
- * Returns: a new unintialized #GValue
+ * Creates a new uninitialized dynamic #GValue
+ *
+ * Returns: a new uninitialized #GValue
  */
 GValue* gel_value_new(void)
 {
@@ -44,6 +46,8 @@ GValue* gel_value_new(void)
 /**
  * gel_value_new_of_type:
  * @type: a #GType
+ *
+ * Creates a new #GValue of type @type
  *
  * Returns: a new #GValue of the type specified by @type
  */
@@ -57,6 +61,8 @@ GValue* gel_value_new_of_type(GType type)
 /**
  * gel_value_new_from_closure:
  * @value_closure: an instance of #GClosure
+ *
+ * Creates a new #GValue of type #GClosure holding @value_closure
  *
  * Returns: a new #GValue of type #GClosure holding @value_closure
  */
@@ -96,6 +102,8 @@ GValue* gel_value_new_closure_from_marshal(GClosureMarshal marshal,
  * gel_value_new_from_boolean:
  * @value_boolean: a #gboolean
  *
+ * Creates a new #GValue of type #gboolean set from @value_boolean
+ *
  * Returns: a new #GValue of type #gboolean set from @value_boolean
  */
 GValue* gel_value_new_from_boolean(gboolean value_boolean)
@@ -109,6 +117,8 @@ GValue* gel_value_new_from_boolean(gboolean value_boolean)
 /**
  * gel_value_new_from_pointer:
  * @value_pointer: a #gpointer
+ *
+ * Creates a new #GValue of type #gpointer set from by @value_pointer
  *
  * Returns: a new #GValue of type #gpointer set from by @value_pointer
  */
@@ -124,7 +134,9 @@ GValue* gel_value_new_from_pointer(gpointer value_pointer)
  * gel_value_dup:
  * @value: a #GValue
  *
- * Returns: a #GValue duplicated from @value
+ * Creates a new #GValue that is a copy of @value
+ *
+ * Returns: a #GValue that is a copy of @value
  */
 GValue *gel_value_dup(const GValue *value)
 {
@@ -177,8 +189,7 @@ gboolean gel_value_copy(const GValue *src_value, GValue *dest_value)
  * gel_value_free:
  * @value: a #GValue allocated by any of the gel_value_new_* functions.
  *
- * If value is set, then it is unset.
- * It's then freed.
+ * Frees a dynamically created value, unsetting it if needed.
  */
 void gel_value_free(GValue *value)
 {

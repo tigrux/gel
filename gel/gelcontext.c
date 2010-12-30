@@ -41,7 +41,10 @@ enum
 /**
  * gel_context_new:
  *
- * Returns: A new created GelContext, with no outer assigned.
+ * Creates a #GelContext, no outer context is assigned and the
+ * default symbols are added with #gel_context_add_symbols.
+ *
+ * Returns: A new #GelContext, with no outer context assigned.
  *
  */
 GelContext* gel_context_new(void)
@@ -53,6 +56,9 @@ GelContext* gel_context_new(void)
 /**
  * gel_context_new_with_outer:
  * @outer: The outer context.
+ *
+ * Creates a #GelContext, using @outer as the outer context.
+ * This method is used when invoking functions to have local variables.
  *
  * Returns: A new created #GelContext, with @outer as the outer context.
  *
