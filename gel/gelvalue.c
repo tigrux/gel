@@ -531,6 +531,11 @@ gboolean gel_values_simple_div(const GValue *v1, const GValue *v2,
                 g_value_get_long(v1)
                 / g_value_get_long(v2));
             return TRUE;
+        case G_TYPE_DOUBLE:
+            g_value_set_double(dest_value,
+                g_value_get_double(v1)
+                / g_value_get_double(v2));
+            return TRUE;
     }
     return FALSE;
 }
