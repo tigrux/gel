@@ -103,7 +103,14 @@ GValueArray* gel_parse_scanner(GScanner *scanner)
             case '=':
                 g_scanner_get_next_token(scanner);
                 g_value_init(&value, G_TYPE_STRING);
-                g_value_set_static_string(&value, "let");
+                token = g_scanner_peek_next_token(scanner);
+                if(token == '=')
+                {
+                    g_scanner_get_next_token(scanner);
+                    g_value_set_static_string(&value, "eq");
+                }
+                else
+                    g_value_set_static_string(&value, "let");
                 break;
             case '+':
                 g_scanner_get_next_token(scanner);
