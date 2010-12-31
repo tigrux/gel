@@ -1,0 +1,26 @@
+
+[var S [array -6 77 0.0 30.6 -15]]
+
+
+[apply or S]
+
+[apply and S]
+
+
+[def negative-of [n]
+    [sub 0 n]
+]
+
+[map negative-of S]
+
+
+[def is-positive [n]
+    [> n 0]
+]
+
+[filter is-positive S]
+
+[sort S]
+S
+
+[quit]
