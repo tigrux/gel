@@ -17,7 +17,7 @@ void gel_warning_needs_at_least_n_arguments(const gchar *func, guint n)
 
 void gel_warning_needs_n_arguments(const gchar *func, guint n)
 {
-    g_warning("%s: %u argument%s", func, n, plural(n));
+    g_warning("%s: Needs %u argument%s", func, n, plural(n));
 }
 
 
