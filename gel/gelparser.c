@@ -52,7 +52,7 @@ const gchar *scanner_errors[] = {
 static
 GValueArray* gel_parse_scanner(GScanner *scanner)
 {
-    GValueArray *array = NULL;
+    GValueArray *array = g_value_array_new(ARRAY_N_PREALLOCATED);
     gint sign = 1;
 
     register gboolean parsing = TRUE;
@@ -186,8 +186,6 @@ GValueArray* gel_parse_scanner(GScanner *scanner)
 
         if(G_IS_VALUE(&value))
         {
-            if(array == NULL)
-                array = g_value_array_new(ARRAY_N_PREALLOCATED);
             g_value_array_append(array, &value);
             g_value_unset(&value);
         }
