@@ -14,9 +14,6 @@
  */
 
 
-GType gel_value_array_get_type(void);
-
-
 static
 GValueArray* gel_parse_strings(const char *first, ...)
 {
