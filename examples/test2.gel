@@ -1,5 +1,5 @@
 
-[def primes-less-than [top]
+[def primes-up-to [top]
     [var sieve [array 2]]
     [var n 3]
     [while [< n top]
@@ -11,7 +11,7 @@
     sieve
 ]
 
-[var first-primes [primes-less-than 100]]
+[var first-primes [primes-up-to 100]]
 
 [var i 0]
 [for iter first-primes
@@ -19,7 +19,7 @@
     [= i [+ i 1]]
 ]
 
-[print "\nThe first prime is " [nth first-primes 0]]
+[print "The first prime is " [nth first-primes 0]]
 [print "The last prime is " [nth first-primes -1]]
 
 
