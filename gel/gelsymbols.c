@@ -1220,8 +1220,8 @@ void type_(GClosure *self, GValue *return_value,
 
     GValue *result_value = G_IS_VALUE(return_value) ? &tmp_value : return_value;
 
-    g_value_init(result_value, G_TYPE_GTYPE);
-    g_value_set_gtype(result_value, value_type);
+    g_value_init(result_value, G_TYPE_STRING);
+    g_value_set_string(result_value, g_type_name(value_type));
 
     if(result_value != return_value)
     {
