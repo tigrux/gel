@@ -210,12 +210,7 @@ void gel_value_free(GValue *value)
  */
 void gel_value_list_free(GList *list)
 {
-    const register GList *iter;
-    for(iter = list; iter != NULL; iter = iter->next)
-    {
-        GValue *iter_value = (GValue*)iter->data;
-        gel_value_free(iter_value);
-    }
+    g_list_foreach(list, (GFunc)gel_value_free, NULL);
     g_list_free(list);
 }
 
