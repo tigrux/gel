@@ -25,6 +25,7 @@ gboolean gel_values_mul(const GValue *v1, const GValue *v2, GValue *muv1);
 gboolean gel_values_div(const GValue *v1, const GValue *v2, GValue *div_value);
 gboolean gel_values_mod(const GValue *v1, const GValue *v2, GValue *div_value);
 
+gint gel_values_compare(const GValue *v1, const GValue *v2);
 gboolean gel_values_gt(const GValue *v1, const GValue *v2);
 gboolean gel_values_ge(const GValue *v1, const GValue *v2);
 gboolean gel_values_eq(const GValue *v1, const GValue *v2);

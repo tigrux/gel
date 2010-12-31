@@ -817,6 +817,123 @@ void len_(GClosure *self, GValue *return_value,
 }
 
 
+static
+void sort_(GClosure *self, GValue *return_value,
+           guint n_values, const GValue *values,
+           GelContext *context, gpointer marshal_data)
+{
+    GList *list = NULL;
+    GValueArray *array = NULL;
+
+    if(!gel_context_eval_params(context, __FUNCTION__, &list,
+          "A", &n_values, &values, &array))
+        return;
+
+    g_value_array_sort(array, (GCompareFunc)gel_values_compare);
+    gel_value_list_free(list);
+}
+
+
+static
+void map_(GClosure *self, GValue *return_value,
+          guint n_values, const GValue *values,
+          GelContext *context, gpointer marshal_data)
+{
+    GList *list = NULL;
+    GClosure *closure = NULL;
+    GValueArray *array = NULL;
+
+    if(!gel_context_eval_params(context, __FUNCTION__, &list,
+          "CA", &n_values, &values, &closure, &array))
+        return;
+
+    GValueArray *result_array = g_value_array_new(array->n_values);
+
+    register guint i;
+    for(i = 0; i < array->n_values; i++)
+    {
+        GValue tmp_value = {0};
+        g_closure_invoke(closure, &tmp_value, 1, array->values + i, context);
+        g_value_array_append(result_array, &tmp_value);
+        g_value_unset(&tmp_value);
+    }
+
+    GValue tmp_value = {0};
+    GValue *result_value = G_IS_VALUE(return_value) ? &tmp_value : return_value;
+
+    g_value_init(result_value, G_TYPE_VALUE_ARRAY);
+    g_value_take_boxed(result_value, result_array);
+
+    if(result_value != return_value)
+    {
+        gel_value_copy(result_value, return_value);
+        g_value_unset(result_value);
+    }
+
+    gel_value_list_free(list);
+}
+
+
+static
+void apply_(GClosure *self, GValue *return_value,
+            guint n_values, const GValue *values,
+            GelContext *context, gpointer marshal_data)
+{
+    GList *list = NULL;
+    GClosure *closure = NULL;
+    GValueArray *array = NULL;
+
+    if(!gel_context_eval_params(context, __FUNCTION__, &list,
+          "CA", &n_values, &values, &closure, &array))
+        return;
+
+    g_closure_invoke(closure, return_value,
+        array->n_values, array->values, context);
+    gel_value_list_free(list);
+}
+
+
+static
+void filter_(GClosure *self, GValue *return_value,
+             guint n_values, const GValue *values,
+             GelContext *context, gpointer marshal_data)
+{
+    GList *list = NULL;
+    GClosure *closure = NULL;
+    GValueArray *array = NULL;
+
+    if(!gel_context_eval_params(context, __FUNCTION__, &list,
+          "CA", &n_values, &values, &closure, &array))
+        return;
+
+    GValueArray *result_array = g_value_array_new(array->n_values);
+
+    register guint i;
+    for(i = 0; i < array->n_values; i++)
+    {
+        GValue tmp_value = {0};
+        g_closure_invoke(closure, &tmp_value, 1, array->values + i, context);
+        if(gel_value_to_boolean(&tmp_value))
+            g_value_array_append(result_array, array->values + i);
+        g_value_unset(&tmp_value);
+    }
+
+    GValue tmp_value = {0};
+    GValue *result_value = G_IS_VALUE(return_value) ? &tmp_value : return_value;
+
+    g_value_init(result_value, G_TYPE_VALUE_ARRAY);
+    g_value_take_boxed(result_value, result_array);
+
+    if(result_value != return_value)
+    {
+        gel_value_copy(result_value, return_value);
+        g_value_unset(result_value);
+    }
+
+    gel_value_list_free(list);
+}
+
+
 void branch(guint n_values, const GValue *values, GelContext *outer,
             GValue *return_value, const GValue *case_value)
 {
@@ -1341,6 +1458,18 @@ void ne_(GClosure *self, GValue *return_value,
  *    [len array]
  *   </para></listitem>
  *   <listitem><para>
+ *    [apply function array]
+ *   </para></listitem>
+ *   <listitem><para>
+ *    [filter function array]
+ *   </para></listitem>
+ *   <listitem><para>
+ *    [map function array]
+ *   </para></listitem>
+ *   <listitem><para>
+ *    [sort array]
+ *   </para></listitem>
+ *   <listitem><para>
  *    [gt values...]
  *   </para></listitem>
  *   <listitem><para>
@@ -1369,6 +1498,8 @@ void ne_(GClosure *self, GValue *return_value,
  *   </para></listitem>
  * </itemizedlist>
  */
+
+
 void gel_context_add_default_symbols(GelContext *self)
 {
     struct Symbol {const gchar *name; GValue *value;} symbols[] =
@@ -1401,6 +1532,12 @@ void gel_context_add_default_symbols(GelContext *self)
         CLOSURE(and),
         CLOSURE(not),
         CLOSURE(or),
+        CLOSURE(gt),
+        CLOSURE(ge),
+        CLOSURE(eq),
+        CLOSURE(lt),
+        CLOSURE(le),
+        CLOSURE(ne),
         CLOSURE(any),
         CLOSURE(all),
         CLOSURE(append),
@@ -1409,12 +1546,10 @@ void gel_context_add_default_symbols(GelContext *self)
         CLOSURE(head),
         CLOSURE(tail),
         CLOSURE(len),
-        CLOSURE(gt),
-        CLOSURE(ge),
-        CLOSURE(eq),
-        CLOSURE(lt),
-        CLOSURE(le),
-        CLOSURE(ne),
+        CLOSURE(apply),
+        CLOSURE(filter),
+        CLOSURE(map),
+        CLOSURE(sort),
         {"TRUE", gel_value_new_from_boolean(TRUE)},
         {"FALSE", gel_value_new_from_boolean(FALSE)},
         {"NULL", gel_value_new_from_pointer(NULL)},
