@@ -59,7 +59,7 @@ GValueArray* gel_parse_scanner(GScanner *scanner)
     while(parsing)
     {
         GValue value = {0};
-        GTokenType token = g_scanner_peek_next_token(scanner);
+        guint token = g_scanner_peek_next_token(scanner);
 
         switch(token)
         {
