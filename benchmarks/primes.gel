@@ -1,0 +1,15 @@
+
+[var sieve [array]]
+[var n 2]
+[def remains [i]
+    [% n i]
+]
+[while [< n 50000]
+    [if [all remains sieve]
+        [append sieve n]
+    ]
+    [= n [+ n 1]]
+]
+
+[quit]
+

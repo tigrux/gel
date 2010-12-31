@@ -268,7 +268,6 @@ void def_(GClosure *self, GValue *return_value,
     {
         GValue *value = gel_value_new_from_closure(closure);
         gel_context_add_symbol(context, symbol, value);
-        gel_value_copy(value, return_value);
     }
 
     if(list != NULL)
