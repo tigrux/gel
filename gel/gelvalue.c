@@ -220,6 +220,38 @@ void gel_value_list_free(GList *list)
 }
 
 
+static
+gchar* gel_value_array_to_string(const GValueArray *array)
+{
+    GString *buffer = g_string_new("[");
+    const guint n_values = array->n_values;
+    if(n_values > 0)
+    {
+        const guint last = n_values - 1;
+        const GValue *const array_values = array->values;
+        register guint i;
+        for(i = 0; i <= last; i++)
+        {
+            gchar *s = gel_value_to_string(array_values + i);
+            g_string_append_printf(buffer, "%s%s", s, i != last ? " " : "");
+            g_free(s);
+        }
+    }
+    g_string_append_c(buffer, ']');
+
+    return g_string_free(buffer, FALSE);
+}
+
+
+static
+void gel_value_array_to_string_transform(const GValue *src_value,
+                                         GValue *dest_value)
+{
+    const GValueArray *array = (GValueArray*)g_value_get_boxed(src_value);
+    g_value_take_string(dest_value, gel_value_array_to_string(array));
+}
+
+
 /**
  * gel_value_to_string:
  * @value: a #GValue
@@ -233,6 +265,15 @@ gchar* gel_value_to_string(const GValue *value)
 {
     g_return_val_if_fail(value != NULL, NULL);
     g_return_val_if_fail(G_IS_VALUE(value), NULL);
+
+    static volatile gsize only_once = 0;
+    if(g_once_init_enter(&only_once))
+    {
+        g_value_register_transform_func(
+            G_TYPE_VALUE_ARRAY, G_TYPE_STRING,
+            gel_value_array_to_string_transform);
+        g_once_init_leave (&only_once, 1);
+    }
 
     gchar *result = NULL;
     GValue string_value = {0};

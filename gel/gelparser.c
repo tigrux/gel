@@ -1,6 +1,5 @@
 #include <gelparser.h>
 
-#define GEL_TYPE_VALUE_ARRAY (gel_value_array_get_type())
 #define ARRAY_N_PREALLOCATED 8
 
 
@@ -86,7 +85,7 @@ GValueArray* gel_parse_scanner(GScanner *scanner)
                 break;
             case '[':
                 g_scanner_get_next_token(scanner);
-                g_value_init(&value, GEL_TYPE_VALUE_ARRAY);
+                g_value_init(&value, G_TYPE_VALUE_ARRAY);
                 g_value_take_boxed(&value, gel_parse_scanner(scanner));
                 break;
             case ']':
@@ -96,7 +95,7 @@ GValueArray* gel_parse_scanner(GScanner *scanner)
                 break;
             case G_TOKEN_STRING:
                 g_scanner_get_next_token(scanner);
-                g_value_init(&value, GEL_TYPE_VALUE_ARRAY);
+                g_value_init(&value, G_TYPE_VALUE_ARRAY);
                 g_value_take_boxed(&value,
                     gel_parse_strings("quote", scanner->value.v_string, NULL));
                 break;
@@ -250,60 +249,5 @@ GValueArray* gel_parse_string(const gchar *text, guint text_len)
     g_scanner_destroy(scanner);
 
     return array;
-}
-
-
-static
-gchar* gel_value_array_to_string(const GValueArray *array)
-{
-    GString *buffer_string = g_string_new("[");
-    const guint n_values = array->n_values;
-    if(n_values > 0)
-    {
-        const guint last = n_values - 1;
-        const GValue *const array_values = array->values;
-        register guint i;
-        for(i = 0; i <= last; i++)
-        {
-            GValue string_value = {0};
-            g_value_init(&string_value, G_TYPE_STRING);
-            if(g_value_transform(array_values + i, &string_value))
-            {
-                g_string_append(buffer_string,
-                    g_value_get_string(&string_value));
-                if(i != last)
-                    g_string_append_c(buffer_string, ' ');
-            }
-            g_value_unset(&string_value);
-        }
-    }
-    g_string_append_c(buffer_string, ']');
-
-    return g_string_free(buffer_string, FALSE);
-}
-
-
-static
-void gel_value_array_to_string_transform(const GValue *src_value,
-                                         GValue *dest_value)
-{
-    const GValueArray *array = (GValueArray*)g_value_get_boxed(src_value);
-    g_value_take_string(dest_value, gel_value_array_to_string(array));
-}
-
-
-GType gel_value_array_get_type(void)
-{
-    static volatile gsize gel_array_type = 0;
-    if(g_once_init_enter(&gel_array_type))
-    {
-        GType type = G_TYPE_VALUE_ARRAY;
-        g_value_register_transform_func(
-            type, G_TYPE_STRING,
-            gel_value_array_to_string_transform);
-
-        g_once_init_leave (&gel_array_type, type);
-    }
-    return (GType)gel_array_type;
 }
 
