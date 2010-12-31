@@ -20,9 +20,17 @@
 
 [filter is-positive S]
 
+
 [sort S]
 S
 [== S [array -15 -6 0.0 30.6 77]]
 
+
+[var operators [array + - * /]]
+[var values [array 4.5 2]]
+
+[for iter_op operators
+    [print [apply iter_op values]]
+]
 
 [quit]
