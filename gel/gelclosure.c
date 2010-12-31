@@ -59,8 +59,11 @@ void gel_closure_marshal(GelClosure *closure, GValue *return_value,
             GValue tmp_value = {0};
             const GValue *value = gel_context_eval_value(context,
                 closure_code_values + i, &tmp_value);
-            if(i == last && return_value != NULL)
+            if(i == last && return_value != NULL && G_IS_VALUE(value))
+            {
+                g_print("G_IS_VALUE = %s\n", G_IS_VALUE(value) ? "TRUE" : "FALSE");
                 gel_value_copy(value, return_value);
+            }
             if(G_IS_VALUE(&tmp_value))
                 g_value_unset(&tmp_value);
         }
