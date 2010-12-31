@@ -259,8 +259,8 @@ void def_(GClosure *self, GValue *return_value,
     GValueArray *array;
     GList *list = NULL;
 
-    if(!gel_context_eval_params(context, __FUNCTION__, &list, "sa*", &n_values, &values,
-            &symbol, &array))
+    if(!gel_context_eval_params(context, __FUNCTION__, &list,
+            "sa*", &n_values, &values, &symbol, &array))
         return;
 
     GClosure *closure = new_closure(context, array, n_values, values);
@@ -284,8 +284,8 @@ void lambda_(GClosure *self, GValue *return_value,
     GValueArray *array;
     GList *list = NULL;
 
-    if(!gel_context_eval_params(context, __FUNCTION__, &list, "a*",
-            &n_values, &values, &array))
+    if(!gel_context_eval_params(context, __FUNCTION__, &list,
+            "a*", &n_values, &values, &array))
         return;
 
     GClosure *closure = new_closure(context, array, n_values, values);
@@ -321,8 +321,8 @@ void connect_(GClosure *self, GValue *return_value,
     GClosure *callback = NULL;
     GList *list = NULL;
 
-    if(!gel_context_eval_params(context, __FUNCTION__, &list, "OSC",
-        &n_values, &values, &object, &signal, &callback))
+    if(!gel_context_eval_params(context, __FUNCTION__, &list,
+            "OSC", &n_values, &values, &object, &signal, &callback))
         return;
 
     if(G_IS_OBJECT(object))
@@ -354,26 +354,30 @@ void print_(GClosure *self, GValue *return_value,
             guint n_values, const GValue *values,
             GelContext *context, gpointer marshal_data)
 {
-    if(n_values > 0)
+    const guint n_args = 1;
+    if(n_values < n_args)
     {
-        const guint last = n_values - 1;
-        register guint i;
-        for(i = 0; i <= last; i++)
-        {
-            GValue tmp_value = {0};
-            const GValue *value =
-                gel_context_eval_value(context, values + i, &tmp_value);
-            if(G_IS_VALUE(value))
-            {
-                gchar *value_string = gel_value_to_string(value);
-                g_print("%s", value_string);
-                g_free(value_string);
-            }
-            if(G_IS_VALUE(&tmp_value))
-                g_value_unset(&tmp_value);
-        }
-        g_print("\n");
+        gel_warning_needs_at_least_n_arguments(__FUNCTION__, n_args);
+        return;
     }
+
+    const guint last = n_values - 1;
+    register guint i;
+    for(i = 0; i <= last; i++)
+    {
+        GValue tmp_value = {0};
+        const GValue *value =
+            gel_context_eval_value(context, values + i, &tmp_value);
+        if(G_IS_VALUE(value))
+        {
+            gchar *value_string = gel_value_to_string(value);
+            g_print("%s", value_string);
+            g_free(value_string);
+        }
+        if(G_IS_VALUE(&tmp_value))
+            g_value_unset(&tmp_value);
+    }
+    g_print("\n");
 }
 
 
@@ -480,32 +484,33 @@ void not_(GClosure *self, GValue *return_value,
           GelContext *context, gpointer marshal_data)
 {
     const guint n_args = 1;
-    if(n_values == n_args)
+    if(n_values != n_args)
     {
-        GValue tmp_value = {0};
-        const GValue *value =
-            gel_context_eval_value(context, values + 0, &tmp_value);
-        gboolean value_bool = gel_value_to_boolean(value);
-        if(G_IS_VALUE(&tmp_value))
-            g_value_unset(&tmp_value);
-
-        GValue *result_value;
-        if(G_IS_VALUE(return_value))
-            result_value = &tmp_value;
-        else
-            result_value = return_value;
-
-        g_value_init(result_value, G_TYPE_BOOLEAN);
-        g_value_set_boolean(result_value, !value_bool);
-
-        if(result_value != return_value)
-        {
-            gel_value_copy(result_value, return_value);
-            g_value_unset(result_value);
-        }
-    }
-    else
         gel_warning_needs_n_arguments(__FUNCTION__, n_args);
+        return;
+    }
+
+    GValue tmp_value = {0};
+    const GValue *value =
+        gel_context_eval_value(context, values + 0, &tmp_value);
+    gboolean value_bool = gel_value_to_boolean(value);
+    if(G_IS_VALUE(&tmp_value))
+        g_value_unset(&tmp_value);
+
+    GValue *result_value;
+    if(G_IS_VALUE(return_value))
+        result_value = &tmp_value;
+    else
+        result_value = return_value;
+
+    g_value_init(result_value, G_TYPE_BOOLEAN);
+    g_value_set_boolean(result_value, !value_bool);
+
+    if(result_value != return_value)
+    {
+        gel_value_copy(result_value, return_value);
+        g_value_unset(result_value);
+    }
 }
 
 
@@ -544,25 +549,26 @@ void or_(GClosure *self, GValue *return_value,
          GelContext *context, gpointer marshal_data)
 {
     const guint n_args = 1;
-    if(n_values >= n_args)
+    if(n_values < n_args)
     {
-        const guint last =  n_values - 1;
-        register gboolean result = FALSE;
-        register guint i;
-        for(i = 0; i <= last && result == FALSE; i++)
-        {
-            GValue tmp_value = {0};
-            const GValue *value =
-                gel_context_eval_value(context, values + i, &tmp_value);
-            result = gel_value_to_boolean(value);
-            if(result || i == last)
-                gel_value_copy(value, return_value);
-            if(G_IS_VALUE(&tmp_value))
-                g_value_unset(&tmp_value);
-        }
-    }
-    else
         gel_warning_needs_at_least_n_arguments(__FUNCTION__, n_args);
+        return;
+    }
+
+    const guint last =  n_values - 1;
+    register gboolean result = FALSE;
+    register guint i;
+    for(i = 0; i <= last && result == FALSE; i++)
+    {
+        GValue tmp_value = {0};
+        const GValue *value =
+            gel_context_eval_value(context, values + i, &tmp_value);
+        result = gel_value_to_boolean(value);
+        if(result || i == last)
+            gel_value_copy(value, return_value);
+        if(G_IS_VALUE(&tmp_value))
+            g_value_unset(&tmp_value);
+    }
 }
 
 
@@ -575,8 +581,8 @@ void any_(GClosure *self, GValue *return_value,
     GClosure *closure = NULL;
     GValueArray *array = NULL;
 
-    if(!gel_context_eval_params(context, __FUNCTION__, &list, "CA",
-            &n_values, &values, &closure, &array))
+    if(!gel_context_eval_params(context, __FUNCTION__, &list,
+            "CA", &n_values, &values, &closure, &array))
         return;
 
     gboolean result = FALSE;
@@ -615,8 +621,8 @@ void all_(GClosure *self, GValue *return_value,
     GClosure *closure = NULL;
     GValueArray *array = NULL;
 
-    if(!gel_context_eval_params(context, __FUNCTION__, &list, "CA", &n_values, &values,
-            &closure, &array))
+    if(!gel_context_eval_params(context, __FUNCTION__, &list,
+            "CA", &n_values, &values, &closure, &array))
         return;
 
     gboolean result = TRUE;
@@ -758,8 +764,8 @@ void tail_(GClosure *self, GValue *return_value,
     GList *list = NULL;
     GValueArray *array = NULL;
 
-    if(!gel_context_eval_params(context, __FUNCTION__,
-            &list, "A", &n_values, &values, &array))
+    if(!gel_context_eval_params(context, __FUNCTION__, &list,
+            "A", &n_values, &values, &array))
         return;
 
     if(array->n_values > 0)
@@ -799,7 +805,7 @@ void len_(GClosure *self, GValue *return_value,
     GValueArray *array = NULL;
 
     if(!gel_context_eval_params(context, __FUNCTION__, &list,
-          "A", &n_values, &values, &array))
+            "A", &n_values, &values, &array))
         return;
 
     GValue tmp_value = {0};
@@ -826,7 +832,7 @@ void sort_(GClosure *self, GValue *return_value,
     GValueArray *array = NULL;
 
     if(!gel_context_eval_params(context, __FUNCTION__, &list,
-          "A", &n_values, &values, &array))
+            "A", &n_values, &values, &array))
         return;
 
     g_value_array_sort(array, (GCompareFunc)gel_values_compare);
@@ -844,7 +850,7 @@ void map_(GClosure *self, GValue *return_value,
     GValueArray *array = NULL;
 
     if(!gel_context_eval_params(context, __FUNCTION__, &list,
-          "CA", &n_values, &values, &closure, &array))
+            "CA", &n_values, &values, &closure, &array))
         return;
 
     GValueArray *result_array = g_value_array_new(array->n_values);
@@ -884,7 +890,7 @@ void apply_(GClosure *self, GValue *return_value,
     GValueArray *array = NULL;
 
     if(!gel_context_eval_params(context, __FUNCTION__, &list,
-          "CA", &n_values, &values, &closure, &array))
+            "CA", &n_values, &values, &closure, &array))
         return;
 
     g_closure_invoke(closure, return_value,
@@ -903,7 +909,7 @@ void filter_(GClosure *self, GValue *return_value,
     GValueArray *array = NULL;
 
     if(!gel_context_eval_params(context, __FUNCTION__, &list,
-          "CA", &n_values, &values, &closure, &array))
+            "CA", &n_values, &values, &closure, &array))
         return;
 
     GValueArray *result_array = g_value_array_new(array->n_values);
@@ -988,18 +994,19 @@ void case_(GClosure *self, GValue *return_value,
            GelContext *context, gpointer marshal_data)
 {
     const guint n_args = 2;
-    if(n_values >= n_args)
+    if(n_values < n_args)
     {
-        GValue tmp_value = {0};
-        const GValue *case_value =
-            gel_context_eval_value(context, values + 0, &tmp_value);
-        n_values--, values++;
-        branch(n_values, values, context, return_value, case_value);
-        if(G_IS_VALUE(&tmp_value))
-            g_value_unset(&tmp_value);
-    }
-    else
         gel_warning_needs_at_least_n_arguments(__FUNCTION__, n_args);
+        return;
+    }
+
+    GValue tmp_value = {0};
+    const GValue *case_value =
+        gel_context_eval_value(context, values + 0, &tmp_value);
+    n_values--, values++;
+    branch(n_values, values, context, return_value, case_value);
+    if(G_IS_VALUE(&tmp_value))
+        g_value_unset(&tmp_value);
 }
 
 
@@ -1009,10 +1016,13 @@ void cond_(GClosure *self, GValue *return_value,
            GelContext *context, gpointer marshal_data)
 {
     const guint n_args = 2;
-    if(n_values >= n_args)
-        branch(n_values, values, context, return_value, NULL);
-    else
+    if(n_values < n_args)
+    {
         gel_warning_needs_at_least_n_arguments(__FUNCTION__, n_args);
+        return;
+    }
+
+    branch(n_values, values, context, return_value, NULL);
 }
 
 
@@ -1085,8 +1095,8 @@ void for_(GClosure *self, GValue *return_value,
     GValueArray *array;
     GList *list = NULL;
 
-    if(!gel_context_eval_params(context, __FUNCTION__, &list, "sA*", &n_values, &values,
-            &symbol, &array))
+    if(!gel_context_eval_params(context, __FUNCTION__, &list,
+            "sA*", &n_values, &values, &symbol, &array))
         return;
 
     const guint last = array->n_values;
