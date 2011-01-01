@@ -25,6 +25,7 @@ typedef struct _GelContextPrivate GelContextPrivate;
 
 struct _GelContext
 {
+    /*< private >*/
     GObject parent_instance;
     /*< private >*/
     GelContextPrivate *priv;
