@@ -1346,7 +1346,7 @@ void ne_(GClosure *self, GValue *return_value,
 
 #define CLOSURE(S) \
     {#S, \
-     gel_value_new_closure_from_marshal((GClosureMarshal)S##_, G_OBJECT(self))}
+     gel_value_new_from_closure_marshal((GClosureMarshal)S##_, G_OBJECT(self))}
 
 /**
  * gel_context_add_default_symbols:

@@ -86,7 +86,7 @@ GValue* gel_value_new_from_closure(GClosure *value_closure)
  *
  * Returns: a new #GValue of type #GClosure holding the created closure
  */
-GValue* gel_value_new_closure_from_marshal(GClosureMarshal marshal,
+GValue* gel_value_new_from_closure_marshal(GClosureMarshal marshal,
                                            GObject *object)
 {
     g_return_val_if_fail(object != NULL, NULL);
