@@ -1,5 +1,6 @@
 SUBDIRS = \
 	gel \
+	vapi \
 	examples \
 	docs
 

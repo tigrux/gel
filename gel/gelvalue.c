@@ -30,27 +30,12 @@ gboolean gel_values_##op(const GValue *v1, const GValue *v2) \
  */
 
 
-/**
- * gel_value_new:
- *
- * Creates a new uninitialized dynamic #GValue
- *
- * Returns: a new uninitialized #GValue
- */
 GValue* gel_value_new(void)
 {
-    return g_slice_new0(GValue);
+    return g_new0(GValue, 1);
 }
 
 
-/**
- * gel_value_new_of_type:
- * @type: a #GType
- *
- * Creates a new #GValue of type @type
- *
- * Returns: a new #GValue of the type specified by @type
- */
 GValue* gel_value_new_of_type(GType type)
 {
     g_return_val_if_fail(type != G_TYPE_INVALID, NULL);
@@ -58,14 +43,6 @@ GValue* gel_value_new_of_type(GType type)
 }
 
 
-/**
- * gel_value_new_from_closure:
- * @value_closure: an instance of #GClosure
- *
- * Creates a new #GValue of type #GClosure holding @value_closure
- *
- * Returns: a new #GValue of type #GClosure holding @value_closure
- */
 GValue* gel_value_new_from_closure(GClosure *value_closure)
 {
     g_return_val_if_fail(value_closure != NULL, NULL);
@@ -76,16 +53,6 @@ GValue* gel_value_new_from_closure(GClosure *value_closure)
 }
 
 
-/**
- * gel_value_new_closure_from_marshal:
- * @marshal: a #GClosureMarshal function
- * @object: an instance of #GObject
- *
- * Creates a new #GClosure with @object as closure's marshal_data and
- * @marshal as the closure's marshal.
- *
- * Returns: a new #GValue of type #GClosure holding the created closure
- */
 GValue* gel_value_new_from_closure_marshal(GClosureMarshal marshal,
                                            GObject *object)
 {
@@ -98,14 +65,6 @@ GValue* gel_value_new_from_closure_marshal(GClosureMarshal marshal,
 }
 
 
-/**
- * gel_value_new_from_boolean:
- * @value_boolean: a #gboolean
- *
- * Creates a new #GValue of type #gboolean set from @value_boolean
- *
- * Returns: a new #GValue of type #gboolean set from @value_boolean
- */
 GValue* gel_value_new_from_boolean(gboolean value_boolean)
 {
     GValue *value = gel_value_new_of_type(G_TYPE_BOOLEAN);
@@ -114,14 +73,6 @@ GValue* gel_value_new_from_boolean(gboolean value_boolean)
 }
 
 
-/**
- * gel_value_new_from_pointer:
- * @value_pointer: a #gpointer
- *
- * Creates a new #GValue of type #gpointer set from by @value_pointer
- *
- * Returns: a new #GValue of type #gpointer set from by @value_pointer
- */
 GValue* gel_value_new_from_pointer(gpointer value_pointer)
 {
     GValue *value = gel_value_new_of_type(G_TYPE_POINTER);
@@ -130,14 +81,6 @@ GValue* gel_value_new_from_pointer(gpointer value_pointer)
 }
 
 
-/**
- * gel_value_dup:
- * @value: a #GValue
- *
- * Creates a new #GValue that is a copy of @value
- *
- * Returns: a #GValue that is a copy of @value
- */
 GValue *gel_value_dup(const GValue *value)
 {
     g_return_val_if_fail(value != NULL, NULL);
@@ -149,16 +92,6 @@ GValue *gel_value_dup(const GValue *value)
 }
 
 
-/**
- * gel_value_copy:
- * @src_value: a #GValue
- * @dest_value: a #GValue
- *
- * If #dest_value has been set, then tries to transform @src_value to @dest_value.
- * If @dest_value is unset, then it is initialized to @src_values's type and then copied.
- *
- * Returns: #TRUE if @src_value was succesfully copied to @dest_value, #FALSE otherwise.
- */
 gboolean gel_value_copy(const GValue *src_value, GValue *dest_value)
 {
     g_return_val_if_fail(src_value != NULL, FALSE);
@@ -185,19 +118,13 @@ gboolean gel_value_copy(const GValue *src_value, GValue *dest_value)
 }
 
 
-/**
- * gel_value_free:
- * @value: a #GValue allocated by any of the gel_value_new_* functions.
- *
- * Frees a dynamically created value, unsetting it if needed.
- */
 void gel_value_free(GValue *value)
 {
     g_return_if_fail(value != NULL);
 
     if(G_IS_VALUE(value))
         g_value_unset(value);
-    g_slice_free(GValue, value);
+    g_free(value);
 }
 
 
@@ -710,6 +637,15 @@ gboolean gel_values_arithmetic(const GValue *v1, const GValue *v2,
 }
 
 
+/**
+ * gel_values_compare:
+ * @v1: A valid #GValue
+ * @v2: A valid #GValue
+ *
+ * Compares @v1 and @v2
+ *
+ * Returns: 0 for v1 == v2, 1 for v1 > v2, -1 otherwise
+ */
 gint gel_values_compare(const GValue *v1, const GValue *v2)
 {
     g_return_val_if_fail(v1 != NULL, FALSE);

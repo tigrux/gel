@@ -1,6 +1,6 @@
 #include <gelcontext.h>
 #include <gelclosure.h>
-#include <gelvalue.h>
+#include <gelvalueprivate.h>
 
 
 /**

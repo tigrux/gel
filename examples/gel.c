@@ -20,7 +20,7 @@ void init(GValueArray *array)
     for(i = 0; i < last; i++)
     {
         const GValue *const iter_value = array_values + i;
-        gchar *value_string = gel_value_to_string(iter_value);
+        gchar *value_string = g_strdup_value_contents(iter_value);
         gchar *escaped_string = g_strescape(value_string, NULL);
         g_free(value_string);
         g_print("%s ?\n", escaped_string);
@@ -29,7 +29,7 @@ void init(GValueArray *array)
         GValue result_value = {0};
         if(gel_context_eval(context, iter_value, &result_value))
         {
-            value_string = gel_value_to_string(&result_value);
+            value_string = g_strdup_value_contents(&result_value);
             g_value_unset(&result_value);
             g_print("= %s\n\n", value_string);
             g_free(value_string);

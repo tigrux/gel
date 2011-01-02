@@ -204,11 +204,11 @@ GValueArray* gel_parse_scanner(GScanner *scanner)
  *
  * Returns: A #GValueArray with the parsed value literals
  */
-GValueArray* gel_parse_file(const gchar *file, GError *error)
+GValueArray* gel_parse_file(const gchar *file, GError **error)
 {
     gchar *content;
     gsize content_len;
-    if(!g_file_get_contents(file, &content, &content_len, &error))
+    if(!g_file_get_contents(file, &content, &content_len, error))
         return NULL;
 
     GValueArray *array = gel_parse_string(content, content_len);

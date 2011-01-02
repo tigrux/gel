@@ -3,6 +3,7 @@
 GelContext
 GelContextClass
 GelContextPrivate
+gel_context_construct
 gel_context_new
 gel_context_new_with_outer
 gel_context_unref
@@ -39,18 +40,8 @@ gel_parse_string
 
 <SECTION>
 <FILE>gelvalue</FILE>
-gel_value_new
-gel_value_new_of_type
-gel_value_new_from_closure
-gel_value_new_closure_from_marshal
-gel_value_new_from_boolean
-gel_value_new_from_pointer
-gel_value_dup
-gel_value_copy
+gel_values_compare
 gel_value_list_free
-gel_value_free
-gel_value_to_string
-gel_value_to_boolean
 gel_values_add
 gel_values_sub
 gel_values_mul

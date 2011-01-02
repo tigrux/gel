@@ -39,6 +39,7 @@ struct _GelContextClass
 
 GType gel_context_get_type(void);
 
+GObject* gel_context_construct(GType type);
 GelContext* gel_context_new(void);
 GelContext* gel_context_new_with_outer(GelContext *outer);
 void gel_context_unref(GelContext *self);

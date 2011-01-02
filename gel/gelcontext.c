@@ -2,6 +2,7 @@
 
 #include <gelcontext.h>
 #include <gelvalue.h>
+#include <gelvalueprivate.h>
 #include <gelclosure.h>
 #include <geldebug.h>
 
@@ -39,6 +40,22 @@ enum
 
 
 /**
+ * gel_context_construct:
+ * @type: type of a #GelContext class
+ *
+ * Creates an instance of a #GelContext derived type
+ *
+ * Returns: A new instance of #GelContext.
+ *
+ */
+GObject* gel_context_construct(GType type)
+{
+    return g_object_new(type, NULL);
+
+}
+
+
+/**
  * gel_context_new:
  *
  * Creates a #GelContext, no outer context is assigned and the
@@ -49,7 +66,7 @@ enum
  */
 GelContext* gel_context_new(void)
 {
-    return (GelContext*)g_object_new(GEL_TYPE_CONTEXT,  NULL);
+    return (GelContext*)gel_context_construct(GEL_TYPE_CONTEXT);
 }
 
 
