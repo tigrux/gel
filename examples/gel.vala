@@ -1,19 +1,19 @@
-class Demo : Gel.Context {
-    public ValueArray array;
+class Demo : Object {
+    ValueArray array;
+    Gel.Context context;
 
     public Demo() {
-        quit.connect(Gtk.main_quit);
+        context = new Gel.Context();
+        context.quit.connect(Gtk.main_quit);
     }
 
-    public bool init()
-    {
+    public bool run() {
         uint i;
-        for(i = 0; i < array.values.length; i++)
-        {
+        for(i = 0; i < array.values.length; i++) {
             print("%s ?\n", array.values[i].strdup_contents());
 
             GLib.Value result_value;
-            if(eval(array.values[i], out result_value))
+            if(context.eval(array.values[i], out result_value))
                 print("= %s\n\n", result_value.strdup_contents());
         }
         return true;
@@ -24,8 +24,7 @@ class Demo : Gel.Context {
     }
 }
 
-int main(string[] args)
-{
+int main(string[] args) {
     Gtk.init(ref args);
 
     Type type;
@@ -35,8 +34,7 @@ int main(string[] args)
     type = typeof(Gtk.Entry);
     type = typeof(Gtk.Button);
 
-    if(args.length != 2)
-    {
+    if(args.length != 2) {
         printerr("%s requires an argument\n", args[0]);
         return 1;
     }
@@ -53,7 +51,7 @@ int main(string[] args)
         return 1;
     }
 
-    Gtk.init_add(demo.init);
+    Gtk.init_add(demo.run);
     Gtk.main();
     return 0;
 }
