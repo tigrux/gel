@@ -26,6 +26,7 @@ AC_CONFIG_FILES([
 	gel/Makefile
 	vapi/Makefile
 	examples/Makefile
+	comparison/Makefile
 	gel-0.1.pc
 	docs/Makefile
 	docs/reference/Makefile

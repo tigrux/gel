@@ -2,6 +2,7 @@ SUBDIRS = \
 	gel \
 	vapi \
 	examples \
+	comparison \
 	docs
 
 
