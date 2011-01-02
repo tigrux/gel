@@ -10,16 +10,11 @@ class Demo : Gel.Context {
         uint i;
         for(i = 0; i < array.values.length; i++)
         {
-            string value_string = array.values[i].strdup_contents();
-            string escaped_string = value_string.escape("");
-            print("%s ?\n", escaped_string);
+            print("%s ?\n", array.values[i].strdup_contents());
 
             GLib.Value result_value;
             if(eval(array.values[i], out result_value))
-            {
-                value_string = result_value.strdup_contents();
-                print("= %s\n\n", value_string);
-            }
+                print("= %s\n\n", result_value.strdup_contents());
         }
         return true;
     }

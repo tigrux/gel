@@ -21,10 +21,8 @@ void init(GValueArray *array)
     {
         const GValue *const iter_value = array_values + i;
         gchar *value_string = g_strdup_value_contents(iter_value);
-        gchar *escaped_string = g_strescape(value_string, NULL);
+        g_print("%s ?\n", value_string);
         g_free(value_string);
-        g_print("%s ?\n", escaped_string);
-        g_free(escaped_string);
 
         GValue result_value = {0};
         if(gel_context_eval(context, iter_value, &result_value))
