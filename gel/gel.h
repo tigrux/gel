@@ -4,7 +4,6 @@
 
 #include <gelclosure.h>
 #include <gelcontext.h>
-#include <geldebug.h>
 #include <gelparser.h>
 #include <gelvalue.h>
 
