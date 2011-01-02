@@ -124,10 +124,25 @@ GelContext* gel_context_new_with_outer(GelContext *outer)
 
 
 /**
+ * gel_context_ref:
+ * @self: context.
+ *
+ * Increases the reference counter of @self.
+ *
+ * Returns: The same #GelContext
+ */
+GelContext* gel_context_ref(GelContext *self)
+{
+    g_return_val_if_fail(self != NULL, NULL);
+    return (GelContext*)g_object_ref(G_OBJECT(self));
+}
+
+
+/**
  * gel_context_unref:
  * @self: context.
  *
- * Unrefs @self
+ * Decreases the reference counter of @self.
  */
 void gel_context_unref(GelContext *self)
 {

@@ -1,5 +1,7 @@
 [CCode (cprefix = "Gel", lower_case_cprefix = "gel_", cheader_filename = "gel.h")]
 namespace Gel {
+
+    [CCode (ref_function = "gel_context_ref", unref_function = "gel_context_unref")]
     public class Context : GLib.Object {
         public Context();
         public Context.with_outer(Gel.Context outer);

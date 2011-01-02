@@ -42,6 +42,7 @@ GType gel_context_get_type(void);
 GObject* gel_context_construct(GType type);
 GelContext* gel_context_new(void);
 GelContext* gel_context_new_with_outer(GelContext *outer);
+GelContext* gel_context_ref(GelContext *self);
 void gel_context_unref(GelContext *self);
 
 GValue* gel_context_find_symbol(const GelContext *self, const gchar *name);

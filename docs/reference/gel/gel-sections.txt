@@ -6,6 +6,7 @@ GelContextPrivate
 gel_context_construct
 gel_context_new
 gel_context_new_with_outer
+gel_context_ref
 gel_context_unref
 gel_context_find_symbol
 gel_context_get_outer
