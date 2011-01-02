@@ -1511,7 +1511,7 @@ void ne_(GClosure *self, GValue *return_value,
 
 void gel_context_add_default_symbols(GelContext *self)
 {
-    struct Symbol {const gchar *name; GValue *value;} symbols[] =
+    struct {const gchar *name; GValue *value;} *p, symbols[] =
     {
         CLOSURE(quit),
         CLOSURE(let),
@@ -1565,7 +1565,6 @@ void gel_context_add_default_symbols(GelContext *self)
         {NULL,NULL}
     };
 
-    register struct Symbol *p;
     for(p = symbols; p->name != NULL; p++)
         gel_context_add_symbol(self, p->name, p->value);
 }
