@@ -20,9 +20,8 @@ However, the syntax is not a direct copy of scheme or lisp:
   and, or, any, all, len, for, while, if, cond, case, new, filter, map, sort.
 - Can use +, *, <, >= instead of add, mul, lt, ge.
 
+Bindings for Vala are provided (see examples/gel.vala)
 Support for gobject-introspection will be optional and available soon.
-
-Support for Vala will be added too.
 
 However, the project has just started, so speed or elegance is not a
 priority yet. The current goal is to prevent memory leaks and provide
