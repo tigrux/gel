@@ -8,12 +8,11 @@ class Demo : Object {
     }
 
     public bool run() {
-        uint i;
-        for(i = 0; i < array.values.length; i++) {
-            print("%s ?\n", array.values[i].strdup_contents());
+        foreach(Value iter_value in array.values) {
+            print("%s ?\n", iter_value.strdup_contents());
 
             GLib.Value result_value;
-            if(context.eval(array.values[i], out result_value))
+            if(context.eval(iter_value, out result_value))
                 print("= %s\n\n", result_value.strdup_contents());
         }
         return true;
