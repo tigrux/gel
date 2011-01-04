@@ -1,29 +1,21 @@
 <SECTION>
 <FILE>gelcontext</FILE>
 GelContext
-GelContextClass
-GelContextPrivate
-gel_context_construct
 gel_context_new
 gel_context_new_with_outer
-gel_context_ref
-gel_context_unref
+gel_context_free
 gel_context_find_symbol
 gel_context_get_outer
 gel_context_add_symbol
 gel_context_add_object
+GelContextCallback
+gel_context_add_callback
 gel_context_add_default_symbols
 gel_context_remove_symbol
 gel_context_eval
 gel_context_eval_value
 gel_context_eval_params
-<SUBSECTION Standard>
-GEL_CONTEXT
-GEL_IS_CONTEXT
-gel_context_get_type
-GEL_CONTEXT_CLASS
-GEL_IS_CONTEXT_CLASS
-GEL_CONTEXT_GET_CLASS
+
 </SECTION>
 
 <SECTION>

@@ -17,7 +17,7 @@ GValue* gel_value_new_from_boolean(gboolean value_boolean);
 GValue* gel_value_new_from_pointer(gpointer value_pointer);
 GValue* gel_value_new_from_closure(GClosure *value_closure);
 GValue* gel_value_new_from_closure_marshal(GClosureMarshal marshal,
-                                           GObject *object);
+                                           gpointer data);
 
 GValue *gel_value_dup(const GValue *value);
 gboolean gel_value_copy(const GValue *src_value, GValue *dest_value);

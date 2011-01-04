@@ -54,12 +54,11 @@ GValue* gel_value_new_from_closure(GClosure *value_closure)
 
 
 GValue* gel_value_new_from_closure_marshal(GClosureMarshal marshal,
-                                           GObject *object)
+                                           gpointer data)
 {
-    g_return_val_if_fail(object != NULL, NULL);
-    g_return_val_if_fail(G_IS_OBJECT(object), NULL);
+    g_return_val_if_fail(data != NULL, NULL);
 
-    GClosure *closure = g_closure_new_object(sizeof(GClosure), object);
+    GClosure *closure = g_closure_new_simple(sizeof(GClosure), data);
     g_closure_set_marshal(closure, marshal);
     return gel_value_new_from_closure(closure);
 }

@@ -6,16 +6,6 @@
 
 
 static
-void quit_(GClosure *self, GValue *return_value,
-           guint n_values, const GValue *values,
-           gpointer invocation_hint, gpointer marshal_data)
-{
-    GelContext *context = (GelContext*)self->data;
-    g_signal_emit_by_name(context, "quit", NULL);
-}
-
-
-static
 void let_(GClosure *self, GValue *return_value,
           guint n_values, const GValue *values,
           GelContext *context, gpointer marshal_data)
@@ -983,7 +973,7 @@ void branch(guint n_values, const GValue *values, GelContext *outer,
             testing = FALSE;
         }
     }
-    gel_context_unref(context);
+    gel_context_free(context);
 }
 
 
@@ -1050,7 +1040,7 @@ void do_(GClosure *self, GValue *return_value,
         if(G_IS_VALUE(&tmp_value))
             g_value_unset(&tmp_value);
     }
-    gel_context_unref(context);
+    gel_context_free(context);
 }
 
 
@@ -1107,7 +1097,7 @@ void for_(GClosure *self, GValue *return_value,
         gel_context_add_symbol(inner, symbol, gel_value_dup(array_values + i));
         do_(self, return_value, n_values, values,
             inner, marshal_data);
-        gel_context_unref(inner);
+        gel_context_free(inner);
     }
     gel_value_list_free(list);
 }
@@ -1346,7 +1336,7 @@ void ne_(GClosure *self, GValue *return_value,
 
 #define CLOSURE(S) \
     {#S, \
-     gel_value_new_from_closure_marshal((GClosureMarshal)S##_, G_OBJECT(self))}
+     gel_value_new_from_closure_marshal((GClosureMarshal)S##_, self)}
 
 /**
  * gel_context_add_default_symbols:
@@ -1358,9 +1348,6 @@ void ne_(GClosure *self, GValue *return_value,
  *
  * Current default symbols are:
  * <itemizedlist>
- *   <listitem><para>
- *    [quit]
- *   </para></listitem>
  *   <listitem><para>
  *    [let symbol value]
  *   </para></listitem>
@@ -1513,7 +1500,6 @@ void gel_context_add_default_symbols(GelContext *self)
 {
     struct {const gchar *name; GValue *value;} *p, symbols[] =
     {
-        CLOSURE(quit),
         CLOSURE(let),
         CLOSURE(var),
         CLOSURE(new),

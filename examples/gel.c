@@ -2,18 +2,12 @@
 #include <gel.h>
 
 
-void quit(GelContext *context)
+GelContext *context;
+GValueArray *array;
+
+
+void init()
 {
-    gel_context_unref(context);
-    gtk_main_quit();
-}
-
-
-void init(GValueArray *array)
-{
-    GelContext *context = gel_context_new();
-    g_signal_connect(G_OBJECT(context), "quit", (GCallback)quit, context);
-
     const guint last = array->n_values;
     const GValue *const array_values = array->values;
     register guint i;
@@ -56,15 +50,21 @@ int main(int argc, char *argv[])
 
     const char *file = argv[1];
 
-    GValueArray *array = gel_parse_file(file, NULL);
+    array = gel_parse_file(file, NULL);
     if(array == NULL)
     {
         g_print("Could not parse file '%s'\n", file);
         return 1;
     }
 
-    gtk_init_add((GtkFunction)init, array);
+    context = gel_context_new();
+    gel_context_add_callback(context,
+        "quit", (GelContextCallback)gtk_main_quit, NULL);
+
+    gtk_init_add((GtkFunction)init, NULL);
     gtk_main();
+
+    gel_context_free(context);
     return 0;
 }
 

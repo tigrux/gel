@@ -6,9 +6,6 @@
 #include <gelclosure.h>
 #include <geldebug.h>
 
-#define GEL_CONTEXT_GET_PRIVATE(o) \
-    (G_TYPE_INSTANCE_GET_PRIVATE((o), GEL_TYPE_CONTEXT, GelContextPrivate))
-
 
 /**
  * SECTION:gelcontext
@@ -19,23 +16,13 @@
  * #GelContext is a class where symbols are stored and evaluated.
  */
 
-struct _GelContextPrivate
+
+struct _GelContext
 {
-    GelContext *outer;
+    /*< private >*/
     GHashTable *symbols;
-};
-
-
-enum
-{
-    GEL_CONTEXT_OUTER = 1
-};
-
-
-enum
-{
-    QUIT,
-    LAST_SIGNAL
+    /*< private >*/
+    GelContext *outer;
 };
 
 
@@ -55,7 +42,6 @@ void gel_value_array_to_string_transform(const GValue *src_value,
         for(i = 0; i <= last; i++)
         {
             gchar *s = gel_value_to_string(array_values + i);
-            //gchar *s = g_strdup_value_contents(array_values + i);
             g_string_append(buffer, s);
             if(i != last)
                 g_string_append(buffer, " ");
@@ -65,30 +51,6 @@ void gel_value_array_to_string_transform(const GValue *src_value,
     g_string_append(buffer, "]");
 
     g_value_take_string(dest_value, g_string_free(buffer, FALSE));
-}
-
-
-/**
- * gel_context_construct:
- * @type: type of a #GelContext class
- *
- * Creates an instance of a #GelContext derived type
- *
- * Returns: A new instance of #GelContext.
- *
- */
-GObject* gel_context_construct(GType type)
-{
-    static volatile gsize only_once = 0;
-    if(g_once_init_enter(&only_once))
-    {
-        g_value_register_transform_func(
-            G_TYPE_VALUE_ARRAY, G_TYPE_STRING,
-            gel_value_array_to_string_transform);
-        g_once_init_leave (&only_once, 1);
-    }
-    return g_object_new(type, NULL);
-
 }
 
 
@@ -103,7 +65,7 @@ GObject* gel_context_construct(GType type)
  */
 GelContext* gel_context_new(void)
 {
-    return (GelContext*)gel_context_construct(GEL_TYPE_CONTEXT);
+    return gel_context_new_with_outer(NULL);
 }
 
 
@@ -119,35 +81,24 @@ GelContext* gel_context_new(void)
  */
 GelContext* gel_context_new_with_outer(GelContext *outer)
 {
-    return (GelContext*)g_object_new(GEL_TYPE_CONTEXT, "outer", outer, NULL);
-}
+    static volatile gsize only_once = 0;
+    if(g_once_init_enter(&only_once))
+    {
+        g_value_register_transform_func(
+            G_TYPE_VALUE_ARRAY, G_TYPE_STRING,
+            gel_value_array_to_string_transform);
+        g_once_init_leave (&only_once, 1);
+    }
 
+    GelContext *self = g_slice_new0(GelContext);
 
-/**
- * gel_context_ref:
- * @self: context.
- *
- * Increases the reference counter of @self.
- *
- * Returns: The same #GelContext
- */
-GelContext* gel_context_ref(GelContext *self)
-{
-    g_return_val_if_fail(self != NULL, NULL);
-    return (GelContext*)g_object_ref(G_OBJECT(self));
-}
+    self->symbols = g_hash_table_new_full(
+        g_str_hash, g_str_equal,
+        (GDestroyNotify)g_free, (GDestroyNotify)gel_value_free);
 
-
-/**
- * gel_context_unref:
- * @self: context.
- *
- * Decreases the reference counter of @self.
- */
-void gel_context_unref(GelContext *self)
-{
-    g_return_if_fail(self != NULL);
-    g_object_unref(G_OBJECT(self));
+    if((self->outer = outer) == NULL)
+        gel_context_add_default_symbols(self);
+    return self;
 }
 
 
@@ -596,11 +547,10 @@ GValue* gel_context_find_symbol(const GelContext *self, const gchar *name)
     g_return_val_if_fail(self != NULL, NULL);
     g_return_val_if_fail(name != NULL, NULL);
 
-    GelContextPrivate *const self_priv = self->priv;
     GValue *symbol = (GValue*)g_hash_table_lookup(
-        self_priv->symbols, name);
-    if(symbol == NULL && self_priv->outer != NULL)
-        symbol = gel_context_find_symbol(self_priv->outer, name);
+        self->symbols, name);
+    if(symbol == NULL && self->outer != NULL)
+        symbol = gel_context_find_symbol(self->outer, name);
     return symbol;
 }
 
@@ -612,14 +562,14 @@ GValue* gel_context_find_symbol(const GelContext *self, const gchar *name)
  * @value: value of the symbol to add
  *
  * Adds a new symbol to @context with the name given by @name.
- * The context takes ownership of @value so it should not be freed or unset.
+ * @self takes ownership of @value so it should not be freed or unset.
  */
 void gel_context_add_symbol(GelContext *self, const gchar *name, GValue *value)
 {
     g_return_if_fail(self != NULL);
     g_return_if_fail(name != NULL);
     g_return_if_fail(value != NULL);
-    g_hash_table_insert(self->priv->symbols, g_strdup(name), value);
+    g_hash_table_insert(self->symbols, g_strdup(name), value);
 }
 
 
@@ -630,7 +580,7 @@ void gel_context_add_symbol(GelContext *self, const gchar *name, GValue *value)
  * @object: object to add
  *
  * A wrapper for #gel_context_add_symbol.
- * @context takes ownership of @object so it should not be unreffed.
+ * @self takes ownership of @object so it should not be unreffed.
  */
 void gel_context_add_object(GelContext *self, const gchar *name,
                             GObject *object)
@@ -642,6 +592,46 @@ void gel_context_add_object(GelContext *self, const gchar *name,
 
     GValue *value = gel_value_new_of_type(G_OBJECT_TYPE(object));
     g_value_take_object(value, object);
+    gel_context_add_symbol(self, name, value);
+}
+
+static
+void gel_context_marshal(GClosure *closure, GValue *return_value,
+                         guint n_param_values, const GValue *param_values,
+                         gpointer invocation_hint, gpointer marshal_data)
+{
+    typedef void (*MarshalCallback)(gpointer data1, gpointer data2);
+    register GCClosure *cc = (GCClosure*)closure;
+    register MarshalCallback callback = (MarshalCallback)cc->callback;
+
+    if(n_param_values > 1)
+        callback(g_value_peek_pointer(param_values + 0), closure->data);
+    else
+        callback(closure->data, NULL);
+}
+
+
+/**
+ * gel_context_add_callback:
+ * @self: context
+ * @name: name of the symbol to add
+ * @callback: a #GelContextCallback to invoke
+ * @user_data: extra data to pass to @callback
+ *
+ * A wrapper for #gel_context_add_symbol that calls @callback when
+ * @self evaluates a call to a function named @name.
+ */
+void gel_context_add_callback(GelContext *self, const gchar *name,
+                              GelContextCallback callback, gpointer user_data)
+{
+    g_return_if_fail(self != NULL);
+    g_return_if_fail(name != NULL);
+    g_return_if_fail(callback != NULL);
+
+    GValue *value = gel_value_new_of_type(G_TYPE_CLOSURE);
+    GClosure *closure = g_cclosure_new(G_CALLBACK(callback), user_data, NULL);
+    g_closure_set_marshal(closure, (GClosureMarshal)gel_context_marshal);
+    g_value_take_boxed(value, closure);
     gel_context_add_symbol(self, name, value);
 }
 
@@ -659,7 +649,7 @@ gboolean gel_context_remove_symbol(GelContext *self, const gchar *name)
 {
     g_return_val_if_fail(self != NULL, FALSE);
     g_return_val_if_fail(name != NULL, FALSE);
-    return g_hash_table_remove(self->priv->symbols, name);
+    return g_hash_table_remove(self->symbols, name);
 }
 
 
@@ -674,171 +664,20 @@ gboolean gel_context_remove_symbol(GelContext *self, const gchar *name)
 GelContext* gel_context_get_outer(const GelContext* self)
 {
     g_return_val_if_fail(self != NULL, NULL);
-    return self->priv->outer;
+    return self->outer;
 }
 
-
-static
-void gel_context_set_outer(GelContext* self, GelContext* outer)
-{
-    g_return_if_fail(self != NULL);
-    self->priv->outer = outer;
-    g_object_notify(G_OBJECT(self), "outer");
-}
-
-
-static
-void gel_context_get_property(GObject * object, guint property_id,
-                              GValue * value, GParamSpec * pspec)
-{
-    GelContext *self = GEL_CONTEXT(object);
-    switch(property_id)
-    {
-        case GEL_CONTEXT_OUTER:
-            g_value_set_object(value, gel_context_get_outer(self));
-            break;
-        default:
-            G_OBJECT_WARN_INVALID_PROPERTY_ID(object, property_id, pspec);
-            break;
-    }
-}
-
-
-static void gel_context_set_property(GObject *object, guint property_id,
-                                     const GValue *value, GParamSpec *pspec)
-{
-    GelContext *self;
-    self = GEL_CONTEXT(object);
-    switch(property_id)
-    {
-        case GEL_CONTEXT_OUTER:
-            gel_context_set_outer(self, (GelContext*)g_value_get_object(value));
-            break;
-        default:
-            G_OBJECT_WARN_INVALID_PROPERTY_ID(object, property_id, pspec);
-            break;
-    }
-}
-
-
-static
-gpointer gel_context_parent_class;
-
-
-static
-GObject *gel_context_constructor(GType type,
-                                 guint n_properties,
-                                 GObjectConstructParam *properties)
-{
-    GObjectClass *parent_class = G_OBJECT_CLASS(gel_context_parent_class);
-    GObject *obj = parent_class->constructor(type, n_properties, properties);
-    GelContext *self = GEL_CONTEXT(obj);
-    GelContextPrivate *const self_priv = self->priv;
-
-    self_priv->symbols = g_hash_table_new_full(
-        g_str_hash, g_str_equal,
-        (GDestroyNotify)g_free, (GDestroyNotify)gel_value_free);
-
-    if(self_priv->outer == NULL)
-        gel_context_add_default_symbols(self);
-    return obj;
-}
-
-
-static
-void gel_context_finalize(GObject *obj)
-{
-    GelContext *self = GEL_CONTEXT(obj);
-    g_hash_table_destroy(self->priv->symbols);
-    G_OBJECT_CLASS(gel_context_parent_class)->finalize(obj);
-}
-
-
-static guint gel_context_signals[LAST_SIGNAL];
-
-
-static
-void gel_context_class_init(GelContextClass * klass)
-{
-    gel_context_parent_class = g_type_class_peek_parent(klass);
-    g_type_class_add_private(klass, sizeof(GelContextPrivate));
-
-    GObjectClass *g_object_class = G_OBJECT_CLASS(klass);
-    g_object_class->get_property = gel_context_get_property;
-    g_object_class->set_property = gel_context_set_property;
-    g_object_class->constructor = gel_context_constructor;
-    g_object_class->finalize = gel_context_finalize;
 
 /**
- * GelContext:outer:
+ * gel_context_free:
+ * @self: context
  *
- * The outer context, or NULL if this is the outermost context.
- *
- */
-    g_object_class_install_property(g_object_class,
-        GEL_CONTEXT_OUTER,
-        g_param_spec_object(
-            "outer",
-            "Outer",
-            "Outer context",
-            GEL_TYPE_CONTEXT,
-            (GParamFlags)(
-                G_PARAM_STATIC_NAME
-                | G_PARAM_STATIC_NICK
-                | G_PARAM_STATIC_BLURB
-                | G_PARAM_READABLE
-                | G_PARAM_WRITABLE
-                | G_PARAM_CONSTRUCT_ONLY)));
-
-/**
- * GelContext::quit
- * @context: The context that received the signal
- *
- * Signal emitted when the predefined
- * function <function>[quit]</function> is invoked.
- * [quit] is automatically provided as part of the default symbols.
+ * Frees resources allocated by @self
  *
  */
-    gel_context_signals[QUIT] = g_signal_new("quit",
-        GEL_TYPE_CONTEXT,
-        G_SIGNAL_RUN_LAST, 0,
-        NULL, NULL,
-        g_cclosure_marshal_VOID__VOID, G_TYPE_NONE, 0);
-}
-
-
-static
-void gel_context_init(GelContext *self)
+void gel_context_free(GelContext *self)
 {
-    self->priv = GEL_CONTEXT_GET_PRIVATE(self);
-}
-
-
-GType gel_context_get_type(void)
-{
-    static volatile gsize gel_context_type = 0;
-
-    if(g_once_init_enter(&gel_context_type))
-    {
-        static const GTypeInfo type_info =
-        {
-            sizeof(GelContextClass),
-            (GBaseInitFunc) NULL,
-            (GBaseFinalizeFunc) NULL,
-            (GClassInitFunc) gel_context_class_init,
-            (GClassFinalizeFunc) NULL,
-            NULL,
-            sizeof(GelContext),
-            0,
-            (GInstanceInitFunc) gel_context_init,
-            NULL
-        };
-
-        GType type = g_type_register_static(
-            G_TYPE_OBJECT, "GelContext", &type_info, (GTypeFlags)0);
-        g_once_init_leave(&gel_context_type, type);
-    }
-
-    return (GType)gel_context_type;
+    g_hash_table_destroy(self->symbols);
+    g_slice_free(GelContext, self);
 }
 

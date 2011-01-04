@@ -1,19 +1,20 @@
 [CCode (cprefix = "Gel", lower_case_cprefix = "gel_", cheader_filename = "gel.h")]
 namespace Gel {
 
-    [CCode (ref_function = "gel_context_ref", unref_function = "gel_context_unref")]
-    public class Context : GLib.Object {
+    public delegate void ContextCallback();
+
+    [Compact]
+    public class Context {
         public Context();
         public Context.with_outer(Gel.Context outer);
         public unowned GLib.Value find_symbol(string name);
-        public Gel.Context outer {get; set construct;}
         public void add_symbol(string name, owned GLib.Value value);
         public void add_object(string name, owned GLib.Object object);
+        public void add_callback(string name, ContextCallback callback);
         public void add_default_symbols();
         public bool remove_symbol(string name);
         public bool eval(GLib.Value value, out GLib.Value dest_value);
         public unowned GLib.Value eval_value(GLib.Value value, out GLib.Value tmp_value);
-        public signal void quit();
     }
 
     GLib.ValueArray parse_file(string file) throws GLib.FileError;

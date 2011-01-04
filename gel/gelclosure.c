@@ -65,7 +65,7 @@ void gel_closure_marshal(GelClosure *closure, GValue *return_value,
                 g_value_unset(&tmp_value);
         }
     }
-    gel_context_unref(context);
+    gel_context_free(context);
 }
 
 
@@ -90,7 +90,7 @@ GClosure* gel_closure_new(GelContext *context, gchar **args, GValueArray *code)
     g_return_val_if_fail(code != NULL, NULL);
 
     GClosure *closure =
-        g_closure_new_object(sizeof(GelClosure), G_OBJECT(context));
+        g_closure_new_simple(sizeof(GelClosure), context);
 
     g_closure_set_marshal(closure, (GClosureMarshal)gel_closure_marshal);
     g_closure_add_finalize_notifier(
