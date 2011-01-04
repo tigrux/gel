@@ -1,8 +1,6 @@
 [CCode (cprefix = "Gel", lower_case_cprefix = "gel_", cheader_filename = "gel.h")]
 namespace Gel {
 
-    public delegate void ContextCallback();
-
     [Compact]
     public class Context {
         public Context();
@@ -10,7 +8,7 @@ namespace Gel {
         public unowned GLib.Value find_symbol(string name);
         public void add_symbol(string name, owned GLib.Value value);
         public void add_object(string name, owned GLib.Object object);
-        public void add_callback(string name, ContextCallback callback);
+        public void add_function(string name, GLib.Func function);
         public void add_default_symbols();
         public bool remove_symbol(string name);
         public bool eval(GLib.Value value, out GLib.Value dest_value);
@@ -20,19 +18,21 @@ namespace Gel {
     GLib.ValueArray parse_file(string file) throws GLib.FileError;
     GLib.ValueArray parse_string(string text, uint text_len);
 
-    bool values_add(GLib.Value v1, GLib.Value v2, out GLib.Value dest_value);
-    bool values_sub(GLib.Value v1, GLib.Value v2, out GLib.Value dest_value);
-    bool values_mul(GLib.Value v1, GLib.Value v2, out GLib.Value dest_Value);
-    bool values_div(GLib.Value v1, GLib.Value v2, out GLib.Value dest_value);
-    bool values_mod(GLib.Value v1, GLib.Value v2, out GLib.Value dest_value);
+    namespace Values {
+        bool add(GLib.Value v1, GLib.Value v2, out GLib.Value dest_value);
+        bool sub(GLib.Value v1, GLib.Value v2, out GLib.Value dest_value);
+        bool mul(GLib.Value v1, GLib.Value v2, out GLib.Value dest_Value);
+        bool div(GLib.Value v1, GLib.Value v2, out GLib.Value dest_value);
+        bool mod(GLib.Value v1, GLib.Value v2, out GLib.Value dest_value);
 
-    int values_compare(GLib.Value v1, GLib.Value v2);
+        int compare(GLib.Value v1, GLib.Value v2);
 
-    bool values_gt(GLib.Value v1, GLib.Value v2);
-    bool values_ge(GLib.Value v1, GLib.Value v2);
-    bool values_eq(GLib.Value v1, GLib.Value v2);
-    bool values_le(GLib.Value v1, GLib.Value v2);
-    bool values_lt(GLib.Value v1, GLib.Value v2);
-    bool values_ne(GLib.Value v1, GLib.Value v2);
+        bool gt(GLib.Value v1, GLib.Value v2);
+        bool ge(GLib.Value v1, GLib.Value v2);
+        bool eq(GLib.Value v1, GLib.Value v2);
+        bool le(GLib.Value v1, GLib.Value v2);
+        bool lt(GLib.Value v1, GLib.Value v2);
+        bool ne(GLib.Value v1, GLib.Value v2);
+    }
 }
 

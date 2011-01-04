@@ -8,8 +8,7 @@ gel_context_find_symbol
 gel_context_get_outer
 gel_context_add_symbol
 gel_context_add_object
-GelContextCallback
-gel_context_add_callback
+gel_context_add_function
 gel_context_add_default_symbols
 gel_context_remove_symbol
 gel_context_eval

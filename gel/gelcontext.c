@@ -600,29 +600,28 @@ void gel_context_marshal(GClosure *closure, GValue *return_value,
                          guint n_param_values, const GValue *param_values,
                          gpointer invocation_hint, gpointer marshal_data)
 {
-    typedef void (*MarshalCallback)(gpointer data1, gpointer data2);
     register GCClosure *cc = (GCClosure*)closure;
-    register MarshalCallback callback = (MarshalCallback)cc->callback;
+    register GFunc callback = (GFunc)cc->callback;
 
     if(n_param_values > 1)
         callback(g_value_peek_pointer(param_values + 0), closure->data);
     else
-        callback(closure->data, NULL);
+        callback(NULL, closure->data);
 }
 
 
 /**
- * gel_context_add_callback:
+ * gel_context_add_function:
  * @self: context
  * @name: name of the symbol to add
- * @callback: a #GelContextCallback to invoke
- * @user_data: extra data to pass to @callback
+ * @function: a #GFunc to invoke
+ * @user_data: extra data to pass to @function
  *
- * A wrapper for #gel_context_add_symbol that calls @callback when
+ * A wrapper for #gel_context_add_symbol that calls @function when
  * @self evaluates a call to a function named @name.
  */
-void gel_context_add_callback(GelContext *self, const gchar *name,
-                              GelContextCallback callback, gpointer user_data)
+void gel_context_add_function(GelContext *self, const gchar *name,
+                              GFunc callback, gpointer user_data)
 {
     g_return_if_fail(self != NULL);
     g_return_if_fail(name != NULL);

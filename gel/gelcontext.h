@@ -6,8 +6,6 @@
 
 typedef struct _GelContext GelContext;
 
-typedef void (*GelContextCallback)(gpointer user_data);
-
 GelContext* gel_context_new(void);
 GelContext* gel_context_new_with_outer(GelContext *outer);
 void gel_context_free(GelContext *self);
@@ -18,8 +16,8 @@ GelContext* gel_context_get_outer(const GelContext *self);
 void gel_context_add_symbol(GelContext *self, const gchar *name, GValue *value);
 void gel_context_add_object(GelContext *self, const gchar *name,
                             GObject *object);
-void gel_context_add_callback(GelContext *self, const gchar *name,
-                              GelContextCallback callback, gpointer user_data);
+void gel_context_add_function(GelContext *self, const gchar *name,
+                              GFunc function, gpointer user_data);
 void gel_context_add_default_symbols(GelContext *self);
 gboolean gel_context_remove_symbol(GelContext *self, const gchar *name);
 

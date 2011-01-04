@@ -4,7 +4,7 @@ class Demo : Object {
 
     public Demo() {
         context = new Gel.Context();
-        context.add_callback("quit", Gtk.main_quit);
+        context.add_function("quit", Gtk.main_quit);
     }
 
     public bool run() {
