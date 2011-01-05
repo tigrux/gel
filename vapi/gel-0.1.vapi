@@ -1,4 +1,4 @@
-[CCode (cprefix = "Gel", lower_case_cprefix = "gel_", cheader_filename = "gel.h")]
+[CCode (cheader_filename = "gel.h")]
 namespace Gel {
 
     [Compact]
