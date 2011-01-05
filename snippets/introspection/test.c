@@ -76,15 +76,6 @@ int main(int argc, char *argv[])
                 GType type = g_registered_type_info_get_g_type(type_info);
                 if(type != G_TYPE_NONE)
                     g_print("\ttypename = %s\n", g_type_name(type));
-                guint n_methods = g_object_info_get_n_methods(info);
-                guint i;
-                for (i = 0; i < n_methods; i++)
-                {
-                    GIFunctionInfo *finfo = g_object_info_get_method(info, i);
-                    g_print("\tmethod %s\n",
-                        g_base_info_get_name((GIBaseInfo*)finfo));
-                    g_base_info_unref((GIBaseInfo*)finfo);
-                }
                 break;
             }
             default:
