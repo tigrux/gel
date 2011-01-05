@@ -18,14 +18,14 @@
 
 [var counter 0]
 
-[def button-clicked [widget]
-    [print "Previous label " [get widget "label"]]
-    [set widget "label" "Thanks!"]
-    [let counter [add counter 1]]
-    [set entry "text" counter]
+[connect button "clicked"
+    [lambda [widget]
+        [print "Previous label " [get widget "label"]]
+        [set widget "label" "Thanks!"]
+        [let counter [add counter 1]]
+        [set entry "text" counter]
+    ]
 ]
-
-[connect button "clicked" button-clicked]
 
 [set button "visible" TRUE]
 [set entry "visible" TRUE]
