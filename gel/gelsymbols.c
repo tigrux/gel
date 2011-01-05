@@ -321,6 +321,7 @@ void connect_(GClosure *self, GValue *return_value,
             G_IS_VALUE(return_value) ? &tmp_value : return_value;
 
         g_value_init(result_value, G_TYPE_UINT);
+        g_closure_ref(callback);
         g_value_set_uint(result_value,
             g_signal_connect_closure(object, signal, callback, FALSE));
 

@@ -48,7 +48,7 @@ GValue* gel_value_new_from_closure(GClosure *value_closure)
     g_return_val_if_fail(value_closure != NULL, NULL);
 
     GValue *value = gel_value_new_of_type(G_TYPE_CLOSURE);
-    g_value_set_boxed(value, value_closure);
+    g_value_take_boxed(value, value_closure);
     return value;
 }
 
