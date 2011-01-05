@@ -6,6 +6,7 @@ namespace Gel {
         public Context();
         public Context.with_outer(Gel.Context outer);
         public unowned GLib.Value find_symbol(string name);
+        public unowned Context outer {get;}
         public void add_symbol(string name, owned GLib.Value value);
         public void add_object(string name, owned GLib.Object object);
         public void add_function(string name, GLib.Func function);
