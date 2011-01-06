@@ -220,8 +220,9 @@ const GValue* gel_context_eval_value(GelContext *self,
     g_return_val_if_fail(tmp_value != NULL, NULL);
 
     const GValue *result_value = NULL;
+    GType type = G_VALUE_TYPE(value);
 
-    if(G_VALUE_HOLDS(value, G_TYPE_STRING))
+    if(type == G_TYPE_STRING)
     {
         const gchar *const symbol_name = g_value_get_string(value);
         GValue *symbol_value = gel_context_find_symbol(self, symbol_name);
@@ -231,7 +232,7 @@ const GValue* gel_context_eval_value(GelContext *self,
             gel_warning_unknown_symbol(__FUNCTION__, symbol_name);
     }
     else
-    if(G_VALUE_HOLDS(value, G_TYPE_VALUE_ARRAY))
+    if(type == G_TYPE_VALUE_ARRAY)
         result_value = gel_context_eval_array(self,
             (GValueArray*)g_value_get_boxed(value), tmp_value);
 
