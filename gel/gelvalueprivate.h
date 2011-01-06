@@ -15,13 +15,19 @@
 
 #ifdef G_VALUE_HOLDS
     #undef G_VALUE_HOLDS
-    #define G_VALUE_HOLDS(v, t) ((v)->g_type == (t) || g_type_is_a((v)->g_type, (t)))
 #endif
+#define G_VALUE_HOLDS(v, t) ((v)->g_type == (t) || g_type_is_a((v)->g_type, (t)))
+
 
 #ifdef G_VALUE_TYPE
     #undef G_VALUE_TYPE
-    #define G_VALUE_TYPE(v) ((v)->g_type)
 #endif
+#define G_VALUE_TYPE(v) ((v)->g_type)
+
+#ifdef G_IS_VALUE
+    #undef G_IS_VALUE
+#endif
+#define G_IS_VALUE(v) ((v)->g_type != G_TYPE_INVALID)
 
 typedef
 gboolean (*GelValuesArithmetic)(const GValue *l_value, const GValue *r_value,
