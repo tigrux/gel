@@ -429,13 +429,22 @@ gboolean gel_values_simple_mod(const GValue *v1, const GValue *v2,
 
 static
 GType gel_values_simple_transform(const GValue *v1, const GValue *v2,
-                                  GValue *vv1, GValue *vv2)
+                                  GValue *vv1, GValue *vv2,
+                                  const GValue **vvv1, const GValue **vvv2)
 {
     g_return_val_if_fail(v1 != NULL, FALSE);
     g_return_val_if_fail(v2 != NULL, FALSE);
 
     GType simple_type = gel_values_simple_type(v1, v2);
     g_return_val_if_fail(simple_type != G_TYPE_INVALID, FALSE);
+
+    if(G_VALUE_TYPE(v1) == simple_type && G_VALUE_TYPE(v2) == simple_type)
+    {
+        *vvv1 = v1;
+        *vvv2 = v2;
+        return simple_type;
+    }
+
 
     g_value_init(vv1, simple_type);
     g_value_init(vv2, simple_type);
@@ -453,6 +462,9 @@ GType gel_values_simple_transform(const GValue *v1, const GValue *v2,
     }
     else
         g_value_unset(vv1);
+
+    *vvv1 = vv1;
+    *vvv2 = vv2;
 
     return result;
 }
@@ -561,17 +573,21 @@ gboolean gel_values_arithmetic(const GValue *v1, const GValue *v2,
     g_return_val_if_fail(v2 != NULL, FALSE);
     g_return_val_if_fail(dest_value != NULL, FALSE);
 
-    GValue vv1 = {0};
-    GValue vv2 = {0};
+    GValue tmp1 = {0};
+    GValue tmp2 = {0};
+    const GValue *vv1 = NULL;
+    const GValue *vv2 = NULL;
 
-    GType dest_type = gel_values_simple_transform(v1, v2, &vv1, &vv2);
+    GType dest_type = gel_values_simple_transform(v1, v2, &tmp1, &tmp2, &vv1, &vv2);
     g_return_val_if_fail(dest_type != G_TYPE_INVALID, FALSE);
 
     g_value_init(dest_value, dest_type);
-    gboolean result = values_function(&vv1, &vv2, dest_value);
+    gboolean result = values_function(vv1, vv2, dest_value);
 
-    g_value_unset(&vv1);
-    g_value_unset(&vv2);
+    if(G_IS_VALUE(&tmp1))
+        g_value_unset(&tmp1);
+    if(G_IS_VALUE(&tmp2))
+        g_value_unset(&tmp2);
     return result;
 }
 
@@ -590,10 +606,12 @@ gint gel_values_cmp(const GValue *v1, const GValue *v2)
     g_return_val_if_fail(v1 != NULL, FALSE);
     g_return_val_if_fail(v2 != NULL, FALSE);
 
-    GValue vv1 = {0};
-    GValue vv2 = {0};
+    GValue tmp1 = {0};
+    GValue tmp2 = {0};
+    const GValue *vv1 = NULL;
+    const GValue *vv2 = NULL;
 
-    GType simple_type = gel_values_simple_transform(v1, v2, &vv1, &vv2);
+    GType simple_type = gel_values_simple_transform(v1, v2, &tmp1, &tmp2, &vv1, &vv2);
     g_return_val_if_fail(simple_type != G_TYPE_INVALID, FALSE);
 
     gboolean result = -1;
@@ -601,44 +619,44 @@ gint gel_values_cmp(const GValue *v1, const GValue *v2)
     {
         case G_TYPE_LONG:
         {
-            glong i1 = g_value_get_long(&vv1);
-            glong i2 = g_value_get_long(&vv2);
+            glong i1 = g_value_get_long(vv1);
+            glong i2 = g_value_get_long(vv2);
             result = i1 > i2 ? 1 : i1 < i2 ? -1 : 0;
             break;
         }
         case G_TYPE_DOUBLE:
         {
-            gdouble d1 = g_value_get_double(&vv1);
-            gdouble d2 = g_value_get_double(&vv2);
+            gdouble d1 = g_value_get_double(vv1);
+            gdouble d2 = g_value_get_double(vv2);
             result = d1 > d2 ? 1 : d1 < d2 ? -1 : 0;
             break;
         }
         case G_TYPE_BOOLEAN:
         {
-            gint b1 = g_value_get_boolean(&vv1);
-            gint b2 = g_value_get_boolean(&vv2);
+            gint b1 = g_value_get_boolean(vv1);
+            gint b2 = g_value_get_boolean(vv2);
             result = b1 > b2 ? 1 : b1 < b2 ? -1 : 0;
             break;
         }
         case G_TYPE_STRING:
         {
             result = g_strcmp0(
-                g_value_get_string(&vv1), g_value_get_string(&vv2));
+                g_value_get_string(vv1), g_value_get_string(vv2));
             break;
         }
         case G_TYPE_POINTER:
         {
             
-            gpointer p1 = g_value_peek_pointer(&vv1);
-            gpointer p2 = g_value_peek_pointer(&vv2);
+            gpointer p1 = g_value_peek_pointer(vv1);
+            gpointer p2 = g_value_peek_pointer(vv2);
             result = p1 > p2 ? 1 : p1 < p2 ? -1 : 0;
             break;
         }
         default:
             if(simple_type == G_TYPE_VALUE_ARRAY)
             {
-                GValueArray *a1 = (GValueArray*)g_value_get_boxed(&vv1);
-                GValueArray *a2 = (GValueArray*)g_value_get_boxed(&vv2);
+                GValueArray *a1 = (GValueArray*)g_value_get_boxed(vv1);
+                GValueArray *a2 = (GValueArray*)g_value_get_boxed(vv2);
                 guint a1_n = a1->n_values;
                 guint a2_n = a2->n_values;
                 guint n_values = MIN(a1_n, a2_n);
@@ -657,8 +675,10 @@ gint gel_values_cmp(const GValue *v1, const GValue *v2)
             }
     }
 
-    g_value_unset(&vv1);
-    g_value_unset(&vv2);
+    if(G_IS_VALUE(&tmp1))
+        g_value_unset(&tmp1);
+    if(G_IS_VALUE(&tmp2))
+        g_value_unset(&tmp2);
     return result;
 }
 
@@ -670,15 +690,20 @@ gboolean gel_values_logic(const GValue *v1, const GValue *v2,
     g_return_val_if_fail(v1 != NULL, FALSE);
     g_return_val_if_fail(v2 != NULL, FALSE);
 
-    GValue vv1 = {0};
-    GValue vv2 = {0};
+    GValue tmp1 = {0};
+    GValue tmp2 = {0};
+    const GValue *vv1 = NULL;
+    const GValue *vv2 = NULL;
 
-    GType simple_type = gel_values_simple_transform(v1, v2, &vv1, &vv2);
-    g_return_val_if_fail(simple_type != G_TYPE_INVALID, FALSE);
+    GType dest_type = gel_values_simple_transform(v1, v2, &tmp1, &tmp2, &vv1, &vv2);
+    g_return_val_if_fail(dest_type != G_TYPE_INVALID, FALSE);
 
-    gboolean result = values_function(&vv1, &vv2);
-    g_value_unset(&vv1);
-    g_value_unset(&vv2);
+    gboolean result = values_function(vv1, vv2);
+
+    if(G_IS_VALUE(&tmp1))
+        g_value_unset(&tmp1);
+    if(G_IS_VALUE(&tmp2))
+        g_value_unset(&tmp2);
     return result;
 }
 
