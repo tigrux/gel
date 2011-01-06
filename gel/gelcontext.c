@@ -507,9 +507,9 @@ GValue* gel_context_find_symbol(const GelContext *self, const gchar *name)
     g_return_val_if_fail(name != NULL, NULL);
 
     register GValue *symbol = NULL;
-    register const GelContext *context = self;
-    for(; context != NULL && symbol == NULL; context = context->outer)
-        symbol = (GValue*)g_hash_table_lookup(context->symbols, name);
+    register const GelContext *ic;
+    for(ic = self; ic != NULL && symbol == NULL; ic = ic->outer)
+        symbol = (GValue*)g_hash_table_lookup(ic->symbols, name);
     return symbol;
 }
 
