@@ -1,9 +1,9 @@
 #include <string.h>
 
 #include <gelcontext.h>
+#include <geldebug.h>
 #include <gelvalue.h>
 #include <gelvalueprivate.h>
-#include <geldebug.h>
 
 
 /**

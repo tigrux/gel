@@ -3,6 +3,15 @@
 
 #include <glib-object.h>
 
+#define g_value_get_boolean(v) ((v)->data[0].v_int != FALSE)
+#define g_value_get_long(v) ((v)->data[0].v_long)
+#define g_value_get_double(v) ((v)->data[0].v_double)
+#define g_value_get_boxed(v) ((v)->data[0].v_pointer)
+#define g_value_get_string(v) ((gchar*)(v)->data[0].v_pointer)
+
+#define g_value_set_boolean(v, a) ((v)->data[0].v_int = (a) != FALSE)
+#define g_value_set_long(v, a) ((v)->data[0].v_long = (glong)(a))
+#define g_value_set_double(v, a) ((v)->data[0].v_double = (gdouble)(a))
 
 typedef
 gboolean (*GelValuesArithmetic)(const GValue *l_value, const GValue *r_value,

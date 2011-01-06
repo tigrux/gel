@@ -1,7 +1,7 @@
-#include <gelvalue.h>
-#include <gelvalueprivate.h>
 #include <gelcontext.h>
 #include <geldebug.h>
+#include <gelvalue.h>
+#include <gelvalueprivate.h>
 
 
 static
