@@ -29,6 +29,9 @@ gboolean gel_context_eval_params(GelContext *self, const gchar *func,
                                  GList **list, const gchar *format,
                                  guint *n_values, const GValue **values, ...);
 
+GClosure* gel_context_closure_new(GelContext *self,
+                                  gchar **args, GValueArray *code);
+
 
 #endif
 

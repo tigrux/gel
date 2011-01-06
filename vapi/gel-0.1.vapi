@@ -14,6 +14,7 @@ namespace Gel {
         public bool remove_symbol(string name);
         public bool eval(GLib.Value value, out GLib.Value dest_value);
         public unowned GLib.Value eval_value(GLib.Value value, out GLib.Value tmp_value);
+        GLib.Closure closure_new([CCode (array_length = false, array_null_terminated = true)] owned string[] args, owned GLib.ValueArray code);
     }
 
     GLib.ValueArray parse_file(string file) throws GLib.FileError;

@@ -3,7 +3,6 @@
 #include <gelcontext.h>
 #include <gelvalue.h>
 #include <gelvalueprivate.h>
-#include <gelclosure.h>
 #include <geldebug.h>
 
 

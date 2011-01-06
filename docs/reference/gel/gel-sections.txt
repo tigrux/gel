@@ -14,14 +14,7 @@ gel_context_remove_symbol
 gel_context_eval
 gel_context_eval_value
 gel_context_eval_params
-
-</SECTION>
-
-<SECTION>
-<FILE>gelclosure</FILE>
-GelClosure
-gel_closure_new
-gel_closure_is_gel
+gel_context_closure_new
 </SECTION>
 
 <SECTION>

@@ -1,7 +1,6 @@
 #include <gelvalue.h>
 #include <gelvalueprivate.h>
 #include <gelcontext.h>
-#include <gelclosure.h>
 #include <geldebug.h>
 
 
@@ -195,7 +194,7 @@ GClosure* new_closure(GelContext *context,
         GValueArray *code = g_value_array_new(n_values);
         for(i = 0; i < n_values; i++)
             g_value_array_append(code, values+i);
-        self = gel_closure_new(context, vars, code);
+        self = gel_context_closure_new(context, vars, code);
     }
     else
     {

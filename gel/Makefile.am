@@ -17,7 +17,6 @@ libgel_la_SOURCES = \
 libgel_includedir = $(includedir)/gel-0.1
 libgel_include_HEADERS = \
 	gel.h \
-	gelclosure.h \
 	gelcontext.h \
 	gelparser.h \
 	gelvalue.h

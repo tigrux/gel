@@ -1,17 +1,9 @@
 #include <gelcontext.h>
-#include <gelclosure.h>
+#include <gelvalue.h>
 #include <gelvalueprivate.h>
 
 
-/**
- * SECTION:gelclosure
- * @short_description: Closure used by functions written in gel.
- * @title: GelClosure
- * @include: gel.h
- *
- * A #GelClosure is a specialization of GClosure for gel function callbacks.
- */
-
+typedef struct _GelClosure GelClosure;
 
 struct _GelClosure
 {
@@ -73,51 +65,37 @@ void gel_closure_marshal(GelClosure *closure, GValue *return_value,
 
 
 /**
- * gel_closure_new:
- * @context: instance of #GelContext
+ * gel_context_closure_new:
+ * @self: #GelContext
  * @args: #NULL terminated array of strings with the closure argument names.
  * @code: #GValueArray with the code of the closure.
  *
- * Creates a new #GClosure where @context is used as the marshal of the new
+ * Creates a new #GClosure where @self is used as the data of the new
  * closure, @args contains the names of the arguments of the closure, and
  * @code contains the values that the closure shall evaluate when invoked.
  *
  * The closure takes ownership of @args and @code so they should not be freed.
  *
- * Returns: a new #GelClosure
+ * Returns: a new #GClosure
  */
-GClosure* gel_closure_new(GelContext *context, gchar **args, GValueArray *code)
+GClosure* gel_context_closure_new(GelContext *self,
+                                  gchar **args, GValueArray *code)
 {
-    g_return_val_if_fail(context != NULL, NULL);
+    g_return_val_if_fail(self != NULL, NULL);
     g_return_val_if_fail(args != NULL, NULL);
     g_return_val_if_fail(code != NULL, NULL);
 
     GClosure *closure =
-        g_closure_new_simple(sizeof(GelClosure), context);
+        g_closure_new_simple(sizeof(GelClosure), self);
 
     g_closure_set_marshal(closure, (GClosureMarshal)gel_closure_marshal);
     g_closure_add_finalize_notifier(
-        closure, context, (GClosureNotify)gel_closure_finalize);
+        closure, self, (GClosureNotify)gel_closure_finalize);
 
     GelClosure *gel_closure = (GelClosure*)closure;
     gel_closure->args = args;
     gel_closure->code = code;
 
     return closure;
-}
-
-
-/**
- * gel_closure_is_gel:
- * @closure: an instance of #GClosure 
- *
- * Checks whether the closure is written in gel or not.
- *
- * Returns: #TRUE if the closure is written in gel, #FALSE otherwise
- */
-gboolean gel_closure_is_gel(GClosure *closure)
-{
-    g_return_val_if_fail(closure != NULL, FALSE);
-    return closure->marshal == (GClosureMarshal)gel_closure_marshal;
 }
 

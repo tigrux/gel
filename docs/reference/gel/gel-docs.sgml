@@ -12,7 +12,6 @@
   <chapter>
     <title>GEL</title>
         <xi:include href="xml/gelcontext.xml"/>
-    <xi:include href="xml/gelclosure.xml"/>
     <xi:include href="xml/gelparser.xml"/>
     <xi:include href="xml/gelvalue.xml"/>
 
