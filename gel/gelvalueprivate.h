@@ -13,6 +13,16 @@
 #define g_value_set_long(v, a) ((v)->data[0].v_long = (glong)(a))
 #define g_value_set_double(v, a) ((v)->data[0].v_double = (gdouble)(a))
 
+#ifdef G_VALUE_HOLDS
+    #undef G_VALUE_HOLDS
+    #define G_VALUE_HOLDS(v, t) ((v)->g_type == (t) || g_type_is_a((v)->g_type, (t)))
+#endif
+
+#ifdef G_VALUE_TYPE
+    #undef G_VALUE_TYPE
+    #define G_VALUE_TYPE(v) ((v)->g_type)
+#endif
+
 typedef
 gboolean (*GelValuesArithmetic)(const GValue *l_value, const GValue *r_value,
                                 GValue *dest_value);

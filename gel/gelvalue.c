@@ -159,7 +159,7 @@ gchar* gel_value_to_string(const GValue *value)
     {
         GString *repr_string = g_string_new("<");
         g_string_append_printf(repr_string, "%s", G_VALUE_TYPE_NAME(value));
-        if(G_VALUE_HOLDS_GTYPE(value))
+        if(G_VALUE_HOLDS(value, G_TYPE_GTYPE))
             g_string_append_printf(
                 repr_string, " %s", g_type_name(g_value_get_gtype(value)));
         else
@@ -187,15 +187,15 @@ gboolean gel_value_to_boolean(const GValue *value)
     }
     else
     {
-        if(G_VALUE_HOLDS_STRING(value))
+        if(G_VALUE_HOLDS(value, G_TYPE_STRING))
             result = (
                 g_value_get_string(value) != NULL
                 && g_strcmp0(g_value_get_string(value), "") != 0);
         else
-        if(G_VALUE_HOLDS_LONG(value))
+        if(G_VALUE_HOLDS(value, G_TYPE_LONG))
             result = (g_value_get_long(value) != 0);
         else
-        if(G_VALUE_HOLDS_DOUBLE(value))
+        if(G_VALUE_HOLDS(value, G_TYPE_DOUBLE))
             result = (g_value_get_double(value) != 0.0);
         else
         if(G_VALUE_HOLDS(value, G_TYPE_ARRAY))
@@ -238,7 +238,8 @@ GType gel_value_simple_type(const GValue *value)
         case G_TYPE_BOOLEAN:
             return G_TYPE_BOOLEAN;
         default:
-            if(G_VALUE_HOLDS_ENUM(value) || G_VALUE_HOLDS_FLAGS(value))
+            if(G_VALUE_HOLDS(value, G_TYPE_ENUM)
+               || G_VALUE_HOLDS(value, G_TYPE_FLAGS))
                 return G_TYPE_LONG;
             if(G_VALUE_HOLDS(value, G_TYPE_VALUE_ARRAY))
                 return G_TYPE_VALUE_ARRAY;

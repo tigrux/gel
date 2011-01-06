@@ -179,7 +179,7 @@ GClosure* new_closure(GelContext *context,
     for(i = 0; i < n_vars; i++)
     {
         const GValue *const value = vars_array_values + i;
-        if(G_VALUE_HOLDS_STRING(value))
+        if(G_VALUE_HOLDS(value, G_TYPE_STRING))
             vars[i] = g_value_dup_string(value);
         else
         {
