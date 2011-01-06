@@ -38,9 +38,9 @@ int main(string[] args) {
         return 1;
     }
 
-    unowned string file = args[1];
+    var file = args[1];
 
-    Demo demo = new Demo();
+    var demo = new Demo();
 
     try {
         demo.parse_file(file);
