@@ -378,7 +378,7 @@ gboolean gel_values_simple_mul(const GValue *v1, const GValue *v2,
 
 static
 gboolean gel_values_simple_div(const GValue *v1, const GValue *v2,
-                              GValue *dest_value)
+                               GValue *dest_value)
 {
     g_return_val_if_fail(v1 != NULL, FALSE);
     g_return_val_if_fail(v2 != NULL, FALSE);

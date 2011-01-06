@@ -3,6 +3,7 @@
 
 #include <glib-object.h>
 
+
 void gel_value_list_free(GList *list);
 
 gboolean gel_values_add(const GValue *v1, const GValue *v2, GValue *dest_value);
