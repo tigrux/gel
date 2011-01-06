@@ -35,7 +35,7 @@ void gel_closure_finalize(GelContext *context, GelClosure *closure)
 static
 void gel_closure_marshal(GelClosure *closure, GValue *return_value,
                          guint n_param_values, const GValue *param_values,
-                         gpointer invocation_hint, gpointer marshal_data)
+                         GelContext *invocation_context, gpointer marshal_data)
 {
     const guint n_args = g_strv_length(closure->args);
     g_return_if_fail(n_param_values == n_args);
@@ -46,8 +46,11 @@ void gel_closure_marshal(GelClosure *closure, GValue *return_value,
     gchar **const closure_args = closure->args;
     register guint i;
     for(i = 0; i < n_args; i++)
-        gel_context_add_symbol(context,
-            closure_args[i], gel_value_dup(param_values + i));
+    {
+        GValue *value = gel_value_new();
+        gel_context_eval(invocation_context, param_values + i, value);
+        gel_context_add_symbol(context, closure_args[i], value);
+    }
 
     const guint n_values = closure->code->n_values;
     if(n_values > 0)

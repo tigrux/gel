@@ -103,58 +103,20 @@ GelContext* gel_context_new_with_outer(GelContext *outer)
 
 
 static
-void gel_context_invoke_closure(GelContext *self, GClosure *closure,
-                                guint n_values, const GValue *values,
-                                GValue *dest_value)
-{
-    g_return_if_fail(self != NULL);
-    g_return_if_fail(closure != NULL);
-    g_return_if_fail(dest_value != NULL);
-
-    if(gel_closure_is_gel(closure))
-    {
-        GValueArray *const array = g_value_array_new(n_values);
-        register guint i;
-        for(i = 0; i < n_values; i++)
-        {
-            GValue tmp_value = {0};
-            g_value_array_append(array,
-                gel_context_eval_value(self, values+i, &tmp_value));
-            if(G_IS_VALUE(&tmp_value))
-                g_value_unset(&tmp_value);
-        }
-
-        g_closure_invoke(
-            closure, dest_value, n_values, array->values, self);
-        g_value_array_free(array);
-    }
-    else
-        g_closure_invoke(closure, dest_value, n_values , values, self);
-}
-
-
-static
 void gel_context_invoke_type(GelContext *self, GType type,
-                             guint n_values, const GValue *values,
-                             GValue *dest_value)
+                             guint n_values, const GValue *values)
 {
     g_return_if_fail(self != NULL);
     g_return_if_fail(type != G_TYPE_INVALID);
-    g_return_if_fail(dest_value != NULL);
 
     register guint i;
     for(i = 0; i < n_values; i++)
     {
-        g_return_if_fail(G_VALUE_HOLDS_STRING(values+i));
-        const gchar *var_name = g_value_get_string(values+i);
-        GValue *var_value = gel_value_new_of_type(type);
-        gel_context_add_symbol(self, var_name, var_value);
+        g_return_if_fail(G_VALUE_HOLDS_STRING(values + i));
+        gel_context_add_symbol(self,
+            g_value_get_string(values + i),
+            gel_value_new_of_type(type));
     }
-
-    GValue count_value = {0};
-    g_value_init(&count_value, G_TYPE_GTYPE);
-    g_value_set_gtype(&count_value, type);
-    gel_value_copy(&count_value, dest_value);
 }
 
 
@@ -173,12 +135,12 @@ const GValue* gel_context_eval_array(GelContext *self, const GValueArray *array,
 
     if(G_VALUE_HOLDS_STRING(array_values + 0))
     {
-        const gchar *type_name = g_value_get_string(array_values + 0);
+        const gchar *const type_name = g_value_get_string(array_values + 0);
         GType type = g_type_from_name(type_name);
         if(type != G_TYPE_INVALID)
         {
             gel_context_invoke_type(self, type,
-                array_n_values -1 , array_values + 1, dest_value);
+                array_n_values -1 , array_values + 1);
             result_value = dest_value;
         }
     }
@@ -191,9 +153,8 @@ const GValue* gel_context_eval_array(GelContext *self, const GValueArray *array,
 
         if(G_VALUE_HOLDS(first_value, G_TYPE_CLOSURE))
         {
-            GClosure *closure = (GClosure*)g_value_get_boxed(first_value);
-            gel_context_invoke_closure(self, closure,
-                array_n_values - 1, array_values + 1, dest_value);
+            g_closure_invoke((GClosure*)g_value_get_boxed(first_value),
+                dest_value, array_n_values - 1 , array_values + 1, self);
             result_value = dest_value;
         }
         else
@@ -263,7 +224,7 @@ const GValue* gel_context_eval_value(GelContext *self,
 
     if(G_VALUE_HOLDS(value, G_TYPE_STRING))
     {
-        const gchar *symbol_name = g_value_get_string(value);
+        const gchar *const symbol_name = g_value_get_string(value);
         GValue *symbol_value = gel_context_find_symbol(self, symbol_name);
         if(symbol_value != NULL)
             result_value = symbol_value;
@@ -272,10 +233,8 @@ const GValue* gel_context_eval_value(GelContext *self,
     }
     else
     if(G_VALUE_HOLDS(value, G_TYPE_VALUE_ARRAY))
-    {
-        GValueArray *array = (GValueArray*)g_value_get_boxed(value);
-        result_value = gel_context_eval_array(self, array, tmp_value);
-    }
+        result_value = gel_context_eval_array(self,
+            (GValueArray*)g_value_get_boxed(value), tmp_value);
 
     if(result_value == NULL)
         result_value = value;
@@ -547,10 +506,10 @@ GValue* gel_context_find_symbol(const GelContext *self, const gchar *name)
     g_return_val_if_fail(self != NULL, NULL);
     g_return_val_if_fail(name != NULL, NULL);
 
-    GValue *symbol = (GValue*)g_hash_table_lookup(
-        self->symbols, name);
-    if(symbol == NULL && self->outer != NULL)
-        symbol = gel_context_find_symbol(self->outer, name);
+    register GValue *symbol = NULL;
+    register const GelContext *context = self;
+    for(; context != NULL && symbol == NULL; context = context->outer)
+        symbol = (GValue*)g_hash_table_lookup(context->symbols, name);
     return symbol;
 }
 
