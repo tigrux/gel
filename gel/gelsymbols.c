@@ -66,18 +66,8 @@ void new_(GClosure *self, GValue *return_value,
             if(G_IS_INITIALLY_UNOWNED(new_object))
                 g_object_ref_sink(new_object);
 
-            GValue tmp_value = {0};
-            GValue *result_value =
-                G_IS_VALUE(return_value) ? &tmp_value : return_value;
-
-            g_value_init(result_value, type);
-            g_value_take_object(result_value, new_object);
-
-            if(result_value != return_value)
-            {
-                gel_value_copy(result_value, return_value);
-                g_value_unset(result_value);
-            }
+            g_value_init(return_value, type);
+            g_value_take_object(return_value, new_object);
         }
         else
             gel_warning_type_not_instantiatable(__FUNCTION__, type);
@@ -101,17 +91,8 @@ void quote_(GClosure *self, GValue *return_value,
         return;
     }
 
-    GValue tmp_value = {0};
-    GValue *result_value = G_IS_VALUE(return_value) ? &tmp_value : return_value;
-
-    g_value_init(result_value, G_TYPE_STRING);
-    g_value_take_string(result_value, gel_value_to_string(values + 0));
-
-    if(result_value != return_value)
-    {
-        gel_value_copy(result_value, return_value);
-        g_value_unset(result_value);
-    }
+    g_value_init(return_value, G_TYPE_STRING);
+    g_value_take_string(return_value, gel_value_to_string(values + 0));
 }
 
 
@@ -134,18 +115,8 @@ void get_(GClosure *self, GValue *return_value,
             g_object_class_find_property(G_OBJECT_GET_CLASS(object), prop_name);
         if(prop_spec != NULL)
         {
-            GValue tmp_value = {0};
-            GValue *result_value =
-                G_IS_VALUE(return_value) ? &tmp_value : return_value;
-
-            g_value_init(result_value, prop_spec->value_type);
-            g_object_get_property(object, prop_name, result_value);
-
-            if(result_value != return_value)
-            {
-                gel_value_copy(result_value, return_value);
-                g_value_unset(result_value);
-            }
+            g_value_init(return_value, prop_spec->value_type);
+            g_object_get_property(object, prop_name, return_value);
         }
         else
             gel_warning_no_such_property(__FUNCTION__, prop_name);
@@ -281,18 +252,8 @@ void lambda_(GClosure *self, GValue *return_value,
 
     if(closure != NULL)
     {
-        GValue tmp_value = {0};
-        GValue *result_value =
-            G_IS_VALUE(return_value) ? &tmp_value : return_value;
-
-        g_value_init(result_value, G_TYPE_CLOSURE);
-        g_value_take_boxed(result_value, closure);
-
-        if(result_value != return_value)
-        {
-            gel_value_copy(result_value, return_value);
-            g_value_unset(result_value);
-        }
+        g_value_init(return_value, G_TYPE_CLOSURE);
+        g_value_take_boxed(return_value, closure);
     }
 
     if(list != NULL)
@@ -316,20 +277,10 @@ void connect_(GClosure *self, GValue *return_value,
 
     if(G_IS_OBJECT(object))
     {
-        GValue tmp_value = {0};
-        GValue *result_value =
-            G_IS_VALUE(return_value) ? &tmp_value : return_value;
-
-        g_value_init(result_value, G_TYPE_UINT);
+        g_value_init(return_value, G_TYPE_UINT);
         g_closure_ref(callback);
-        g_value_set_uint(result_value,
+        g_value_set_uint(return_value,
             g_signal_connect_closure(object, signal, callback, FALSE));
-
-        if(result_value != return_value)
-        {
-            gel_value_copy(result_value, return_value);
-            g_value_unset(result_value);
-        }
     }
     else
         gel_warning_value_not_of_type(__FUNCTION__, values + 0, G_TYPE_OBJECT);
@@ -454,17 +405,8 @@ void logic(GClosure *self, GValue *return_value,
             g_value_unset(&tmp2);
     }
 
-    GValue tmp_value = {0};
-    GValue *result_value = G_IS_VALUE(return_value) ? &tmp_value : return_value;
-
-    g_value_init(result_value, G_TYPE_BOOLEAN);
-    g_value_set_boolean(result_value, result);
-
-    if(result_value != return_value)
-    {
-        gel_value_copy(result_value, return_value);
-        g_value_unset(result_value);
-    }
+    g_value_init(return_value, G_TYPE_BOOLEAN);
+    g_value_set_boolean(return_value, result);
 }
 
 
@@ -487,20 +429,8 @@ void not_(GClosure *self, GValue *return_value,
     if(G_IS_VALUE(&tmp_value))
         g_value_unset(&tmp_value);
 
-    GValue *result_value;
-    if(G_IS_VALUE(return_value))
-        result_value = &tmp_value;
-    else
-        result_value = return_value;
-
-    g_value_init(result_value, G_TYPE_BOOLEAN);
-    g_value_set_boolean(result_value, !value_bool);
-
-    if(result_value != return_value)
-    {
-        gel_value_copy(result_value, return_value);
-        g_value_unset(result_value);
-    }
+    g_value_init(return_value, G_TYPE_BOOLEAN);
+    g_value_set_boolean(return_value, !value_bool);
 }
 
 
@@ -586,17 +516,8 @@ void any_(GClosure *self, GValue *return_value,
         g_value_unset(&value);
     }
 
-    GValue tmp_value = {0};
-    GValue *result_value = G_IS_VALUE(return_value) ? &tmp_value : return_value;
-
-    g_value_init(result_value, G_TYPE_BOOLEAN);
-    g_value_set_boolean(result_value, result);
-
-    if(result_value != return_value)
-    {
-        gel_value_copy(result_value, return_value);
-        g_value_unset(result_value);
-    }
+    g_value_init(return_value, G_TYPE_BOOLEAN);
+    g_value_set_boolean(return_value, result);
 
     gel_value_list_free(list);
 }
@@ -627,17 +548,8 @@ void all_(GClosure *self, GValue *return_value,
         g_value_unset(&value);
     }
 
-    GValue tmp_value = {0};
-    GValue *result_value = G_IS_VALUE(return_value) ? &tmp_value : return_value;
-
-    g_value_init(result_value, G_TYPE_BOOLEAN);
-    g_value_set_boolean(result_value, result);
-
-    if(result_value != return_value)
-    {
-        gel_value_copy(result_value, return_value);
-        g_value_unset(result_value);
-    }
+    g_value_init(return_value, G_TYPE_BOOLEAN);
+    g_value_set_boolean(return_value, result);
 
     gel_value_list_free(list);
 }
@@ -768,18 +680,8 @@ void tail_(GClosure *self, GValue *return_value,
         for(i = 1; i <= tail_len; i++)
             g_value_array_append(tail, array_values + i);
 
-        GValue tmp_value = {0};
-        GValue *result_value =
-            G_IS_VALUE(return_value) ? &tmp_value : return_value;
-
-        g_value_init(result_value, G_TYPE_VALUE_ARRAY);
-        g_value_take_boxed(result_value, tail);
-
-        if(result_value != return_value)
-        {
-            gel_value_copy(result_value, return_value);
-            g_value_unset(result_value);
-        }
+        g_value_init(return_value, G_TYPE_VALUE_ARRAY);
+        g_value_take_boxed(return_value, tail);
     }
 
     gel_value_list_free(list);
@@ -798,17 +700,9 @@ void len_(GClosure *self, GValue *return_value,
             "A", &n_values, &values, &array))
         return;
 
-    GValue tmp_value = {0};
-    GValue *result_value = G_IS_VALUE(return_value) ? &tmp_value : return_value;
+    g_value_init(return_value, G_TYPE_UINT);
+    g_value_set_uint(return_value, array->n_values);
 
-    g_value_init(result_value, G_TYPE_UINT);
-    g_value_set_uint(result_value, array->n_values);
-
-    if(result_value != return_value)
-    {
-        gel_value_copy(result_value, return_value);
-        g_value_unset(result_value);
-    }
     gel_value_list_free(list);
 }
 
@@ -854,17 +748,8 @@ void map_(GClosure *self, GValue *return_value,
         g_value_unset(&tmp_value);
     }
 
-    GValue tmp_value = {0};
-    GValue *result_value = G_IS_VALUE(return_value) ? &tmp_value : return_value;
-
-    g_value_init(result_value, G_TYPE_VALUE_ARRAY);
-    g_value_take_boxed(result_value, result_array);
-
-    if(result_value != return_value)
-    {
-        gel_value_copy(result_value, return_value);
-        g_value_unset(result_value);
-    }
+    g_value_init(return_value, G_TYPE_VALUE_ARRAY);
+    g_value_take_boxed(return_value, result_array);
 
     gel_value_list_free(list);
 }
@@ -914,17 +799,8 @@ void filter_(GClosure *self, GValue *return_value,
         g_value_unset(&tmp_value);
     }
 
-    GValue tmp_value = {0};
-    GValue *result_value = G_IS_VALUE(return_value) ? &tmp_value : return_value;
-
-    g_value_init(result_value, G_TYPE_VALUE_ARRAY);
-    g_value_take_boxed(result_value, result_array);
-
-    if(result_value != return_value)
-    {
-        gel_value_copy(result_value, return_value);
-        g_value_unset(result_value);
-    }
+    g_value_init(return_value, G_TYPE_VALUE_ARRAY);
+    g_value_take_boxed(return_value, result_array);
 
     gel_value_list_free(list);
 }
@@ -1062,17 +938,8 @@ void array_(GClosure *self, GValue *return_value,
             g_value_unset(&tmp_value);
     }
 
-    GValue tmp_value = {0};
-    GValue *result_value = G_IS_VALUE(return_value) ? &tmp_value : return_value;
-
-    g_value_init(result_value, G_TYPE_VALUE_ARRAY);
-    g_value_take_boxed(result_value, array);
-
-    if(result_value != return_value)
-    {
-        gel_value_copy(result_value, return_value);
-        g_value_unset(result_value);
-    }
+    g_value_init(return_value, G_TYPE_VALUE_ARRAY);
+    g_value_take_boxed(return_value, array);
 }
 
 
@@ -1182,20 +1049,13 @@ void str_(GClosure *self, GValue *return_value,
     GValue tmp_value = {0};
     const GValue *value =
         gel_context_eval_value(context, values + 0, &tmp_value);
+
     gchar *value_string = gel_value_to_string(value);
     if(G_IS_VALUE(&tmp_value))
         g_value_unset(&tmp_value);
 
-    GValue *result_value = G_IS_VALUE(return_value) ? &tmp_value : return_value;
-
-    g_value_init(result_value, G_TYPE_STRING);
-    g_value_take_string(result_value, value_string);
-
-    if(result_value != return_value)
-    {
-        gel_value_copy(result_value, return_value);
-        g_value_unset(result_value);
-    }
+    g_value_init(return_value, G_TYPE_STRING);
+    g_value_take_string(return_value, value_string);
 }
 
 
@@ -1218,16 +1078,8 @@ void type_(GClosure *self, GValue *return_value,
     if(G_IS_VALUE(&tmp_value))
         g_value_unset(&tmp_value);
 
-    GValue *result_value = G_IS_VALUE(return_value) ? &tmp_value : return_value;
-
-    g_value_init(result_value, G_TYPE_STRING);
-    g_value_set_string(result_value, g_type_name(value_type));
-
-    if(result_value != return_value)
-    {
-        gel_value_copy(result_value, return_value);
-        g_value_unset(result_value);
-    }
+    g_value_init(return_value, G_TYPE_STRING);
+    g_value_set_string(return_value, g_type_name(value_type));
 }
 
 
