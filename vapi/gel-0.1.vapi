@@ -27,8 +27,6 @@ namespace Gel {
         bool div(GLib.Value v1, GLib.Value v2, out GLib.Value dest_value);
         bool mod(GLib.Value v1, GLib.Value v2, out GLib.Value dest_value);
 
-        int compare(GLib.Value v1, GLib.Value v2);
-
         bool gt(GLib.Value v1, GLib.Value v2);
         bool ge(GLib.Value v1, GLib.Value v2);
         bool eq(GLib.Value v1, GLib.Value v2);

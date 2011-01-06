@@ -23,6 +23,7 @@ GValue *gel_value_dup(const GValue *value);
 gboolean gel_value_copy(const GValue *src_value, GValue *dest_value);
 void gel_value_free(GValue *value);
 gchar *gel_value_to_string(const GValue *value);
+gint gel_values_cmp(const GValue *v1, const GValue *v2);
 gboolean gel_value_to_boolean(const GValue *value);
 
 

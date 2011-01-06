@@ -718,7 +718,7 @@ void sort_(GClosure *self, GValue *return_value,
             "A", &n_values, &values, &array))
         return;
 
-    g_value_array_sort(array, (GCompareFunc)gel_values_compare);
+    g_value_array_sort(array, (GCompareFunc)gel_values_cmp);
     gel_value_list_free(list);
 }
 

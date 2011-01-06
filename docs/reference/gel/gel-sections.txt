@@ -25,7 +25,6 @@ gel_parse_string
 
 <SECTION>
 <FILE>gelvalue</FILE>
-gel_values_compare
 gel_value_list_free
 gel_values_add
 gel_values_sub

@@ -458,7 +458,7 @@ GType gel_values_simple_transform(const GValue *v1, const GValue *v2,
 
 
 static
-gboolean gel_values_can_compare(const GValue *v1, const GValue *v2)
+gboolean gel_values_can_cmp(const GValue *v1, const GValue *v2)
 {
     g_return_val_if_fail(v1 != NULL, FALSE);
     g_return_val_if_fail(v2 != NULL, FALSE);
@@ -487,8 +487,8 @@ gboolean gel_values_simple_gt(const GValue *v1, const GValue *v2)
     g_return_val_if_fail(v1 != NULL, FALSE);
     g_return_val_if_fail(v2 != NULL, FALSE);
 
-    if(gel_values_can_compare(v1, v2))
-        return gel_values_compare(v1, v2) > 0;
+    if(gel_values_can_cmp(v1, v2))
+        return gel_values_cmp(v1, v2) > 0;
     return FALSE;
 }
 
@@ -499,8 +499,8 @@ gboolean gel_values_simple_ge(const GValue *v1, const GValue *v2)
     g_return_val_if_fail(v1 != NULL, FALSE);
     g_return_val_if_fail(v2 != NULL, FALSE);
 
-    if(gel_values_can_compare(v1, v2))
-        return gel_values_compare(v1, v2) >= 0;
+    if(gel_values_can_cmp(v1, v2))
+        return gel_values_cmp(v1, v2) >= 0;
     return FALSE;
 }
 
@@ -508,8 +508,8 @@ gboolean gel_values_simple_ge(const GValue *v1, const GValue *v2)
 static
 gboolean gel_values_simple_eq(const GValue *v1, const GValue *v2)
 {
-    if(gel_values_can_compare(v1, v2))
-        return gel_values_compare(v1, v2) == 0;
+    if(gel_values_can_cmp(v1, v2))
+        return gel_values_cmp(v1, v2) == 0;
     return FALSE;
 }
 
@@ -520,8 +520,8 @@ gboolean gel_values_simple_le(const GValue *v1, const GValue *v2)
     g_return_val_if_fail(v1 != NULL, FALSE);
     g_return_val_if_fail(v2 != NULL, FALSE);
 
-    if(gel_values_can_compare(v1, v2))
-        return gel_values_compare(v1, v2) <= 0;
+    if(gel_values_can_cmp(v1, v2))
+        return gel_values_cmp(v1, v2) <= 0;
     return FALSE;
 }
 
@@ -532,8 +532,8 @@ gboolean gel_values_simple_lt(const GValue *v1, const GValue *v2)
     g_return_val_if_fail(v1 != NULL, FALSE);
     g_return_val_if_fail(v2 != NULL, FALSE);
 
-    if(gel_values_can_compare(v1, v2))
-        return gel_values_compare(v1, v2) < 0;
+    if(gel_values_can_cmp(v1, v2))
+        return gel_values_cmp(v1, v2) < 0;
     return FALSE;
 }
 
@@ -544,8 +544,8 @@ gboolean gel_values_simple_ne(const GValue *v1, const GValue *v2)
     g_return_val_if_fail(v1 != NULL, FALSE);
     g_return_val_if_fail(v2 != NULL, FALSE);
 
-    if(gel_values_can_compare(v1, v2))
-        return gel_values_compare(v1, v2) != 0;
+    if(gel_values_can_cmp(v1, v2))
+        return gel_values_cmp(v1, v2) != 0;
     return FALSE;
 }
 
@@ -576,7 +576,7 @@ gboolean gel_values_arithmetic(const GValue *v1, const GValue *v2,
 
 
 /**
- * gel_values_compare:
+ * gel_values_cmp:
  * @v1: A valid #GValue
  * @v2: A valid #GValue
  *
@@ -584,7 +584,7 @@ gboolean gel_values_arithmetic(const GValue *v1, const GValue *v2,
  *
  * Returns: 0 for v1 == v2, 1 for v1 > v2, -1 otherwise
  */
-gint gel_values_compare(const GValue *v1, const GValue *v2)
+gint gel_values_cmp(const GValue *v1, const GValue *v2)
 {
     g_return_val_if_fail(v1 != NULL, FALSE);
     g_return_val_if_fail(v2 != NULL, FALSE);
@@ -647,7 +647,7 @@ gint gel_values_compare(const GValue *v1, const GValue *v2)
                 GValue *const a2_values = a2->values;
                 for(i = 0; i < n_values; i++)
                 {
-                    result = gel_values_compare(a1_values + i, a2_values + i);
+                    result = gel_values_cmp(a1_values + i, a2_values + i);
                     if(result != 0)
                         break;
                 }
