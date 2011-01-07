@@ -4,6 +4,7 @@ GelContext
 gel_context_new
 gel_context_new_with_outer
 gel_context_free
+gel_context_is_valid
 gel_context_find_symbol
 gel_context_get_outer
 gel_context_add_symbol
