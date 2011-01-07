@@ -68,6 +68,28 @@ GelContext* gel_context_new(void)
 }
 
 
+static guint contexts_COUNT;
+static GList *contexts_POOL;
+static GStaticMutex contexts_MUTEX = G_STATIC_MUTEX_INIT;
+
+
+static GelContext *gel_context_alloc()
+{
+    register GelContext *self = g_slice_new0(GelContext);
+    self->symbols = g_hash_table_new_full(
+        g_str_hash, g_str_equal,
+        (GDestroyNotify)g_free, (GDestroyNotify)gel_value_free);
+    return self;
+}
+
+
+static void gel_context_dispose(GelContext *self)
+{
+    g_hash_table_unref(self->symbols);
+    g_slice_free(GelContext, self);
+}
+
+
 /**
  * gel_context_new_with_outer:
  * @outer: The outer context.
@@ -89,15 +111,43 @@ GelContext* gel_context_new_with_outer(GelContext *outer)
         g_once_init_leave (&only_once, 1);
     }
 
-    register GelContext *self = g_slice_new0(GelContext);
-
-    self->symbols = g_hash_table_new_full(
-        g_str_hash, g_str_equal,
-        (GDestroyNotify)g_free, (GDestroyNotify)gel_value_free);
+    register GelContext *self;
+    g_static_mutex_lock(&contexts_MUTEX);
+        if(contexts_POOL != NULL)
+        {
+            self = (GelContext*)contexts_POOL->data;
+            contexts_POOL = g_list_delete_link(contexts_POOL, contexts_POOL);
+        }
+        else
+            self = gel_context_alloc();
+        contexts_COUNT++;
+    g_static_mutex_unlock(&contexts_MUTEX);
 
     if((self->outer = outer) == NULL)
         gel_context_add_default_symbols(self);
     return self;
+}
+
+
+/**
+ * gel_context_free:
+ * @self: context
+ *
+ * Frees resources allocated by @self
+ *
+ */
+void gel_context_free(GelContext *self)
+{
+    g_hash_table_remove_all(self->symbols);
+
+    g_static_mutex_lock(&contexts_MUTEX);
+        contexts_POOL = g_list_append(contexts_POOL, self);
+        if(--contexts_COUNT == 0)
+        {
+            g_list_foreach(contexts_POOL, (GFunc)gel_context_dispose, NULL);
+            g_list_free(contexts_POOL);
+        }
+    g_static_mutex_unlock(&contexts_MUTEX);
 }
 
 
@@ -625,19 +675,5 @@ GelContext* gel_context_get_outer(const GelContext* self)
 {
     g_return_val_if_fail(self != NULL, NULL);
     return self->outer;
-}
-
-
-/**
- * gel_context_free:
- * @self: context
- *
- * Frees resources allocated by @self
- *
- */
-void gel_context_free(GelContext *self)
-{
-    g_hash_table_destroy(self->symbols);
-    g_slice_free(GelContext, self);
 }
 
