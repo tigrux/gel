@@ -3,31 +3,24 @@
 
 #include <glib-object.h>
 
-#define g_value_get_boolean(v) ((v)->data[0].v_int != FALSE)
-#define g_value_get_long(v) ((v)->data[0].v_long)
-#define g_value_get_double(v) ((v)->data[0].v_double)
-#define g_value_get_boxed(v) ((v)->data[0].v_pointer)
-#define g_value_get_string(v) ((gchar*)(v)->data[0].v_pointer)
+#define gel_value_get_boolean(v) ((v)->data[0].v_int != FALSE)
+#define gel_value_get_long(v) ((v)->data[0].v_long)
+#define gel_value_get_double(v) ((v)->data[0].v_double)
+#define gel_value_get_boxed(v) ((v)->data[0].v_pointer)
+#define gel_value_get_pointer(v) ((v)->data[0].v_pointer)
+#define gel_value_peek_pointer(v) ((v)->data[0].v_pointer)
+#define gel_value_get_string(v) ((gchar*)(v)->data[0].v_pointer)
 
-#define g_value_set_boolean(v, a) ((v)->data[0].v_int = (a) != FALSE)
-#define g_value_set_long(v, a) ((v)->data[0].v_long = (glong)(a))
-#define g_value_set_double(v, a) ((v)->data[0].v_double = (gdouble)(a))
+#define gel_value_set_boolean(v, a) ((v)->data[0].v_int = (a) != FALSE)
+#define gel_value_set_long(v, a) ((v)->data[0].v_long = (glong)(a))
+#define gel_value_set_uint(v, a) ((v)->data[0].v_uint = (guint)(a))
+#define gel_value_set_pointer(v, a) ((v)->data[0].v_pointer = (gpointer)(a))
+#define gel_value_set_double(v, a) ((v)->data[0].v_double = (gdouble)(a))
 
-#ifdef G_VALUE_HOLDS
-    #undef G_VALUE_HOLDS
-#endif
-#define G_VALUE_HOLDS(v, t) ((v)->g_type == (t) || g_type_is_a((v)->g_type, (t)))
-
-
-#ifdef G_VALUE_TYPE
-    #undef G_VALUE_TYPE
-#endif
-#define G_VALUE_TYPE(v) ((v)->g_type)
-
-#ifdef G_IS_VALUE
-    #undef G_IS_VALUE
-#endif
-#define G_IS_VALUE(v) ((v)->g_type != G_TYPE_INVALID)
+#define GEL_VALUE_HOLDS(v, t) ((v)->g_type == (t) || g_type_is_a((v)->g_type, (t)))
+#define GEL_VALUE_TYPE(v) ((v)->g_type)
+#define GEL_VALUE_TYPE_NAME(v) (g_type_name((v)->g_type))
+#define GEL_IS_VALUE(v) ((v)->g_type != G_TYPE_INVALID)
 
 #define gel_value_new() (g_new0(GValue, 1))
 

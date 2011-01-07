@@ -179,7 +179,7 @@ GClosure* new_closure(GelContext *context,
     for(i = 0; i < n_vars; i++)
     {
         const GValue *const value = vars_array_values + i;
-        if(G_VALUE_HOLDS(value, G_TYPE_STRING))
+        if(GEL_VALUE_HOLDS(value, G_TYPE_STRING))
             vars[i] = g_value_dup_string(value);
         else
         {
@@ -277,7 +277,7 @@ void connect_(GClosure *self, GValue *return_value,
     if(G_IS_OBJECT(object))
     {
         g_value_init(return_value, G_TYPE_UINT);
-        g_value_set_uint(return_value,
+        gel_value_set_uint(return_value,
             g_signal_connect_closure(object,
                 signal, g_closure_ref(callback), FALSE));
     }
@@ -308,13 +308,13 @@ void print_(GClosure *self, GValue *return_value,
         GValue tmp_value = {0};
         register const GValue *value =
             gel_context_eval_value(context, values + i, &tmp_value);
-        if(G_IS_VALUE(value))
+        if(GEL_IS_VALUE(value))
         {
             gchar *value_string = gel_value_to_string(value);
             g_print("%s", value_string);
             g_free(value_string);
         }
-        if(G_IS_VALUE(&tmp_value))
+        if(GEL_IS_VALUE(&tmp_value))
             g_value_unset(&tmp_value);
     }
     g_print("\n");
@@ -343,9 +343,9 @@ void arithmetic(GClosure *self, GValue *return_value,
             gel_context_eval_value(context, values + 1, &tmp2),
             &tmp3);
 
-    if(G_IS_VALUE(&tmp1))
+    if(GEL_IS_VALUE(&tmp1))
         g_value_unset(&tmp1);
-    if(G_IS_VALUE(&tmp2))
+    if(GEL_IS_VALUE(&tmp2))
         g_value_unset(&tmp2);
 
     const guint last = n_values - 2;
@@ -362,9 +362,9 @@ void arithmetic(GClosure *self, GValue *return_value,
         running = values_function(
             v1, gel_context_eval_value(context, values + i, &tmp1), v2);
 
-        if(G_IS_VALUE(v1))
+        if(GEL_IS_VALUE(v1))
             g_value_unset(v1);
-        if(G_IS_VALUE(&tmp1))
+        if(GEL_IS_VALUE(&tmp1))
             g_value_unset(&tmp1);
     }
 
@@ -398,14 +398,14 @@ void logic(GClosure *self, GValue *return_value,
             gel_context_eval_value(context, i_value, &tmp1),
             gel_context_eval_value(context, i_value+1, &tmp2));
 
-        if(G_IS_VALUE(&tmp1))
+        if(GEL_IS_VALUE(&tmp1))
             g_value_unset(&tmp1);
-        if(G_IS_VALUE(&tmp2))
+        if(GEL_IS_VALUE(&tmp2))
             g_value_unset(&tmp2);
     }
 
     g_value_init(return_value, G_TYPE_BOOLEAN);
-    g_value_set_boolean(return_value, result);
+    gel_value_set_boolean(return_value, result);
 }
 
 
@@ -425,11 +425,11 @@ void not_(GClosure *self, GValue *return_value,
     register const GValue *value =
         gel_context_eval_value(context, values + 0, &tmp_value);
     register gboolean value_bool = gel_value_to_boolean(value);
-    if(G_IS_VALUE(&tmp_value))
+    if(GEL_IS_VALUE(&tmp_value))
         g_value_unset(&tmp_value);
 
     g_value_init(return_value, G_TYPE_BOOLEAN);
-    g_value_set_boolean(return_value, !value_bool);
+    gel_value_set_boolean(return_value, !value_bool);
 }
 
 
@@ -456,7 +456,7 @@ void and_(GClosure *self, GValue *return_value,
         result = gel_value_to_boolean(value);
         if(!result || i == last)
             gel_value_copy(value, return_value);
-        if(G_IS_VALUE(&tmp_value))
+        if(GEL_IS_VALUE(&tmp_value))
             g_value_unset(&tmp_value);
     }
 }
@@ -485,7 +485,7 @@ void or_(GClosure *self, GValue *return_value,
         result = gel_value_to_boolean(value);
         if(result || i == last)
             gel_value_copy(value, return_value);
-        if(G_IS_VALUE(&tmp_value))
+        if(GEL_IS_VALUE(&tmp_value))
             g_value_unset(&tmp_value);
     }
 }
@@ -516,7 +516,7 @@ void any_(GClosure *self, GValue *return_value,
     }
 
     g_value_init(return_value, G_TYPE_BOOLEAN);
-    g_value_set_boolean(return_value, result);
+    gel_value_set_boolean(return_value, result);
 
     gel_value_list_free(list);
 }
@@ -548,7 +548,7 @@ void all_(GClosure *self, GValue *return_value,
     }
 
     g_value_init(return_value, G_TYPE_BOOLEAN);
-    g_value_set_boolean(return_value, result);
+    gel_value_set_boolean(return_value, result);
 
     gel_value_list_free(list);
 }
@@ -573,7 +573,7 @@ void append_(GClosure *self, GValue *return_value,
         GValue tmp = {0};
         const GValue *value = gel_context_eval_value(context, values + i, &tmp);
         g_value_array_append(array, value);
-        if(G_IS_VALUE(&tmp))
+        if(GEL_IS_VALUE(&tmp))
             g_value_unset(&tmp);
     }
 
@@ -700,7 +700,7 @@ void len_(GClosure *self, GValue *return_value,
         return;
 
     g_value_init(return_value, G_TYPE_UINT);
-    g_value_set_uint(return_value, array->n_values);
+    gel_value_set_uint(return_value, array->n_values);
 
     gel_value_list_free(list);
 }
@@ -825,7 +825,7 @@ void branch(guint n_values, const GValue *values, GelContext *outer,
             else
                 match = gel_value_to_boolean(if_value);
 
-            if(G_IS_VALUE(&tmp_value))
+            if(GEL_IS_VALUE(&tmp_value))
                 g_value_unset(&tmp_value);
 
             if(match)
@@ -844,7 +844,7 @@ void branch(guint n_values, const GValue *values, GelContext *outer,
             register const GValue *then_value =
                 gel_context_eval_value(context, values + 0, &tmp_value);
             gel_value_copy(then_value, return_value);
-            if(G_IS_VALUE(&tmp_value))
+            if(GEL_IS_VALUE(&tmp_value))
                 g_value_unset(&tmp_value);
             testing = FALSE;
         }
@@ -870,7 +870,7 @@ void case_(GClosure *self, GValue *return_value,
         gel_context_eval_value(context, values + 0, &tmp_value);
     n_values--, values++;
     branch(n_values, values, context, return_value, case_value);
-    if(G_IS_VALUE(&tmp_value))
+    if(GEL_IS_VALUE(&tmp_value))
         g_value_unset(&tmp_value);
 }
 
@@ -911,9 +911,9 @@ void do_(GClosure *self, GValue *return_value,
         GValue tmp_value = {0};
         register const GValue *value =
             gel_context_eval_value(context, values + i, &tmp_value);
-        if(i == last && G_IS_VALUE(value))
+        if(i == last && GEL_IS_VALUE(value))
             gel_value_copy(value, return_value);
-        if(G_IS_VALUE(&tmp_value))
+        if(GEL_IS_VALUE(&tmp_value))
             g_value_unset(&tmp_value);
     }
     gel_context_free(context);
@@ -933,7 +933,7 @@ void array_(GClosure *self, GValue *return_value,
         register const GValue *value =
             gel_context_eval_value(context, values + i, &tmp_value);
         g_value_array_append(array, value);
-        if(G_IS_VALUE(&tmp_value))
+        if(GEL_IS_VALUE(&tmp_value))
             g_value_unset(&tmp_value);
     }
 
@@ -1000,7 +1000,7 @@ void while_(GClosure *self, GValue *return_value,
             if(run == FALSE)
                 gel_value_copy(cond_value, return_value);
         }
-        if(G_IS_VALUE(&tmp_value))
+        if(GEL_IS_VALUE(&tmp_value))
             g_value_unset(&tmp_value);
     }
 }
@@ -1027,7 +1027,7 @@ void if_(GClosure *self, GValue *return_value,
             context, marshal_data);
     else
         gel_value_copy(cond_value, return_value);
-    if(G_IS_VALUE(&tmp_value))
+    if(GEL_IS_VALUE(&tmp_value))
         g_value_unset(&tmp_value);
 }
 
@@ -1049,7 +1049,7 @@ void str_(GClosure *self, GValue *return_value,
         gel_context_eval_value(context, values + 0, &tmp_value);
 
     register gchar *value_string = gel_value_to_string(value);
-    if(G_IS_VALUE(&tmp_value))
+    if(GEL_IS_VALUE(&tmp_value))
         g_value_unset(&tmp_value);
 
     g_value_init(return_value, G_TYPE_STRING);
@@ -1072,8 +1072,8 @@ void type_(GClosure *self, GValue *return_value,
     GValue tmp_value = {0};
     register const GValue *value =
         gel_context_eval_value(context, values + 0, &tmp_value);
-    register GType value_type = G_VALUE_TYPE(value);
-    if(G_IS_VALUE(&tmp_value))
+    register GType value_type = GEL_VALUE_TYPE(value);
+    if(GEL_IS_VALUE(&tmp_value))
         g_value_unset(&tmp_value);
 
     g_value_init(return_value, G_TYPE_STRING);

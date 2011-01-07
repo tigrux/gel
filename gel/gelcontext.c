@@ -178,7 +178,7 @@ void gel_context_invoke_type(GelContext *self, GType type,
     register guint i;
     for(i = 0; i < n_values; i++)
     {
-        g_return_if_fail(G_VALUE_HOLDS(values + i, G_TYPE_STRING));
+        g_return_if_fail(GEL_VALUE_HOLDS(values + i, G_TYPE_STRING));
         gel_context_add_symbol(self,
             g_value_get_string(values + i),
             gel_value_new_of_type(type));
@@ -199,7 +199,7 @@ const GValue* gel_context_eval_array(GelContext *self, const GValueArray *array,
     register const GValue *result_value = NULL;
     const GValue *const array_values = array->values;
 
-    if(G_VALUE_HOLDS(array_values + 0, G_TYPE_STRING))
+    if(GEL_VALUE_HOLDS(array_values + 0, G_TYPE_STRING))
     {
         const gchar *const type_name = g_value_get_string(array_values + 0);
         register GType type;
@@ -217,7 +217,7 @@ const GValue* gel_context_eval_array(GelContext *self, const GValueArray *array,
         register const GValue *first_value =
             gel_context_eval_value(self, array_values + 0, &tmp_value);
 
-        if(G_VALUE_HOLDS(first_value, G_TYPE_CLOSURE))
+        if(GEL_VALUE_HOLDS(first_value, G_TYPE_CLOSURE))
         {
             g_closure_invoke((GClosure*)g_value_get_boxed(first_value),
                 dest_value, array_n_values - 1 , array_values + 1, self);
@@ -227,7 +227,7 @@ const GValue* gel_context_eval_array(GelContext *self, const GValueArray *array,
             gel_warning_value_not_of_type(__FUNCTION__,
                 first_value, G_TYPE_CLOSURE);
 
-        if(G_IS_VALUE(&tmp_value))
+        if(GEL_IS_VALUE(&tmp_value))
             g_value_unset(&tmp_value);
     }
 
@@ -255,7 +255,7 @@ gboolean gel_context_eval(GelContext *self,
 
     register const GValue *result_value =
         gel_context_eval_value(self, value, dest_value);
-    if(G_IS_VALUE(result_value))
+    if(GEL_IS_VALUE(result_value))
     {
         if(result_value != dest_value)
             gel_value_copy(result_value, dest_value);
@@ -287,7 +287,7 @@ const GValue* gel_context_eval_value(GelContext *self,
     g_return_val_if_fail(tmp_value != NULL, NULL);
 
     register const GValue *result_value = NULL;
-    register GType type = G_VALUE_TYPE(value);
+    register GType type = GEL_VALUE_TYPE(value);
 
     if(type == G_TYPE_STRING)
     {
@@ -410,7 +410,7 @@ gboolean gel_context_eval_params(GelContext *self, const gchar *func,
         switch(*format)
         {
             case 'a':
-                if(G_VALUE_HOLDS(*values, G_TYPE_VALUE_ARRAY))
+                if(GEL_VALUE_HOLDS(*values, G_TYPE_VALUE_ARRAY))
                 {
                     GValueArray **a = va_arg(args, GValueArray **);
                     *a = (GValueArray*)g_value_get_boxed(*values);
@@ -423,7 +423,7 @@ gboolean gel_context_eval_params(GelContext *self, const gchar *func,
                 }
                 break;
             case 's':
-                if(G_VALUE_HOLDS(*values, G_TYPE_STRING))
+                if(GEL_VALUE_HOLDS(*values, G_TYPE_STRING))
                 {
                     const gchar **s = va_arg(args, const gchar **);
                     *s = g_value_get_string(*values);
@@ -438,7 +438,7 @@ gboolean gel_context_eval_params(GelContext *self, const gchar *func,
             case 'O':
                 value = gel_value_new();
                 result_value = gel_context_eval_value(self, *values, value);
-                if(G_VALUE_HOLDS(result_value, G_TYPE_OBJECT))
+                if(GEL_VALUE_HOLDS(result_value, G_TYPE_OBJECT))
                 {
                     GObject **obj = va_arg(args, GObject **);
                     *obj = (GObject*)g_value_get_object(result_value);
@@ -453,7 +453,7 @@ gboolean gel_context_eval_params(GelContext *self, const gchar *func,
             case 'A':
                 value = gel_value_new();
                 result_value = gel_context_eval_value(self, *values, value);
-                if(G_VALUE_HOLDS(result_value, G_TYPE_VALUE_ARRAY))
+                if(GEL_VALUE_HOLDS(result_value, G_TYPE_VALUE_ARRAY))
                 {
                     GValueArray **a = va_arg(args, GValueArray **);
                     *a = (GValueArray*)g_value_get_boxed(result_value);
@@ -468,7 +468,7 @@ gboolean gel_context_eval_params(GelContext *self, const gchar *func,
             case 'S':
                 value = gel_value_new();
                 result_value = gel_context_eval_value(self, *values, value);
-                if(G_VALUE_HOLDS(result_value, G_TYPE_STRING))
+                if(GEL_VALUE_HOLDS(result_value, G_TYPE_STRING))
                 {
                     const gchar **s = va_arg(args, const gchar **);
                     *s = g_value_get_string(result_value);
@@ -483,10 +483,10 @@ gboolean gel_context_eval_params(GelContext *self, const gchar *func,
             case 'I':
                 value = gel_value_new();
                 result_value = gel_context_eval_value(self, *values, value);
-                if(G_VALUE_HOLDS(result_value, G_TYPE_LONG))
+                if(GEL_VALUE_HOLDS(result_value, G_TYPE_LONG))
                 {
                     glong *i = va_arg(args, glong *);
-                    *i = g_value_get_long(result_value);
+                    *i = gel_value_get_long(result_value);
                 }
                 else
                 {
@@ -498,7 +498,7 @@ gboolean gel_context_eval_params(GelContext *self, const gchar *func,
             case 'C':
                 value = gel_value_new();
                 result_value = gel_context_eval_value(self, *values, value);
-                if(G_VALUE_HOLDS(result_value, G_TYPE_CLOSURE))
+                if(GEL_VALUE_HOLDS(result_value, G_TYPE_CLOSURE))
                 {
                     GClosure **closure = va_arg(args, GClosure **);
                     *closure = (GClosure*)g_value_get_boxed(result_value);
@@ -513,7 +513,7 @@ gboolean gel_context_eval_params(GelContext *self, const gchar *func,
             case 'V':
                 value = gel_value_new();
                 result_value = gel_context_eval_value(self, *values, value);
-                if(G_IS_VALUE(result_value))
+                if(GEL_IS_VALUE(result_value))
                 {
                     const GValue **v = va_arg(args, const GValue **);
                     *v = result_value;
