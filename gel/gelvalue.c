@@ -30,12 +30,6 @@ gboolean gel_values_##op(const GValue *v1, const GValue *v2) \
  */
 
 
-GValue* gel_value_new(void)
-{
-    return g_new0(GValue, 1);
-}
-
-
 GValue* gel_value_new_of_type(GType type)
 {
     g_return_val_if_fail(type != G_TYPE_INVALID, NULL);
@@ -47,7 +41,7 @@ GValue* gel_value_new_from_closure(GClosure *value_closure)
 {
     g_return_val_if_fail(value_closure != NULL, NULL);
 
-    GValue *value = gel_value_new_of_type(G_TYPE_CLOSURE);
+    register GValue *value = gel_value_new_of_type(G_TYPE_CLOSURE);
     g_value_take_boxed(value, value_closure);
     return value;
 }
@@ -58,7 +52,7 @@ GValue* gel_value_new_from_closure_marshal(GClosureMarshal marshal,
 {
     g_return_val_if_fail(data != NULL, NULL);
 
-    GClosure *closure = g_closure_new_simple(sizeof(GClosure), data);
+    register GClosure *closure = g_closure_new_simple(sizeof(GClosure), data);
     g_closure_set_marshal(closure, marshal);
     return gel_value_new_from_closure(closure);
 }
@@ -66,7 +60,7 @@ GValue* gel_value_new_from_closure_marshal(GClosureMarshal marshal,
 
 GValue* gel_value_new_from_boolean(gboolean value_boolean)
 {
-    GValue *value = gel_value_new_of_type(G_TYPE_BOOLEAN);
+    register GValue *value = gel_value_new_of_type(G_TYPE_BOOLEAN);
     g_value_set_boolean(value, value_boolean);
     return value;
 }
@@ -74,7 +68,7 @@ GValue* gel_value_new_from_boolean(gboolean value_boolean)
 
 GValue* gel_value_new_from_pointer(gpointer value_pointer)
 {
-    GValue *value = gel_value_new_of_type(G_TYPE_POINTER);
+    register GValue *value = gel_value_new_of_type(G_TYPE_POINTER);
     g_value_set_pointer(value, value_pointer);
     return value;
 }
@@ -85,7 +79,7 @@ GValue *gel_value_dup(const GValue *value)
     g_return_val_if_fail(value != NULL, NULL);
     g_return_val_if_fail(G_IS_VALUE(value), NULL);
 
-    GValue *dup_value = gel_value_new_of_type(G_VALUE_TYPE(value));
+    register GValue *dup_value = gel_value_new_of_type(G_VALUE_TYPE(value));
     g_value_copy(value, dup_value);
     return dup_value;
 }
@@ -97,20 +91,22 @@ gboolean gel_value_copy(const GValue *src_value, GValue *dest_value)
     g_return_val_if_fail(dest_value != NULL, FALSE);
     g_return_val_if_fail(G_IS_VALUE(src_value), FALSE);
 
-    gboolean result = TRUE;
+    register gboolean result = TRUE;
+    register GType src_type = G_VALUE_TYPE(src_value);
 
     if(G_IS_VALUE(dest_value))
     {
-        if(!g_value_transform(src_value, dest_value))
-        {
+        register GType dest_type = G_VALUE_TYPE(dest_value);
+        if(src_type == dest_type)
+            g_value_copy(src_value, dest_value);
+        else
+        if(!(result = g_value_transform(src_value, dest_value)))
             g_warning("Cannot assign from %s to %s",
-                G_VALUE_TYPE_NAME(src_value), G_VALUE_TYPE_NAME(dest_value));
-            result = FALSE;
-        }
+                g_type_name(src_type), g_type_name(dest_type));
     }
     else
     {
-        g_value_init(dest_value, G_VALUE_TYPE(src_value));
+        g_value_init(dest_value, src_type);
         g_value_copy(src_value, dest_value);
     }
     return result;
@@ -146,7 +142,7 @@ gchar* gel_value_to_string(const GValue *value)
     g_return_val_if_fail(value != NULL, NULL);
     g_return_val_if_fail(G_IS_VALUE(value), NULL);
 
-    gchar *result = NULL;
+    register gchar *result = NULL;
     GValue string_value = {0};
 
     g_value_init(&string_value, G_TYPE_STRING);
@@ -157,7 +153,7 @@ gchar* gel_value_to_string(const GValue *value)
     }
     else
     {
-        GString *repr_string = g_string_new("<");
+        register GString *repr_string = g_string_new("<");
         g_string_append_printf(repr_string, "%s", G_VALUE_TYPE_NAME(value));
         if(G_VALUE_HOLDS(value, G_TYPE_GTYPE))
             g_string_append_printf(
@@ -177,42 +173,39 @@ gboolean gel_value_to_boolean(const GValue *value)
 {
     g_return_val_if_fail(value != NULL, FALSE);
 
-    gboolean result;
-    GValue bool_value = {0};
-    g_value_init(&bool_value, G_TYPE_BOOLEAN);
-    if(g_value_transform(value, &bool_value))
+    register gboolean result = TRUE;
+
+    GType type = G_VALUE_TYPE(value);
+    switch(type)
     {
-        result = g_value_get_boolean(&bool_value);
-        g_value_unset(&bool_value);
-    }
-    else
-    {
-        if(G_VALUE_HOLDS(value, G_TYPE_STRING))
+        case G_TYPE_STRING:
             result = (
                 g_value_get_string(value) != NULL
                 && g_strcmp0(g_value_get_string(value), "") != 0);
-        else
-        if(G_VALUE_HOLDS(value, G_TYPE_LONG))
+            break;
+        case G_TYPE_BOOLEAN:
+            result = (g_value_get_boolean(value) != FALSE);
+            break;
+        case G_TYPE_LONG:
             result = (g_value_get_long(value) != 0);
-        else
-        if(G_VALUE_HOLDS(value, G_TYPE_DOUBLE))
+            break;
+        case G_TYPE_DOUBLE:
             result = (g_value_get_double(value) != 0.0);
-        else
-        if(G_VALUE_HOLDS(value, G_TYPE_ARRAY))
-        {
-            GValueArray *array = (GValueArray*)g_value_get_boxed(value);
-            if(array == NULL || array->n_values == 0)
-                result = FALSE;
-            else
-                result = TRUE;
-        }
-        else
-        if(g_value_fits_pointer(value))
-            result = (g_value_peek_pointer(value) != NULL);
-        else
-            result = TRUE;
+            break;
+        default:
+            if(type == G_TYPE_ARRAY)
+            {
+                GValueArray *array = (GValueArray*)g_value_get_boxed(value);
+                result = (array != NULL && array->n_values != 0);
+                break;
+            }
+            if(g_value_fits_pointer(value))
+            {
+                result = (g_value_peek_pointer(value) != NULL);
+                break;
+            }
+            g_warning("Could not convert %s to gboolean", g_type_name(type));
     }
-
     return result;
 }
 
@@ -222,7 +215,7 @@ GType gel_value_simple_type(const GValue *value)
 {
     g_return_val_if_fail(value != NULL, G_TYPE_INVALID);
 
-    GType type = G_VALUE_TYPE(value);
+    register GType type = G_VALUE_TYPE(value);
     switch(type)
     {
         case G_TYPE_UINT:
@@ -254,8 +247,8 @@ GType gel_value_simple_type(const GValue *value)
 static
 GType gel_values_simple_type(const GValue *v1, const GValue *v2)
 {
-    GType l_type = gel_value_simple_type(v1);
-    GType r_type = gel_value_simple_type(v2);
+    register GType l_type = gel_value_simple_type(v1);
+    register GType r_type = gel_value_simple_type(v2);
 
     if(l_type == r_type)
         return l_type;
@@ -281,7 +274,7 @@ gboolean gel_values_simple_add(const GValue *v1, const GValue *v2,
     g_return_val_if_fail(v2 != NULL, FALSE);
     g_return_val_if_fail(dest_value != NULL, FALSE);
 
-    GType type = G_VALUE_TYPE(dest_value);
+    register GType type = G_VALUE_TYPE(dest_value);
     switch(type)
     {
         case G_TYPE_LONG:
@@ -304,12 +297,13 @@ gboolean gel_values_simple_add(const GValue *v1, const GValue *v2,
         default:
             if(type == G_TYPE_VALUE_ARRAY)
             {
-                GValueArray *a1 = (GValueArray*)g_value_get_boxed(v1);
-                GValueArray *a2 = (GValueArray*)g_value_get_boxed(v2);
+                register GValueArray *a1 = (GValueArray*)g_value_get_boxed(v1);
+                register GValueArray *a2 = (GValueArray*)g_value_get_boxed(v2);
                 const guint n1_values = a1->n_values;
                 const guint n2_values = a2->n_values;
 
-                GValueArray *array = g_value_array_new(n1_values + n2_values);
+                register GValueArray *array =
+                    g_value_array_new(n1_values + n2_values);
                 register guint i;
 
                 const GValue *const a1_values = a1->values;
@@ -476,7 +470,7 @@ gboolean gel_values_can_cmp(const GValue *v1, const GValue *v2)
     g_return_val_if_fail(v1 != NULL, FALSE);
     g_return_val_if_fail(v2 != NULL, FALSE);
     
-    GType type = gel_values_simple_type(v1, v2);
+    register GType type = gel_values_simple_type(v1, v2);
     switch(type)
     {
         case G_TYPE_LONG:
@@ -578,11 +572,12 @@ gboolean gel_values_arithmetic(const GValue *v1, const GValue *v2,
     const GValue *vv1 = NULL;
     const GValue *vv2 = NULL;
 
-    GType dest_type = gel_values_simple_transform(v1, v2, &tmp1, &tmp2, &vv1, &vv2);
+    register GType dest_type =
+        gel_values_simple_transform(v1, v2, &tmp1, &tmp2, &vv1, &vv2);
     g_return_val_if_fail(dest_type != G_TYPE_INVALID, FALSE);
 
     g_value_init(dest_value, dest_type);
-    gboolean result = values_function(vv1, vv2, dest_value);
+    register gboolean result = values_function(vv1, vv2, dest_value);
 
     if(G_IS_VALUE(&tmp1))
         g_value_unset(&tmp1);
@@ -611,30 +606,31 @@ gint gel_values_cmp(const GValue *v1, const GValue *v2)
     const GValue *vv1 = NULL;
     const GValue *vv2 = NULL;
 
-    GType simple_type = gel_values_simple_transform(v1, v2, &tmp1, &tmp2, &vv1, &vv2);
+    register GType simple_type =
+        gel_values_simple_transform(v1, v2, &tmp1, &tmp2, &vv1, &vv2);
     g_return_val_if_fail(simple_type != G_TYPE_INVALID, FALSE);
 
-    gboolean result = -1;
+    register gboolean result = -1;
     switch(simple_type)
     {
         case G_TYPE_LONG:
         {
-            glong i1 = g_value_get_long(vv1);
-            glong i2 = g_value_get_long(vv2);
+            register glong i1 = g_value_get_long(vv1);
+            register glong i2 = g_value_get_long(vv2);
             result = i1 > i2 ? 1 : i1 < i2 ? -1 : 0;
             break;
         }
         case G_TYPE_DOUBLE:
         {
-            gdouble d1 = g_value_get_double(vv1);
-            gdouble d2 = g_value_get_double(vv2);
+            register gdouble d1 = g_value_get_double(vv1);
+            register gdouble d2 = g_value_get_double(vv2);
             result = d1 > d2 ? 1 : d1 < d2 ? -1 : 0;
             break;
         }
         case G_TYPE_BOOLEAN:
         {
-            gint b1 = g_value_get_boolean(vv1);
-            gint b2 = g_value_get_boolean(vv2);
+            register gint b1 = g_value_get_boolean(vv1);
+            register gint b2 = g_value_get_boolean(vv2);
             result = b1 > b2 ? 1 : b1 < b2 ? -1 : 0;
             break;
         }
@@ -647,23 +643,23 @@ gint gel_values_cmp(const GValue *v1, const GValue *v2)
         case G_TYPE_POINTER:
         {
             
-            gpointer p1 = g_value_peek_pointer(vv1);
-            gpointer p2 = g_value_peek_pointer(vv2);
+            register gpointer p1 = g_value_peek_pointer(vv1);
+            register gpointer p2 = g_value_peek_pointer(vv2);
             result = p1 > p2 ? 1 : p1 < p2 ? -1 : 0;
             break;
         }
         default:
             if(simple_type == G_TYPE_VALUE_ARRAY)
             {
-                GValueArray *a1 = (GValueArray*)g_value_get_boxed(vv1);
-                GValueArray *a2 = (GValueArray*)g_value_get_boxed(vv2);
-                guint a1_n = a1->n_values;
-                guint a2_n = a2->n_values;
-                guint n_values = MIN(a1_n, a2_n);
+                register GValueArray *a1 = (GValueArray*)g_value_get_boxed(vv1);
+                register GValueArray *a2 = (GValueArray*)g_value_get_boxed(vv2);
+                register guint a1_n = a1->n_values;
+                register guint a2_n = a2->n_values;
+                register guint n_values = MIN(a1_n, a2_n);
 
-                register guint i;
                 GValue *const a1_values = a1->values;
                 GValue *const a2_values = a2->values;
+                register guint i;
                 for(i = 0; i < n_values; i++)
                 {
                     result = gel_values_cmp(a1_values + i, a2_values + i);
@@ -695,10 +691,11 @@ gboolean gel_values_logic(const GValue *v1, const GValue *v2,
     const GValue *vv1 = NULL;
     const GValue *vv2 = NULL;
 
-    GType dest_type = gel_values_simple_transform(v1, v2, &tmp1, &tmp2, &vv1, &vv2);
+    register GType dest_type =
+        gel_values_simple_transform(v1, v2, &tmp1, &tmp2, &vv1, &vv2);
     g_return_val_if_fail(dest_type != G_TYPE_INVALID, FALSE);
 
-    gboolean result = values_function(vv1, vv2);
+    register gboolean result = values_function(vv1, vv2);
 
     if(G_IS_VALUE(&tmp1))
         g_value_unset(&tmp1);

@@ -32,14 +32,14 @@ void gel_closure_marshal(GelClosure *closure, GValue *return_value,
     const guint n_args = g_strv_length(closure->args);
     g_return_if_fail(n_param_values == n_args);
 
-    GelContext *outer = (GelContext*)closure->closure.data;
-    GelContext *context = gel_context_new_with_outer(outer);
+    register GelContext *outer = (GelContext*)closure->closure.data;
+    register GelContext *context = gel_context_new_with_outer(outer);
 
     gchar **const closure_args = closure->args;
     register guint i;
     for(i = 0; i < n_args; i++)
     {
-        GValue *value = gel_value_new();
+        register GValue *value = gel_value_new();
         gel_context_eval(invocation_context, param_values + i, value);
         gel_context_add_symbol(context, closure_args[i], value);
     }
@@ -52,7 +52,7 @@ void gel_closure_marshal(GelClosure *closure, GValue *return_value,
         for(i = 0; i <= last; i++)
         {
             GValue tmp_value = {0};
-            const GValue *value = gel_context_eval_value(context,
+            register const GValue *value = gel_context_eval_value(context,
                 closure_code_values + i, &tmp_value);
             if(i == last && return_value != NULL && G_IS_VALUE(value))
                 gel_value_copy(value, return_value);
@@ -85,14 +85,14 @@ GClosure* gel_context_closure_new(GelContext *self,
     g_return_val_if_fail(args != NULL, NULL);
     g_return_val_if_fail(code != NULL, NULL);
 
-    GClosure *closure =
+    register GClosure *closure =
         g_closure_new_simple(sizeof(GelClosure), self);
 
     g_closure_set_marshal(closure, (GClosureMarshal)gel_closure_marshal);
     g_closure_add_finalize_notifier(
         closure, self, (GClosureNotify)gel_closure_finalize);
 
-    GelClosure *gel_closure = (GelClosure*)closure;
+    register GelClosure *gel_closure = (GelClosure*)closure;
     gel_closure->args = args;
     gel_closure->code = code;
 

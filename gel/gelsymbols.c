@@ -17,7 +17,7 @@ void let_(GClosure *self, GValue *return_value,
             "sV", &n_values, &values, &symbol, &value))
         return;
 
-    GValue *symbol_value = gel_context_find_symbol(context, symbol);
+    register GValue *symbol_value = gel_context_find_symbol(context, symbol);
     if(symbol_value != NULL)
         gel_value_copy(value, symbol_value);
     else
@@ -56,7 +56,7 @@ void new_(GClosure *self, GValue *return_value,
             "s", &n_values, &values, &type_name))
         return;
 
-    GType type = g_type_from_name(type_name);
+    register GType type = g_type_from_name(type_name);
     if(type != G_TYPE_INVALID)
     {
         if(G_TYPE_IS_INSTANTIATABLE(type))
@@ -141,7 +141,7 @@ void set_(GClosure *self, GValue *return_value,
 
     if(G_IS_OBJECT(object))
     {
-        GParamSpec *prop_spec =
+        register GParamSpec *prop_spec =
             g_object_class_find_property(G_OBJECT_GET_CLASS(object), prop_name);
         if(prop_spec != NULL)
         {
@@ -174,8 +174,8 @@ GClosure* new_closure(GelContext *context,
     gchar **const vars = (gchar**)g_new0(gchar*, n_vars + 1);
     gchar *invalid_arg_name = NULL;
     const GValue *const vars_array_values = vars_array->values;
-    register guint i;
 
+    register guint i;
     for(i = 0; i < n_vars; i++)
     {
         const GValue *const value = vars_array_values + i;
@@ -188,7 +188,7 @@ GClosure* new_closure(GelContext *context,
         }
     }
 
-    GClosure *self;
+    register GClosure *self;
     if(invalid_arg_name == NULL)
     {
         GValueArray *code = g_value_array_new(n_values);
@@ -247,7 +247,7 @@ void lambda_(GClosure *self, GValue *return_value,
             "a*", &n_values, &values, &array))
         return;
 
-    GClosure *closure = new_closure(context, array, n_values, values);
+    register GClosure *closure = new_closure(context, array, n_values, values);
 
     if(closure != NULL)
     {
@@ -277,9 +277,9 @@ void connect_(GClosure *self, GValue *return_value,
     if(G_IS_OBJECT(object))
     {
         g_value_init(return_value, G_TYPE_UINT);
-        g_closure_ref(callback);
         g_value_set_uint(return_value,
-            g_signal_connect_closure(object, signal, callback, FALSE));
+            g_signal_connect_closure(object,
+                signal, g_closure_ref(callback), FALSE));
     }
     else
         gel_warning_value_not_of_type(__FUNCTION__, values + 0, G_TYPE_OBJECT);
@@ -306,7 +306,7 @@ void print_(GClosure *self, GValue *return_value,
     for(i = 0; i <= last; i++)
     {
         GValue tmp_value = {0};
-        const GValue *value =
+        register const GValue *value =
             gel_context_eval_value(context, values + i, &tmp_value);
         if(G_IS_VALUE(value))
         {
@@ -336,7 +336,7 @@ void arithmetic(GClosure *self, GValue *return_value,
     GValue tmp1 = {0};
     GValue tmp2 = {0};
     GValue tmp3 = {0};
-    GValue *v2 = &tmp3;
+    register GValue *v2 = &tmp3;
 
     gboolean running = values_function(
             gel_context_eval_value(context, values + 0, &tmp1),
@@ -352,7 +352,7 @@ void arithmetic(GClosure *self, GValue *return_value,
     register guint i;
     for(i = 0; i < last && running; i++)
     {
-        GValue *v1;
+        register GValue *v1;
 
         if(i%2 == 0)
             v1 = &tmp3, v2 = &tmp2;
@@ -386,7 +386,7 @@ void logic(GClosure *self, GValue *return_value,
         return;
     }
 
-    gboolean result = TRUE;
+    register gboolean result = TRUE;
     const guint last = n_values - 1;
     register guint i;
     for(i = 0; i < last && result; i++)
@@ -422,9 +422,9 @@ void not_(GClosure *self, GValue *return_value,
     }
 
     GValue tmp_value = {0};
-    const GValue *value =
+    register const GValue *value =
         gel_context_eval_value(context, values + 0, &tmp_value);
-    gboolean value_bool = gel_value_to_boolean(value);
+    register gboolean value_bool = gel_value_to_boolean(value);
     if(G_IS_VALUE(&tmp_value))
         g_value_unset(&tmp_value);
 
@@ -445,13 +445,13 @@ void and_(GClosure *self, GValue *return_value,
         return;
     }
 
-    gboolean result = TRUE;
+    register gboolean result = TRUE;
     const guint last = n_values - 1;
     register guint i;
     for(i = 0; i <= last && result == TRUE; i++)
     {
         GValue tmp_value = {0};
-        const GValue *value =
+        register const GValue *value =
             gel_context_eval_value(context, values + i, &tmp_value);
         result = gel_value_to_boolean(value);
         if(!result || i == last)
@@ -480,7 +480,7 @@ void or_(GClosure *self, GValue *return_value,
     for(i = 0; i <= last && result == FALSE; i++)
     {
         GValue tmp_value = {0};
-        const GValue *value =
+        register const GValue *value =
             gel_context_eval_value(context, values + i, &tmp_value);
         result = gel_value_to_boolean(value);
         if(result || i == last)
@@ -504,7 +504,7 @@ void any_(GClosure *self, GValue *return_value,
             "CA", &n_values, &values, &closure, &array))
         return;
 
-    gboolean result = FALSE;
+    register gboolean result = FALSE;
     const GValue *const array_values = array->values;
     register guint i;
     for(i = 0; i < array->n_values && !result; i++)
@@ -535,7 +535,7 @@ void all_(GClosure *self, GValue *return_value,
             "CA", &n_values, &values, &closure, &array))
         return;
 
-    gboolean result = TRUE;
+    register gboolean result = TRUE;
     const guint last = array->n_values;
     const GValue *const array_values = array->values;
     register guint i;
@@ -672,7 +672,7 @@ void tail_(GClosure *self, GValue *return_value,
     if(array->n_values > 0)
     {
         const guint tail_len = array->n_values - 1;
-        GValueArray *tail = g_value_array_new(tail_len);
+        register GValueArray *tail = g_value_array_new(tail_len);
 
         const GValue *const array_values = array->values;
         register guint i;
@@ -736,7 +736,7 @@ void map_(GClosure *self, GValue *return_value,
             "CA", &n_values, &values, &closure, &array))
         return;
 
-    GValueArray *result_array = g_value_array_new(array->n_values);
+    register GValueArray *result_array = g_value_array_new(array->n_values);
 
     register guint i;
     for(i = 0; i < array->n_values; i++)
@@ -811,13 +811,13 @@ void branch(guint n_values, const GValue *values, GelContext *outer,
     register gboolean match = FALSE;
     register gboolean testing = TRUE;
 
-    GelContext *context = gel_context_new_with_outer(outer);
+    register GelContext *context = gel_context_new_with_outer(outer);
     while(testing)
     {
         if(n_values > 1)
         {
             GValue tmp_value = {0};
-            const GValue *if_value =
+            register const GValue *if_value =
                 gel_context_eval_value(context, values + 0, &tmp_value);
 
             if(case_value != NULL)
@@ -841,7 +841,7 @@ void branch(guint n_values, const GValue *values, GelContext *outer,
         if(match)
         {
             GValue tmp_value = {0};
-            const GValue *then_value =
+            register const GValue *then_value =
                 gel_context_eval_value(context, values + 0, &tmp_value);
             gel_value_copy(then_value, return_value);
             if(G_IS_VALUE(&tmp_value))
@@ -866,7 +866,7 @@ void case_(GClosure *self, GValue *return_value,
     }
 
     GValue tmp_value = {0};
-    const GValue *case_value =
+    register const GValue *case_value =
         gel_context_eval_value(context, values + 0, &tmp_value);
     n_values--, values++;
     branch(n_values, values, context, return_value, case_value);
@@ -905,11 +905,11 @@ void do_(GClosure *self, GValue *return_value,
 
     const guint last = n_values-1;
     register guint i;
-    GelContext *context = gel_context_new_with_outer(outer);
+    register GelContext *context = gel_context_new_with_outer(outer);
     for(i = 0; i <= last; i++)
     {
         GValue tmp_value = {0};
-        const GValue *value =
+        register const GValue *value =
             gel_context_eval_value(context, values + i, &tmp_value);
         if(i == last && G_IS_VALUE(value))
             gel_value_copy(value, return_value);
@@ -930,7 +930,7 @@ void array_(GClosure *self, GValue *return_value,
     for(i = 0; i < n_values; i++)
     {
         GValue tmp_value = {0};
-        const GValue *value =
+        register const GValue *value =
             gel_context_eval_value(context, values + i, &tmp_value);
         g_value_array_append(array, value);
         if(G_IS_VALUE(&tmp_value))
@@ -960,10 +960,9 @@ void for_(GClosure *self, GValue *return_value,
     register guint i;
     for(i = 0; i < last; i++)
     {
-        GelContext *inner = gel_context_new_with_outer(context);
+        register GelContext *inner = gel_context_new_with_outer(context);
         gel_context_add_symbol(inner, symbol, gel_value_dup(array_values + i));
-        do_(self, return_value, n_values, values,
-            inner, marshal_data);
+        do_(self, return_value, n_values, values, inner, marshal_data);
         gel_context_free(inner);
     }
     gel_value_list_free(list);
@@ -983,11 +982,11 @@ void while_(GClosure *self, GValue *return_value,
     }
 
     register gboolean running = TRUE;
-    gboolean run = FALSE;
+    register gboolean run = FALSE;
     while(running)
     {
         GValue tmp_value = {0};
-        const GValue *cond_value =
+        register const GValue *cond_value =
             gel_context_eval_value(context, values + 0, &tmp_value);
         if(gel_value_to_boolean(cond_value))
         {
@@ -1020,7 +1019,7 @@ void if_(GClosure *self, GValue *return_value,
     }
 
     GValue tmp_value = {0};
-    const GValue *cond_value =
+    register const GValue *cond_value =
         gel_context_eval_value(context, values + 0, &tmp_value);
 
     if(gel_value_to_boolean(cond_value))
@@ -1046,10 +1045,10 @@ void str_(GClosure *self, GValue *return_value,
     }
 
     GValue tmp_value = {0};
-    const GValue *value =
+    register const GValue *value =
         gel_context_eval_value(context, values + 0, &tmp_value);
 
-    gchar *value_string = gel_value_to_string(value);
+    register gchar *value_string = gel_value_to_string(value);
     if(G_IS_VALUE(&tmp_value))
         g_value_unset(&tmp_value);
 
@@ -1071,9 +1070,9 @@ void type_(GClosure *self, GValue *return_value,
     }
 
     GValue tmp_value = {0};
-    const GValue *value =
+    register const GValue *value =
         gel_context_eval_value(context, values + 0, &tmp_value);
-    GType value_type = G_VALUE_TYPE(value);
+    register GType value_type = G_VALUE_TYPE(value);
     if(G_IS_VALUE(&tmp_value))
         g_value_unset(&tmp_value);
 

@@ -29,6 +29,9 @@
 #endif
 #define G_IS_VALUE(v) ((v)->g_type != G_TYPE_INVALID)
 
+#define gel_value_new() (g_new0(GValue, 1))
+
+
 typedef
 gboolean (*GelValuesArithmetic)(const GValue *l_value, const GValue *r_value,
                                 GValue *dest_value);
@@ -36,7 +39,6 @@ gboolean (*GelValuesArithmetic)(const GValue *l_value, const GValue *r_value,
 typedef
 gboolean (*GelValuesLogic)(const GValue *l_value, const GValue *r_value);
 
-GValue* gel_value_new(void);
 GValue* gel_value_new_of_type(GType type);
 GValue* gel_value_new_from_boolean(gboolean value_boolean);
 GValue* gel_value_new_from_pointer(gpointer value_pointer);
