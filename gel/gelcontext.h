@@ -10,6 +10,8 @@ GelContext* gel_context_new(void);
 GelContext* gel_context_new_with_outer(GelContext *outer);
 void gel_context_free(GelContext *self);
 
+gboolean gel_context_is_valid(GelContext *context);
+
 GValue* gel_context_find_symbol(const GelContext *self, const gchar *name);
 GelContext* gel_context_get_outer(const GelContext *self);
 

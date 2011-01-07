@@ -151,6 +151,20 @@ void gel_context_free(GelContext *self)
 }
 
 
+/**
+ * gel_context_is_valid:
+ * @context: variable to check
+ *
+ * Checks whether @context is a valid context
+ *
+ * Returns: #TRUE if @context is a valid context, #FALSE otherwise
+ */
+gboolean gel_context_is_valid(GelContext *context)
+{
+    return g_list_find(contexts_POOL, context) != NULL;
+}
+
+
 static
 void gel_context_invoke_type(GelContext *self, GType type,
                              guint n_values, const GValue *values)
