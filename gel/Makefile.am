@@ -21,3 +21,7 @@ libgel_include_HEADERS = \
 	gelparser.h \
 	gelvalue.h
 
+noinst_HEADERS = \
+	gelvalueprivate.h \
+	geldebug.h
+
