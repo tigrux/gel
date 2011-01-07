@@ -70,6 +70,7 @@ GelContext* gel_context_new(void)
 
 static guint contexts_COUNT;
 static GList *contexts_POOL;
+static GList *contexts_LIST;
 static GStaticMutex contexts_MUTEX = G_STATIC_MUTEX_INIT;
 
 
@@ -79,12 +80,14 @@ static GelContext *gel_context_alloc()
     self->symbols = g_hash_table_new_full(
         g_str_hash, g_str_equal,
         (GDestroyNotify)g_free, (GDestroyNotify)gel_value_free);
+    contexts_LIST = g_list_append(contexts_LIST, self);
     return self;
 }
 
 
 static void gel_context_dispose(GelContext *self)
 {
+    contexts_LIST = g_list_remove(contexts_LIST, self);
     g_hash_table_unref(self->symbols);
     g_slice_free(GelContext, self);
 }
@@ -161,7 +164,7 @@ void gel_context_free(GelContext *self)
  */
 gboolean gel_context_is_valid(GelContext *context)
 {
-    return g_list_find(contexts_POOL, context) != NULL;
+    return g_list_find(contexts_LIST, context) != NULL;
 }
 
 
