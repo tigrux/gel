@@ -7,7 +7,7 @@ gel_context_free
 gel_context_is_valid
 gel_context_find_symbol
 gel_context_get_outer
-gel_context_add_symbol
+gel_context_add_value
 gel_context_add_object
 gel_context_add_function
 gel_context_add_default_symbols
@@ -21,17 +21,21 @@ gel_context_closure_new
 <SECTION>
 <FILE>gelparser</FILE>
 gel_parse_file
-gel_parse_string
+gel_parse_text
 </SECTION>
 
 <SECTION>
 <FILE>gelvalue</FILE>
+gel_value_copy
+gel_value_to_boolean
+gel_value_to_string
 gel_value_list_free
 gel_values_add
 gel_values_sub
 gel_values_mul
 gel_values_div
 gel_values_mod
+gel_values_cmp
 gel_values_gt
 gel_values_ge
 gel_values_eq

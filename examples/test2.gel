@@ -1,5 +1,5 @@
 
-[def primes-up-to [top]
+[def primes-under [top]
     [var sieve [array 2]]
     [var n 3]
     [def remains [i]
@@ -14,12 +14,10 @@
     sieve
 ]
 
-[var first-primes [primes-up-to 100]]
+[var first-primes [primes-under 100]]
 
-[var i 0]
 [for iter first-primes
-    [print "Primes[" i "] = " iter]
-    [= i [+ i 1]]
+    [print "Primes[" [index first-primes iter] "] = " iter]
 ]
 
 [print "The first prime is " [nth first-primes 0]]
@@ -47,10 +45,8 @@
     ]
 ]
 
-[var i 0]
-[while [le i 10]
+[for i [range 10 0]
     [print "Fibonacci[" i "] = " [fibonacci i]]
-    [= i [+ i 1]]
 ]
 
 

@@ -42,11 +42,11 @@ void gel_closure_marshal(GelClosure *closure, GValue *return_value,
         {
             register GValue *value = gel_value_new();
             gel_context_eval(invocation_context, param_values + i, value);
-            gel_context_add_symbol(context, closure_args[i], value);
+            gel_context_add_value(context, closure_args[i], value);
         }
     else
         for(i = 0; i < n_args; i++)
-            gel_context_add_symbol(context,
+            gel_context_add_value(context,
                 closure_args[i], gel_value_dup(param_values + i));
 
     const guint n_values = closure->code->n_values;
@@ -71,7 +71,7 @@ void gel_closure_marshal(GelClosure *closure, GValue *return_value,
 
 /**
  * gel_context_closure_new:
- * @self: #GelContext
+ * @self: #GelContext where to define a #GClosure
  * @args: #NULL terminated array of strings with the closure argument names.
  * @code: #GValueArray with the code of the closure.
  *

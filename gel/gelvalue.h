@@ -4,7 +4,12 @@
 #include <glib-object.h>
 
 
-void gel_value_list_free(GList *list);
+gchar *gel_value_to_string(const GValue *value);
+gboolean gel_value_to_boolean(const GValue *value);
+
+void gel_value_list_free(GList *value_list);
+gboolean gel_value_copy(const GValue *src_value, GValue *dest_value);
+gint gel_values_cmp(const GValue *v1, const GValue *v2);
 
 gboolean gel_values_add(const GValue *v1, const GValue *v2, GValue *dest_value);
 gboolean gel_values_sub(const GValue *v1, const GValue *v2, GValue *dest_value);

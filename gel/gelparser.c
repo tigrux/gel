@@ -211,15 +211,15 @@ GValueArray* gel_parse_file(const gchar *file, GError **error)
     if(!g_file_get_contents(file, &content, &content_len, error))
         return NULL;
 
-    register GValueArray *array = gel_parse_string(content, content_len);
+    register GValueArray *array = gel_parse_text(content, content_len);
     g_free(content);
     return array;
 }
 
 
 /**
- * gel_parse_string:
- * @text: content to parse
+ * gel_parse_text:
+ * @text: text to parse
  * @text_len: length of the content to parse, or -1 if it is zero terminated.
  *
  * Uses a #GScanner to parse @content, operators are replaced with their
@@ -231,7 +231,7 @@ GValueArray* gel_parse_file(const gchar *file, GError **error)
  *
  * Returns: A #GValueArray with the parsed value literals.
  */
-GValueArray* gel_parse_string(const gchar *text, guint text_len)
+GValueArray* gel_parse_text(const gchar *text, guint text_len)
 {
     register GScanner *scanner = g_scanner_new(NULL);
 

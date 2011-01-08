@@ -9,19 +9,20 @@ class Demo : Object {
 
     public bool run() {
         foreach(Value iter_value in array.values) {
-            print("%s ?\n", iter_value.strdup_contents());
+            print("\n%s ?\n", Gel.Value.to_string(iter_value));
 
             GLib.Value result_value;
             if(context.eval(iter_value, out result_value))
-                print("= %s\n\n", result_value.strdup_contents());
+                print("= %s\n\n", Gel.Value.to_string(result_value));
         }
         return true;
     }
 
-    public void parse_file(string file) throws FileError {
+    public void parse(string file) throws FileError {
         array = Gel.parse_file(file);
     }
 }
+
 
 int main(string[] args) {
     Gtk.init(ref args);
@@ -38,15 +39,13 @@ int main(string[] args) {
         return 1;
     }
 
-    var file = args[1];
-
     var demo = new Demo();
 
     try {
-        demo.parse_file(file);
+        demo.parse(args[1]);
     }
     catch {
-        print("Could not parse file '%s'\n", file);
+        print("Could not parse file '%s'\n", args[1]);
         return 1;
     }
 

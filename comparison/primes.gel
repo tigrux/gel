@@ -1,15 +1,13 @@
 
 [var sieve [array]]
-[var n 2]
-[def remains [i]
-    [% n i]
-]
-[while [< n 50000]
-    [if [all remains sieve]
+
+[for n [range 2 50000]
+    [if [all [lambda [i] [% n i]] sieve]
         [append sieve n]
     ]
-    [= n [+ n 1]]
 ]
+
+[print "Calculated " [len sieve] " primes"]
 
 [quit]
 

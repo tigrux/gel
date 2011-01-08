@@ -85,6 +85,18 @@ GValue *gel_value_dup(const GValue *value)
 }
 
 
+
+/**
+ * gel_value_copy:
+ * @src_value: a valid #GValue
+ * @dest_value: a #GValue
+ *
+ * Tries to copy @src_value to @dest_value.
+ * If @dest_value is empty, #g_value_init and #g_value_copy are used.
+ * If not, #g_value_transform is used.
+ *
+ * Returns: #TRUE on success , #FALSE otherwise
+ */
 gboolean gel_value_copy(const GValue *src_value, GValue *dest_value)
 {
     g_return_val_if_fail(src_value != NULL, FALSE);
@@ -98,7 +110,27 @@ gboolean gel_value_copy(const GValue *src_value, GValue *dest_value)
     {
         register GType dest_type = GEL_VALUE_TYPE(dest_value);
         if(src_type == dest_type)
-            g_value_copy(src_value, dest_value);
+            switch(src_type)
+            {
+                case G_TYPE_BOOLEAN:
+                    gel_value_set_boolean(dest_value,
+                        gel_value_get_boolean(src_value));
+                    break;
+                case G_TYPE_LONG:
+                    gel_value_set_long(dest_value,
+                        gel_value_get_long(src_value));
+                    break;
+                case G_TYPE_POINTER:
+                    gel_value_set_pointer(dest_value,
+                        gel_value_peek_pointer(src_value));
+                    break;
+                case G_TYPE_DOUBLE:
+                    gel_value_set_double(dest_value,
+                        gel_value_get_double(src_value));
+                    break;
+                default:
+                    g_value_copy(src_value, dest_value);
+            }
         else
         if(!(result = g_value_transform(src_value, dest_value)))
             g_warning("Cannot assign from %s to %s",
@@ -125,22 +157,34 @@ void gel_value_free(GValue *value)
 
 /**
  * gel_value_list_free:
- * @list: a #GList of #GValue
+ * @value_list: a #GList of #GValue
  *
- * Frees @list of #GValue
+ * Frees a #GList of #GValue.
  * This function is needed to free lists used by #gel_context_eval_params
  */
-void gel_value_list_free(GList *list)
+void gel_value_list_free(GList *value_list)
 {
-    g_list_foreach(list, (GFunc)gel_value_free, NULL);
-    g_list_free(list);
+    g_list_foreach(value_list, (GFunc)gel_value_free, NULL);
+    g_list_free(value_list);
 }
 
 
+
+/**
+ * gel_value_to_string:
+ * @value: #GValue to get its representation
+ *
+ * Provides a debug friendly representation of @value
+ *
+ * Returns: a newly allocated string
+ */
 gchar* gel_value_to_string(const GValue *value)
 {
     g_return_val_if_fail(value != NULL, NULL);
     g_return_val_if_fail(GEL_IS_VALUE(value), NULL);
+
+    if(GEL_VALUE_HOLDS(value, G_TYPE_STRING))
+        return g_value_dup_string(value);
 
     register gchar *result = NULL;
     GValue string_value = {0};
@@ -152,9 +196,33 @@ gchar* gel_value_to_string(const GValue *value)
         g_value_unset(&string_value);
     }
     else
+    if(GEL_VALUE_HOLDS(value, G_TYPE_VALUE_ARRAY))
+    {
+        const GValueArray *array = (GValueArray*)g_value_get_boxed(value);
+        register GString *buffer = g_string_new("[");
+        const guint n_values = array->n_values;
+        if(n_values > 0)
+        {
+            const guint last = n_values - 1;
+            const GValue *const array_values = array->values;
+            register guint i;
+            for(i = 0; i <= last; i++)
+            {
+                register gchar *s = gel_value_to_string(array_values + i);
+                g_string_append(buffer, s);
+                if(i != last)
+                    g_string_append(buffer, " ");
+                g_free(s);
+            }
+        }
+        g_string_append(buffer, "]");
+        result =  g_string_free(buffer, FALSE);
+    }
+    else
     {
         register GString *repr_string = g_string_new("<");
         g_string_append_printf(repr_string, "%s", GEL_VALUE_TYPE_NAME(value));
+
         if(GEL_VALUE_HOLDS(value, G_TYPE_GTYPE))
             g_string_append_printf(
                 repr_string, " %s", g_type_name(g_value_get_gtype(value)));
@@ -162,6 +230,7 @@ gchar* gel_value_to_string(const GValue *value)
         if(g_value_fits_pointer(value))
             g_string_append_printf(
                 repr_string, " %p", gel_value_peek_pointer(value));
+
         g_string_append_c(repr_string, '>');
         result = g_string_free(repr_string, FALSE);
     }
@@ -169,9 +238,27 @@ gchar* gel_value_to_string(const GValue *value)
 }
 
 
+
+/**
+ * gel_value_to_boolean:
+ * @value: #GValue to evaluate as #gboolean
+ *
+ * Evaluates @value as #gboolean
+ *
+ * An invalid value is #FALSE
+ * A string is #FALSE if it is empty.
+ * A number is #FALSE if it is zero.
+ * An array is #FALSE if it does not have elements.
+ * A pointer, object or boxed is #FALSE if it is #NULL.
+ *
+ * Returns: #FALSE if @value is empty or zero, #TRUE otherwise
+ */
 gboolean gel_value_to_boolean(const GValue *value)
 {
     g_return_val_if_fail(value != NULL, FALSE);
+
+    if(!GEL_IS_VALUE(value))
+        return FALSE;
 
     register gboolean result = TRUE;
 

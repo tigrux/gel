@@ -5,7 +5,7 @@
 
 
 GValueArray* gel_parse_file(const gchar *file, GError **error);
-GValueArray* gel_parse_string(const gchar *text, guint text_len);
+GValueArray* gel_parse_text(const gchar *text, guint text_len);
 
 
 #endif

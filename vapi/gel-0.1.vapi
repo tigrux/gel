@@ -8,7 +8,7 @@ namespace Gel {
         static bool is_valid(Gel.Context? context);
         public unowned GLib.Value find_symbol(string name);
         public unowned Context outer {get;}
-        public void add_symbol(string name, owned GLib.Value value);
+        public void add_value(string name, owned GLib.Value value);
         public void add_object(string name, owned GLib.Object object);
         public void add_function(string name, GLib.Func function);
         public void add_default_symbols();
@@ -19,7 +19,17 @@ namespace Gel {
     }
 
     GLib.ValueArray parse_file(string file) throws GLib.FileError;
-    GLib.ValueArray parse_string(string text, uint text_len);
+    GLib.ValueArray parse_text(string text, uint text_len);
+
+    namespace Value {
+        string to_string(GLib.Value value);
+        bool to_boolean(GLib.Value value);
+        bool copy(GLib.Value src_value, out GLib.Value dest_value);
+    }
+
+    namespace ValueList {
+        void free(GLib.List<GLib.Value> value_list);
+    }
 
     namespace Values {
         bool add(GLib.Value v1, GLib.Value v2, out GLib.Value dest_value);
@@ -27,6 +37,8 @@ namespace Gel {
         bool mul(GLib.Value v1, GLib.Value v2, out GLib.Value dest_Value);
         bool div(GLib.Value v1, GLib.Value v2, out GLib.Value dest_value);
         bool mod(GLib.Value v1, GLib.Value v2, out GLib.Value dest_value);
+
+        int cmp(GLib.Value v1, GLib.Value v2);
 
         bool gt(GLib.Value v1, GLib.Value v2);
         bool ge(GLib.Value v1, GLib.Value v2);

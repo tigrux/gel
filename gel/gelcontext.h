@@ -15,7 +15,7 @@ gboolean gel_context_is_valid(GelContext *context);
 GValue* gel_context_find_symbol(const GelContext *self, const gchar *name);
 GelContext* gel_context_get_outer(const GelContext *self);
 
-void gel_context_add_symbol(GelContext *self, const gchar *name, GValue *value);
+void gel_context_add_value(GelContext *self, const gchar *name, GValue *value);
 void gel_context_add_object(GelContext *self, const gchar *name,
                             GObject *object);
 void gel_context_add_function(GelContext *self, const gchar *name,

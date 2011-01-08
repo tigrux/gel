@@ -14,8 +14,6 @@
  *
  * #GelContext is a class where symbols are stored and evaluated.
  */
-
-
 struct _GelContext
 {
     /*< private >*/
@@ -25,32 +23,10 @@ struct _GelContext
 };
 
 
-static
-void gel_value_array_to_string_transform(const GValue *src_value,
-                                         GValue *dest_value)
-{
-    const GValueArray *array = (GValueArray*)g_value_get_boxed(src_value);
-
-    register GString *buffer = g_string_new("[");
-    const guint n_values = array->n_values;
-    if(n_values > 0)
-    {
-        const guint last = n_values - 1;
-        const GValue *const array_values = array->values;
-        register guint i;
-        for(i = 0; i <= last; i++)
-        {
-            register gchar *s = gel_value_to_string(array_values + i);
-            g_string_append(buffer, s);
-            if(i != last)
-                g_string_append(buffer, " ");
-            g_free(s);
-        }
-    }
-    g_string_append(buffer, "]");
-
-    g_value_take_string(dest_value, g_string_free(buffer, FALSE));
-}
+static guint contexts_COUNT;
+static GList *contexts_POOL;
+static GList *contexts_LIST;
+static GStaticMutex contexts_MUTEX;
 
 
 /**
@@ -68,13 +44,8 @@ GelContext* gel_context_new(void)
 }
 
 
-static guint contexts_COUNT;
-static GList *contexts_POOL;
-static GList *contexts_LIST;
-static GStaticMutex contexts_MUTEX = G_STATIC_MUTEX_INIT;
-
-
-static GelContext *gel_context_alloc()
+static
+GelContext *gel_context_alloc()
 {
     register GelContext *self = g_slice_new0(GelContext);
     self->symbols = g_hash_table_new_full(
@@ -85,7 +56,8 @@ static GelContext *gel_context_alloc()
 }
 
 
-static void gel_context_dispose(GelContext *self)
+static
+void gel_context_dispose(GelContext *self)
 {
     contexts_LIST = g_list_remove(contexts_LIST, self);
     g_hash_table_unref(self->symbols);
@@ -95,7 +67,7 @@ static void gel_context_dispose(GelContext *self)
 
 /**
  * gel_context_new_with_outer:
- * @outer: The outer context.
+ * @outer: The outer #GelContext
  *
  * Creates a #GelContext, using @outer as the outer context.
  * This method is used when invoking functions to have local variables.
@@ -105,25 +77,16 @@ static void gel_context_dispose(GelContext *self)
  */
 GelContext* gel_context_new_with_outer(GelContext *outer)
 {
-    static volatile gsize only_once = 0;
-    if(g_once_init_enter(&only_once))
-    {
-        g_value_register_transform_func(
-            G_TYPE_VALUE_ARRAY, G_TYPE_STRING,
-            gel_value_array_to_string_transform);
-        g_once_init_leave (&only_once, 1);
-    }
-
     register GelContext *self;
     g_static_mutex_lock(&contexts_MUTEX);
-        if(contexts_POOL != NULL)
-        {
-            self = (GelContext*)contexts_POOL->data;
-            contexts_POOL = g_list_delete_link(contexts_POOL, contexts_POOL);
-        }
-        else
-            self = gel_context_alloc();
-        contexts_COUNT++;
+    if(contexts_POOL != NULL)
+    {
+        self = (GelContext*)contexts_POOL->data;
+        contexts_POOL = g_list_delete_link(contexts_POOL, contexts_POOL);
+    }
+    else
+        self = gel_context_alloc();
+    contexts_COUNT++;
     g_static_mutex_unlock(&contexts_MUTEX);
 
     if((self->outer = outer) == NULL)
@@ -134,7 +97,7 @@ GelContext* gel_context_new_with_outer(GelContext *outer)
 
 /**
  * gel_context_free:
- * @self: context
+ * @self: #GelContext to free
  *
  * Frees resources allocated by @self
  *
@@ -144,45 +107,27 @@ void gel_context_free(GelContext *self)
     g_hash_table_remove_all(self->symbols);
 
     g_static_mutex_lock(&contexts_MUTEX);
-        contexts_POOL = g_list_append(contexts_POOL, self);
-        if(--contexts_COUNT == 0)
-        {
-            g_list_foreach(contexts_POOL, (GFunc)gel_context_dispose, NULL);
-            g_list_free(contexts_POOL);
-        }
+    contexts_POOL = g_list_append(contexts_POOL, self);
+    if(--contexts_COUNT == 0)
+    {
+        g_list_foreach(contexts_POOL, (GFunc)gel_context_dispose, NULL);
+        g_list_free(contexts_POOL);
+    }
     g_static_mutex_unlock(&contexts_MUTEX);
 }
 
 
 /**
  * gel_context_is_valid:
- * @context: variable to check
+ * @context: variable to check if is #GelContext
  *
- * Checks whether @context is a valid context
+ * Checks whether @context is a valid #GelContext
  *
  * Returns: #TRUE if @context is a valid context, #FALSE otherwise
  */
 gboolean gel_context_is_valid(GelContext *context)
 {
     return g_list_find(contexts_LIST, context) != NULL;
-}
-
-
-static
-void gel_context_invoke_type(GelContext *self, GType type,
-                             guint n_values, const GValue *values)
-{
-    g_return_if_fail(self != NULL);
-    g_return_if_fail(type != G_TYPE_INVALID);
-
-    register guint i;
-    for(i = 0; i < n_values; i++)
-    {
-        g_return_if_fail(GEL_VALUE_HOLDS(values + i, G_TYPE_STRING));
-        gel_context_add_symbol(self,
-            g_value_get_string(values + i),
-            gel_value_new_of_type(type));
-    }
 }
 
 
@@ -199,37 +144,22 @@ const GValue* gel_context_eval_array(GelContext *self, const GValueArray *array,
     register const GValue *result_value = NULL;
     const GValue *const array_values = array->values;
 
-    if(GEL_VALUE_HOLDS(array_values + 0, G_TYPE_STRING))
+    GValue tmp_value = {0};
+    register const GValue *first_value =
+        gel_context_eval_value(self, array_values + 0, &tmp_value);
+
+    if(GEL_VALUE_HOLDS(first_value, G_TYPE_CLOSURE))
     {
-        const gchar *const type_name = g_value_get_string(array_values + 0);
-        register GType type;
-        if((type = g_type_from_name(type_name)) != G_TYPE_INVALID)
-        {
-            gel_context_invoke_type(self, type,
-                array_n_values -1 , array_values + 1);
-            result_value = dest_value;
-        }
+        g_closure_invoke((GClosure*)g_value_get_boxed(first_value),
+            dest_value, array_n_values - 1 , array_values + 1, self);
+        result_value = dest_value;
     }
+    else
+        gel_warning_value_not_of_type(__FUNCTION__,
+            first_value, G_TYPE_CLOSURE);
 
-    if(result_value == NULL)
-    {
-        GValue tmp_value = {0};
-        register const GValue *first_value =
-            gel_context_eval_value(self, array_values + 0, &tmp_value);
-
-        if(GEL_VALUE_HOLDS(first_value, G_TYPE_CLOSURE))
-        {
-            g_closure_invoke((GClosure*)g_value_get_boxed(first_value),
-                dest_value, array_n_values - 1 , array_values + 1, self);
-            result_value = dest_value;
-        }
-        else
-            gel_warning_value_not_of_type(__FUNCTION__,
-                first_value, G_TYPE_CLOSURE);
-
-        if(GEL_IS_VALUE(&tmp_value))
-            g_value_unset(&tmp_value);
-    }
+    if(GEL_IS_VALUE(&tmp_value))
+        g_value_unset(&tmp_value);
 
     return result_value;
 }
@@ -237,9 +167,9 @@ const GValue* gel_context_eval_array(GelContext *self, const GValueArray *array,
 
 /**
  * gel_context_eval:
- * @self: context
- * @value: value to evaluate
- * @dest_value: destination value
+ * @self: #GelContext where to evaluate @value
+ * @value: #GValue to evaluate
+ * @dest_value: destination #GValue
  *
  * Evaluates @value, stores the result in @dest_value
  *
@@ -267,7 +197,7 @@ gboolean gel_context_eval(GelContext *self,
 
 /**
  * gel_context_eval_value:
- * @self: context
+ * @self: #GelContext where to evaluate @value
  * @value: value to evaluate
  * @tmp_value: value where a result may be written.
  *
@@ -313,7 +243,7 @@ const GValue* gel_context_eval_value(GelContext *self,
 
 /**
  * gel_context_eval_params:
- * @self: context to use
+ * @self: #GelContext where to evaluate
  * @func: name of the invoker function, usually __FUNCTION__
  * @list: pointer to a list to keep temporary values
  * @format: string describing types to get
@@ -520,8 +450,7 @@ gboolean gel_context_eval_params(GelContext *self, const gchar *func,
                 }
                 else
                 {
-                    gel_warning_value_not_of_type(func,
-                        result_value, G_TYPE_VALUE);
+                    g_warning("%s: Not a GValue", func);
                     parsed = FALSE;
                 }
                 break;
@@ -560,7 +489,7 @@ gboolean gel_context_eval_params(GelContext *self, const gchar *func,
 
 /**
  * gel_context_find_symbol:
- * @self: context
+ * @self: #GelContext where to look for the symbol named @name
  * @name: name of the symbol to lookup
  *
  * If @context has a definition for @name, then returns its value.
@@ -583,15 +512,15 @@ GValue* gel_context_find_symbol(const GelContext *self, const gchar *name)
 
 
 /**
- * gel_context_add_symbol:
- * @self: context
+ * gel_context_add_value:
+ * @self: #GelContext where to add the symbol
  * @name: name of the symbol to add
  * @value: value of the symbol to add
  *
  * Adds a new symbol to @context with the name given by @name.
  * @self takes ownership of @value so it should not be freed or unset.
  */
-void gel_context_add_symbol(GelContext *self, const gchar *name, GValue *value)
+void gel_context_add_value(GelContext *self, const gchar *name, GValue *value)
 {
     g_return_if_fail(self != NULL);
     g_return_if_fail(name != NULL);
@@ -602,7 +531,7 @@ void gel_context_add_symbol(GelContext *self, const gchar *name, GValue *value)
 
 /**
  * gel_context_add_object:
- * @self: context
+ * @self: #GelContext where to add the object
  * @name: name of the symbol to add
  * @object: object to add
  *
@@ -619,7 +548,7 @@ void gel_context_add_object(GelContext *self, const gchar *name,
 
     register GValue *value = gel_value_new_of_type(G_OBJECT_TYPE(object));
     g_value_take_object(value, object);
-    gel_context_add_symbol(self, name, value);
+    gel_context_add_value(self, name, value);
 }
 
 static
@@ -639,7 +568,7 @@ void gel_context_marshal(GClosure *closure, GValue *return_value,
 
 /**
  * gel_context_add_function:
- * @self: context
+ * @self: #GelContext where to add the function
  * @name: name of the symbol to add
  * @function: a #GFunc to invoke
  * @user_data: extra data to pass to @function
@@ -659,13 +588,13 @@ void gel_context_add_function(GelContext *self, const gchar *name,
         g_cclosure_new(G_CALLBACK(callback), user_data, NULL);
     g_closure_set_marshal(closure, (GClosureMarshal)gel_context_marshal);
     g_value_take_boxed(value, closure);
-    gel_context_add_symbol(self, name, value);
+    gel_context_add_value(self, name, value);
 }
 
 
 /**
  * gel_context_remove_symbol:
- * @self: context
+ * @self: #GelContext where to remove the symbol
  * @name: name of the symbol to remove
  *
  * Removes the symbol gived by @name.
@@ -682,7 +611,7 @@ gboolean gel_context_remove_symbol(GelContext *self, const gchar *name)
 
 /**
  * gel_context_get_outer:
- * @self: context
+ * @self: #GelContext to get its outer context
  *
  * Retrieves @self's outer context
  *
