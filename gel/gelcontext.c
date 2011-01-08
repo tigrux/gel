@@ -348,7 +348,7 @@ gboolean gel_context_eval_params(GelContext *self, const gchar *func,
                 else
                 {
                     gel_warning_value_not_of_type(func,
-                        value, G_TYPE_VALUE_ARRAY);
+                        *values, G_TYPE_VALUE_ARRAY);
                     parsed = FALSE;
                 }
                 break;
@@ -361,7 +361,7 @@ gboolean gel_context_eval_params(GelContext *self, const gchar *func,
                 else
                 {
                     gel_warning_value_not_of_type(func,
-                        value, G_TYPE_STRING);
+                        *values, G_TYPE_STRING);
                     parsed = FALSE;
                 }
                 break;
