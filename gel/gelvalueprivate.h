@@ -19,7 +19,7 @@
 
 #define GEL_VALUE_HOLDS(v, t) ((v)->g_type == (t) || g_type_is_a((v)->g_type, (t)))
 #define GEL_VALUE_TYPE(v) ((v)->g_type)
-#define GEL_VALUE_TYPE_NAME(v) (g_type_name((v)->g_type))
+#define GEL_VALUE_TYPE_NAME(v) (g_type_name(GEL_VALUE_TYPE(v)))
 #define GEL_IS_VALUE(v) ((v)->g_type != G_TYPE_INVALID)
 
 #define gel_value_new() (g_new0(GValue, 1))
@@ -44,3 +44,4 @@ void gel_value_free(GValue *value);
 
 
 #endif
+
