@@ -1,5 +1,5 @@
 
-[def primes-under [top]
+[def primes-lesser-than [top]
     [var sieve [array 2]]
     [var n 3]
     [def remains [i]
@@ -14,7 +14,7 @@
     sieve
 ]
 
-[var first-primes [primes-under 100]]
+[var first-primes [primes-lesser-than 100]]
 
 [for iter first-primes
     [print "Primes[" [index first-primes iter] "] = " iter]

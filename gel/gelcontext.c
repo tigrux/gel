@@ -131,40 +131,6 @@ gboolean gel_context_is_valid(GelContext *context)
 }
 
 
-static
-const GValue* gel_context_eval_array(GelContext *self, const GValueArray *array,
-                                     GValue *dest_value)
-{
-    g_return_val_if_fail(self != NULL, NULL);
-    g_return_val_if_fail(dest_value != NULL, NULL);
-    g_return_val_if_fail(array != NULL, NULL);
-    const guint array_n_values = array->n_values;
-    g_return_val_if_fail(array_n_values > 0, NULL);
-
-    register const GValue *result_value = NULL;
-    const GValue *const array_values = array->values;
-
-    GValue tmp_value = {0};
-    register const GValue *first_value =
-        gel_context_eval_value(self, array_values + 0, &tmp_value);
-
-    if(GEL_VALUE_HOLDS(first_value, G_TYPE_CLOSURE))
-    {
-        g_closure_invoke((GClosure*)g_value_get_boxed(first_value),
-            dest_value, array_n_values - 1 , array_values + 1, self);
-        result_value = dest_value;
-    }
-    else
-        gel_warning_value_not_of_type(__FUNCTION__,
-            first_value, G_TYPE_CLOSURE);
-
-    if(GEL_IS_VALUE(&tmp_value))
-        g_value_unset(&tmp_value);
-
-    return result_value;
-}
-
-
 /**
  * gel_context_eval:
  * @self: #GelContext where to evaluate @value
@@ -199,22 +165,22 @@ gboolean gel_context_eval(GelContext *self,
  * gel_context_eval_value:
  * @self: #GelContext where to evaluate @value
  * @value: value to evaluate
- * @tmp_value: value where a result may be written.
+ * @out_value: value where a result may be written.
  *
  * Evaluates the given value.
  * If @value matches a symbol, returns the corresponding value.
  * If @value is a literal (number or string), returns @value itself.
- * If not, then @value is evaluated and the result stored in @tmp_value.
+ * If not, then @value is evaluated and the result stored in @out_value.
  *
- * Returns: The value with the result.
+ * Returns: A #GValue with the result
  *
  */
 const GValue* gel_context_eval_value(GelContext *self,
-                                     const GValue *value, GValue *tmp_value)
+                                     const GValue *value, GValue *out_value)
 {
     g_return_val_if_fail(self != NULL, NULL);
     g_return_val_if_fail(value != NULL, NULL);
-    g_return_val_if_fail(tmp_value != NULL, NULL);
+    g_return_val_if_fail(out_value != NULL, NULL);
 
     register const GValue *result_value = NULL;
     register GType type = GEL_VALUE_TYPE(value);
@@ -231,8 +197,25 @@ const GValue* gel_context_eval_value(GelContext *self,
     }
     else
     if(type == G_TYPE_VALUE_ARRAY)
-        result_value = gel_context_eval_array(self,
-            (GValueArray*)g_value_get_boxed(value), tmp_value);
+    {
+        const GValueArray *const array = (GValueArray*)g_value_get_boxed(value);
+        const guint array_n_values = array->n_values;
+        const GValue *const array_values = array->values;
+
+        GValue tmp_value = {0};
+        register const GValue *first_value =
+            gel_context_eval_value(self, array_values + 0, &tmp_value);
+
+        if(GEL_VALUE_HOLDS(first_value, G_TYPE_CLOSURE))
+        {
+            g_closure_invoke((GClosure*)g_value_get_boxed(first_value),
+                out_value, array_n_values - 1 , array_values + 1, self);
+            result_value = out_value;
+        }
+
+        if(GEL_IS_VALUE(&tmp_value))
+            g_value_unset(&tmp_value);
+    }
 
     if(result_value == NULL)
         result_value = value;

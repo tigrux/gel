@@ -332,9 +332,8 @@ void arithmetic(GClosure *self, GValue *return_value,
     if(GEL_IS_VALUE(&tmp2))
         g_value_unset(&tmp2);
 
-    const guint last = n_values - 2;
     register guint i;
-    for(i = 0; i < last && running; i++)
+    for(i = 2; i < n_values && running; i++)
     {
         register GValue *v1;
 
@@ -720,16 +719,17 @@ void map_(GClosure *self, GValue *return_value,
             "CA", &n_values, &values, &closure, &array))
         return;
 
-    register GValueArray *result_array = g_value_array_new(array->n_values);
+    const GValue *const array_values = array->values;
+    const guint array_n_values = array->n_values;
+
+    register GValueArray *result_array = g_value_array_new(array_n_values);
+    result_array->n_values = array_n_values;
+    GValue *const result_array_values = result_array->values;
 
     register guint i;
-    for(i = 0; i < array->n_values; i++)
-    {
-        GValue tmp_value = {0};
-        g_closure_invoke(closure, &tmp_value, 1, array->values + i, context);
-        g_value_array_append(result_array, &tmp_value);
-        g_value_unset(&tmp_value);
-    }
+    for(i = 0; i < array_n_values; i++)
+        g_closure_invoke(closure,
+            result_array_values + i, 1, array_values + i, context);
 
     g_value_init(return_value, G_TYPE_VALUE_ARRAY);
     g_value_take_boxed(return_value, result_array);
@@ -751,6 +751,55 @@ void apply_(GClosure *self, GValue *return_value,
 
     g_closure_invoke(closure, return_value,
         array->n_values, array->values, context);
+    gel_value_list_free(list);
+}
+
+
+static
+void zip_(GClosure *self, GValue *return_value,
+          guint n_values, const GValue *values, GelContext *context)
+{
+    GList *list = NULL;
+
+    const guint n_arrays = n_values;
+    register GValueArray **arrays = g_new0(GValueArray*, n_values);
+
+    register guint i;
+    for(i = 0; i < n_arrays; i++)
+        if(!gel_context_eval_params(context, __FUNCTION__, &list,
+                "A*", &n_values, &values, arrays + i))
+        break;
+
+    if(i == n_arrays)
+    {
+        register guint min_n_values = arrays[0]->n_values;
+        for(i = 1; i < n_arrays; i++)
+        {
+            register guint i_n_values = arrays[i]->n_values;
+            if(i_n_values < min_n_values)
+                min_n_values = i_n_values;
+        }
+
+        register GValueArray *result_array = g_value_array_new(min_n_values);
+        GValue *const result_array_values = result_array->values;
+        result_array->n_values = min_n_values;
+
+        for(i = 0; i < min_n_values; i++)
+        {
+            register GValueArray *array = g_value_array_new(n_arrays);
+            register guint j;
+            for(j = 0; j < n_arrays; j++)
+                g_value_array_append(array, arrays[j]->values + i);
+            g_value_init(result_array_values + i, G_TYPE_VALUE_ARRAY);
+            g_value_take_boxed(result_array_values + i, array);
+        }
+        g_value_init(return_value, G_TYPE_VALUE_ARRAY);
+        g_value_take_boxed(return_value, result_array);
+    }
+    else
+        g_warning("%s: Argument %u is not an array", __FUNCTION__, i);
+
+    g_free(arrays);
     gel_value_list_free(list);
 }
 
@@ -1175,6 +1224,7 @@ void gel_context_add_default_symbols(GelContext *self)
         CLOSURE(apply),
         CLOSURE(filter),
         CLOSURE(map),
+        CLOSURE(zip),
         CLOSURE(sort),
         {"TRUE", gel_value_new_from_boolean(TRUE)},
         {"FALSE", gel_value_new_from_boolean(FALSE)},

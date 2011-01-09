@@ -26,7 +26,7 @@ gboolean gel_context_remove_symbol(GelContext *self, const gchar *name);
 gboolean gel_context_eval(GelContext *self,
                           const GValue *value, GValue *dest_value);
 const GValue* gel_context_eval_value(GelContext *self,
-                                     const GValue *value, GValue *tmp_value);
+                                     const GValue *value, GValue *out_value);
 gboolean gel_context_eval_params(GelContext *self, const gchar *func,
                                  GList **list, const gchar *format,
                                  guint *n_values, const GValue **values, ...);

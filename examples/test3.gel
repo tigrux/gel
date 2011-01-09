@@ -26,11 +26,25 @@ S
 [== S [array -15 -6 0.0 30.6 77]]
 
 
-[var operators [array + - * /]]
 [var values [array 4.5 2]]
+[var operators [array + - * /]]
 
-[for iter_op operators
-    [print [apply iter_op values]]
+[def apply-oper [oper]
+    [apply oper values]
 ]
 
+[map apply-oper operators]
+
+
+[var A [array 100 200 300 400]]
+[var B [array 10  20  30  40]]
+[var C [array 1   2   3   4]]
+
+[def sum-of [values]
+    [apply + values]
+]
+
+[map sum-of [zip A B C]]
+
 [quit]
+
