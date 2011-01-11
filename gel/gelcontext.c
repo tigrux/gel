@@ -16,17 +16,13 @@
  */
 struct _GelContext
 {
-    /*< private >*/
     GHashTable *symbols;
-    /*< private >*/
     GelContext *outer;
+    gint ref_count;
 };
 
 
-static guint contexts_COUNT;
-static GList *contexts_POOL;
 static GList *contexts_LIST;
-static GStaticMutex contexts_MUTEX;
 
 
 /**
@@ -44,27 +40,6 @@ GelContext* gel_context_new(void)
 }
 
 
-static
-GelContext *gel_context_alloc()
-{
-    register GelContext *self = g_slice_new0(GelContext);
-    self->symbols = g_hash_table_new_full(
-        g_str_hash, g_str_equal,
-        (GDestroyNotify)g_free, (GDestroyNotify)gel_value_free);
-    contexts_LIST = g_list_append(contexts_LIST, self);
-    return self;
-}
-
-
-static
-void gel_context_dispose(GelContext *self)
-{
-    contexts_LIST = g_list_remove(contexts_LIST, self);
-    g_hash_table_unref(self->symbols);
-    g_slice_free(GelContext, self);
-}
-
-
 /**
  * gel_context_new_with_outer:
  * @outer: The outer #GelContext
@@ -77,43 +52,58 @@ void gel_context_dispose(GelContext *self)
  */
 GelContext* gel_context_new_with_outer(GelContext *outer)
 {
-    register GelContext *self;
-    g_static_mutex_lock(&contexts_MUTEX);
-    if(contexts_POOL != NULL)
-    {
-        self = (GelContext*)contexts_POOL->data;
-        contexts_POOL = g_list_delete_link(contexts_POOL, contexts_POOL);
-    }
-    else
-        self = gel_context_alloc();
-    contexts_COUNT++;
-    g_static_mutex_unlock(&contexts_MUTEX);
+    register GelContext *self = g_slice_new0(GelContext);
+    self->symbols = g_hash_table_new_full(
+        g_str_hash, g_str_equal,
+        (GDestroyNotify)g_free, (GDestroyNotify)gel_value_free);
 
     if((self->outer = outer) == NULL)
         gel_context_add_default_symbols(self);
+
+    self->ref_count = 1;
+    contexts_LIST = g_list_append(contexts_LIST, self);
+
     return self;
 }
 
 
 /**
- * gel_context_free:
- * @self: #GelContext to free
+ * gel_context_ref:
+ * @self: #GelContext to increase the reference count
  *
- * Frees resources allocated by @self
+ * Increases the reference count of @self
+ *
+ * Returns: the same #GelContext with the reference count increased
+ */
+
+GelContext* gel_context_ref(GelContext *self)
+{
+    g_return_val_if_fail(self != NULL, NULL);
+
+    g_hash_table_ref(self->symbols);
+    g_atomic_int_add(&self->ref_count, 1);
+    return self;
+}
+
+
+/**
+ * gel_context_unref:
+ * @self: #GelContext to unref
+ *
+ * Decreases the refcount of @self,
+ * releasing resources if the refcount reaches zero.
  *
  */
-void gel_context_free(GelContext *self)
+void gel_context_unref(GelContext *self)
 {
-    g_hash_table_remove_all(self->symbols);
+    g_return_if_fail(self != NULL);
 
-    g_static_mutex_lock(&contexts_MUTEX);
-    contexts_POOL = g_list_append(contexts_POOL, self);
-    if(--contexts_COUNT == 0)
+    g_hash_table_unref(self->symbols);
+    if(g_atomic_int_exchange_and_add(&self->ref_count, -1)  == 1)
     {
-        g_list_foreach(contexts_POOL, (GFunc)gel_context_dispose, NULL);
-        g_list_free(contexts_POOL);
+        contexts_LIST = g_list_remove(contexts_LIST, self);
+        g_slice_free(GelContext, self);
     }
-    g_static_mutex_unlock(&contexts_MUTEX);
 }
 
 

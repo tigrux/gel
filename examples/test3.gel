@@ -36,15 +36,20 @@ S
 [map apply-oper operators]
 
 
-[var A [array 100 200 300 400]]
-[var B [array 10  20  30  40]]
-[var C [array 1   2   3   4]]
+[def multiply-by [factor]
+    [lambda [n] [* n factor] ]
+]
+
+[var A [range 1 4]]
+[var B [map [multiply-by 10] A]]
+[var C [map [multiply-by 10] B]]
 
 [def sum-of [values]
     [apply + values]
 ]
 
 [map sum-of [zip A B C]]
+
 
 [quit]
 

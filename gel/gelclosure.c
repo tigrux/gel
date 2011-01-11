@@ -15,10 +15,12 @@ struct _GelClosure
 
 
 static
-void gel_closure_finalize(GelContext *context, GelClosure *closure)
+void gel_closure_finalize(GelContext *self, GelClosure *closure)
 {
-    g_return_if_fail(context != NULL);
+    g_return_if_fail(self != NULL);
 
+    /* MEMORY LEAK! */
+    gel_context_unref(self);
     g_strfreev(closure->args);
     g_value_array_free(closure->code);
 }
@@ -65,7 +67,8 @@ void gel_closure_marshal(GelClosure *closure, GValue *return_value,
                 g_value_unset(&tmp_value);
         }
     }
-    gel_context_free(context);
+
+    gel_context_unref(context);
 }
 
 
@@ -90,6 +93,8 @@ GClosure* gel_context_closure_new(GelContext *self,
     g_return_val_if_fail(args != NULL, NULL);
     g_return_val_if_fail(code != NULL, NULL);
 
+    /* MEMORY LEAK! */
+    gel_context_ref(self);
     register GClosure *closure =
         g_closure_new_simple(sizeof(GelClosure), self);
 
