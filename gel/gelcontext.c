@@ -18,7 +18,7 @@ struct _GelContext
 {
     GHashTable *symbols;
     GelContext *outer;
-    gint ref_count;
+    volatile gint ref_count;
 };
 
 
@@ -523,6 +523,7 @@ void gel_context_add_object(GelContext *self, const gchar *name,
     g_value_take_object(value, object);
     gel_context_add_value(self, name, value);
 }
+
 
 static
 void gel_context_marshal(GClosure *closure, GValue *return_value,
