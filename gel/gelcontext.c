@@ -32,7 +32,6 @@ static GList *contexts_LIST;
  * default symbols are added with #gel_context_add_symbols.
  *
  * Returns: A new #GelContext, with no outer context assigned.
- *
  */
 GelContext* gel_context_new(void)
 {
@@ -48,7 +47,6 @@ GelContext* gel_context_new(void)
  * This method is used when invoking functions to have local variables.
  *
  * Returns: A new created #GelContext, with @outer as the outer context.
- *
  */
 GelContext* gel_context_new_with_outer(GelContext *outer)
 {
@@ -75,7 +73,6 @@ GelContext* gel_context_new_with_outer(GelContext *outer)
  *
  * Returns: the same #GelContext with the reference count increased
  */
-
 GelContext* gel_context_ref(GelContext *self)
 {
     g_return_val_if_fail(self != NULL, NULL);
@@ -92,7 +89,6 @@ GelContext* gel_context_ref(GelContext *self)
  *
  * Decreases the refcount of @self,
  * releasing resources if the refcount reaches zero.
- *
  */
 void gel_context_unref(GelContext *self)
 {
@@ -130,7 +126,6 @@ gboolean gel_context_is_valid(GelContext *context)
  * Evaluates @value, stores the result in @dest_value
  *
  * Returns: #TRUE if @dest_value was written, #FALSE otherwise.
- *
  */
 gboolean gel_context_eval(GelContext *self, 
                           const GValue *value, GValue *dest_value)
@@ -163,7 +158,6 @@ gboolean gel_context_eval(GelContext *self,
  * If not, then @value is evaluated and the result stored in @out_value.
  *
  * Returns: A #GValue with the result
- *
  */
 const GValue* gel_context_eval_value(GelContext *self,
                                      const GValue *value, GValue *out_value)
@@ -266,7 +260,6 @@ const GValue* gel_context_eval_value(GelContext *self,
  * On failure , @n_values and @values are left untouched.
  * 
  * Returns: #TRUE on sucess, #FALSE otherwise.
- *
  */
 gboolean gel_context_eval_params(GelContext *self, const gchar *func,
                                  GList **list, const gchar *format,
