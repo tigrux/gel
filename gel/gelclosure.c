@@ -60,19 +60,13 @@ void gel_closure_marshal(GelClosure *closure, GValue *return_value,
 }
 
 
-//static guint count;
-
-
 static
 void gel_closure_finalize(GelContext *self, GelClosure *closure)
 {
     g_return_if_fail(self != NULL);
 
-    /* MEMORY LEAK! */
-    gel_context_free(self);
     g_strfreev(closure->args);
     g_value_array_free(closure->code);
-    //g_print("-- count = %d\n", --count);
 }
 
 
@@ -97,9 +91,7 @@ GClosure* gel_context_closure_new(GelContext *self,
     g_return_val_if_fail(args != NULL, NULL);
     g_return_val_if_fail(code != NULL, NULL);
 
-    /* MEMORY LEAK! */
-    //g_print("++ count = %d\n", ++count);
-    register GelContext *context = gel_context_copy(self);
+    register GelContext *context = self;
     register GClosure *closure =
         g_closure_new_simple(sizeof(GelClosure), context);
 

@@ -40,6 +40,7 @@ S
     [lambda [n] [* n factor] ]
 ]
 
+/*
 [var A [range 1 4]]
 [var B [map [multiply-by 10] A]]
 [var C [map [multiply-by 10] B]]
@@ -49,7 +50,7 @@ S
 ]
 
 [map sum-of [zip A B C]]
-
+*/
 
 [quit]
 
