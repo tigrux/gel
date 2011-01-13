@@ -1,6 +1,7 @@
 #include <string.h>
 
 #include <gelcontext.h>
+#include <gelcontextprivate.h>
 #include <geldebug.h>
 #include <gelvalue.h>
 #include <gelvalueprivate.h>
@@ -14,12 +15,6 @@
  *
  * #GelContext is a class where symbols are stored and evaluated.
  */
-struct _GelContext
-{
-    GHashTable *symbols;
-    GelContext *outer;
-    volatile gint ref_count;
-};
 
 
 static GList *contexts_LIST;
