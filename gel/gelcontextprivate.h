@@ -8,8 +8,6 @@ struct _GelContext
 {
     GHashTable *symbols;
     GelContext *outer;
-    GList *closures;
-    volatile gint ref_count;
 };
 
 
