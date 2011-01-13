@@ -880,7 +880,7 @@ void branch(GelContext *outer, const GValue *case_value, GValue *return_value,
             testing = FALSE;
         }
     }
-    gel_context_unref(context);
+    gel_context_free(context);
 }
 
 
@@ -945,7 +945,7 @@ void do_(GClosure *self, GValue *return_value,
             g_value_unset(&tmp_value);
     }
 
-    gel_context_unref(context);
+    gel_context_free(context);
 }
 
 
@@ -990,7 +990,7 @@ void for_(GClosure *self, GValue *return_value,
         register GelContext *inner = gel_context_new_with_outer(context);
         gel_context_add_value(inner, symbol, gel_value_dup(array_values + i));
         do_(self, return_value, n_values, values, inner);
-        gel_context_unref(inner);
+        gel_context_free(inner);
     }
 
     gel_value_list_free(list);

@@ -8,8 +8,8 @@ typedef struct _GelContext GelContext;
 
 GelContext* gel_context_new(void);
 GelContext* gel_context_new_with_outer(GelContext *outer);
-GelContext* gel_context_ref(GelContext *self);
-void gel_context_unref(GelContext *self);
+GelContext* gel_context_copy(GelContext *self);
+void gel_context_free(GelContext *self);
 
 gboolean gel_context_is_valid(GelContext *context);
 

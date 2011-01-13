@@ -53,7 +53,6 @@ GelContext* gel_context_new_with_outer(GelContext *outer)
     if((self->outer = outer) == NULL)
         gel_context_add_default_symbols(self);
 
-    self->ref_count = 1;
     contexts_LIST = g_list_append(contexts_LIST, self);
 
     return self;
@@ -61,40 +60,38 @@ GelContext* gel_context_new_with_outer(GelContext *outer)
 
 
 /**
- * gel_context_ref:
- * @self: #GelContext to increase the reference count
+ * gel_context_copy:
+ * @self: #GelContext to copy
  *
- * Increases the reference count of @self
+ * Constructs a copy of @self
  *
- * Returns: the same #GelContext with the reference count increased
+ * Returns: a #GelContext that is a copy of @self
  */
-GelContext* gel_context_ref(GelContext *self)
+GelContext* gel_context_copy(GelContext *self)
 {
     g_return_val_if_fail(self != NULL, NULL);
 
-    g_hash_table_ref(self->symbols);
-    g_atomic_int_add(&self->ref_count, 1);
-    return self;
+    register GelContext *context = g_slice_new0(GelContext);
+    context->symbols = g_hash_table_ref(self->symbols);
+    context->outer = self->outer;
+
+    return context;
 }
 
 
 /**
- * gel_context_unref:
- * @self: #GelContext to unref
+ * gel_context_free:
+ * @self: #GelContext to free
  *
- * Decreases the refcount of @self,
- * releasing resources if the refcount reaches zero.
+ * Releases resources of @self
  */
-void gel_context_unref(GelContext *self)
+void gel_context_free(GelContext *self)
 {
     g_return_if_fail(self != NULL);
 
     g_hash_table_unref(self->symbols);
-    if(g_atomic_int_exchange_and_add(&self->ref_count, -1)  == 1)
-    {
-        contexts_LIST = g_list_remove(contexts_LIST, self);
-        g_slice_free(GelContext, self);
-    }
+    contexts_LIST = g_list_remove(contexts_LIST, self);
+    g_slice_free(GelContext, self);
 }
 
 

@@ -62,7 +62,7 @@ int main(int argc, char *argv[])
     gtk_init_add((GtkFunction)demo_run, NULL);
     gtk_main();
 
-    gel_context_unref(context);
+    gel_context_free(context);
     return 0;
 }
 
