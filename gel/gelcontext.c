@@ -17,7 +17,31 @@
  */
 
 
+static guint contexts_COUNT;
+static GList *contexts_POOL;
 static GList *contexts_LIST;
+static GStaticMutex contexts_MUTEX;
+
+
+static
+GelContext *gel_context_alloc()
+{
+    register GelContext *self = g_slice_new0(GelContext);
+    self->symbols = g_hash_table_new_full(
+        g_str_hash, g_str_equal,
+        (GDestroyNotify)g_free, (GDestroyNotify)gel_value_free);
+    contexts_LIST = g_list_append(contexts_LIST, self);
+    return self;
+}
+
+
+static
+void gel_context_dispose(GelContext *self)
+{
+    contexts_LIST = g_list_remove(contexts_LIST, self);
+    g_hash_table_unref(self->symbols);
+    g_slice_free(GelContext, self);
+}
 
 
 /**
@@ -45,15 +69,20 @@ GelContext* gel_context_new(void)
  */
 GelContext* gel_context_new_with_outer(GelContext *outer)
 {
-    register GelContext *self = g_slice_new0(GelContext);
-    self->symbols = g_hash_table_new_full(
-        g_str_hash, g_str_equal,
-        (GDestroyNotify)g_free, (GDestroyNotify)gel_value_free);
+    register GelContext *self;
+    g_static_mutex_lock(&contexts_MUTEX);
+    if(contexts_POOL != NULL)
+    {
+        self = (GelContext*)contexts_POOL->data;
+        contexts_POOL = g_list_delete_link(contexts_POOL, contexts_POOL);
+    }
+    else
+        self = gel_context_alloc();
+    contexts_COUNT++;
+    g_static_mutex_unlock(&contexts_MUTEX);
 
     if((self->outer = outer) == NULL)
         gel_context_add_default_symbols(self);
-
-    contexts_LIST = g_list_append(contexts_LIST, self);
 
     return self;
 }
@@ -87,11 +116,16 @@ GelContext* gel_context_copy(GelContext *self)
  */
 void gel_context_free(GelContext *self)
 {
-    g_return_if_fail(self != NULL);
+    g_hash_table_remove_all(self->symbols);
 
-    g_hash_table_unref(self->symbols);
-    contexts_LIST = g_list_remove(contexts_LIST, self);
-    g_slice_free(GelContext, self);
+    g_static_mutex_lock(&contexts_MUTEX);
+    contexts_POOL = g_list_append(contexts_POOL, self);
+    if(--contexts_COUNT == 0)
+    {
+        g_list_foreach(contexts_POOL, (GFunc)gel_context_dispose, NULL);
+        g_list_free(contexts_POOL);
+    }
+    g_static_mutex_unlock(&contexts_MUTEX);
 }
 
 
