@@ -15,7 +15,6 @@ What makes gel different is that everything is implemented in glib:
 - Arithmetic and logic are exposed as functions that take GValues.
 
 However, the syntax is not a direct copy of scheme or lisp:
-- It uses brackets instead of parenthesis, because writing [] is faster than ().
 - Built-in functions allow an intuitive python-like style, with functions like:
   and, or, any, all, len, for, while, if, cond, case, new, filter, map, sort.
 - Can use +, *, <, >= instead of add, mul, lt, ge.
