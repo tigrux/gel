@@ -80,12 +80,12 @@ GValueArray* gel_parse_scanner(GScanner *scanner)
                 g_value_set_long(&value, scanner->value.v_int * sign);
                 sign = 1;
                 break;
-            case '[':
+            case G_TOKEN_LEFT_PAREN:
                 g_scanner_get_next_token(scanner);
                 g_value_init(&value, G_TYPE_VALUE_ARRAY);
                 g_value_take_boxed(&value, gel_parse_scanner(scanner));
                 break;
-            case ']':
+            case G_TOKEN_RIGHT_PAREN:
                 g_scanner_get_next_token(scanner);
             case G_TOKEN_EOF:
                 parsing = FALSE;

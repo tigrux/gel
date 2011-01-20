@@ -199,7 +199,7 @@ gchar* gel_value_to_string(const GValue *value)
     if(GEL_VALUE_HOLDS(value, G_TYPE_VALUE_ARRAY))
     {
         const GValueArray *array = (GValueArray*)g_value_get_boxed(value);
-        register GString *buffer = g_string_new("[");
+        register GString *buffer = g_string_new("(");
         const guint n_values = array->n_values;
         if(n_values > 0)
         {
@@ -215,7 +215,7 @@ gchar* gel_value_to_string(const GValue *value)
                 g_free(s);
             }
         }
-        g_string_append(buffer, "]");
+        g_string_append(buffer, ")");
         result =  g_string_free(buffer, FALSE);
     }
     else

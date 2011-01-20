@@ -1,54 +1,54 @@
 
-[def primes-lesser-than [top]
-    [var sieve [array 2]]
-    [var n 3]
-    [def remains [i]
-        [% n i]
-    ]
-    [while [< n top]
-        [if [all remains sieve]
-            [append sieve n]
-        ]
-        [= n [+ n 2]]
-    ]
+(def primes-lesser-than (top)
+    (var sieve (array 2))
+    (var n 3)
+    (def remains (i)
+        (% n i)
+    )
+    (while (< n top)
+        (if (all remains sieve)
+            (append sieve n)
+        )
+        (= n (+ n 2))
+    )
     sieve
-]
+)
 
-[var first-primes [primes-lesser-than 100]]
+(var first-primes (primes-lesser-than 100))
 
-[for iter first-primes
-    [print "Primes[" [index first-primes iter] "] = " iter]
-]
+(for iter first-primes
+    (print "Primes(" (index first-primes iter) ") = " iter)
+)
 
-[print "The first prime is " [nth first-primes 0]]
-[print "The last prime is " [nth first-primes -1]]
+(print "The first prime is " (nth first-primes 0))
+(print "The last prime is " (nth first-primes -1))
 
 
-[def factorial [n]
-    [cond
-        [<= n 0]
+(def factorial (n)
+    (cond
+        (<= n 0)
             1
-        [> n 0]
-            [* n [factorial [- n 1]]]
-    ]
-]
+        (> n 0)
+            (* n (factorial (- n 1)))
+    )
+)
 
-[var n 10]
-[print "Factorial of " n " is " [factorial n]]
+(var n 10)
+(print "Factorial of " n " is " (factorial n))
 
 
-[def fibonacci [n]
-    [case n
+(def fibonacci (n)
+    (case n
         0 0
         1 1
-          [+ [fibonacci [- n 1]] [fibonacci [- n 2]]]
-    ]
-]
+          (+ (fibonacci (- n 1)) (fibonacci (- n 2)))
+    )
+)
 
-[for i [range 10 0]
-    [print "Fibonacci[" i "] = " [fibonacci i]]
-]
+(for i (range 10 0)
+    (print "Fibonacci(" i ") = " (fibonacci i))
+)
 
 
-[quit]
+(quit)
 

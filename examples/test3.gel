@@ -1,56 +1,56 @@
 
-[var S [array -6 77 0.0 30.6 -15]]
+(var S (array -6 77 0.0 30.6 -15))
 
 
-[apply or S]
+(apply or S)
 
-[apply and S]
-
-
-[def negative-of [n]
-    [sub 0 n]
-]
-
-[map negative-of S]
+(apply and S)
 
 
-[def is-positive [n]
-    [> n 0]
-]
+(def negative-of (n)
+    (sub 0 n)
+)
 
-[filter is-positive S]
+(map negative-of S)
 
 
-[sort S]
+(def is-positive (n)
+    (> n 0)
+)
+
+(filter is-positive S)
+
+
+(sort S)
 S
-[== S [array -15 -6 0.0 30.6 77]]
+(== S (array -15 -6 0.0 30.6 77))
 
 
-[var values [array 4.5 2]]
-[var operators [array + - * /]]
+(var values (array 4.5 2))
+(var operators (array + - * /))
 
-[def apply-oper [oper]
-    [apply oper values]
-]
+(def apply-oper (oper)
+    (apply oper values)
+)
 
-[map apply-oper operators]
+(map apply-oper operators)
 
 
-[def multiply-by [factor]
-    [lambda [n] [* n factor] ]
-]
+(def multiply-by (factor)
+    (lambda (n) (* n factor) )
+)
 
 /*
-[var A [range 1 4]]
-[var B [map [multiply-by 10] A]]
-[var C [map [multiply-by 10] B]]
+(var A (range 1 4))
+(var B (map (multiply-by 10) A))
+(var C (map (multiply-by 10) B))
 
-[def sum-of [values]
-    [apply + values]
-]
+(def sum-of (values)
+    (apply + values)
+)
 
-[map sum-of [zip A B C]]
+(map sum-of (zip A B C))
 */
 
-[quit]
+(quit)
 
