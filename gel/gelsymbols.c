@@ -51,7 +51,7 @@ void new_(GClosure *self, GValue *return_value,
     GList *list = NULL;
 
     if(!gel_context_eval_params(context, __FUNCTION__, &list,
-            "s", &n_values, &values, &type_name))
+            "S", &n_values, &values, &type_name))
         return;
 
     register GType type = g_type_from_name(type_name);
@@ -1183,21 +1183,21 @@ void gel_context_add_default_symbols(GelContext *self)
 {
     struct {const gchar *name; GValue *value;} *p, symbols[] =
     {
-        CLOSURE(let),
-        CLOSURE(var),
+        CLOSURE(let),/* string */
+        CLOSURE(var),/* string */
         CLOSURE(new),
-        CLOSURE(quote),
+        CLOSURE(quote),/* string */
         CLOSURE(get),
         CLOSURE(set),
-        CLOSURE(def),
-        CLOSURE(lambda),
+        CLOSURE(def),/* string, array */
+        CLOSURE(lambda),/* array */
         CLOSURE(connect),
         CLOSURE(print),
         CLOSURE(case),
         CLOSURE(cond),
         CLOSURE(do),
         CLOSURE(array),
-        CLOSURE(for),
+        CLOSURE(for),/* string */
         CLOSURE(while),
         CLOSURE(if),
         CLOSURE(str),

@@ -1,5 +1,5 @@
 
-(var window (new GtkWindow))
+(var window (new "GtkWindow"))
 (set window "title" "Hello world")
 (set window "default-width" 320)
 (set window "default-height" 120)
