@@ -30,7 +30,6 @@ GelContext *gel_context_alloc()
     self->symbols = g_hash_table_new_full(
         g_str_hash, g_str_equal,
         (GDestroyNotify)g_free, (GDestroyNotify)gel_value_free);
-    contexts_LIST = g_list_append(contexts_LIST, self);
     return self;
 }
 
@@ -38,7 +37,6 @@ GelContext *gel_context_alloc()
 static
 void gel_context_dispose(GelContext *self)
 {
-    contexts_LIST = g_list_remove(contexts_LIST, self);
     g_hash_table_unref(self->symbols);
     g_slice_free(GelContext, self);
 }
@@ -79,6 +77,7 @@ GelContext* gel_context_new_with_outer(GelContext *outer)
     else
         self = gel_context_alloc();
     contexts_COUNT++;
+    contexts_LIST = g_list_append(contexts_LIST, self);
     g_static_mutex_unlock(&contexts_MUTEX);
 
     if((self->outer = outer) == NULL)
@@ -119,6 +118,7 @@ void gel_context_free(GelContext *self)
     g_hash_table_remove_all(self->symbols);
 
     g_static_mutex_lock(&contexts_MUTEX);
+    contexts_LIST = g_list_remove(contexts_LIST, self);
     contexts_POOL = g_list_append(contexts_POOL, self);
     if(--contexts_COUNT == 0)
     {
