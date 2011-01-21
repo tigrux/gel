@@ -106,41 +106,37 @@ gboolean gel_value_copy(const GValue *src_value, GValue *dest_value)
     register gboolean result = TRUE;
     register GType src_type = GEL_VALUE_TYPE(src_value);
 
-    if(GEL_IS_VALUE(dest_value))
-    {
-        register GType dest_type = GEL_VALUE_TYPE(dest_value);
-        if(src_type == dest_type)
-            switch(src_type)
-            {
-                case G_TYPE_BOOLEAN:
-                    gel_value_set_boolean(dest_value,
-                        gel_value_get_boolean(src_value));
-                    break;
-                case G_TYPE_LONG:
-                    gel_value_set_long(dest_value,
-                        gel_value_get_long(src_value));
-                    break;
-                case G_TYPE_POINTER:
-                    gel_value_set_pointer(dest_value,
-                        gel_value_peek_pointer(src_value));
-                    break;
-                case G_TYPE_DOUBLE:
-                    gel_value_set_double(dest_value,
-                        gel_value_get_double(src_value));
-                    break;
-                default:
-                    g_value_copy(src_value, dest_value);
-            }
-        else
-        if(!(result = g_value_transform(src_value, dest_value)))
-            g_warning("Cannot assign from %s to %s",
-                g_type_name(src_type), g_type_name(dest_type));
-    }
-    else
-    {
+    if(!GEL_IS_VALUE(dest_value))
         g_value_init(dest_value, src_type);
-        g_value_copy(src_value, dest_value);
-    }
+
+    register GType dest_type = GEL_VALUE_TYPE(dest_value);
+    if(src_type == dest_type)
+        switch(src_type)
+        {
+            case G_TYPE_BOOLEAN:
+                gel_value_set_boolean(dest_value,
+                    gel_value_get_boolean(src_value));
+                break;
+            case G_TYPE_LONG:
+                gel_value_set_long(dest_value,
+                    gel_value_get_long(src_value));
+                break;
+            case G_TYPE_POINTER:
+                gel_value_set_pointer(dest_value,
+                    gel_value_peek_pointer(src_value));
+                break;
+            case G_TYPE_DOUBLE:
+                gel_value_set_double(dest_value,
+                    gel_value_get_double(src_value));
+                break;
+            default:
+                g_value_copy(src_value, dest_value);
+        }
+    else
+    if(!(result = g_value_transform(src_value, dest_value)))
+        g_warning("Cannot assign from %s to %s",
+            g_type_name(src_type), g_type_name(dest_type));
+
     return result;
 }
 
