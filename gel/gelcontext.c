@@ -17,6 +17,9 @@
  */
 
 
+G_DEFINE_BOXED_TYPE(GelContext, gel_context, gel_context_copy, gel_context_free)
+
+
 static guint contexts_COUNT;
 static GList *contexts_POOL;
 static GList *contexts_LIST;
@@ -46,7 +49,7 @@ void gel_context_dispose(GelContext *self)
  * gel_context_new:
  *
  * Creates a #GelContext, no outer context is assigned and the
- * default symbols are added with #gel_context_add_symbols.
+ * default symbols are added with #gel_context_add_default_symbols.
  *
  * Returns: A new #GelContext, with no outer context assigned.
  */

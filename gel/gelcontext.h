@@ -1,5 +1,5 @@
-#ifndef __GEL_CONTEXT_H__
-#define __GEL_CONTEXT_H__
+#ifndef GEL_CONTEXT_TYPE
+#define GEL_CONTEXT_TYPE (gel_context_get_type())
 
 #include <glib-object.h>
 
@@ -10,6 +10,7 @@ GelContext* gel_context_new(void);
 GelContext* gel_context_new_with_outer(GelContext *outer);
 GelContext* gel_context_copy(GelContext *self);
 void gel_context_free(GelContext *self);
+GType gel_context_get_type(void) G_GNUC_CONST;
 
 gboolean gel_context_is_valid(GelContext *context);
 

@@ -1,6 +1,7 @@
 [CCode (cheader_filename = "gel.h")]
 namespace Gel {
 
+    [CCode (type_id = "GEL_CONTEXT_TYPE")]
     [Compact]
     public class Context {
         public Context();

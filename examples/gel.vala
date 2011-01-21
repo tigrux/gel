@@ -3,6 +3,7 @@ class Demo : Object {
     Gel.Context context;
 
     public Demo() {
+        print("Instantiating a %s\n", typeof(Gel.Context).name());
         context = new Gel.Context();
         context.add_function("quit", Gtk.main_quit);
     }

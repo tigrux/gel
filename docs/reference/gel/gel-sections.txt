@@ -17,6 +17,8 @@ gel_context_eval
 gel_context_eval_value
 gel_context_eval_params
 gel_context_closure_new
+<SUBSECTION Private>
+gel_context_get_type
 </SECTION>
 
 <SECTION>
