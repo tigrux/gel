@@ -5,15 +5,15 @@
 (set window "default-height" 120)
 (connect window "hide" quit)
 
-(var box (new GtkVBox))
+(var box (new "GtkVBox"))
 (set window "child" box)
 (set box "border-width" 12)
 
-(var button (new GtkButton))
+(var button (new "GtkButton"))
 (set box "child" button)
 (set button "label" "Click me!")
 
-(var entry (new GtkEntry))
+(var entry (new "GtkEntry"))
 (set box "child" entry)
 
 (var counter 0)
