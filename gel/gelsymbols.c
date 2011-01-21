@@ -38,7 +38,11 @@ void var_(GClosure *self, GValue *return_value,
             "sV", &n_values, &values, &symbol, &value))
         return;
 
-    gel_context_add_value(context, symbol, gel_value_dup(value));
+    if(gel_context_find_symbol(context, symbol) == NULL)
+        gel_context_add_value(context, symbol, gel_value_dup(value));
+    else
+        g_warning("%s: Symbol '%s' already exists", __FUNCTION__, symbol);
+
     gel_value_list_free(list);
 }
 
