@@ -922,7 +922,7 @@ void cond_(GClosure *self, GValue *return_value,
 
 static
 void do_(GClosure *self, GValue *return_value,
-         guint n_values, const GValue *values, GelContext *outer)
+         guint n_values, const GValue *values, GelContext *context)
 {
     const guint n_args = 1;
     if(n_values < n_args)
@@ -933,7 +933,6 @@ void do_(GClosure *self, GValue *return_value,
 
     const guint last = n_values-1;
     register guint i;
-    register GelContext *context = gel_context_new_with_outer(outer);
     for(i = 0; i <= last; i++)
     {
         GValue tmp_value = {0};
@@ -944,8 +943,6 @@ void do_(GClosure *self, GValue *return_value,
         if(GEL_IS_VALUE(&tmp_value))
             g_value_unset(&tmp_value);
     }
-
-    gel_context_free(context);
 }
 
 
@@ -987,10 +984,8 @@ void for_(GClosure *self, GValue *return_value,
     register guint i;
     for(i = 0; i < last; i++)
     {
-        register GelContext *inner = gel_context_new_with_outer(context);
-        gel_context_add_value(inner, symbol, gel_value_dup(array_values + i));
-        do_(self, return_value, n_values, values, inner);
-        gel_context_free(inner);
+        gel_context_add_value(context, symbol, gel_value_dup(array_values + i));
+        do_(self, return_value, n_values, values, context);
     }
 
     gel_value_list_free(list);
