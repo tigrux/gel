@@ -192,17 +192,25 @@ const GValue* gel_context_eval_value(GelContext *self,
     g_return_val_if_fail(value != NULL, NULL);
     g_return_val_if_fail(out_value != NULL, NULL);
 
-    register const GValue *result_value = NULL;
+    register const GValue *result = NULL;
     register GType type = GEL_VALUE_TYPE(value);
+    register gboolean is_local;
 
     if(type == G_TYPE_STRING)
     {
         const gchar *const symbol_name = g_value_get_string(value);
-        register GValue *symbol_value =
-            gel_context_find_symbol(self, symbol_name);
-        if(symbol_value != NULL)
-            result_value = symbol_value;
-        else
+        register const GelContext *ctx = self;
+        while(ctx != NULL && result == NULL)
+        {
+            result = (GValue*)g_hash_table_lookup(ctx->symbols, symbol_name);
+            if(result == NULL)
+                ctx = ctx->outer;
+            else
+                is_local = (ctx == self);
+                    
+        }
+
+        if(result == NULL)
             gel_warning_unknown_symbol(__FUNCTION__, symbol_name);
     }
     else
@@ -220,17 +228,17 @@ const GValue* gel_context_eval_value(GelContext *self,
         {
             g_closure_invoke((GClosure*)g_value_get_boxed(first_value),
                 out_value, array_n_values - 1 , array_values + 1, self);
-            result_value = out_value;
+            result = out_value;
         }
 
         if(GEL_IS_VALUE(&tmp_value))
             g_value_unset(&tmp_value);
     }
 
-    if(result_value == NULL)
-        result_value = value;
+    if(result == NULL)
+        result = value;
 
-    return result_value;
+    return result;
 }
 
 
