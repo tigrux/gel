@@ -99,9 +99,14 @@ GelContext* gel_context_copy(GelContext *self)
 {
     g_return_val_if_fail(self != NULL, NULL);
 
-    register GelContext *context = g_slice_new0(GelContext);
-    context->symbols = g_hash_table_ref(self->symbols);
-    context->outer = self->outer;
+    GHashTableIter iter;
+    const gchar *name;
+    GValue *value;
+
+    register GelContext *context = gel_context_new_with_outer(self->outer);
+    g_hash_table_iter_init(&iter, self->symbols);
+    while(g_hash_table_iter_next(&iter, (gpointer*)&name, (gpointer*)&value))
+        gel_context_add_value(context, name, gel_value_dup(value));
 
     return context;
 }
