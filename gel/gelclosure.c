@@ -91,13 +91,12 @@ GClosure* gel_context_closure_new(GelContext *self,
     g_return_val_if_fail(args != NULL, NULL);
     g_return_val_if_fail(code != NULL, NULL);
 
-    register GelContext *context = self;
     register GClosure *closure =
-        g_closure_new_simple(sizeof(GelClosure), context);
+        g_closure_new_simple(sizeof(GelClosure), self);
 
     g_closure_set_marshal(closure, (GClosureMarshal)gel_closure_marshal);
-    g_closure_add_finalize_notifier(
-        closure, context, (GClosureNotify)gel_closure_finalize);
+    g_closure_add_finalize_notifier(closure,
+        self, (GClosureNotify)gel_closure_finalize);
 
     register GelClosure *gel_closure = (GelClosure*)closure;
     gel_closure->args = args;
