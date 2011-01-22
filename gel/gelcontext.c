@@ -79,6 +79,7 @@ GelContext* gel_context_new_with_outer(GelContext *outer)
     }
     else
         self = gel_context_alloc();
+    self->running = TRUE;
     contexts_COUNT++;
     contexts_LIST = g_list_append(contexts_LIST, self);
     g_static_mutex_unlock(&contexts_MUTEX);

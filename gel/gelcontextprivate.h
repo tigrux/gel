@@ -8,6 +8,7 @@ struct _GelContext
 {
     GHashTable *symbols;
     GelContext *outer;
+    gboolean running;
 };
 
 

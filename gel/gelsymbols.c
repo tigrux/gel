@@ -1,4 +1,5 @@
 #include <gelcontext.h>
+#include <gelcontextprivate.h>
 #include <geldebug.h>
 #include <gelvalue.h>
 #include <gelvalueprivate.h>
@@ -941,7 +942,7 @@ void do_(GClosure *self, GValue *return_value,
 
     const guint last = n_values-1;
     register guint i;
-    for(i = 0; i <= last; i++)
+    for(i = 0; i <= last && context->running; i++)
     {
         GValue tmp_value = {0};
         register const GValue *value =
@@ -990,11 +991,14 @@ void for_(GClosure *self, GValue *return_value,
     const guint last = array->n_values;
     const GValue *const array_values = array->values;
     register guint i;
-    for(i = 0; i < last; i++)
+    GelContext *loop_context = gel_context_new_with_outer(context);
+    for(i = 0; i < last && loop_context->running; i++)
     {
-        gel_context_add_value(context, symbol, gel_value_dup(array_values + i));
-        do_(self, return_value, n_values, values, context);
+        gel_context_add_value(loop_context,
+            symbol, gel_value_dup(array_values + i));
+        do_(self, return_value, n_values, values, loop_context);
     }
+    gel_context_free(loop_context);
 
     gel_value_list_free(list);
 }
@@ -1011,9 +1015,9 @@ void while_(GClosure *self, GValue *return_value,
         return;
     }
 
-    register gboolean running = TRUE;
     register gboolean run = FALSE;
-    while(running)
+    GelContext *loop_context = gel_context_new_with_outer(context);
+    while(loop_context->running)
     {
         GValue tmp_value = {0};
         register const GValue *cond_value =
@@ -1025,13 +1029,28 @@ void while_(GClosure *self, GValue *return_value,
         }
         else
         {
-            running = FALSE;
+            loop_context->running = FALSE;
             if(run == FALSE)
                 gel_value_copy(cond_value, return_value);
         }
         if(GEL_IS_VALUE(&tmp_value))
             g_value_unset(&tmp_value);
     }
+    gel_context_free(loop_context);
+}
+
+
+static
+void break_(GClosure *self, GValue *return_value,
+            guint n_values, const GValue *values, GelContext *context)
+{
+    register GelContext *i;
+    for(i = context; i != NULL; i = i->outer)
+        if(i->running)
+        {
+            i->running = FALSE;
+            break;
+        }
 }
 
 
@@ -1205,6 +1224,7 @@ void gel_context_add_default_symbols(GelContext *self)
         CLOSURE(array),
         CLOSURE(for),/* string */
         CLOSURE(while),
+        CLOSURE(break),
         CLOSURE(if),
         CLOSURE(str),
         CLOSURE(add),
