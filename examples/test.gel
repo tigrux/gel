@@ -1,34 +1,34 @@
 
-(var window (new "GtkWindow"))
-(set window "title" "Hello world")
-(set window "default-width" 320)
-(set window "default-height" 120)
-(connect window "hide" quit)
+(define window (new "GtkWindow"))
+(object-set window "title" "Hello world")
+(object-set window "default-width" 320)
+(object-set window "default-height" 120)
+(object-connect window "hide" quit)
 
-(var box (new "GtkVBox"))
-(set window "child" box)
-(set box "border-width" 12)
+(define box (new "GtkVBox"))
+(object-set window "child" box)
+(object-set box "border-width" 12)
 
-(var button (new "GtkButton"))
-(set box "child" button)
-(set button "label" "Click me!")
+(define button (new "GtkButton"))
+(object-set box "child" button)
+(object-set button "label" "Click me!")
 
-(var entry (new "GtkEntry"))
-(set box "child" entry)
+(define entry (new "GtkEntry"))
+(object-set box "child" entry)
 
-(var counter 0)
+(define counter 0)
 
-(connect button "clicked"
+(object-connect button "clicked"
     (lambda (widget)
-        (print "Previous label " (get widget "label"))
-        (set widget "label" "Thanks!")
-        (let counter (add counter 1))
-        (set entry "text" counter)
+        (print "Previous label " (object-get widget "label"))
+        (object-set widget "label" "Thanks!")
+        (set counter (add counter 1))
+        (object-set entry "text" counter)
     )
 )
 
-(set button "visible" TRUE)
-(set entry "visible" TRUE)
-(set box "visible" TRUE)
-(set window "visible" TRUE)
+(object-set button "visible" TRUE)
+(object-set entry "visible" TRUE)
+(object-set box "visible" TRUE)
+(object-set window "visible" TRUE)
 

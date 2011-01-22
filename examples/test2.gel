@@ -1,8 +1,8 @@
 
-(def primes-lesser-than (top)
-    (var sieve (array 2))
-    (var n 3)
-    (def remains (i)
+(define primes-lesser-than (top)
+    (define sieve (array 2))
+    (define n 3)
+    (define remains (i)
         (% n i)
     )
     (while (< n top)
@@ -14,7 +14,7 @@
     sieve
 )
 
-(var first-primes (primes-lesser-than 100))
+(define first-primes (primes-lesser-than 100))
 
 (for iter first-primes
     (print "Primes(" (index first-primes iter) ") = " iter)
@@ -24,7 +24,7 @@
 (print "The last prime is " (nth first-primes -1))
 
 
-(def factorial (n)
+(define factorial (n)
     (cond
         (<= n 0)
             1
@@ -33,11 +33,11 @@
     )
 )
 
-(var n 10)
+(define n 10)
 (print "Factorial of " n " is " (factorial n))
 
 
-(def fibonacci (n)
+(define fibonacci (n)
     (case n
         0 0
         1 1

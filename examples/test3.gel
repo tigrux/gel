@@ -1,5 +1,5 @@
 
-(var S (array -6 77 0.0 30.6 -15))
+(define S (array -6 77 0.0 30.6 -15))
 
 
 (apply or S)
@@ -7,14 +7,14 @@
 (apply and S)
 
 
-(def negative-of (n)
+(define negative-of (n)
     (sub 0 n)
 )
 
 (map negative-of S)
 
 
-(def is-positive (n)
+(define is-positive (n)
     (> n 0)
 )
 
@@ -26,26 +26,26 @@ S
 (== S (array -15 -6 0.0 30.6 77))
 
 
-(var values (array 4.5 2))
-(var operators (array + - * /))
+(define values (array 4.5 2))
+(define operators (array + - * /))
 
-(def apply-oper (oper)
+(define apply-oper (oper)
     (apply oper values)
 )
 
 (map apply-oper operators)
 
 
-(def multiply-by (factor)
+(define multiply-by (factor)
     (lambda (n) (* n factor) )
 )
 
 /*
-(var A (range 1 4))
-(var B (map (multiply-by 10) A))
-(var C (map (multiply-by 10) B))
+(define A (range 1 4))
+(define B (map (multiply-by 10) A))
+(define C (map (multiply-by 10) B))
 
-(def sum-of (values)
+(define sum-of (values)
     (apply + values)
 )
 

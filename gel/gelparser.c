@@ -106,7 +106,7 @@ GValueArray* gel_parse_scanner(GScanner *scanner)
                     g_value_set_static_string(&value, "eq");
                 }
                 else
-                    g_value_set_static_string(&value, "let");
+                    g_value_set_static_string(&value, "set");
                 break;
             case '+':
                 g_scanner_get_next_token(scanner);

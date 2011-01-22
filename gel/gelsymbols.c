@@ -5,7 +5,7 @@
 
 
 static
-void let_(GClosure *self, GValue *return_value,
+void set_(GClosure *self, GValue *return_value,
           guint n_values, const GValue *values, GelContext *context)
 {
     const gchar *symbol = NULL;
@@ -21,27 +21,6 @@ void let_(GClosure *self, GValue *return_value,
         gel_value_copy(value, symbol_value);
     else
         gel_warning_unknown_symbol(__FUNCTION__, symbol);
-
-    gel_value_list_free(list);
-}
-
-
-static
-void var_(GClosure *self, GValue *return_value,
-          guint n_values, const GValue *values, GelContext *context)
-{
-    const gchar *symbol = NULL;
-    GValue *value = NULL;
-    GList *list = NULL;
-
-     if(!gel_context_eval_params(context, __FUNCTION__, &list,
-            "sV", &n_values, &values, &symbol, &value))
-        return;
-
-    if(gel_context_find_symbol(context, symbol) == NULL)
-        gel_context_add_value(context, symbol, gel_value_dup(value));
-    else
-        g_warning("%s: Symbol '%s' already exists", __FUNCTION__, symbol);
 
     gel_value_list_free(list);
 }
@@ -95,8 +74,8 @@ void quote_(GClosure *self, GValue *return_value,
 
 
 static
-void get_(GClosure *self, GValue *return_value,
-          guint n_values, const GValue *values, GelContext *context)
+void object_get(GClosure *self, GValue *return_value,
+                guint n_values, const GValue *values, GelContext *context)
 {
     GObject *object = NULL;
     const gchar *prop_name = NULL;
@@ -124,8 +103,8 @@ void get_(GClosure *self, GValue *return_value,
 
 
 static
-void set_(GClosure *self, GValue *return_value,
-          guint n_values, const GValue *values, GelContext *context)
+void object_set(GClosure *self, GValue *return_value,
+                guint n_values, const GValue *values, GelContext *context)
 {
     GObject *object = NULL;
     gchar *prop_name = NULL;
@@ -191,6 +170,8 @@ GClosure* new_closure(GelContext *context, GValueArray *vars_array,
         for(i = 0; i < n_values; i++)
             g_value_array_append(code, values+i);
         self = gel_context_closure_new(context, vars, code);
+        g_closure_ref(self);
+        g_closure_sink(self);
     }
     else
     {
@@ -203,28 +184,51 @@ GClosure* new_closure(GelContext *context, GValueArray *vars_array,
         self = NULL;
     }
 
-    g_closure_ref(self);
-    g_closure_sink(self);
     return self;
 }
 
 
 static
-void def_(GClosure *self, GValue *return_value,
-          guint n_values, const GValue *values, GelContext *context)
+void define_(GClosure *self, GValue *return_value,
+             guint n_values, const GValue *values, GelContext *context)
 {
-    const gchar *symbol;
-    GValueArray *array;
+    const gchar *symbol = NULL;
     GList *list = NULL;
+    const guint n_args = 2;
+
+    if(n_values < n_args)
+    {
+        gel_warning_needs_at_least_n_arguments(__FUNCTION__, n_args);
+        return;
+    }
 
     if(!gel_context_eval_params(context, __FUNCTION__, &list,
-            "sa*", &n_values, &values, &symbol, &array))
+            "s*", &n_values, &values, &symbol))
         return;
 
-    GClosure *closure = new_closure(context, array, n_values, values);
-    if(closure != NULL)
-        gel_context_add_value(context,
-            symbol, gel_value_new_from_closure(closure));
+    if(gel_context_find_symbol(context, symbol) == NULL)
+        if(n_values == 1)
+        {
+            GValue *value = NULL;
+            if(gel_context_eval_params(context, __FUNCTION__, &list,
+                    "V", &n_values, &values, &value))
+                gel_context_add_value(context, symbol, gel_value_dup(value));
+        }
+        else
+        {
+            GValueArray *array;
+            if(gel_context_eval_params(context, __FUNCTION__, &list,
+                    "a*", &n_values, &values, &array))
+            {
+                GClosure *closure =
+                    new_closure(context, array, n_values, values);
+                if(closure != NULL)
+                    gel_context_add_value(context,
+                        symbol, gel_value_new_from_closure(closure));
+            }
+        }
+    else
+        g_warning("%s: Symbol '%s' already exists", __FUNCTION__, symbol);
 
     gel_value_list_free(list);
 }
@@ -254,8 +258,8 @@ void lambda_(GClosure *self, GValue *return_value,
 
 
 static
-void connect_(GClosure *self, GValue *return_value,
-              guint n_values, const GValue *values, GelContext *context)
+void object_connect(GClosure *self, GValue *return_value,
+                    guint n_values, const GValue *values, GelContext *context)
 {
     GObject *object = NULL;
     gchar *signal = NULL;
@@ -1167,8 +1171,12 @@ void ne_(GClosure *self, GValue *return_value,
 }
 
 
+
 #define CLOSURE(S) \
     {#S, gel_value_new_from_closure_marshal((GClosureMarshal)S##_, self)}
+
+#define CLOSURE_NAME(N, S) \
+    {N, gel_value_new_from_closure_marshal((GClosureMarshal)S, self)}
 
 /**
  * gel_context_add_default_symbols:
@@ -1182,15 +1190,14 @@ void gel_context_add_default_symbols(GelContext *self)
 {
     struct {const gchar *name; GValue *value;} *p, symbols[] =
     {
-        CLOSURE(let),/* string */
-        CLOSURE(var),/* string */
+        CLOSURE(set),/* string */
+        CLOSURE(define),/* string */
         CLOSURE(new),
         CLOSURE(quote),/* string */
-        CLOSURE(get),
-        CLOSURE(set),
-        CLOSURE(def),/* string, array */
+        CLOSURE_NAME("object-get", object_get),
+        CLOSURE_NAME("object-set", object_set),
         CLOSURE(lambda),/* array */
-        CLOSURE(connect),
+        CLOSURE_NAME("object-connect", object_connect),
         CLOSURE(print),
         CLOSURE(case),
         CLOSURE(cond),

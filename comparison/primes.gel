@@ -1,5 +1,5 @@
 
-(var sieve (array))
+(define sieve (array))
 
 (for n (range 2 50000)
     (if (all (lambda (i) (% n i)) sieve)
