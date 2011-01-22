@@ -543,7 +543,7 @@ void gel_context_add_value(GelContext *self, const gchar *name, GValue *value)
  * @name: name of the symbol to add
  * @object: object to add
  *
- * A wrapper for #gel_context_add_symbol.
+ * A wrapper for #gel_context_add_value.
  * @self takes ownership of @object so it should not be unreffed.
  */
 void gel_context_add_object(GelContext *self, const gchar *name,
@@ -582,7 +582,7 @@ void gel_context_marshal(GClosure *closure, GValue *return_value,
  * @function: a #GFunc to invoke
  * @user_data: extra data to pass to @function
  *
- * A wrapper for #gel_context_add_symbol that calls @function when
+ * A wrapper for #gel_context_add_value that calls @function when
  * @self evaluates a call to a function named @name.
  */
 void gel_context_add_function(GelContext *self, const gchar *name,
