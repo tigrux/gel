@@ -7,8 +7,7 @@ typedef struct _GelSymbol GelSymbol;
 
 struct _GelSymbol {
     gchar *name;
-    GValue *value; /*< unowned >*/
-    GHashTable *owner; /*< unowned >*/
+    const GValue *value; /*< unowned >*/
 };
 
 GType gel_symbol_get_type(void) G_GNUC_CONST;

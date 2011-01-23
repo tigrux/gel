@@ -21,7 +21,6 @@ GelSymbol *gel_symbol_copy(const GelSymbol *self)
 
     GelSymbol *symbol = gel_symbol_new(self->name);
     symbol->value = self->value;
-    symbol->owner = self->owner;
 
     return symbol;
 }
