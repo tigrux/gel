@@ -984,22 +984,25 @@ static
 void for_(GClosure *self, GValue *return_value,
           guint n_values, const GValue *values, GelContext *context)
 {
-    const gchar *symbol;
+    const gchar *name;
     GValueArray *array;
     GList *list = NULL;
 
     if(!gel_context_eval_params(context, __FUNCTION__, &list,
-            "sA*", &n_values, &values, &symbol, &array))
+            "sA*", &n_values, &values, &name, &array))
         return;
 
     const guint last = array->n_values;
     const GValue *const array_values = array->values;
-    register guint i;
+
     GelContext *loop_context = gel_context_new_with_outer(context);
+    GValue *value = gel_value_new_of_type(GEL_VALUE_TYPE(array_values + 0));
+    gel_context_add_value(loop_context, name, value);
+
+    register guint i;
     for(i = 0; i < last && loop_context->running; i++)
     {
-        gel_context_add_value(loop_context,
-            symbol, gel_value_dup(array_values + i));
+        gel_value_copy(array_values + i, value);
         do_(self, return_value, n_values, values, loop_context);
     }
     gel_context_free(loop_context);
