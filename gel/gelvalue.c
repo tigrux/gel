@@ -2,6 +2,7 @@
 
 #include <gelvalue.h>
 #include <gelvalueprivate.h>
+#include <gelsymbol.h>
 
 #define DEFINE_ARITHMETIC(op) \
 gboolean gel_values_##op(const GValue *v1, const GValue *v2, GValue *value) \
@@ -213,6 +214,12 @@ gchar* gel_value_to_string(const GValue *value)
         }
         g_string_append(buffer, ")");
         result =  g_string_free(buffer, FALSE);
+    }
+    else
+    if(GEL_VALUE_HOLDS(value, GEL_TYPE_SYMBOL))
+    {
+        const GelSymbol *symbol = (GelSymbol*)g_value_get_boxed(value);
+        result = g_strdup(symbol->name);
     }
     else
     {

@@ -1,4 +1,6 @@
 #include <gelparser.h>
+#include <gelsymbol.h>
+
 
 #define ARRAY_N_PREALLOCATED 8
 
@@ -15,28 +17,6 @@
 
 
 static
-GValueArray* gel_parse_strings(const char *first, ...)
-{
-    register GValueArray *array = g_value_array_new(ARRAY_N_PREALLOCATED);
-    va_list vl;
-
-    register const char *arg;
-    va_start(vl, first);
-    for(arg = first; arg != NULL; arg = va_arg(vl, const char*))
-    {
-        GValue value = {0};
-        g_value_init(&value, G_TYPE_STRING);
-        g_value_set_string(&value, arg);
-        g_value_array_append(array, &value);
-        g_value_unset(&value);
-    }
-    va_end(vl);
-
-    return array;
-}
-
-
-static
 const gchar *scanner_errors[] = {
     "Unknown error",
     "Unexpected end of file",
@@ -47,6 +27,13 @@ const gchar *scanner_errors[] = {
     "Non-decimal floating point number",
     "Malformed floating point number"
 };
+
+
+static
+void gel_value_take_symbol_from_name(GValue *value, const gchar *symbol_name)
+{
+    g_value_take_boxed(value, gel_symbol_new(symbol_name));
+}
 
 
 static
@@ -65,8 +52,9 @@ GValueArray* gel_parse_scanner(GScanner *scanner)
         {
             case G_TOKEN_IDENTIFIER:
                 g_scanner_get_next_token(scanner);
-                g_value_init(&value, G_TYPE_STRING);
-                g_value_set_string(&value, scanner->value.v_identifier);
+                g_value_init(&value, GEL_TYPE_SYMBOL);
+                gel_value_take_symbol_from_name(&value,
+                    scanner->value.v_identifier);
                 break;
             case G_TOKEN_FLOAT:
                 g_scanner_get_next_token(scanner);
@@ -92,75 +80,74 @@ GValueArray* gel_parse_scanner(GScanner *scanner)
                 break;
             case G_TOKEN_STRING:
                 g_scanner_get_next_token(scanner);
-                g_value_init(&value, G_TYPE_VALUE_ARRAY);
-                g_value_take_boxed(&value,
-                    gel_parse_strings("quote", scanner->value.v_string, NULL));
+                g_value_init(&value, G_TYPE_STRING);
+                g_value_set_string(&value, scanner->value.v_string);
                 break;
             case '=':
                 g_scanner_get_next_token(scanner);
-                g_value_init(&value, G_TYPE_STRING);
+                g_value_init(&value, GEL_TYPE_SYMBOL);
                 token = g_scanner_peek_next_token(scanner);
                 if(token == '=')
                 {
                     g_scanner_get_next_token(scanner);
-                    g_value_set_static_string(&value, "eq");
+                    gel_value_take_symbol_from_name(&value, "eq");
                 }
                 else
-                    g_value_set_static_string(&value, "set");
+                    gel_value_take_symbol_from_name(&value, "set");
                 break;
             case '+':
                 g_scanner_get_next_token(scanner);
-                g_value_init(&value, G_TYPE_STRING);
-                g_value_set_static_string(&value, "add");
+                g_value_init(&value, GEL_TYPE_SYMBOL);
+                gel_value_take_symbol_from_name(&value, "add");
                 break;
             case '*':
                 g_scanner_get_next_token(scanner);
-                g_value_init(&value, G_TYPE_STRING);
-                g_value_set_static_string(&value, "mul");
+                g_value_init(&value, GEL_TYPE_SYMBOL);
+                gel_value_take_symbol_from_name(&value, "mul");
                 break;
             case '/':
                 g_scanner_get_next_token(scanner);
-                g_value_init(&value, G_TYPE_STRING);
-                g_value_set_static_string(&value, "div");
+                g_value_init(&value, GEL_TYPE_SYMBOL);
+                gel_value_take_symbol_from_name(&value, "div");
                 break;
             case '%':
                 g_scanner_get_next_token(scanner);
-                g_value_init(&value, G_TYPE_STRING);
-                g_value_set_static_string(&value, "mod");
+                g_value_init(&value, GEL_TYPE_SYMBOL);
+                gel_value_take_symbol_from_name(&value, "mod");
                 break;
             case '&':
                 g_scanner_get_next_token(scanner);
-                g_value_init(&value, G_TYPE_STRING);
-                g_value_set_static_string(&value, "and");
+                g_value_init(&value, GEL_TYPE_SYMBOL);
+                gel_value_take_symbol_from_name(&value, "and");
                 break;
             case '|':
                 g_scanner_get_next_token(scanner);
-                g_value_init(&value, G_TYPE_STRING);
-                g_value_set_static_string(&value, "or");
+                g_value_init(&value, GEL_TYPE_SYMBOL);
+                gel_value_take_symbol_from_name(&value, "or");
                 break;
             case '<':
                 g_scanner_get_next_token(scanner);
-                g_value_init(&value, G_TYPE_STRING);
+                g_value_init(&value, GEL_TYPE_SYMBOL);
                 token = g_scanner_peek_next_token(scanner);
                 if(token == '=')
                 {
                     g_scanner_get_next_token(scanner);
-                    g_value_set_static_string(&value, "le");
+                    gel_value_take_symbol_from_name(&value, "le");
                 }
                 else
-                    g_value_set_static_string(&value, "lt");
+                    gel_value_take_symbol_from_name(&value, "lt");
                 break;
             case '>':
                 g_scanner_get_next_token(scanner);
-                g_value_init(&value, G_TYPE_STRING);
+                g_value_init(&value, GEL_TYPE_SYMBOL);
                 token = g_scanner_peek_next_token(scanner);
                 if(token == '=')
                 {
                     g_scanner_get_next_token(scanner);
-                    g_value_set_static_string(&value, "ge");
+                    gel_value_take_symbol_from_name(&value, "ge");
                 }
                 else
-                    g_value_set_static_string(&value, "gt");
+                    gel_value_take_symbol_from_name(&value, "gt");
                 break;
             case '-':
                 g_scanner_get_next_token(scanner);
@@ -169,8 +156,8 @@ GValueArray* gel_parse_scanner(GScanner *scanner)
                     sign = -sign;
                 else
                 {
-                    g_value_init(&value, G_TYPE_STRING);
-                    g_value_set_static_string(&value, "sub");
+                    g_value_init(&value, GEL_TYPE_SYMBOL);
+                    gel_value_take_symbol_from_name(&value, "sub");
                 }
                 break;
             case G_TOKEN_ERROR:

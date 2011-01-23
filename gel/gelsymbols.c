@@ -3,6 +3,7 @@
 #include <geldebug.h>
 #include <gelvalue.h>
 #include <gelvalueprivate.h>
+#include <gelsymbol.h>
 
 
 static
@@ -155,8 +156,11 @@ GClosure* new_closure(GelContext *context, GValueArray *vars_array,
     for(i = 0; i < n_vars; i++)
     {
         const GValue *const value = vars_array_values + i;
-        if(GEL_VALUE_HOLDS(value, G_TYPE_STRING))
-            vars[i] = g_value_dup_string(value);
+        if(GEL_VALUE_HOLDS(value, GEL_TYPE_SYMBOL))
+        {
+            register GelSymbol *symbol = (GelSymbol*)g_value_get_boxed(value);
+            vars[i] = g_strdup(symbol->name);
+        }
         else
         {
             invalid_arg_name = gel_value_to_string(value);

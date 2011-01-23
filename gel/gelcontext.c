@@ -5,6 +5,7 @@
 #include <geldebug.h>
 #include <gelvalue.h>
 #include <gelvalueprivate.h>
+#include <gelsymbol.h>
 
 
 /**
@@ -27,7 +28,7 @@ static GStaticMutex contexts_MUTEX;
 
 
 static
-GelContext *gel_context_alloc()
+GelContext *gel_context_alloc(void)
 {
     register GelContext *self = g_slice_new0(GelContext);
     self->symbols = g_hash_table_new_full(
@@ -205,9 +206,10 @@ const GValue* gel_context_eval_value(GelContext *self,
     register GType type = GEL_VALUE_TYPE(value);
     register gboolean is_local;
 
-    if(type == G_TYPE_STRING)
+    if(type == GEL_TYPE_SYMBOL)
     {
-        const gchar *const symbol_name = g_value_get_string(value);
+        GelSymbol *symbol = (GelSymbol*)g_value_get_boxed(value);
+        const gchar *const symbol_name = symbol->name;
         register const GelContext *ctx = self;
         while(ctx != NULL && result == NULL)
         {
@@ -362,15 +364,16 @@ gboolean gel_context_eval_params(GelContext *self, const gchar *func,
                 }
                 break;
             case 's':
-                if(GEL_VALUE_HOLDS(*values, G_TYPE_STRING))
+                if(GEL_VALUE_HOLDS(*values, GEL_TYPE_SYMBOL))
                 {
                     const gchar **s = va_arg(args, const gchar **);
-                    *s = g_value_get_string(*values);
+                    GelSymbol *symbol = (GelSymbol*)g_value_get_boxed(*values);
+                    *s = symbol->name;
                 }
                 else
                 {
                     gel_warning_value_not_of_type(func,
-                        *values, G_TYPE_STRING);
+                        *values, GEL_TYPE_SYMBOL);
                     parsed = FALSE;
                 }
                 break;
@@ -445,7 +448,7 @@ gboolean gel_context_eval_params(GelContext *self, const gchar *func,
                 else
                 {
                     gel_warning_value_not_of_type(func,
-                        result_value, G_TYPE_STRING);
+                        result_value, G_TYPE_CLOSURE);
                     parsed = FALSE;
                 }
                 break;
