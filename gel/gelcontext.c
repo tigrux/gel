@@ -204,25 +204,29 @@ const GValue* gel_context_eval_value(GelContext *self,
 
     register const GValue *result = NULL;
     register GType type = GEL_VALUE_TYPE(value);
-    register gboolean is_local;
 
     if(type == GEL_TYPE_SYMBOL)
     {
-        GelSymbol *symbol = (GelSymbol*)g_value_get_boxed(value);
-        const gchar *const symbol_name = symbol->name;
-        register const GelContext *ctx = self;
-        while(ctx != NULL && result == NULL)
+        register GelSymbol *symbol = (GelSymbol*)g_value_get_boxed(value);
+        if(symbol->value != NULL)
+            result = symbol->value;
+        else
         {
-            result = (GValue*)g_hash_table_lookup(ctx->symbols, symbol_name);
-            if(result == NULL)
-                ctx = ctx->outer;
-            else
-                is_local = (ctx == self);
-                    
+            register const GelContext *ctx = self;
+            while(ctx != NULL && result == NULL)
+            {
+                result =
+                    (GValue*)g_hash_table_lookup(ctx->symbols, symbol->name);
+                if(result == NULL)
+                    ctx = ctx->outer;
+                else
+                    if(ctx->outer == NULL)
+                        symbol->value = result;
+            }
         }
 
         if(result == NULL)
-            gel_warning_unknown_symbol(__FUNCTION__, symbol_name);
+            gel_warning_unknown_symbol(__FUNCTION__, symbol->name);
     }
     else
     if(type == G_TYPE_VALUE_ARRAY)
