@@ -55,7 +55,9 @@ void gel_context_dispose(GelContext *self)
  */
 GelContext* gel_context_new(void)
 {
-    return gel_context_new_with_outer(NULL);
+    register GelContext *self = gel_context_new_with_outer(NULL);
+    gel_context_add_default_symbols(self);
+    return self;
 }
 
 
@@ -79,13 +81,11 @@ GelContext* gel_context_new_with_outer(GelContext *outer)
     }
     else
         self = gel_context_alloc();
+    self->outer = outer;
     self->running = TRUE;
     contexts_COUNT++;
     contexts_LIST = g_list_append(contexts_LIST, self);
     g_static_mutex_unlock(&contexts_MUTEX);
-
-    if((self->outer = outer) == NULL)
-        gel_context_add_default_symbols(self);
 
     return self;
 }
