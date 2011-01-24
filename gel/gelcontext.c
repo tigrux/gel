@@ -208,7 +208,7 @@ const GValue* gel_context_eval_value(GelContext *self,
     if(type == GEL_TYPE_SYMBOL)
     {
         register GelSymbol *symbol = (GelSymbol*)g_value_get_boxed(value);
-        if(symbol->value != NULL)
+        if(symbol->value != NULL && self->outer == NULL)
             result = symbol->value;
         else
         {
@@ -220,8 +220,7 @@ const GValue* gel_context_eval_value(GelContext *self,
                 if(result == NULL)
                     ctx = ctx->outer;
                 else
-                    if(ctx->outer == NULL)
-                        symbol->value = result;
+                    symbol->value = result;
             }
         }
 
