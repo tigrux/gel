@@ -29,8 +29,8 @@ void set_(GClosure *self, GValue *return_value,
 
 
 static
-void new_(GClosure *self, GValue *return_value,
-          guint n_values, const GValue *values, GelContext *context)
+void object_new(GClosure *self, GValue *return_value,
+                guint n_values, const GValue *values, GelContext *context)
 {
     const gchar *type_name = NULL;
     GList *list = NULL;
@@ -1218,7 +1218,7 @@ void gel_context_add_default_symbols(GelContext *self)
     {
         CLOSURE(set),/* string */
         CLOSURE(define),/* string */
-        CLOSURE(new),
+        CLOSURE_NAME("object-new", object_new),
         CLOSURE(quote),/* string */
         CLOSURE_NAME("object-get", object_get),
         CLOSURE_NAME("object-set", object_set),

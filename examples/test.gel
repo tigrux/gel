@@ -1,19 +1,19 @@
 
-(define window (new "GtkWindow"))
+(define window (object-new "GtkWindow"))
 (object-set window "title" "Hello world")
 (object-set window "default-width" 320)
 (object-set window "default-height" 120)
 (object-connect window "hide" quit)
 
-(define box (new "GtkVBox"))
+(define box (object-new "GtkVBox"))
 (object-set window "child" box)
 (object-set box "border-width" 12)
 
-(define button (new "GtkButton"))
+(define button (object-new "GtkButton"))
 (object-set box "child" button)
 (object-set button "label" "Click me!")
 
-(define entry (new "GtkEntry"))
+(define entry (object-new "GtkEntry"))
 (object-set box "child" entry)
 
 (define counter 0)
