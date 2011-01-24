@@ -195,7 +195,7 @@ gchar* gel_value_to_string(const GValue *value)
     else
     if(GEL_VALUE_HOLDS(value, G_TYPE_VALUE_ARRAY))
     {
-        const GValueArray *array = (GValueArray*)g_value_get_boxed(value);
+        const GValueArray *array = (GValueArray*)gel_value_get_boxed(value);
         register GString *buffer = g_string_new("(");
         const guint n_values = array->n_values;
         if(n_values > 0)
@@ -218,7 +218,7 @@ gchar* gel_value_to_string(const GValue *value)
     else
     if(GEL_VALUE_HOLDS(value, GEL_TYPE_SYMBOL))
     {
-        const GelSymbol *symbol = (GelSymbol*)g_value_get_boxed(value);
+        const GelSymbol *symbol = (GelSymbol*)gel_value_get_boxed(value);
         result = g_strdup(symbol->name);
     }
     else

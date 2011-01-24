@@ -158,7 +158,7 @@ GClosure* new_closure(GelContext *context, GValueArray *vars_array,
         const GValue *const value = vars_array_values + i;
         if(GEL_VALUE_HOLDS(value, GEL_TYPE_SYMBOL))
         {
-            register GelSymbol *symbol = (GelSymbol*)g_value_get_boxed(value);
+            register GelSymbol *symbol = (GelSymbol*)gel_value_get_boxed(value);
             vars[i] = g_strdup(symbol->name);
         }
         else

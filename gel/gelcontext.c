@@ -207,7 +207,7 @@ const GValue* gel_context_eval_value(GelContext *self,
 
     if(type == GEL_TYPE_SYMBOL)
     {
-        register GelSymbol *symbol = (GelSymbol*)g_value_get_boxed(value);
+        register GelSymbol *symbol = (GelSymbol*)gel_value_get_boxed(value);
         if(symbol->value != NULL && self->outer == NULL)
             result = symbol->value;
         else
@@ -230,7 +230,8 @@ const GValue* gel_context_eval_value(GelContext *self,
     else
     if(type == G_TYPE_VALUE_ARRAY)
     {
-        const GValueArray *const array = (GValueArray*)g_value_get_boxed(value);
+        const GValueArray *const array =
+            (GValueArray*)gel_value_get_boxed(value);
         const guint array_n_values = array->n_values;
         const GValue *const array_values = array->values;
 
@@ -240,7 +241,7 @@ const GValue* gel_context_eval_value(GelContext *self,
 
         if(GEL_VALUE_HOLDS(first_value, G_TYPE_CLOSURE))
         {
-            g_closure_invoke((GClosure*)g_value_get_boxed(first_value),
+            g_closure_invoke((GClosure*)gel_value_get_boxed(first_value),
                 out_value, array_n_values - 1 , array_values + 1, self);
             result = out_value;
         }
@@ -357,7 +358,7 @@ gboolean gel_context_eval_params(GelContext *self, const gchar *func,
                 if(GEL_VALUE_HOLDS(*values, G_TYPE_VALUE_ARRAY))
                 {
                     GValueArray **a = va_arg(args, GValueArray **);
-                    *a = (GValueArray*)g_value_get_boxed(*values);
+                    *a = (GValueArray*)gel_value_get_boxed(*values);
                 }
                 else
                 {
@@ -370,7 +371,7 @@ gboolean gel_context_eval_params(GelContext *self, const gchar *func,
                 if(GEL_VALUE_HOLDS(*values, GEL_TYPE_SYMBOL))
                 {
                     const gchar **s = va_arg(args, const gchar **);
-                    GelSymbol *symbol = (GelSymbol*)g_value_get_boxed(*values);
+                    GelSymbol *symbol = (GelSymbol*)gel_value_get_boxed(*values);
                     *s = symbol->name;
                 }
                 else
@@ -401,7 +402,7 @@ gboolean gel_context_eval_params(GelContext *self, const gchar *func,
                 if(GEL_VALUE_HOLDS(result_value, G_TYPE_VALUE_ARRAY))
                 {
                     GValueArray **a = va_arg(args, GValueArray **);
-                    *a = (GValueArray*)g_value_get_boxed(result_value);
+                    *a = (GValueArray*)gel_value_get_boxed(result_value);
                 }
                 else
                 {
@@ -446,7 +447,7 @@ gboolean gel_context_eval_params(GelContext *self, const gchar *func,
                 if(GEL_VALUE_HOLDS(result_value, G_TYPE_CLOSURE))
                 {
                     GClosure **closure = va_arg(args, GClosure **);
-                    *closure = (GClosure*)g_value_get_boxed(result_value);
+                    *closure = (GClosure*)gel_value_get_boxed(result_value);
                 }
                 else
                 {
