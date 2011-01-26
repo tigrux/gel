@@ -7,14 +7,14 @@
 (apply and S)
 
 
-(define negative-of (n)
+(define (negative-of n)
     (sub 0 n)
 )
 
 (map negative-of S)
 
 
-(define is-positive (n)
+(define (is-positive n)
     (> n 0)
 )
 
@@ -29,14 +29,14 @@ S
 (define values (array 4.5 2))
 (define operators (array + - * /))
 
-(define apply-oper (oper)
+(define (apply-oper oper)
     (apply oper values)
 )
 
 (map apply-oper operators)
 
 
-(define multiply-by (factor)
+(define (multiply-by factor)
     (lambda (n) (* n factor) )
 )
 
@@ -45,7 +45,7 @@ S
 (define B (map (multiply-by 10) A))
 (define C (map (multiply-by 10) B))
 
-(define sum-of (values)
+(define (sum-of values)
     (apply + values)
 )
 

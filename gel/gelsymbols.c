@@ -144,18 +144,17 @@ void object_set(GClosure *self, GValue *return_value,
 
 
 static
-GClosure* new_closure(GelContext *context, GValueArray *vars_array,
+GClosure* new_closure(GelContext *context,
+                      guint n_vars, const GValue *var_values,
                       guint n_values, const GValue *values)
 {
-    const guint n_vars = vars_array->n_values;
     gchar **const vars = (gchar**)g_new0(gchar*, n_vars + 1);
     gchar *invalid_arg_name = NULL;
-    const GValue *const vars_array_values = vars_array->values;
 
     register guint i;
     for(i = 0; i < n_vars; i++)
     {
-        const GValue *const value = vars_array_values + i;
+        const GValue *const value = var_values + i;
         if(GEL_VALUE_HOLDS(value, GEL_TYPE_SYMBOL))
         {
             register GelSymbol *symbol = (GelSymbol*)gel_value_get_boxed(value);
@@ -197,43 +196,68 @@ static
 void define_(GClosure *self, GValue *return_value,
              guint n_values, const GValue *values, GelContext *context)
 {
-    const gchar *symbol = NULL;
-    GList *list = NULL;
     const guint n_args = 2;
-
     if(n_values < n_args)
     {
         gel_warning_needs_at_least_n_arguments(__FUNCTION__, n_args);
         return;
     }
 
-    if(!gel_context_eval_params(context, __FUNCTION__, &list,
-            "s*", &n_values, &values, &symbol))
-        return;
+    GList *list = NULL;
+    gchar *name = NULL;
+    GValue *value = NULL;
+    gboolean defined = TRUE;
 
-    if(gel_context_find_symbol(context, symbol) == NULL)
-        if(n_values == 1)
+    GType type = GEL_VALUE_TYPE(values + 0);
+
+    if(type == GEL_TYPE_SYMBOL)
+    {
+        GValue *r_value = NULL;
+        if(gel_context_eval_params(context, __FUNCTION__, &list,
+                "sV", &n_values, &values, &name, &r_value))
+            if(gel_context_find_symbol(context, name) == NULL)
+            {
+                defined = FALSE;
+                value = gel_value_dup(r_value);
+            }
+    }
+    else
+    if(type == G_TYPE_VALUE_ARRAY)
+    {
+        GValueArray *array = NULL;
+        if(gel_context_eval_params(context, __FUNCTION__, &list,
+                "a*", &n_values, &values, &array))
         {
-            GValue *value = NULL;
-            if(gel_context_eval_params(context, __FUNCTION__, &list,
-                    "V", &n_values, &values, &value))
-                gel_context_add_value(context, symbol, gel_value_dup(value));
+            guint array_n_values = array->n_values;
+            const GValue *array_values = array->values;
+            if(!gel_context_eval_params(context, __FUNCTION__, &list,
+                    "s*", &array_n_values, &array_values, &name))
+                type = G_TYPE_INVALID;
+            else
+                if(gel_context_find_symbol(context, name) == NULL)
+                {
+                    defined = FALSE;
+                    register GClosure *closure = new_closure(context,
+                        array_n_values, array_values, n_values, values);
+                    if(closure != NULL)
+                    {
+                        value = gel_value_new_of_type(G_TYPE_CLOSURE);
+                        g_value_take_boxed(value, closure);
+                    }
+                }
         }
         else
-        {
-            GValueArray *array;
-            if(gel_context_eval_params(context, __FUNCTION__, &list,
-                    "a*", &n_values, &values, &array))
-            {
-                GClosure *closure =
-                    new_closure(context, array, n_values, values);
-                if(closure != NULL)
-                    gel_context_add_value(context,
-                        symbol, gel_value_new_from_closure(closure));
-            }
-        }
+            type = G_TYPE_INVALID;
+    }
+
+    if(type == G_TYPE_INVALID)
+        g_warning("%s: Expected a symbol or array of symbols", __FUNCTION__);
     else
-        g_warning("%s: Symbol '%s' already exists", __FUNCTION__, symbol);
+        if(defined)
+            g_warning("%s: Symbol '%s' already exists", __FUNCTION__, name);
+        else
+            if(value != NULL)
+                gel_context_add_value(context, name, value);
 
     gel_value_list_free(list);
 }
@@ -250,7 +274,8 @@ void lambda_(GClosure *self, GValue *return_value,
             "a*", &n_values, &values, &array))
         return;
 
-    register GClosure *closure = new_closure(context, array, n_values, values);
+    register GClosure *closure =
+        new_closure(context, array->n_values, array->values, n_values, values);
 
     if(closure != NULL)
     {
