@@ -60,22 +60,6 @@ void object_new(GClosure *self, GValue *return_value,
 
 
 static
-void quote_(GClosure *self, GValue *return_value,
-            guint n_values, const GValue *values, GelContext *context)
-{
-    const guint n_args = 1;
-    if(n_values != n_args)
-    {
-        gel_warning_needs_n_arguments(__FUNCTION__, n_args);
-        return;
-    }
-
-    g_value_init(return_value, G_TYPE_STRING);
-    g_value_take_string(return_value, gel_value_to_string(values + 0));
-}
-
-
-static
 void object_get(GClosure *self, GValue *return_value,
                 guint n_values, const GValue *values, GelContext *context)
 {
@@ -1244,7 +1228,6 @@ void gel_context_add_default_symbols(GelContext *self)
         CLOSURE(set),/* string */
         CLOSURE(define),/* string */
         CLOSURE_NAME("object-new", object_new),
-        CLOSURE(quote),/* string */
         CLOSURE_NAME("object-get", object_get),
         CLOSURE_NAME("object-set", object_set),
         CLOSURE(lambda),/* array */
