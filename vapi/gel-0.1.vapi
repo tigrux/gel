@@ -6,7 +6,6 @@ namespace Gel {
     public class Context {
         public Context();
         public Context.with_outer(Gel.Context outer);
-        static bool is_valid(Gel.Context? context);
         public unowned GLib.Value find_symbol(string name);
         public unowned Context outer {get;}
         public void add_value(string name, owned GLib.Value value);

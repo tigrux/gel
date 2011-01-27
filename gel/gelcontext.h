@@ -12,8 +12,6 @@ GelContext* gel_context_copy(GelContext *self);
 void gel_context_free(GelContext *self);
 GType gel_context_get_type(void) G_GNUC_CONST;
 
-gboolean gel_context_is_valid(GelContext *context);
-
 GValue* gel_context_find_symbol(const GelContext *self, const gchar *name);
 GelContext* gel_context_get_outer(const GelContext *self);
 

@@ -23,7 +23,6 @@ G_DEFINE_BOXED_TYPE(GelContext, gel_context, gel_context_copy, gel_context_free)
 
 static guint contexts_COUNT;
 static GList *contexts_POOL;
-static GList *contexts_LIST;
 static GStaticMutex contexts_MUTEX;
 
 
@@ -85,7 +84,6 @@ GelContext* gel_context_new_with_outer(GelContext *outer)
     self->outer = outer;
     self->running = TRUE;
     contexts_COUNT++;
-    contexts_LIST = g_list_append(contexts_LIST, self);
     g_static_mutex_unlock(&contexts_MUTEX);
 
     return self;
@@ -128,7 +126,6 @@ void gel_context_free(GelContext *self)
     g_hash_table_remove_all(self->symbols);
 
     g_static_mutex_lock(&contexts_MUTEX);
-    contexts_LIST = g_list_remove(contexts_LIST, self);
     contexts_POOL = g_list_append(contexts_POOL, self);
     if(--contexts_COUNT == 0)
     {
@@ -136,20 +133,6 @@ void gel_context_free(GelContext *self)
         g_list_free(contexts_POOL);
     }
     g_static_mutex_unlock(&contexts_MUTEX);
-}
-
-
-/**
- * gel_context_is_valid:
- * @context: variable to check if is #GelContext
- *
- * Checks whether @context is a valid #GelContext
- *
- * Returns: #TRUE if @context is a valid context, #FALSE otherwise
- */
-gboolean gel_context_is_valid(GelContext *context)
-{
-    return g_list_find(contexts_LIST, context) != NULL;
 }
 
 
