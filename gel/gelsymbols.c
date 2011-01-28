@@ -943,8 +943,8 @@ void cond_(GClosure *self, GValue *return_value,
 
 
 static
-void do_(GClosure *self, GValue *return_value,
-         guint n_values, const GValue *values, GelContext *context)
+void begin_(GClosure *self, GValue *return_value,
+            guint n_values, const GValue *values, GelContext *context)
 {
     const guint n_args = 1;
     if(n_values < n_args)
@@ -1012,7 +1012,7 @@ void for_(GClosure *self, GValue *return_value,
     for(i = 0; i < last && loop_context->running; i++)
     {
         gel_value_copy(array_values + i, value);
-        do_(self, return_value, n_values, values, loop_context);
+        begin_(self, return_value, n_values, values, loop_context);
     }
     gel_context_free(loop_context);
 
@@ -1041,7 +1041,7 @@ void while_(GClosure *self, GValue *return_value,
         if(gel_value_to_boolean(cond_value))
         {
             run = TRUE;
-            do_(self, return_value, n_values-1, values+1, context);
+            begin_(self, return_value, n_values-1, values+1, context);
         }
         else
         {
@@ -1071,8 +1071,8 @@ void break_(GClosure *self, GValue *return_value,
 
 
 static
-void if_(GClosure *self, GValue *return_value,
-         guint n_values, const GValue *values, GelContext *context)
+void when_(GClosure *self, GValue *return_value,
+           guint n_values, const GValue *values, GelContext *context)
 {
     const guint n_args = 2;
     if(n_values < n_args)
@@ -1086,7 +1086,7 @@ void if_(GClosure *self, GValue *return_value,
         gel_context_eval_value(context, values + 0, &tmp_value);
 
     if(gel_value_to_boolean(cond_value))
-        do_(self, return_value, n_values-1, values+1, context);
+        begin_(self, return_value, n_values-1, values+1, context);
     else
         gel_value_copy(cond_value, return_value);
     if(GEL_IS_VALUE(&tmp_value))
@@ -1235,12 +1235,12 @@ void gel_context_add_default_symbols(GelContext *self)
         CLOSURE(print),
         CLOSURE(case),
         CLOSURE(cond),
-        CLOSURE(do),
+        CLOSURE(begin),
         CLOSURE(array),
         CLOSURE(for),/* string */
         CLOSURE(while),
         CLOSURE(break),
-        CLOSURE(if),
+        CLOSURE(when),
         CLOSURE(str),
         CLOSURE(add),
         CLOSURE(sub),

@@ -3,10 +3,10 @@
 
 (for n (range 3 1000000)
     (for i sieve
-        (if (== (% n i) 0)
+        (when (== (% n i) 0)
             (break)
         )
-        (if (>= (* i i) n)
+        (when (>= (* i i) n)
             (append sieve n)
             (break)
         )

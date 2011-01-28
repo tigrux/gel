@@ -6,7 +6,7 @@
         (% n i)
     )
     (while (< n top)
-        (if (all remains sieve)
+        (when (all remains sieve)
             (append sieve n)
         )
         (= n (+ n 2))
