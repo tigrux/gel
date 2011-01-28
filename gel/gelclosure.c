@@ -35,7 +35,7 @@ void gel_closure_marshal(GelClosure *closure, GValue *return_value,
     }
 
     const guint closure_code_n_values = closure->code->n_values;
-    if(n_values > 0)
+    if(closure_code_n_values > 0)
     {
         const guint last = closure_code_n_values - 1;
         const GValue *const closure_code_values = closure->code->values;
