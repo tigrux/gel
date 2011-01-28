@@ -1208,10 +1208,10 @@ void ne_(GClosure *self, GValue *return_value,
 
 
 #define CLOSURE(S) \
-    {#S, gel_value_new_from_closure_marshal((GClosureMarshal)S##_, self)}
+    {#S, (GClosureMarshal)S##_}
 
 #define CLOSURE_NAME(N, S) \
-    {N, gel_value_new_from_closure_marshal((GClosureMarshal)S, self)}
+    {N, (GClosureMarshal)S}
 
 /**
  * gel_context_add_default_symbols:
@@ -1223,7 +1223,7 @@ void ne_(GClosure *self, GValue *return_value,
  */
 void gel_context_add_default_symbols(GelContext *self)
 {
-    struct {const gchar *name; GValue *value;} *p, symbols[] =
+    struct {const gchar *name; GClosureMarshal marshal;} *c, closures[] =
     {
         CLOSURE(set),/* string */
         CLOSURE(define),/* string */
@@ -1269,13 +1269,26 @@ void gel_context_add_default_symbols(GelContext *self)
         CLOSURE(map),
         CLOSURE(zip),
         CLOSURE(sort),
-        {"TRUE", gel_value_new_from_boolean(TRUE)},
-        {"FALSE", gel_value_new_from_boolean(FALSE)},
-        {"NULL", gel_value_new_from_pointer(NULL)},
         {NULL,NULL}
     };
 
-    for(p = symbols; p->name != NULL; p++)
-        gel_context_add_value(self, p->name, p->value);
+    register GValue *value;
+
+    for(c = closures; c->name != NULL; c++)
+    {
+        value = gel_value_new_of_type(G_TYPE_CLOSURE);
+        register GClosure *closure = g_closure_new_simple(sizeof(GClosure), self);
+        g_closure_set_marshal(closure, c->marshal);
+        g_value_set_boxed(value, closure);
+        gel_context_add_value(self, c->name, value);
+    }
+
+    value = gel_value_new_of_type(G_TYPE_BOOLEAN);
+    g_value_set_boolean(value, TRUE);
+    gel_context_add_value(self, "TRUE", value);
+
+    value = gel_value_new_of_type(G_TYPE_BOOLEAN);
+    g_value_set_boolean(value, FALSE);
+    gel_context_add_value(self, "FALSE", value);
 }
 
