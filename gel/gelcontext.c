@@ -23,7 +23,7 @@ G_DEFINE_BOXED_TYPE(GelContext, gel_context, gel_context_copy, gel_context_free)
 
 static guint contexts_COUNT;
 static GList *contexts_POOL;
-G_LOCK_DEFINE(contexts);
+G_LOCK_DEFINE_STATIC(contexts);
 
 
 static
