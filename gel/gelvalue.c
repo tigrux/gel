@@ -31,50 +31,6 @@ gboolean gel_values_##op(const GValue *v1, const GValue *v2) \
  */
 
 
-GValue* gel_value_new_of_type(GType type)
-{
-    g_return_val_if_fail(type != G_TYPE_INVALID, NULL);
-    return g_value_init(gel_value_new(), type);
-}
-
-
-GValue* gel_value_new_from_closure(GClosure *value_closure)
-{
-    g_return_val_if_fail(value_closure != NULL, NULL);
-
-    register GValue *value = gel_value_new_of_type(G_TYPE_CLOSURE);
-    g_value_take_boxed(value, value_closure);
-    return value;
-}
-
-
-GValue* gel_value_new_from_closure_marshal(GClosureMarshal marshal,
-                                           gpointer data)
-{
-    g_return_val_if_fail(data != NULL, NULL);
-
-    register GClosure *closure = g_closure_new_simple(sizeof(GClosure), data);
-    g_closure_set_marshal(closure, marshal);
-    return gel_value_new_from_closure(closure);
-}
-
-
-GValue* gel_value_new_from_boolean(gboolean value_boolean)
-{
-    register GValue *value = gel_value_new_of_type(G_TYPE_BOOLEAN);
-    gel_value_set_boolean(value, value_boolean);
-    return value;
-}
-
-
-GValue* gel_value_new_from_pointer(gpointer value_pointer)
-{
-    register GValue *value = gel_value_new_of_type(G_TYPE_POINTER);
-    gel_value_set_pointer(value, value_pointer);
-    return value;
-}
-
-
 GValue *gel_value_dup(const GValue *value)
 {
     g_return_val_if_fail(value != NULL, NULL);
