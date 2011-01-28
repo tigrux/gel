@@ -156,7 +156,7 @@ GClosure* new_closure(GelContext *context,
     {
         GValueArray *const code = g_value_array_new(n_values);
         for(i = 0; i < n_values; i++)
-            g_value_array_append(code, values+i);
+            g_value_array_append(code, values + i);
         self = gel_context_closure_new(context, vars, code);
         g_closure_ref(self);
         g_closure_sink(self);
