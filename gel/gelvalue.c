@@ -175,7 +175,10 @@ gchar* gel_value_to_string(const GValue *value)
     if(GEL_VALUE_HOLDS(value, GEL_TYPE_SYMBOL))
     {
         const GelSymbol *symbol = (GelSymbol*)gel_value_get_boxed(value);
-        result = g_strdup(symbol->name);
+        if(symbol->value == NULL)
+            result = g_strdup(symbol->name);
+        else
+            result = gel_value_to_string(symbol->value);
     }
     else
     {
