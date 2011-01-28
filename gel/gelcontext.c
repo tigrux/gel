@@ -191,18 +191,11 @@ const GValue* gel_context_eval_value(GelContext *self,
     if(type == GEL_TYPE_SYMBOL)
     {
         register GelSymbol *symbol = (GelSymbol*)gel_value_get_boxed(value);
-        register const GelContext *ctx = self;
-        while(ctx != NULL && result == NULL)
-        {
-            result = (GValue*)g_hash_table_lookup(ctx->symbols, symbol->name);
-            if(result == NULL)
-                ctx = ctx->outer;
-            else
-                symbol->value = result;
-        }
-
-        if(result == NULL)
-            gel_warning_unknown_symbol(__FUNCTION__, symbol->name);
+        const gchar *symbol_name = symbol->name;
+        if((result = gel_context_find_symbol(self, symbol_name)) != NULL)
+            symbol->value = result;
+        else
+            gel_warning_unknown_symbol(__FUNCTION__, symbol_name);
     }
     else
     if(type == G_TYPE_VALUE_ARRAY)
