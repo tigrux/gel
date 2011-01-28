@@ -23,7 +23,7 @@ G_DEFINE_BOXED_TYPE(GelContext, gel_context, gel_context_copy, gel_context_free)
 
 static guint contexts_COUNT;
 static GList *contexts_POOL;
-static GStaticMutex contexts_MUTEX;
+G_LOCK_DEFINE(contexts);
 
 
 static
@@ -73,7 +73,7 @@ GelContext* gel_context_new(void)
 GelContext* gel_context_new_with_outer(GelContext *outer)
 {
     register GelContext *self;
-    g_static_mutex_lock(&contexts_MUTEX);
+    G_LOCK(contexts);
     if(contexts_POOL != NULL)
     {
         self = (GelContext*)contexts_POOL->data;
@@ -84,7 +84,7 @@ GelContext* gel_context_new_with_outer(GelContext *outer)
     self->outer = outer;
     self->running = TRUE;
     contexts_COUNT++;
-    g_static_mutex_unlock(&contexts_MUTEX);
+    G_UNLOCK(contexts);
 
     return self;
 }
@@ -125,14 +125,14 @@ void gel_context_free(GelContext *self)
 {
     g_hash_table_remove_all(self->symbols);
 
-    g_static_mutex_lock(&contexts_MUTEX);
+    G_LOCK(contexts);
     contexts_POOL = g_list_append(contexts_POOL, self);
     if(--contexts_COUNT == 0)
     {
         g_list_foreach(contexts_POOL, (GFunc)gel_context_dispose, NULL);
         g_list_free(contexts_POOL);
     }
-    g_static_mutex_unlock(&contexts_MUTEX);
+    G_UNLOCK(contexts);
 }
 
 
