@@ -16,11 +16,11 @@ struct _GelClosure
 
 static
 void gel_closure_marshal(GelClosure *closure, GValue *return_value,
-                         guint n_param_values, const GValue *param_values,
-                         GelContext *invocation_context, gpointer marshal_data)
+                         guint n_values, const GValue *values,
+                         GelContext *invocation_context)
 {
     const guint n_args = g_strv_length(closure->args);
-    g_return_if_fail(n_param_values == n_args);
+    g_return_if_fail(n_values == n_args);
 
     register GelContext *outer = (GelContext*)closure->closure.data;
     register GelContext *context = gel_context_new_with_outer(outer);
@@ -30,23 +30,23 @@ void gel_closure_marshal(GelClosure *closure, GValue *return_value,
     for(i = 0; i < n_args; i++)
     {
         register GValue *value = gel_value_new();
-        gel_context_eval(invocation_context, param_values + i, value);
+        gel_context_eval(invocation_context, values + i, value);
         gel_context_add_value(context, closure_args[i], value);
     }
 
-    const guint n_values = closure->code->n_values;
+    const guint closure_code_n_values = closure->code->n_values;
     if(n_values > 0)
     {
-        const guint last = n_values - 1;
+        const guint last = closure_code_n_values - 1;
         const GValue *const closure_code_values = closure->code->values;
         for(i = 0; i <= last; i++)
         {
             GValue tmp_value = {0};
             register const GValue *value = gel_context_eval_value(context,
                 closure_code_values + i, &tmp_value);
-            if(i == last && return_value != NULL && G_IS_VALUE(value))
+            if(i == last && return_value != NULL && GEL_IS_VALUE(value))
                 gel_value_copy(value, return_value);
-            if(G_IS_VALUE(&tmp_value))
+            if(GEL_IS_VALUE(&tmp_value))
                 g_value_unset(&tmp_value);
         }
     }
