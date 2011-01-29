@@ -200,24 +200,26 @@ const GValue* gel_context_eval_value(GelContext *self,
     else
     if(type == G_TYPE_VALUE_ARRAY)
     {
-        const GValueArray *const array =
-            (GValueArray*)gel_value_get_boxed(value);
+        GValueArray *const array = (GValueArray*)gel_value_get_boxed(value);
         const guint array_n_values = array->n_values;
-        const GValue *const array_values = array->values;
-
-        GValue tmp_value = {0};
-        register const GValue *first_value =
-            gel_context_eval_value(self, array_values + 0, &tmp_value);
-
-        if(GEL_VALUE_HOLDS(first_value, G_TYPE_CLOSURE))
+        if(array_n_values > 0)
         {
-            g_closure_invoke((GClosure*)gel_value_get_boxed(first_value),
-                out_value, array_n_values - 1 , array_values + 1, self);
-            result = out_value;
-        }
+            const GValue *const array_values = array->values;
 
-        if(GEL_IS_VALUE(&tmp_value))
-            g_value_unset(&tmp_value);
+            GValue tmp_value = {0};
+            register const GValue *first_value =
+                gel_context_eval_value(self, array_values + 0, &tmp_value);
+
+            if(GEL_VALUE_HOLDS(first_value, G_TYPE_CLOSURE))
+            {
+                g_closure_invoke((GClosure*)gel_value_get_boxed(first_value),
+                    out_value, array_n_values - 1 , array_values + 1, self);
+                result = out_value;
+            }
+
+            if(GEL_IS_VALUE(&tmp_value))
+                g_value_unset(&tmp_value);
+        }
     }
 
     if(result == NULL)
