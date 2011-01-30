@@ -1,7 +1,7 @@
 #include <gelsymbol.h>
 
 
-G_DEFINE_BOXED_TYPE(GelSymbol, gel_symbol, gel_symbol_copy, gel_symbol_free)
+G_DEFINE_BOXED_TYPE(GelSymbol, gel_symbol, gel_symbol_dup, gel_symbol_free)
 
 
 GelSymbol *gel_symbol_new(const gchar *name)
@@ -15,7 +15,7 @@ GelSymbol *gel_symbol_new(const gchar *name)
 }
 
 
-GelSymbol *gel_symbol_copy(const GelSymbol *self)
+GelSymbol *gel_symbol_dup(const GelSymbol *self)
 {
     g_return_val_if_fail(self != NULL, NULL);
 
