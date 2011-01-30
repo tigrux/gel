@@ -18,7 +18,7 @@
  */
 
 
-G_DEFINE_BOXED_TYPE(GelContext, gel_context, gel_context_copy, gel_context_free)
+G_DEFINE_BOXED_TYPE(GelContext, gel_context, gel_context_dup, gel_context_free)
 
 
 static guint contexts_COUNT;
@@ -91,14 +91,14 @@ GelContext* gel_context_new_with_outer(GelContext *outer)
 
 
 /**
- * gel_context_copy:
- * @self: #GelContext to copy
+ * gel_context_dup:
+ * @self: #GelContext to duplicate
  *
- * Constructs a copy of @self
+ * Constructs a duplicate of @self
  *
- * Returns: a #GelContext that is a copy of @self
+ * Returns: a #GelContext that is a duplicate of @self
  */
-GelContext* gel_context_copy(GelContext *self)
+GelContext* gel_context_dup(GelContext *self)
 {
     g_return_val_if_fail(self != NULL, NULL);
 

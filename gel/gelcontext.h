@@ -8,7 +8,7 @@ typedef struct _GelContext GelContext;
 
 GelContext* gel_context_new(void);
 GelContext* gel_context_new_with_outer(GelContext *outer);
-GelContext* gel_context_copy(GelContext *self);
+GelContext* gel_context_dup(GelContext *self);
 void gel_context_free(GelContext *self);
 GType gel_context_get_type(void) G_GNUC_CONST;
 
