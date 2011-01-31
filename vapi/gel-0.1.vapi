@@ -8,6 +8,7 @@ namespace Gel {
         public Context.with_outer(Gel.Context outer);
         public unowned GLib.Value lookup_symbol(string name);
         public unowned Context outer {get;}
+        public bool running {get; set;}
         public void add_symbol(string name, owned GLib.Value value);
         public void add_object(string name, owned GLib.Object object);
         public void add_function(string name, GLib.Func function);
@@ -16,8 +17,6 @@ namespace Gel {
         public bool eval(GLib.Value value, out GLib.Value dest_value);
         public unowned GLib.Value eval_value(GLib.Value value, out GLib.Value tmp_value);
         GLib.Closure closure_new([CCode (array_length=false, array_null_terminated=true)] owned string[] args, owned GLib.ValueArray code);
-        public bool get_running();
-        public void set_running(bool running);
     }
 
     GLib.ValueArray parse_file(string file) throws GLib.FileError;
