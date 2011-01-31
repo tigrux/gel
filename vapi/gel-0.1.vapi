@@ -6,9 +6,9 @@ namespace Gel {
     public class Context {
         public Context();
         public Context.with_outer(Gel.Context outer);
-        public unowned GLib.Value find_symbol(string name);
+        public unowned GLib.Value lookup_symbol(string name);
         public unowned Context outer {get;}
-        public void add_value(string name, owned GLib.Value value);
+        public void add_symbol(string name, owned GLib.Value value);
         public void add_object(string name, owned GLib.Object object);
         public void add_function(string name, GLib.Func function);
         public void add_default_symbols();

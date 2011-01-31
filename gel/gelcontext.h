@@ -8,14 +8,14 @@ typedef struct _GelContext GelContext;
 
 GelContext* gel_context_new(void);
 GelContext* gel_context_new_with_outer(GelContext *outer);
-GelContext* gel_context_dup(GelContext *self);
+GelContext* gel_context_dup(const GelContext *self);
 void gel_context_free(GelContext *self);
 GType gel_context_get_type(void) G_GNUC_CONST;
 
-GValue* gel_context_find_symbol(const GelContext *self, const gchar *name);
+GValue* gel_context_lookup_symbol(const GelContext *self, const gchar *name);
 GelContext* gel_context_get_outer(const GelContext *self);
 
-void gel_context_add_value(GelContext *self, const gchar *name, GValue *value);
+void gel_context_add_symbol(GelContext *self, const gchar *name, GValue *value);
 void gel_context_add_object(GelContext *self, const gchar *name,
                             GObject *object);
 void gel_context_add_function(GelContext *self, const gchar *name,

@@ -98,7 +98,7 @@ GelContext* gel_context_new_with_outer(GelContext *outer)
  *
  * Returns: a #GelContext that is a duplicate of @self
  */
-GelContext* gel_context_dup(GelContext *self)
+GelContext* gel_context_dup(const GelContext *self)
 {
     g_return_val_if_fail(self != NULL, NULL);
 
@@ -109,7 +109,7 @@ GelContext* gel_context_dup(GelContext *self)
     register GelContext *context = gel_context_new_with_outer(self->outer);
     g_hash_table_iter_init(&iter, self->symbols);
     while(g_hash_table_iter_next(&iter, (gpointer*)&name, (gpointer*)&value))
-        gel_context_add_value(context, name, gel_value_dup(value));
+        gel_context_add_symbol(context, name, gel_value_dup(value));
 
     return context;
 }
@@ -195,7 +195,7 @@ const GValue* gel_context_eval_value(GelContext *self,
         if(result == NULL)
         {
             register const gchar *symbol_name = symbol->name;
-            result = gel_context_find_symbol(self, symbol_name);
+            result = gel_context_lookup_symbol(self, symbol_name);
             if(result == NULL)
                 gel_warning_unknown_symbol(__FUNCTION__, symbol_name);
         }
@@ -479,7 +479,7 @@ gboolean gel_context_eval_params(GelContext *self, const gchar *func,
 
 
 /**
- * gel_context_find_symbol:
+ * gel_context_lookup_symbol:
  * @self: #GelContext where to look for the symbol named @name
  * @name: name of the symbol to lookup
  *
@@ -489,7 +489,7 @@ gboolean gel_context_eval_params(GelContext *self, const gchar *func,
  *
  * Returns: The value corresponding to @name, or #NULL if could not find it.
  */
-GValue* gel_context_find_symbol(const GelContext *self, const gchar *name)
+GValue* gel_context_lookup_symbol(const GelContext *self, const gchar *name)
 {
     g_return_val_if_fail(self != NULL, NULL);
     g_return_val_if_fail(name != NULL, NULL);
@@ -503,7 +503,7 @@ GValue* gel_context_find_symbol(const GelContext *self, const gchar *name)
 
 
 /**
- * gel_context_add_value:
+ * gel_context_add_symbol:
  * @self: #GelContext where to add the symbol
  * @name: name of the symbol to add
  * @value: value of the symbol to add
@@ -511,7 +511,7 @@ GValue* gel_context_find_symbol(const GelContext *self, const gchar *name)
  * Adds a new symbol to @context with the name given by @name.
  * @self takes ownership of @value so it should not be freed or unset.
  */
-void gel_context_add_value(GelContext *self, const gchar *name, GValue *value)
+void gel_context_add_symbol(GelContext *self, const gchar *name, GValue *value)
 {
     g_return_if_fail(self != NULL);
     g_return_if_fail(name != NULL);
@@ -526,7 +526,7 @@ void gel_context_add_value(GelContext *self, const gchar *name, GValue *value)
  * @name: name of the symbol to add
  * @object: object to add
  *
- * A wrapper for #gel_context_add_value.
+ * A wrapper for #gel_context_add_symbol.
  * @self takes ownership of @object so it should not be unreffed.
  */
 void gel_context_add_object(GelContext *self, const gchar *name,
@@ -539,7 +539,7 @@ void gel_context_add_object(GelContext *self, const gchar *name,
 
     register GValue *value = gel_value_new_of_type(G_OBJECT_TYPE(object));
     g_value_take_object(value, object);
-    gel_context_add_value(self, name, value);
+    gel_context_add_symbol(self, name, value);
 }
 
 
@@ -565,7 +565,7 @@ void gel_context_marshal(GClosure *closure, GValue *return_value,
  * @function: a #GFunc to invoke
  * @user_data: extra data to pass to @function
  *
- * A wrapper for #gel_context_add_value that calls @function when
+ * A wrapper for #gel_context_add_symbol that calls @function when
  * @self evaluates a call to a function named @name.
  */
 void gel_context_add_function(GelContext *self, const gchar *name,
@@ -580,7 +580,7 @@ void gel_context_add_function(GelContext *self, const gchar *name,
         g_cclosure_new(G_CALLBACK(callback), user_data, NULL);
     g_closure_set_marshal(closure, (GClosureMarshal)gel_context_marshal);
     g_value_take_boxed(value, closure);
-    gel_context_add_value(self, name, value);
+    gel_context_add_symbol(self, name, value);
 }
 
 

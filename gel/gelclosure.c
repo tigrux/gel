@@ -31,7 +31,7 @@ void gel_closure_marshal(GelClosure *closure, GValue *return_value,
     {
         register GValue *value = gel_value_new();
         gel_context_eval(invocation_context, values + i, value);
-        gel_context_add_value(context, closure_args[i], value);
+        gel_context_add_symbol(context, closure_args[i], value);
     }
 
     const guint closure_code_n_values = closure->code->n_values;

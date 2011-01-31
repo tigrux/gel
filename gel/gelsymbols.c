@@ -18,7 +18,7 @@ void set_(GClosure *self, GValue *return_value,
             "sV", &n_values, &values, &symbol, &value))
         return;
 
-    register GValue *symbol_value = gel_context_find_symbol(context, symbol);
+    register GValue *symbol_value = gel_context_lookup_symbol(context, symbol);
     if(symbol_value != NULL)
         gel_value_copy(value, symbol_value);
     else
@@ -199,7 +199,7 @@ void define_(GClosure *self, GValue *return_value,
         GValue *r_value = NULL;
         if(gel_context_eval_params(context, __FUNCTION__, &list,
                 "sV", &n_values, &values, &name, &r_value))
-            if(gel_context_find_symbol(context, name) == NULL)
+            if(gel_context_lookup_symbol(context, name) == NULL)
             {
                 defined = FALSE;
                 value = gel_value_dup(r_value);
@@ -218,7 +218,7 @@ void define_(GClosure *self, GValue *return_value,
                     "s*", &array_n_values, &array_values, &name))
                 type = G_TYPE_INVALID;
             else
-                if(gel_context_find_symbol(context, name) == NULL)
+                if(gel_context_lookup_symbol(context, name) == NULL)
                 {
                     defined = FALSE;
                     register GClosure *closure = new_closure(context,
@@ -241,7 +241,7 @@ void define_(GClosure *self, GValue *return_value,
             g_warning("%s: Symbol '%s' already exists", __FUNCTION__, name);
         else
             if(value != NULL)
-                gel_context_add_value(context, name, value);
+                gel_context_add_symbol(context, name, value);
 
     gel_value_list_free(list);
 }
@@ -1006,7 +1006,7 @@ void for_(GClosure *self, GValue *return_value,
 
     GelContext *loop_context = gel_context_new_with_outer(context);
     GValue *value = gel_value_new_of_type(GEL_VALUE_TYPE(array_values + 0));
-    gel_context_add_value(loop_context, name, value);
+    gel_context_add_symbol(loop_context, name, value);
 
     register guint i;
     for(i = 0; i < last && loop_context->running; i++)
@@ -1280,15 +1280,15 @@ void gel_context_add_default_symbols(GelContext *self)
         register GClosure *closure = g_closure_new_simple(sizeof(GClosure), self);
         g_closure_set_marshal(closure, c->marshal);
         g_value_set_boxed(value, closure);
-        gel_context_add_value(self, c->name, value);
+        gel_context_add_symbol(self, c->name, value);
     }
 
     value = gel_value_new_of_type(G_TYPE_BOOLEAN);
     g_value_set_boolean(value, TRUE);
-    gel_context_add_value(self, "TRUE", value);
+    gel_context_add_symbol(self, "TRUE", value);
 
     value = gel_value_new_of_type(G_TYPE_BOOLEAN);
     g_value_set_boolean(value, FALSE);
-    gel_context_add_value(self, "FALSE", value);
+    gel_context_add_symbol(self, "FALSE", value);
 }
 

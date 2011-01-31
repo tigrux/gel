@@ -5,9 +5,9 @@ gel_context_new
 gel_context_new_with_outer
 gel_context_dup
 gel_context_free
-gel_context_find_symbol
+gel_context_lookup_symbol
 gel_context_get_outer
-gel_context_add_value
+gel_context_add_symbol
 gel_context_add_object
 gel_context_add_function
 gel_context_add_default_symbols
