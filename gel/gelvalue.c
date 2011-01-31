@@ -24,7 +24,7 @@ GValue *gel_value_dup(const GValue *value)
     g_return_val_if_fail(GEL_IS_VALUE(value), NULL);
 
     register GValue *dup_value = gel_value_new_of_type(GEL_VALUE_TYPE(value));
-    g_value_copy(value, dup_value);
+    gel_value_copy(value, dup_value);
     return dup_value;
 }
 
