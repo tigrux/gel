@@ -1,5 +1,4 @@
 #include <gelcontext.h>
-#include <gelcontextprivate.h>
 #include <geldebug.h>
 #include <gelvalue.h>
 #include <gelvalueprivate.h>
@@ -955,7 +954,7 @@ void begin_(GClosure *self, GValue *return_value,
 
     const guint last = n_values-1;
     register guint i;
-    for(i = 0; i <= last && context->running; i++)
+    for(i = 0; i <= last && gel_context_get_running(context); i++)
     {
         GValue tmp_value = {0};
         register const GValue *value =
@@ -1009,7 +1008,7 @@ void for_(GClosure *self, GValue *return_value,
     gel_context_add_symbol(loop_context, name, value);
 
     register guint i;
-    for(i = 0; i < last && loop_context->running; i++)
+    for(i = 0; i < last && gel_context_get_running(loop_context); i++)
     {
         gel_value_copy(array_values + i, value);
         begin_(self, return_value, n_values, values, loop_context);
@@ -1033,7 +1032,7 @@ void while_(GClosure *self, GValue *return_value,
 
     register gboolean run = FALSE;
     GelContext *loop_context = gel_context_new_with_outer(context);
-    while(loop_context->running)
+    while(gel_context_get_running(loop_context))
     {
         GValue tmp_value = {0};
         register const GValue *cond_value =
@@ -1045,7 +1044,7 @@ void while_(GClosure *self, GValue *return_value,
         }
         else
         {
-            loop_context->running = FALSE;
+            gel_context_set_running(loop_context, FALSE);
             if(run == FALSE)
                 gel_value_copy(cond_value, return_value);
         }
@@ -1061,10 +1060,10 @@ void break_(GClosure *self, GValue *return_value,
             guint n_values, const GValue *values, GelContext *context)
 {
     register GelContext *i;
-    for(i = context; i != NULL; i = i->outer)
-        if(i->running)
+    for(i = context; i != NULL; i = gel_context_get_outer(i))
+        if(gel_context_get_running(i))
         {
-            i->running = FALSE;
+            gel_context_set_running(i, FALSE);
             break;
         }
 }

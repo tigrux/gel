@@ -1,7 +1,6 @@
 #include <string.h>
 
 #include <gelcontext.h>
-#include <gelcontextprivate.h>
 #include <geldebug.h>
 #include <gelvalue.h>
 #include <gelvalueprivate.h>
@@ -19,6 +18,14 @@
 
 
 G_DEFINE_BOXED_TYPE(GelContext, gel_context, gel_context_dup, gel_context_free)
+
+
+struct _GelContext
+{
+    GHashTable *symbols;
+    GelContext *outer;
+    gboolean running;
+};
 
 
 static guint contexts_COUNT;
@@ -613,5 +620,38 @@ GelContext* gel_context_get_outer(const GelContext* self)
 {
     g_return_val_if_fail(self != NULL, NULL);
     return self->outer;
+}
+
+
+/**
+ * gel_context_get_running:
+ * @self: #GelContext to check if it is running or not
+ *
+ * Checks if @self is running.
+ * A #GelContext is considered as running when it is
+ * currently evaluating a loop (for, while).
+ *
+ * Returns: #TRUE if #self is running, #FALSE otherwise
+ */
+gboolean gel_context_get_running(const GelContext *self)
+{
+    g_return_val_if_fail(self != NULL, FALSE);
+    return self->running;
+}
+
+
+/**
+ * gel_context_set_running:
+ * @self: #GelContext whose running state will be set
+ * @running: #TRUE to set the context as running
+ *
+ * Set @self's running state as @running
+ * It stops the current execution loop (for, while)
+ * and is used internally by the function break.
+ */
+void gel_context_set_running(GelContext *self, gboolean running)
+{
+    g_return_if_fail(self != NULL);
+    self->running = running;
 }
 

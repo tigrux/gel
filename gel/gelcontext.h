@@ -34,6 +34,8 @@ gboolean gel_context_eval_params(GelContext *self, const gchar *func,
 GClosure* gel_context_closure_new(GelContext *self,
                                   gchar **args, GValueArray *code);
 
+gboolean gel_context_get_running(const GelContext *self);
+void gel_context_set_running(GelContext *self, gboolean running);
 
 #endif
 
