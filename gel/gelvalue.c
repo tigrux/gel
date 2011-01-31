@@ -4,19 +4,6 @@
 #include <gelvalueprivate.h>
 #include <gelsymbol.h>
 
-#define DEFINE_ARITHMETIC(op) \
-gboolean gel_values_##op(const GValue *v1, const GValue *v2, GValue *value) \
-{ \
-    return gel_values_arithmetic(v1, v2, value, gel_values_simple_##op); \
-}
-
-
-#define DEFINE_LOGIC(op) \
-gboolean gel_values_##op(const GValue *v1, const GValue *v2) \
-{ \
-    return gel_values_logic(v1, v2, gel_values_simple_##op); \
-}
-
 
 /**
  * SECTION:gelvalue
@@ -754,12 +741,25 @@ gboolean gel_values_logic(const GValue *v1, const GValue *v2,
 }
 
 
+#define DEFINE_LOGIC(op) \
+gboolean gel_values_##op(const GValue *v1, const GValue *v2) \
+{ \
+    return gel_values_logic(v1, v2, gel_values_simple_##op); \
+}
+
 DEFINE_LOGIC(gt)
 DEFINE_LOGIC(ge)
 DEFINE_LOGIC(eq)
 DEFINE_LOGIC(le)
 DEFINE_LOGIC(lt)
 DEFINE_LOGIC(ne)
+
+
+#define DEFINE_ARITHMETIC(op) \
+gboolean gel_values_##op(const GValue *v1, const GValue *v2, GValue *value) \
+{ \
+    return gel_values_arithmetic(v1, v2, value, gel_values_simple_##op); \
+}
 
 DEFINE_ARITHMETIC(add)
 DEFINE_ARITHMETIC(sub)
