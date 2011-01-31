@@ -35,7 +35,7 @@
 
 (define n 10)
 (print "Factorial of " n " is " (factorial n))
-
+(print n " is " (if (== (% n 2) 0) "even" "odd"))
 
 (define (fibonacci n)
     (case n
