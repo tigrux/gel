@@ -142,7 +142,7 @@ GClosure* new_closure(GelContext *context,
         if(GEL_VALUE_HOLDS(value, GEL_TYPE_SYMBOL))
         {
             register GelSymbol *symbol = (GelSymbol*)gel_value_get_boxed(value);
-            vars[i] = g_strdup(symbol->name);
+            vars[i] = g_strdup(gel_symbol_get_name(symbol));
         }
         else
         {

@@ -6,18 +6,16 @@
 
 typedef struct _GelSymbol GelSymbol;
 
-struct _GelSymbol {
-    gchar *name;
-    const GValue *value; /*< unowned >*/
-};
-
 GType gel_symbol_get_type(void) G_GNUC_CONST;
 
-GelSymbol *gel_symbol_new(const gchar *name);
+GelSymbol* gel_symbol_new(const gchar *name);
 
-GelSymbol *gel_symbol_dup(const GelSymbol *self);
+GelSymbol* gel_symbol_dup(const GelSymbol *self);
 
 void gel_symbol_free(GelSymbol *self);
 
+const gchar* gel_symbol_get_name(const GelSymbol *self);
+
+const GValue* gel_symbol_get_value(const GelSymbol *self);
 
 #endif
