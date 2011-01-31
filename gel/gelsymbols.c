@@ -1119,6 +1119,29 @@ void when_(GClosure *self, GValue *return_value,
 
 
 static
+void unless_(GClosure *self, GValue *return_value,
+             guint n_values, const GValue *values, GelContext *context)
+{
+    const guint n_args = 2;
+    if(n_values < n_args)
+    {
+        gel_warning_needs_at_least_n_arguments(__FUNCTION__, n_args);
+        return;
+    }
+
+    GValue tmp_value = {0};
+    register const GValue *cond_value =
+        gel_context_eval_value(context, values + 0, &tmp_value);
+
+    if(!gel_value_to_boolean(cond_value))
+        begin_(self, return_value, n_values-1, values+1, context);
+    else
+        gel_value_copy(cond_value, return_value);
+    if(GEL_IS_VALUE(&tmp_value))
+        g_value_unset(&tmp_value);
+}
+
+static
 void str_(GClosure *self, GValue *return_value,
           guint n_values, const GValue *values, GelContext *context)
 {
@@ -1266,6 +1289,7 @@ void gel_context_add_default_symbols(GelContext *self)
         CLOSURE(break),
         CLOSURE(if),
         CLOSURE(when),
+        CLOSURE(unless),
         CLOSURE(str),
         CLOSURE(add),
         CLOSURE(sub),
