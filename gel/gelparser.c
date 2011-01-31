@@ -95,6 +95,18 @@ GValueArray* gel_parse_scanner(GScanner *scanner)
                 else
                     gel_value_take_symbol_from_name(&value, "set");
                 break;
+            case '!':
+                g_scanner_get_next_token(scanner);
+                g_value_init(&value, GEL_TYPE_SYMBOL);
+                token = g_scanner_peek_next_token(scanner);
+                if(token == '=')
+                {
+                    g_scanner_get_next_token(scanner);
+                    gel_value_take_symbol_from_name(&value, "ne");
+                }
+                else
+                    gel_value_take_symbol_from_name(&value, "not");
+                break;
             case '+':
                 g_scanner_get_next_token(scanner);
                 g_value_init(&value, GEL_TYPE_SYMBOL);
