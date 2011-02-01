@@ -7,11 +7,11 @@
 typedef struct _GelVariable GelVariable;
 
 GType gel_variable_get_type(void) G_GNUC_CONST;
-GelVariable* gel_variable_new(GValue *value);
+GelVariable* gel_variable_new(GValue *value, gboolean owned);
 GelVariable* gel_variable_ref(GelVariable *self);
 void gel_variable_unref(GelVariable *self);
 
 GValue* gel_variable_get_value(GelVariable *self);
-
+gboolean gel_variable_get_owned(GelVariable *self);
 
 #endif
