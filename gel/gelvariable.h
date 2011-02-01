@@ -2,6 +2,8 @@
 #define GEL_TYPE_VARIABLE (gel_variable_get_type())
 
 #define GEL_VARIABLE_VALUE(v) ((GValue*)(v))
+#define GEL_VARIABLE_TYPE(v) (GEL_VALUE_TYPE((GValue*)(v)))
+#define GEL_VARIABLE_TYPE_NAME(v) (GEL_VALUE_TYPE_NAME((GValue*)(v)))
 
 #include <glib-object.h>
 
