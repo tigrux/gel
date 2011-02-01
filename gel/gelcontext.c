@@ -112,12 +112,13 @@ GelContext* gel_context_dup(const GelContext *self)
 
     GHashTableIter iter;
     const gchar *name;
-    GValue *value;
+    GelVariable *variable;
 
     register GelContext *context = gel_context_new_with_outer(self->outer);
     g_hash_table_iter_init(&iter, self->symbols);
-    while(g_hash_table_iter_next(&iter, (gpointer*)&name, (gpointer*)&value))
-        gel_context_insert_symbol(context, name, gel_value_dup(value));
+    while(g_hash_table_iter_next(&iter, (gpointer*)&name, (gpointer*)&variable))
+        g_hash_table_insert(context->symbols,
+            g_strdup(name), gel_variable_ref(variable));
 
     return context;
 }
