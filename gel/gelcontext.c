@@ -5,6 +5,7 @@
 #include <gelvalue.h>
 #include <gelvalueprivate.h>
 #include <gelsymbol.h>
+#include <gelvariable.h>
 
 
 /**
@@ -39,7 +40,7 @@ GelContext *gel_context_alloc(void)
     register GelContext *self = g_slice_new0(GelContext);
     self->symbols = g_hash_table_new_full(
         g_str_hash, g_str_equal,
-        (GDestroyNotify)g_free, (GDestroyNotify)gel_value_free);
+        (GDestroyNotify)g_free, (GDestroyNotify)gel_variable_unref);
     return self;
 }
 
@@ -501,11 +502,17 @@ GValue* gel_context_lookup_symbol(const GelContext *self, const gchar *name)
     g_return_val_if_fail(self != NULL, NULL);
     g_return_val_if_fail(name != NULL, NULL);
 
-    register GValue *symbol = NULL;
+    register GelVariable *variable = NULL;
     register const GelContext *ic;
-    for(ic = self; ic != NULL && symbol == NULL; ic = ic->outer)
-        symbol = (GValue*)g_hash_table_lookup(ic->symbols, name);
-    return symbol;
+    for(ic = self; ic != NULL && variable == NULL; ic = ic->outer)
+        variable = (GelVariable*)g_hash_table_lookup(ic->symbols, name);
+
+    register GValue *value;
+    if(variable != NULL)
+        value = gel_variable_get_value(variable);
+    else
+        value = NULL;
+    return value;
 }
 
 
@@ -523,7 +530,8 @@ void gel_context_add_symbol(GelContext *self, const gchar *name, GValue *value)
     g_return_if_fail(self != NULL);
     g_return_if_fail(name != NULL);
     g_return_if_fail(value != NULL);
-    g_hash_table_insert(self->symbols, g_strdup(name), value);
+    GelVariable *variable = gel_variable_new(value, TRUE);
+    g_hash_table_insert(self->symbols, g_strdup(name), variable);
 }
 
 
