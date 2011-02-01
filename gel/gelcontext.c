@@ -131,8 +131,9 @@ GelContext* gel_context_dup(const GelContext *self)
  */
 void gel_context_free(GelContext *self)
 {
-    g_hash_table_remove_all(self->symbols);
+    g_return_if_fail(self != NULL);
 
+    g_hash_table_remove_all(self->symbols);
     G_LOCK(contexts);
     contexts_POOL = g_list_append(contexts_POOL, self);
     if(--contexts_COUNT == 0)
@@ -530,6 +531,7 @@ void gel_context_add_symbol(GelContext *self, const gchar *name, GValue *value)
     g_return_if_fail(self != NULL);
     g_return_if_fail(name != NULL);
     g_return_if_fail(value != NULL);
+
     GelVariable *variable = gel_variable_new(value, TRUE);
     g_hash_table_insert(self->symbols, g_strdup(name), variable);
 }
@@ -612,6 +614,7 @@ gboolean gel_context_remove_symbol(GelContext *self, const gchar *name)
 {
     g_return_val_if_fail(self != NULL, FALSE);
     g_return_val_if_fail(name != NULL, FALSE);
+
     return g_hash_table_remove(self->symbols, name);
 }
 
