@@ -23,7 +23,7 @@ G_DEFINE_BOXED_TYPE(GelContext, gel_context, gel_context_dup, gel_context_free)
 
 struct _GelContext
 {
-    GHashTable *symbols;
+    GHashTable *variables;
     GelContext *outer;
     gboolean running;
 };
@@ -38,7 +38,7 @@ static
 GelContext *gel_context_alloc(void)
 {
     register GelContext *self = g_slice_new0(GelContext);
-    self->symbols = g_hash_table_new_full(
+    self->variables = g_hash_table_new_full(
         g_str_hash, g_str_equal,
         (GDestroyNotify)g_free, (GDestroyNotify)gel_variable_unref);
     return self;
@@ -48,7 +48,7 @@ GelContext *gel_context_alloc(void)
 static
 void gel_context_dispose(GelContext *self)
 {
-    g_hash_table_unref(self->symbols);
+    g_hash_table_unref(self->variables);
     g_slice_free(GelContext, self);
 }
 
@@ -115,9 +115,9 @@ GelContext* gel_context_dup(const GelContext *self)
     GelVariable *variable;
 
     register GelContext *context = gel_context_new_with_outer(self->outer);
-    g_hash_table_iter_init(&iter, self->symbols);
+    g_hash_table_iter_init(&iter, self->variables);
     while(g_hash_table_iter_next(&iter, (gpointer*)&name, (gpointer*)&variable))
-        g_hash_table_insert(context->symbols,
+        g_hash_table_insert(context->variables,
             g_strdup(name), gel_variable_ref(variable));
 
     return context;
@@ -134,7 +134,7 @@ void gel_context_free(GelContext *self)
 {
     g_return_if_fail(self != NULL);
 
-    g_hash_table_remove_all(self->symbols);
+    g_hash_table_remove_all(self->variables);
     G_LOCK(contexts);
     contexts_POOL = g_list_append(contexts_POOL, self);
     if(--contexts_COUNT == 0)
@@ -356,7 +356,8 @@ gboolean gel_context_eval_params(GelContext *self, const gchar *func,
                 if(GEL_VALUE_HOLDS(*values, GEL_TYPE_SYMBOL))
                 {
                     const gchar **s = va_arg(args, const gchar **);
-                    GelSymbol *symbol = (GelSymbol*)gel_value_get_boxed(*values);
+                    GelSymbol *symbol =
+                        (GelSymbol*)gel_value_get_boxed(*values);
                     *s = gel_symbol_get_name(symbol);
                 }
                 else
@@ -507,7 +508,7 @@ GValue* gel_context_lookup_symbol(const GelContext *self, const gchar *name)
     register GelVariable *variable = NULL;
     register const GelContext *ic;
     for(ic = self; ic != NULL && variable == NULL; ic = ic->outer)
-        variable = (GelVariable*)g_hash_table_lookup(ic->symbols, name);
+        variable = (GelVariable*)g_hash_table_lookup(ic->variables, name);
 
     register GValue *value;
     if(variable != NULL)
@@ -527,14 +528,15 @@ GValue* gel_context_lookup_symbol(const GelContext *self, const gchar *name)
  * Adds a new symbol to @context with the name given by @name.
  * @self takes ownership of @value so it should not be freed or unset.
  */
-void gel_context_insert_symbol(GelContext *self, const gchar *name, GValue *value)
+void gel_context_insert_symbol(GelContext *self,
+                               const gchar *name, GValue *value)
 {
     g_return_if_fail(self != NULL);
     g_return_if_fail(name != NULL);
     g_return_if_fail(value != NULL);
 
     GelVariable *variable = gel_variable_new(value, TRUE);
-    g_hash_table_insert(self->symbols, g_strdup(name), variable);
+    g_hash_table_insert(self->variables, g_strdup(name), variable);
 }
 
 
@@ -616,7 +618,7 @@ gboolean gel_context_remove_symbol(GelContext *self, const gchar *name)
     g_return_val_if_fail(self != NULL, FALSE);
     g_return_val_if_fail(name != NULL, FALSE);
 
-    return g_hash_table_remove(self->symbols, name);
+    return g_hash_table_remove(self->variables, name);
 }
 
 
