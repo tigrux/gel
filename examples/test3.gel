@@ -8,7 +8,7 @@
 
 
 (define (negative-of n)
-    (sub 0 n)
+    (- 0 n)
 )
 
 (map negative-of S)
