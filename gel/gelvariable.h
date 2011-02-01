@@ -1,5 +1,7 @@
-#ifndef GEL_TYPE_VALUE_REFERENCE
-#define GEL_TYPE_VALUE_REFERENCE (gel_variable_get_type())
+#ifndef GEL_TYPE_VARIABLE
+#define GEL_TYPE_VARIABLE (gel_variable_get_type())
+
+#define GEL_VARIABLE_VALUE(v) ((GValue*)(v))
 
 #include <glib-object.h>
 
@@ -12,5 +14,6 @@ GelVariable* gel_variable_ref(GelVariable *self);
 void gel_variable_unref(GelVariable *self);
 
 GValue* gel_variable_get_value(GelVariable *self);
+
 
 #endif
