@@ -7,10 +7,10 @@ gel_context_dup
 gel_context_free
 gel_context_lookup_symbol
 gel_context_get_outer
-gel_context_add_symbol
-gel_context_add_object
-gel_context_add_function
-gel_context_add_default_symbols
+gel_context_insert_symbol
+gel_context_insert_object
+gel_context_insert_function
+gel_context_insert_default_symbols
 gel_context_remove_symbol
 gel_context_eval
 gel_context_eval_value

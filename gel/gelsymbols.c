@@ -240,7 +240,7 @@ void define_(GClosure *self, GValue *return_value,
             g_warning("%s: Symbol '%s' already exists", __FUNCTION__, name);
         else
             if(value != NULL)
-                gel_context_add_symbol(context, name, value);
+                gel_context_insert_symbol(context, name, value);
 
     gel_value_list_free(list);
 }
@@ -1005,7 +1005,7 @@ void for_(GClosure *self, GValue *return_value,
 
     GelContext *loop_context = gel_context_new_with_outer(context);
     GValue *value = gel_value_new();
-    gel_context_add_symbol(loop_context, name, value);
+    gel_context_insert_symbol(loop_context, name, value);
 
     register guint i;
     for(i = 0; i < last && gel_context_get_running(loop_context); i++)
@@ -1261,14 +1261,14 @@ void ne_(GClosure *self, GValue *return_value,
     {N, (GClosureMarshal)S}
 
 /**
- * gel_context_add_default_symbols:
+ * gel_context_insert_default_symbols:
  * @self: #GelContext to add the default symbols
  *
  * Adds a bunch of predefined functions and symbols to @self.
  * This method is automatically called for contexts created with
  * #gel_context_new.
  */
-void gel_context_add_default_symbols(GelContext *self)
+void gel_context_insert_default_symbols(GelContext *self)
 {
     struct {const gchar *name; GClosureMarshal marshal;} *c, closures[] =
     {
@@ -1329,15 +1329,15 @@ void gel_context_add_default_symbols(GelContext *self)
         register GClosure *closure = g_closure_new_simple(sizeof(GClosure), self);
         g_closure_set_marshal(closure, c->marshal);
         g_value_set_boxed(value, closure);
-        gel_context_add_symbol(self, c->name, value);
+        gel_context_insert_symbol(self, c->name, value);
     }
 
     value = gel_value_new_of_type(G_TYPE_BOOLEAN);
     g_value_set_boolean(value, TRUE);
-    gel_context_add_symbol(self, "TRUE", value);
+    gel_context_insert_symbol(self, "TRUE", value);
 
     value = gel_value_new_of_type(G_TYPE_BOOLEAN);
     g_value_set_boolean(value, FALSE);
-    gel_context_add_symbol(self, "FALSE", value);
+    gel_context_insert_symbol(self, "FALSE", value);
 }
 

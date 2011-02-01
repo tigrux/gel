@@ -5,7 +5,7 @@ class Demo : Object {
     public Demo() {
         print("Instantiating a %s\n", typeof(Gel.Context).name());
         context = new Gel.Context();
-        context.add_function("quit", Gtk.main_quit);
+        context.insert_function("quit", Gtk.main_quit);
     }
 
     public bool run() {

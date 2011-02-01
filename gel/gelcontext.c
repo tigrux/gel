@@ -57,14 +57,14 @@ void gel_context_dispose(GelContext *self)
  * gel_context_new:
  *
  * Creates a #GelContext, no outer context is assigned and the
- * default symbols are added with #gel_context_add_default_symbols.
+ * default symbols are added with #gel_context_insert_default_symbols.
  *
  * Returns: A new #GelContext, with no outer context assigned.
  */
 GelContext* gel_context_new(void)
 {
     register GelContext *self = gel_context_new_with_outer(NULL);
-    gel_context_add_default_symbols(self);
+    gel_context_insert_default_symbols(self);
     return self;
 }
 
@@ -117,7 +117,7 @@ GelContext* gel_context_dup(const GelContext *self)
     register GelContext *context = gel_context_new_with_outer(self->outer);
     g_hash_table_iter_init(&iter, self->symbols);
     while(g_hash_table_iter_next(&iter, (gpointer*)&name, (gpointer*)&value))
-        gel_context_add_symbol(context, name, gel_value_dup(value));
+        gel_context_insert_symbol(context, name, gel_value_dup(value));
 
     return context;
 }
@@ -518,7 +518,7 @@ GValue* gel_context_lookup_symbol(const GelContext *self, const gchar *name)
 
 
 /**
- * gel_context_add_symbol:
+ * gel_context_insert_symbol:
  * @self: #GelContext where to add the symbol
  * @name: name of the symbol to add
  * @value: value of the symbol to add
@@ -526,7 +526,7 @@ GValue* gel_context_lookup_symbol(const GelContext *self, const gchar *name)
  * Adds a new symbol to @context with the name given by @name.
  * @self takes ownership of @value so it should not be freed or unset.
  */
-void gel_context_add_symbol(GelContext *self, const gchar *name, GValue *value)
+void gel_context_insert_symbol(GelContext *self, const gchar *name, GValue *value)
 {
     g_return_if_fail(self != NULL);
     g_return_if_fail(name != NULL);
@@ -538,16 +538,16 @@ void gel_context_add_symbol(GelContext *self, const gchar *name, GValue *value)
 
 
 /**
- * gel_context_add_object:
+ * gel_context_insert_object:
  * @self: #GelContext where to add the object
  * @name: name of the symbol to add
  * @object: object to add
  *
- * A wrapper for #gel_context_add_symbol.
+ * A wrapper for #gel_context_insert_symbol.
  * @self takes ownership of @object so it should not be unreffed.
  */
-void gel_context_add_object(GelContext *self, const gchar *name,
-                            GObject *object)
+void gel_context_insert_object(GelContext *self, const gchar *name,
+                               GObject *object)
 {
     g_return_if_fail(self != NULL);
     g_return_if_fail(name != NULL);
@@ -556,7 +556,7 @@ void gel_context_add_object(GelContext *self, const gchar *name,
 
     register GValue *value = gel_value_new_of_type(G_OBJECT_TYPE(object));
     g_value_take_object(value, object);
-    gel_context_add_symbol(self, name, value);
+    gel_context_insert_symbol(self, name, value);
 }
 
 
@@ -576,17 +576,17 @@ void gel_context_marshal(GClosure *closure, GValue *return_value,
 
 
 /**
- * gel_context_add_function:
+ * gel_context_insert_function:
  * @self: #GelContext where to add the function
  * @name: name of the symbol to add
  * @function: a #GFunc to invoke
  * @user_data: extra data to pass to @function
  *
- * A wrapper for #gel_context_add_symbol that calls @function when
+ * A wrapper for #gel_context_insert_symbol that calls @function when
  * @self evaluates a call to a function named @name.
  */
-void gel_context_add_function(GelContext *self, const gchar *name,
-                              GFunc callback, gpointer user_data)
+void gel_context_insert_function(GelContext *self, const gchar *name,
+                                 GFunc callback, gpointer user_data)
 {
     g_return_if_fail(self != NULL);
     g_return_if_fail(name != NULL);
@@ -597,7 +597,7 @@ void gel_context_add_function(GelContext *self, const gchar *name,
         g_cclosure_new(G_CALLBACK(callback), user_data, NULL);
     g_closure_set_marshal(closure, (GClosureMarshal)gel_context_marshal);
     g_value_take_boxed(value, closure);
-    gel_context_add_symbol(self, name, value);
+    gel_context_insert_symbol(self, name, value);
 }
 
 

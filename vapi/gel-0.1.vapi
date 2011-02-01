@@ -9,10 +9,10 @@ namespace Gel {
         public unowned GLib.Value lookup_symbol(string name);
         public unowned Context outer {get;}
         public bool running {get; set;}
-        public void add_symbol(string name, owned GLib.Value value);
-        public void add_object(string name, owned GLib.Object object);
-        public void add_function(string name, GLib.Func function);
-        public void add_default_symbols();
+        public void insert_symbol(string name, owned GLib.Value value);
+        public void insert_object(string name, owned GLib.Object object);
+        public void insert_function(string name, GLib.Func function);
+        public void insert_default_symbols();
         public bool remove_symbol(string name);
         public bool eval(GLib.Value value, out GLib.Value dest_value);
         public unowned GLib.Value eval_value(GLib.Value value, out GLib.Value tmp_value);

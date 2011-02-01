@@ -57,7 +57,7 @@ int main(int argc, char *argv[])
     }
 
     context = gel_context_new();
-    gel_context_add_function(context, "quit", (GFunc)gtk_main_quit, NULL);
+    gel_context_insert_function(context, "quit", (GFunc)gtk_main_quit, NULL);
 
     gtk_init_add((GtkFunction)demo_run, NULL);
     gtk_main();
