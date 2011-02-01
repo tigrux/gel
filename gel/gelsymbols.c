@@ -1004,7 +1004,7 @@ void for_(GClosure *self, GValue *return_value,
     const GValue *const array_values = array->values;
 
     GelContext *loop_context = gel_context_new_with_outer(context);
-    GValue *value = gel_value_new_of_type(GEL_VALUE_TYPE(array_values + 0));
+    GValue *value = gel_value_new();
     gel_context_add_symbol(loop_context, name, value);
 
     register guint i;
@@ -1012,6 +1012,7 @@ void for_(GClosure *self, GValue *return_value,
     {
         gel_value_copy(array_values + i, value);
         begin_(self, return_value, n_values, values, loop_context);
+        g_value_unset(value);
     }
     gel_context_free(loop_context);
 
