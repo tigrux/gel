@@ -18,4 +18,6 @@ const gchar* gel_symbol_get_name(const GelSymbol *self);
 
 const GValue* gel_symbol_get_value(const GelSymbol *self);
 
+GValue* gel_symbol_lookup_predefined(const gchar *name);
+
 #endif

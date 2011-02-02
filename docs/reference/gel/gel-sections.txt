@@ -10,7 +10,6 @@ gel_context_get_outer
 gel_context_insert_symbol
 gel_context_insert_object
 gel_context_insert_function
-gel_context_insert_default_symbols
 gel_context_remove_symbol
 gel_context_eval
 gel_context_eval_value

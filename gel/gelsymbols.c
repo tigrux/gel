@@ -1278,17 +1278,11 @@ void ne_(GClosure *self, GValue *return_value,
 #define CLOSURE_NAME(N, S) \
     {N, (GClosureMarshal)S}
 
-/**
- * gel_context_insert_default_symbols:
- * @self: #GelContext to add the default symbols
- *
- * Adds a bunch of predefined functions and symbols to @self.
- * This method is automatically called for contexts created with
- * #gel_context_new.
- */
-void gel_context_insert_default_symbols(GelContext *self)
+
+static
+GHashTable* gel_make_default_symbols(void)
 {
-    struct {const gchar *name; GClosureMarshal marshal;} *c, closures[] =
+    struct {gchar *name; GClosureMarshal marshal;} *c, closures[] =
     {
         CLOSURE(set),/* string */
         CLOSURE(define),/* string */
@@ -1340,14 +1334,50 @@ void gel_context_insert_default_symbols(GelContext *self)
     };
 
     register GValue *value;
+    GHashTable *symbols = g_hash_table_new(g_str_hash, g_str_equal);
 
     for(c = closures; c->name != NULL; c++)
     {
         value = gel_value_new_of_type(G_TYPE_CLOSURE);
-        register GClosure *closure = g_closure_new_simple(sizeof(GClosure), self);
+        register GClosure *closure =
+            g_closure_new_simple(sizeof(GClosure), NULL);
         g_closure_set_marshal(closure, c->marshal);
         g_value_set_boxed(value, closure);
-        gel_context_insert_symbol(self, c->name, value);
+        g_hash_table_insert(symbols, c->name, value);
     }
+
+    value = gel_value_new_of_type(G_TYPE_BOOLEAN);
+    gel_value_set_boolean(value, TRUE);
+    g_hash_table_insert(symbols, "TRUE", value);
+
+    value = gel_value_new_of_type(G_TYPE_BOOLEAN);
+    gel_value_set_boolean(value, FALSE);
+    g_hash_table_insert(symbols, "FALSE", value);
+
+    value = gel_value_new_of_type(G_TYPE_POINTER);
+    gel_value_set_pointer(value, NULL);
+    g_hash_table_insert(symbols, "NULL", value);
+
+    return symbols;
+}
+
+/**
+ * gel_symbol_lookup_predefined:
+ * 
+ * Lookups the table of predefined symbols and retrieves
+ * the value that correspond to @name.
+ *
+ * Returns: The #GValue that correspond to @name
+ */
+GValue *gel_symbol_lookup_predefined(const gchar *name)
+{
+    static volatile gsize symbols_once = 0;
+    static GHashTable *symbols = NULL;
+    if(g_once_init_enter(&symbols_once))
+    {
+        symbols = gel_make_default_symbols();
+        g_once_init_leave(&symbols_once, 1);
+    }
+    return g_hash_table_lookup(symbols, name);
 }
 

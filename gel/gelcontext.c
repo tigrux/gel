@@ -56,15 +56,13 @@ void gel_context_dispose(GelContext *self)
 /**
  * gel_context_new:
  *
- * Creates a #GelContext, no outer context is assigned and the
- * default symbols are added with #gel_context_insert_default_symbols.
+ * Creates a #GelContext, with no outer context set.
  *
  * Returns: A new #GelContext, with no outer context assigned.
  */
 GelContext* gel_context_new(void)
 {
     register GelContext *self = gel_context_new_with_outer(NULL);
-    gel_context_insert_default_symbols(self);
     return self;
 }
 

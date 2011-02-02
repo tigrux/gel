@@ -21,7 +21,6 @@ void gel_context_insert_object(GelContext *self, const gchar *name,
                                GObject *object);
 void gel_context_insert_function(GelContext *self, const gchar *name,
                               GFunc function, gpointer user_data);
-void gel_context_insert_default_symbols(GelContext *self);
 gboolean gel_context_remove_symbol(GelContext *self, const gchar *name);
 
 gboolean gel_context_eval(GelContext *self,
