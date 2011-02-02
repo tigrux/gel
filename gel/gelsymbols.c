@@ -927,21 +927,6 @@ void case_(GClosure *self, GValue *return_value,
 
 
 static
-void cond_(GClosure *self, GValue *return_value,
-           guint n_values, const GValue *values, GelContext *context)
-{
-    const guint n_args = 2;
-    if(n_values < n_args)
-    {
-        gel_warning_needs_at_least_n_arguments(__FUNCTION__, n_args);
-        return;
-    }
-
-    branch(context, NULL, return_value, n_values, values);
-}
-
-
-static
 void begin_(GClosure *self, GValue *return_value,
             guint n_values, const GValue *values, GelContext *context)
 {
@@ -964,6 +949,39 @@ void begin_(GClosure *self, GValue *return_value,
         if(GEL_IS_VALUE(&tmp_value))
             g_value_unset(&tmp_value);
     }
+}
+
+
+static
+void cond_(GClosure *self, GValue *return_value,
+           guint n_values, const GValue *values, GelContext *context)
+{
+    GList *list = NULL;
+    gboolean running = TRUE;
+    while(n_values > 0 && running)
+    {
+        GValueArray *array = NULL;
+        if(gel_context_eval_params(context, __FUNCTION__, &list,
+                "a*", &n_values, &values, &array))
+        {
+            const GValue *array_values = array->values;
+            guint array_n_values = array->n_values;
+            GValue *cond_value = NULL;
+            if(!gel_context_eval_params(context, __FUNCTION__, &list,
+                    "V*", &array_n_values, &array_values, &cond_value))
+                running = FALSE;
+            else
+                if(gel_value_to_boolean(cond_value))
+                {
+                    begin_(self, return_value,
+                        array_n_values, array_values, context);
+                    running = FALSE;
+                }
+        }
+        else
+            running = FALSE;
+    }
+    gel_value_list_free(list);
 }
 
 
