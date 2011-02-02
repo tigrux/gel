@@ -51,11 +51,31 @@ GValueArray* gel_parse_scanner(GScanner *scanner)
         switch(token)
         {
             case G_TOKEN_IDENTIFIER:
+            {
                 g_scanner_get_next_token(scanner);
-                g_value_init(&value, GEL_TYPE_SYMBOL);
-                gel_value_take_symbol_from_name(&value,
-                    scanner->value.v_identifier);
+                const gchar *identifier = scanner->value.v_identifier;
+                if(g_strcmp0(identifier, "TRUE") == 0)
+                {
+                    g_value_init(&value, G_TYPE_BOOLEAN);
+                    g_value_set_boolean(&value, TRUE);
+                }
+                else if(g_strcmp0(identifier, "FALSE") == 0)
+                {
+                    g_value_init(&value, G_TYPE_BOOLEAN);
+                    g_value_set_boolean(&value, FALSE);
+                }
+                else if(g_strcmp0(identifier, "NULL") == 0)
+                {
+                    g_value_init(&value, G_TYPE_POINTER);
+                    g_value_set_pointer(&value, NULL);
+                }
+                else
+                {
+                    g_value_init(&value, GEL_TYPE_SYMBOL);
+                    gel_value_take_symbol_from_name(&value, identifier);
+                }
                 break;
+            }
             case G_TOKEN_FLOAT:
                 g_scanner_get_next_token(scanner);
                 g_value_init(&value, G_TYPE_DOUBLE);

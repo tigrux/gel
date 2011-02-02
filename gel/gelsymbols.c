@@ -1349,13 +1349,5 @@ void gel_context_insert_default_symbols(GelContext *self)
         g_value_set_boxed(value, closure);
         gel_context_insert_symbol(self, c->name, value);
     }
-
-    value = gel_value_new_of_type(G_TYPE_BOOLEAN);
-    g_value_set_boolean(value, TRUE);
-    gel_context_insert_symbol(self, "TRUE", value);
-
-    value = gel_value_new_of_type(G_TYPE_BOOLEAN);
-    g_value_set_boolean(value, FALSE);
-    gel_context_insert_symbol(self, "FALSE", value);
 }
 
