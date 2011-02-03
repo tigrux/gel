@@ -519,11 +519,11 @@ GValue* gel_context_lookup_symbol(const GelContext *self, const gchar *name)
 
 /**
  * gel_context_insert_symbol:
- * @self: #GelContext where to add the symbol
- * @name: name of the symbol to add
- * @value: value of the symbol to add
+ * @self: #GelContext where to insert the symbol
+ * @name: name of the symbol to insert
+ * @value: value of the symbol to insert
  *
- * Adds a new symbol to @context with the name given by @name.
+ * Inserts a new symbol to @context with the name given by @name.
  * @self takes ownership of @value so it should not be freed or unset.
  */
 void gel_context_insert_symbol(GelContext *self,
@@ -540,9 +540,9 @@ void gel_context_insert_symbol(GelContext *self,
 
 /**
  * gel_context_insert_object:
- * @self: #GelContext where to add the object
- * @name: name of the symbol to add
- * @object: object to add
+ * @self: #GelContext where to insert the object
+ * @name: name of the symbol to insert
+ * @object: object to insert
  *
  * A wrapper for #gel_context_insert_symbol.
  * @self takes ownership of @object so it should not be unreffed.
@@ -578,8 +578,8 @@ void gel_context_marshal(GClosure *closure, GValue *return_value,
 
 /**
  * gel_context_insert_function:
- * @self: #GelContext where to add the function
- * @name: name of the symbol to add
+ * @self: #GelContext where to insert the function
+ * @name: name of the symbol to insert
  * @function: a #GFunc to invoke
  * @user_data: extra data to pass to @function
  *
