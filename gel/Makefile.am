@@ -11,7 +11,7 @@ libgel_la_SOURCES = \
 	gelcontext.c \
 	geldebug.c \
 	gelparser.c \
-	gelsymbols.c \
+	gelpredefined.c \
 	gelvalue.c \
 	gelsymbol.c \
 	gelvariable.c
