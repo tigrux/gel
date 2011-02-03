@@ -170,7 +170,7 @@ GValueArray* gel_parse_scanner(GScanner *scanner)
             else
             {
                 g_value_init(&value, GEL_TYPE_SYMBOL);
-                g_value_take_boxed(&value, gel_symbol_new(name));
+                g_value_take_boxed(&value, gel_symbol_new(name, NULL));
             }
         }
 
