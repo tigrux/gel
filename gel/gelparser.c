@@ -1,6 +1,6 @@
 #include <gelparser.h>
 #include <gelsymbol.h>
-
+#include <gelvalue.h>
 
 #define ARRAY_N_PREALLOCATED 8
 
@@ -164,7 +164,7 @@ GValueArray* gel_parse_scanner(GScanner *scanner)
 
         if(name != NULL)
         {
-            GValue *symbol = gel_symbol_lookup_predefined(name);
+            GValue *symbol = gel_value_lookup_predefined(name);
             if(symbol != NULL)
                 g_value_array_append(array, symbol);
             else

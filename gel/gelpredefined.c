@@ -1362,14 +1362,15 @@ GHashTable* gel_make_default_symbols(void)
 }
 
 /**
- * gel_symbol_lookup_predefined:
- * 
- * Lookups the table of predefined symbols and retrieves
+ * gel_value_lookup_predefined:
+ * @name: name of the predefined value to lookup
+ *
+ * Lookups the table of predefined values and retrieves
  * the value that correspond to @name.
  *
  * Returns: The #GValue that correspond to @name
  */
-GValue *gel_symbol_lookup_predefined(const gchar *name)
+GValue *gel_value_lookup_predefined(const gchar *name)
 {
     static volatile gsize symbols_once = 0;
     static GHashTable *symbols = NULL;

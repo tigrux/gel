@@ -17,6 +17,4 @@ GelVariable* gel_symbol_get_variable(const GelSymbol *self);
 void gel_symbol_set_variable(GelSymbol *self, GelVariable *variable);
 GValue* gel_symbol_get_value(const GelSymbol *self);
 
-GValue* gel_symbol_lookup_predefined(const gchar *name);
-
 #endif

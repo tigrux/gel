@@ -33,6 +33,7 @@ gel_value_copy
 gel_value_to_boolean
 gel_value_to_string
 gel_value_list_free
+gel_value_lookup_predefined
 gel_values_add
 gel_values_sub
 gel_values_mul
