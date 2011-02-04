@@ -109,7 +109,6 @@ void gel_value_list_free(GList *value_list)
 }
 
 
-
 /**
  * gel_value_to_string:
  * @value: #GValue to get its representation
@@ -120,6 +119,8 @@ void gel_value_list_free(GList *value_list)
  */
 gchar* gel_value_to_string(const GValue *value)
 {
+    const gchar* gel_predefined_closure_get_name(const GClosure *closure);
+
     g_return_val_if_fail(value != NULL, NULL);
     g_return_val_if_fail(GEL_IS_VALUE(value), NULL);
 
@@ -169,6 +170,15 @@ gchar* gel_value_to_string(const GValue *value)
             result = g_strdup(gel_symbol_get_name(symbol));
     }
     else
+    if(GEL_VALUE_HOLDS(value, G_TYPE_CLOSURE))
+    {
+        const GClosure *closure = (GClosure*)gel_value_get_boxed(value);
+        const gchar *name = gel_predefined_closure_get_name(closure);
+        if(name != NULL)
+            result = g_strdup(name);
+    }
+
+    if(result == NULL)
     {
         GString *repr_string = g_string_new("<");
         g_string_append_printf(repr_string, "%s", GEL_VALUE_TYPE_NAME(value));
@@ -184,6 +194,7 @@ gchar* gel_value_to_string(const GValue *value)
         g_string_append_c(repr_string, '>');
         result = g_string_free(repr_string, FALSE);
     }
+
     return result;
 }
 
