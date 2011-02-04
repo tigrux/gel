@@ -5,6 +5,7 @@
 #include <gelcontext.h>
 #include <gelparser.h>
 #include <gelvalue.h>
+#include <gelclosure.h>
 
 
 #endif

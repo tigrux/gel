@@ -27,6 +27,13 @@ gel_parse_text
 </SECTION>
 
 <SECTION>
+<FILE>gelclosure</FILE>
+gel_closure_get_name
+gel_closure_new
+gel_closure_new_native
+</SECTION>
+
+<SECTION>
 <FILE>gelvalue</FILE>
 gel_value_copy
 gel_value_to_boolean

@@ -22,12 +22,12 @@ libgel_include_HEADERS = \
 	gel.h \
 	gelcontext.h \
 	gelparser.h \
-	gelvalue.h
+	gelvalue.h \
+	gelclosure.h
 
 noinst_HEADERS = \
 	gelvalueprivate.h \
 	gelsymbol.h \
 	geldebug.h \
-	gelvariable.h \
-	gelclosure.h
+	gelvariable.h
 

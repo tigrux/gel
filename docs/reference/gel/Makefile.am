@@ -63,8 +63,7 @@ gelcontextprivate.h \
 gelvalueprivate.h \
 geldebug.h \
 gelsymbol.h \
-gelvariable.h \
-gelclosure.h
+gelvariable.h
 
 # Images to copy into HTML directory.
 # e.g. HTML_IMAGES=$(top_srcdir)/gtk/stock-icons/stock_about_24.png

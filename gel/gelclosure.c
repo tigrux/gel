@@ -4,6 +4,23 @@
 #include <gelclosure.h>
 
 
+/**
+ * SECTION:gelclosure
+ * @short_description: Functions to create closures to be used by gel.
+ * @title: GelClosure
+ * @include: gel.h
+ *
+ * Gel provides two type of closures: native and written in gel.
+ * All the predefined closures are native functions written in C.
+ *
+ * Closures written in gel behave as normal closures and the can be
+ * called via a #g_closure_invoke.
+ *
+ * Closures predefined or written in gel provide a name that can be queried
+ * in runtime to make them debug friendly.
+ */
+
+
 typedef struct _GelClosure GelClosure;
 
 typedef struct _GelNativeClosure GelNativeClosure;
@@ -126,8 +143,22 @@ void gel_native_closure_marshal(GClosure *closure, GValue *return_value,
 }
 
 
+/**
+ * gel_closure_new_native:
+ * @name: name of the closure, must be a static string.
+ * @marshal: a #GClosureMarshal to call when the closure is invoked.
+ *
+ * Creates a new #GClosure named @name that will call @marshal when invoked.
+ * The sole purpose of this function is to create predefined closures
+ * that are assigned a name to retrieve with #gel_closure_get_name.
+ *
+ * Returns: a new gel native #GClosure
+ */
 GClosure* gel_closure_new_native(gchar *name, GClosureMarshal marshal)
 {
+    g_return_val_if_fail(name != NULL, NULL);
+    g_return_val_if_fail(marshal != NULL, NULL);
+
     GClosure *closure = g_closure_new_simple(sizeof (GelNativeClosure), NULL);
     g_closure_set_marshal(closure, (GClosureMarshal)gel_native_closure_marshal);
     GelNativeClosure *gel_closure = (GelNativeClosure*)closure;
@@ -137,6 +168,14 @@ GClosure* gel_closure_new_native(gchar *name, GClosureMarshal marshal)
 }
 
 
+/**
+ * gel_closure_get_name:
+ * @closure: a #GClosure whose name will be retrieved
+ *
+ * Gets the name for closures predefined or written in gel.
+ *
+ * Returns: The name of the gel closure, or #NULL if it is not predefined nor written in gel.
+ */
 const gchar* gel_closure_get_name(const GClosure *closure)
 {
     const gchar *name;
