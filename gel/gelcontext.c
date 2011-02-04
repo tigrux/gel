@@ -150,7 +150,7 @@ void gel_context_free(GelContext *self)
  * @value: #GValue to evaluate
  * @dest: destination #GValue
  *
- * Evaluates @value, stores the result in @dest_value
+ * Evaluates @value, stores the result in @dest
  *
  * Returns: #TRUE if @dest_value was written, #FALSE otherwise.
  */
