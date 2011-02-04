@@ -37,7 +37,7 @@ G_LOCK_DEFINE_STATIC(contexts);
 static
 GelContext *gel_context_alloc(void)
 {
-    register GelContext *self = g_slice_new0(GelContext);
+    GelContext *self = g_slice_new0(GelContext);
     self->variables = g_hash_table_new_full(
         g_str_hash, g_str_equal,
         (GDestroyNotify)g_free, (GDestroyNotify)gel_variable_unref);
@@ -62,7 +62,7 @@ void gel_context_dispose(GelContext *self)
  */
 GelContext* gel_context_new(void)
 {
-    register GelContext *self = gel_context_new_with_outer(NULL);
+    GelContext *self = gel_context_new_with_outer(NULL);
     return self;
 }
 
@@ -78,7 +78,7 @@ GelContext* gel_context_new(void)
  */
 GelContext* gel_context_new_with_outer(GelContext *outer)
 {
-    register GelContext *self;
+    GelContext *self;
     G_LOCK(contexts);
     if(contexts_POOL != NULL)
     {
@@ -112,7 +112,7 @@ GelContext* gel_context_dup(const GelContext *self)
     const gchar *name;
     GelVariable *variable;
 
-    register GelContext *context = gel_context_new_with_outer(self->outer);
+    GelContext *context = gel_context_new_with_outer(self->outer);
     g_hash_table_iter_init(&iter, self->variables);
     while(g_hash_table_iter_next(&iter, (gpointer*)&name, (gpointer*)&variable))
         g_hash_table_insert(context->variables,
@@ -148,25 +148,24 @@ void gel_context_free(GelContext *self)
  * gel_context_eval:
  * @self: #GelContext where to evaluate @value
  * @value: #GValue to evaluate
- * @dest_value: destination #GValue
+ * @dest: destination #GValue
  *
  * Evaluates @value, stores the result in @dest_value
  *
  * Returns: #TRUE if @dest_value was written, #FALSE otherwise.
  */
 gboolean gel_context_eval(GelContext *self, 
-                          const GValue *value, GValue *dest_value)
+                          const GValue *value, GValue *dest)
 {
     g_return_val_if_fail(self != NULL, FALSE);
     g_return_val_if_fail(value != NULL, FALSE);
-    g_return_val_if_fail(dest_value != NULL, FALSE);
+    g_return_val_if_fail(dest != NULL, FALSE);
 
-    register const GValue *result_value =
-        gel_context_eval_value(self, value, dest_value);
-    if(GEL_IS_VALUE(result_value))
+    const GValue *result = gel_context_eval_value(self, value, dest);
+    if(GEL_IS_VALUE(result))
     {
-        if(result_value != dest_value)
-            gel_value_copy(result_value, dest_value);
+        if(result != dest)
+            gel_value_copy(result, dest);
         return TRUE;
     }
     return FALSE;
@@ -193,16 +192,16 @@ const GValue* gel_context_eval_value(GelContext *self,
     g_return_val_if_fail(value != NULL, NULL);
     g_return_val_if_fail(out_value != NULL, NULL);
 
-    register const GValue *result = NULL;
-    register GType type = GEL_VALUE_TYPE(value);
+    const GValue *result = NULL;
+    GType type = GEL_VALUE_TYPE(value);
 
     if(type == GEL_TYPE_SYMBOL)
     {
-        register GelSymbol *symbol = (GelSymbol*)gel_value_get_boxed(value);
+        GelSymbol *symbol = (GelSymbol*)gel_value_get_boxed(value);
         result = gel_symbol_get_value(symbol);
         if(result == NULL)
         {
-            register const gchar *symbol_name = gel_symbol_get_name(symbol);
+            const gchar *symbol_name = gel_symbol_get_name(symbol);
             result = gel_context_lookup_symbol(self, symbol_name);
             if(result == NULL)
                 gel_warning_unknown_symbol(__FUNCTION__, symbol_name);
@@ -211,14 +210,14 @@ const GValue* gel_context_eval_value(GelContext *self,
     else
     if(type == G_TYPE_VALUE_ARRAY)
     {
-        GValueArray *const array = (GValueArray*)gel_value_get_boxed(value);
+        GValueArray *array = (GValueArray*)gel_value_get_boxed(value);
         const guint array_n_values = array->n_values;
         if(array_n_values > 0)
         {
-            const GValue *const array_values = array->values;
+            const GValue *array_values = array->values;
 
             GValue tmp_value = {0};
-            const GValue *const first_value =
+            const GValue *first_value =
                 gel_context_eval_value(self, array_values + 0, &tmp_value);
 
             if(GEL_VALUE_HOLDS(first_value, G_TYPE_CLOSURE))
@@ -301,13 +300,13 @@ gboolean gel_context_eval_params(GelContext *self, const gchar *func,
     g_return_val_if_fail(n_values != NULL, FALSE);
     g_return_val_if_fail(values != NULL, FALSE);
 
-    register guint n_args = 0;
-    register guint i;
+    guint n_args = 0;
+    guint i;
     for(i = 0; format[i] != 0; i++)
         if(strchr("asASIOCV", format[i]) != NULL)
             n_args++;
 
-    register gboolean exact = (strchr(format, '*') == NULL);
+    gboolean exact = (strchr(format, '*') == NULL);
 
     if(exact && n_args != *n_values)
     {
@@ -321,19 +320,19 @@ gboolean gel_context_eval_params(GelContext *self, const gchar *func,
         return FALSE;
     }
 
-    register gboolean parsed = TRUE;
-    register gboolean pending = FALSE;
+    gboolean parsed = TRUE;
+    gboolean pending = FALSE;
     va_list args;
 
-    register GList *o_list = *list;
-    register guint o_n_values = *n_values;
-    register const GValue *o_values = *values;
+    GList *o_list = *list;
+    guint o_n_values = *n_values;
+    const GValue *o_values = *values;
 
     va_start(args, values);
     while(*format != 0 && *n_values >= 0 && parsed && !pending)
     {
-        register GValue *value = NULL;
-        register const GValue *result_value = NULL;
+        GValue *value = NULL;
+        const GValue *result_value = NULL;
 
         switch(*format)
         {
@@ -503,12 +502,12 @@ GValue* gel_context_lookup_symbol(const GelContext *self, const gchar *name)
     g_return_val_if_fail(self != NULL, NULL);
     g_return_val_if_fail(name != NULL, NULL);
 
-    register GelVariable *variable = NULL;
-    register const GelContext *ic;
+    GelVariable *variable = NULL;
+    const GelContext *ic;
     for(ic = self; ic != NULL && variable == NULL; ic = ic->outer)
         variable = (GelVariable*)g_hash_table_lookup(ic->variables, name);
 
-    register GValue *value;
+    GValue *value;
     if(variable != NULL)
         value = gel_variable_get_value(variable);
     else
@@ -555,7 +554,7 @@ void gel_context_insert_object(GelContext *self, const gchar *name,
     g_return_if_fail(object != NULL);
     g_return_if_fail(G_IS_OBJECT(object));
 
-    register GValue *value = gel_value_new_of_type(G_OBJECT_TYPE(object));
+    GValue *value = gel_value_new_of_type(G_OBJECT_TYPE(object));
     g_value_take_object(value, object);
     gel_context_insert_symbol(self, name, value);
 }
@@ -566,8 +565,8 @@ void gel_context_marshal(GClosure *closure, GValue *return_value,
                          guint n_param_values, const GValue *param_values,
                          gpointer invocation_hint, gpointer marshal_data)
 {
-    register GCClosure *cc = (GCClosure*)closure;
-    register GFunc callback = (GFunc)cc->callback;
+    GCClosure *cc = (GCClosure*)closure;
+    GFunc callback = (GFunc)cc->callback;
 
     if(n_param_values > 1)
         callback(g_value_peek_pointer(param_values + 0), closure->data);
@@ -593,9 +592,8 @@ void gel_context_insert_function(GelContext *self, const gchar *name,
     g_return_if_fail(name != NULL);
     g_return_if_fail(callback != NULL);
 
-    register GValue *value = gel_value_new_of_type(G_TYPE_CLOSURE);
-    register GClosure *closure =
-        g_cclosure_new(G_CALLBACK(callback), user_data, NULL);
+    GValue *value = gel_value_new_of_type(G_TYPE_CLOSURE);
+    GClosure *closure = g_cclosure_new(G_CALLBACK(callback), user_data, NULL);
     g_closure_set_marshal(closure, (GClosureMarshal)gel_context_marshal);
     g_value_take_boxed(value, closure);
     gel_context_insert_symbol(self, name, value);

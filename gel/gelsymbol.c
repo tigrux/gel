@@ -79,7 +79,7 @@ GValue* gel_symbol_get_value(const GelSymbol *self)
 {
     g_return_val_if_fail(self != NULL, NULL);
 
-    register GValue *value;
+    GValue *value;
     if(self->variable != NULL)
         value = gel_variable_get_value(self->variable);
     else

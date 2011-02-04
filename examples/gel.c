@@ -8,14 +8,14 @@ GValueArray *array;
 
 void demo_run(void)
 {
-    const guint n_values = array->n_values;
-    const GValue *const array_values = array->values;
+    guint n_values = array->n_values;
+    const GValue *array_values = array->values;
 
     register guint i;
     for(i = 0; i < n_values; i++)
     {
-        const GValue *const iter_value = array_values + i;
-        register gchar *value_string = gel_value_to_string(iter_value);
+        const GValue *iter_value = array_values + i;
+        gchar *value_string = gel_value_to_string(iter_value);
         g_print("\n%s ?\n", value_string);
         g_free(value_string);
 

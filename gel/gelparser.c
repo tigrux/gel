@@ -32,15 +32,15 @@ const gchar *scanner_errors[] = {
 static
 GValueArray* gel_parse_scanner(GScanner *scanner)
 {
-    register GValueArray *array = g_value_array_new(ARRAY_N_PREALLOCATED);
-    register gint sign = 1;
+    GValueArray *array = g_value_array_new(ARRAY_N_PREALLOCATED);
+    gint sign = 1;
 
-    register gboolean parsing = TRUE;
+    gboolean parsing = TRUE;
     while(parsing)
     {
         GValue value = {0};
         const gchar *name = NULL;
-        register guint token = g_scanner_peek_next_token(scanner);
+        guint token = g_scanner_peek_next_token(scanner);
 
         switch(token)
         {
@@ -201,7 +201,7 @@ GValueArray* gel_parse_file(const gchar *file, GError **error)
     if(!g_file_get_contents(file, &content, &content_len, error))
         return NULL;
 
-    register GValueArray *array = gel_parse_text(content, content_len);
+    GValueArray *array = gel_parse_text(content, content_len);
     g_free(content);
     return array;
 }
@@ -223,14 +223,14 @@ GValueArray* gel_parse_file(const gchar *file, GError **error)
  */
 GValueArray* gel_parse_text(const gchar *text, guint text_len)
 {
-    register GScanner *scanner = g_scanner_new(NULL);
+    GScanner *scanner = g_scanner_new(NULL);
 
     scanner->config->cset_identifier_nth =
         (gchar*)G_CSET_a_2_z G_CSET_A_2_Z "_-" G_CSET_DIGITS;
     scanner->config->scan_identifier_1char = TRUE;
     g_scanner_input_text(scanner, text, text_len);
 
-    register GValueArray *array = gel_parse_scanner(scanner);
+    GValueArray *array = gel_parse_scanner(scanner);
     g_scanner_destroy(scanner);
 
     return array;
