@@ -14,7 +14,6 @@ gel_context_remove_symbol
 gel_context_eval
 gel_context_eval_value
 gel_context_eval_params
-gel_context_closure_new
 gel_context_get_running
 gel_context_set_running
 <SUBSECTION Private>

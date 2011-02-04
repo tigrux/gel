@@ -3,26 +3,11 @@
 #include <gelvalue.h>
 #include <gelvalueprivate.h>
 #include <gelsymbol.h>
-
-
-typedef struct _GelNativeClosure GelNativeClosure;
-
-typedef void (*GelPredefinedClosureMarshal)(
-    GelNativeClosure *self, GValue *return_value,
-    guint n_values, const GValue *values,
-    GelContext *context
-);
-
-struct _GelNativeClosure
-{
-    GClosure closure;
-    const gchar *name;
-    GelPredefinedClosureMarshal marshal;
-};
+#include <gelclosure.h>
 
 
 static
-void set_(GelNativeClosure *self, GValue *return_value,
+void set_(GClosure *self, GValue *return_value,
           guint n_values, const GValue *values, GelContext *context)
 {
     const gchar *symbol = NULL;
@@ -44,7 +29,7 @@ void set_(GelNativeClosure *self, GValue *return_value,
 
 
 static
-void object_new(GelNativeClosure *self, GValue *return_value,
+void object_new(GClosure *self, GValue *return_value,
                 guint n_values, const GValue *values, GelContext *context)
 {
     const gchar *type_name = NULL;
@@ -75,7 +60,7 @@ void object_new(GelNativeClosure *self, GValue *return_value,
 
 
 static
-void object_get(GelNativeClosure *self, GValue *return_value,
+void object_get(GClosure *self, GValue *return_value,
                 guint n_values, const GValue *values, GelContext *context)
 {
     GObject *object = NULL;
@@ -104,7 +89,7 @@ void object_get(GelNativeClosure *self, GValue *return_value,
 
 
 static
-void object_set(GelNativeClosure *self, GValue *return_value,
+void object_set(GClosure *self, GValue *return_value,
                 guint n_values, const GValue *values, GelContext *context)
 {
     GObject *object = NULL;
@@ -143,7 +128,7 @@ void object_set(GelNativeClosure *self, GValue *return_value,
 
 
 static
-GClosure* new_closure(GelContext *context,
+GClosure* new_closure(GelContext *context, const gchar *name,
                       guint n_vars, const GValue *var_values,
                       guint n_values, const GValue *values)
 {
@@ -172,7 +157,7 @@ GClosure* new_closure(GelContext *context,
         GValueArray *code = g_value_array_new(n_values);
         for(i = 0; i < n_values; i++)
             g_value_array_append(code, values + i);
-        self = gel_context_closure_new(context, vars, code);
+        self = gel_closure_new(name, vars, code, context);
         g_closure_ref(self);
         g_closure_sink(self);
     }
@@ -192,7 +177,7 @@ GClosure* new_closure(GelContext *context,
 
 
 static
-void define_(GelNativeClosure *self, GValue *return_value,
+void define_(GClosure *self, GValue *return_value,
              guint n_values, const GValue *values, GelContext *context)
 {
     guint n_args = 2;
@@ -236,7 +221,7 @@ void define_(GelNativeClosure *self, GValue *return_value,
                 if(gel_context_lookup_symbol(context, name) == NULL)
                 {
                     defined = FALSE;
-                    GClosure *closure = new_closure(context,
+                    GClosure *closure = new_closure(context, name,
                             array_n_values, array_values, n_values, values);
                     if(closure != NULL)
                     {
@@ -263,7 +248,7 @@ void define_(GelNativeClosure *self, GValue *return_value,
 
 
 static
-void lambda_(GelNativeClosure *self, GValue *return_value,
+void lambda_(GClosure *self, GValue *return_value,
              guint n_values, const GValue *values, GelContext *context)
 {
     GValueArray *array;
@@ -273,8 +258,8 @@ void lambda_(GelNativeClosure *self, GValue *return_value,
             "a*", &n_values, &values, &array))
         return;
 
-    GClosure *closure =
-        new_closure(context, array->n_values, array->values, n_values, values);
+    GClosure *closure = new_closure(context, "lambda",
+            array->n_values, array->values, n_values, values);
 
     if(closure != NULL)
     {
@@ -287,7 +272,7 @@ void lambda_(GelNativeClosure *self, GValue *return_value,
 
 
 static
-void object_connect(GelNativeClosure *self, GValue *return_value,
+void object_connect(GClosure *self, GValue *return_value,
                     guint n_values, const GValue *values, GelContext *context)
 {
     GObject *object = NULL;
@@ -314,7 +299,7 @@ void object_connect(GelNativeClosure *self, GValue *return_value,
 
 
 static
-void print_(GelNativeClosure *self, GValue *return_value,
+void print_(GClosure *self, GValue *return_value,
             guint n_values, const GValue *values, GelContext *context)
 {
     guint n_args = 1;
@@ -345,7 +330,7 @@ void print_(GelNativeClosure *self, GValue *return_value,
 
 
 static
-void arithmetic(GelNativeClosure *self, GValue *return_value,
+void arithmetic(GClosure *self, GValue *return_value,
                 guint n_values, const GValue *values,
                 GelContext *context, GelValuesArithmetic values_function)
 {
@@ -397,7 +382,7 @@ void arithmetic(GelNativeClosure *self, GValue *return_value,
 
 
 static
-void logic(GelNativeClosure *self, GValue *return_value,
+void logic(GClosure *self, GValue *return_value,
            guint n_values, const GValue *values,
            GelContext *context, GelValuesLogic values_function)
 {
@@ -433,7 +418,7 @@ void logic(GelNativeClosure *self, GValue *return_value,
 
 
 static
-void not_(GelNativeClosure *self, GValue *return_value,
+void not_(GClosure *self, GValue *return_value,
           guint n_values, const GValue *values, GelContext *context)
 {
     guint n_args = 1;
@@ -456,7 +441,7 @@ void not_(GelNativeClosure *self, GValue *return_value,
 
 
 static
-void and_(GelNativeClosure *self, GValue *return_value,
+void and_(GClosure *self, GValue *return_value,
           guint n_values, const GValue *values, GelContext *context)
 {
     guint n_args = 1;
@@ -484,7 +469,7 @@ void and_(GelNativeClosure *self, GValue *return_value,
 
 
 static
-void or_(GelNativeClosure *self, GValue *return_value,
+void or_(GClosure *self, GValue *return_value,
          guint n_values, const GValue *values, GelContext *context)
 {
     guint n_args = 1;
@@ -512,7 +497,7 @@ void or_(GelNativeClosure *self, GValue *return_value,
 
 
 static
-void range_(GelNativeClosure *self, GValue *return_value,
+void range_(GClosure *self, GValue *return_value,
             guint n_values, const GValue *values, GelContext *context)
 {
     GList *list = NULL;
@@ -548,7 +533,7 @@ void range_(GelNativeClosure *self, GValue *return_value,
 
 
 static
-void any_(GelNativeClosure *self, GValue *return_value,
+void any_(GClosure *self, GValue *return_value,
           guint n_values, const GValue *values, GelContext *context)
 {
     GList *list = NULL;
@@ -577,7 +562,7 @@ void any_(GelNativeClosure *self, GValue *return_value,
 
 
 static
-void all_(GelNativeClosure *self, GValue *return_value,
+void all_(GClosure *self, GValue *return_value,
           guint n_values, const GValue *values, GelContext *context)
 {
     GList *list = NULL;
@@ -608,7 +593,7 @@ void all_(GelNativeClosure *self, GValue *return_value,
 
 
 static
-void append_(GelNativeClosure *self, GValue *return_value,
+void append_(GClosure *self, GValue *return_value,
              guint n_values, const GValue *values, GelContext *context)
 {
     GList *list = NULL;
@@ -633,7 +618,7 @@ void append_(GelNativeClosure *self, GValue *return_value,
 
 
 static
-void nth_(GelNativeClosure *self, GValue *return_value,
+void nth_(GClosure *self, GValue *return_value,
           guint n_values, const GValue *values, GelContext *context)
 {
     GList *list = NULL;
@@ -660,7 +645,7 @@ void nth_(GelNativeClosure *self, GValue *return_value,
 
 
 static
-void index_(GelNativeClosure *self, GValue *return_value,
+void index_(GClosure *self, GValue *return_value,
             guint n_values, const GValue *values, GelContext *context)
 {
     GList *list = NULL;
@@ -686,7 +671,7 @@ void index_(GelNativeClosure *self, GValue *return_value,
 
 
 static
-void remove_(GelNativeClosure *self, GValue *return_value,
+void remove_(GClosure *self, GValue *return_value,
              guint n_values, const GValue *values, GelContext *context)
 {
     GList *list = NULL;
@@ -713,7 +698,7 @@ void remove_(GelNativeClosure *self, GValue *return_value,
 
 
 static
-void len_(GelNativeClosure *self, GValue *return_value,
+void len_(GClosure *self, GValue *return_value,
           guint n_values, const GValue *values, GelContext *context)
 {
     GList *list = NULL;
@@ -730,7 +715,7 @@ void len_(GelNativeClosure *self, GValue *return_value,
 
 
 static
-void sort_(GelNativeClosure *self, GValue *return_value,
+void sort_(GClosure *self, GValue *return_value,
            guint n_values, const GValue *values, GelContext *context)
 {
     GList *list = NULL;
@@ -746,7 +731,7 @@ void sort_(GelNativeClosure *self, GValue *return_value,
 
 
 static
-void map_(GelNativeClosure *self, GValue *return_value,
+void map_(GClosure *self, GValue *return_value,
           guint n_values, const GValue *values, GelContext *context)
 {
     GList *list = NULL;
@@ -776,7 +761,7 @@ void map_(GelNativeClosure *self, GValue *return_value,
 
 
 static
-void apply_(GelNativeClosure *self, GValue *return_value,
+void apply_(GClosure *self, GValue *return_value,
             guint n_values, const GValue *values, GelContext *context)
 {
     GList *list = NULL;
@@ -794,7 +779,7 @@ void apply_(GelNativeClosure *self, GValue *return_value,
 
 
 static
-void zip_(GelNativeClosure *self, GValue *return_value,
+void zip_(GClosure *self, GValue *return_value,
           guint n_values, const GValue *values, GelContext *context)
 {
     GList *list = NULL;
@@ -843,7 +828,7 @@ void zip_(GelNativeClosure *self, GValue *return_value,
 
 
 static
-void filter_(GelNativeClosure *self, GValue *return_value,
+void filter_(GClosure *self, GValue *return_value,
              guint n_values, const GValue *values, GelContext *context)
 {
     GList *list = NULL;
@@ -922,7 +907,7 @@ void branch(GelContext *outer, const GValue *case_value,
 
 
 static
-void case_(GelNativeClosure *self, GValue *return_value,
+void case_(GClosure *self, GValue *return_value,
            guint n_values, const GValue *values, GelContext *context)
 {
     guint n_args = 2;
@@ -943,7 +928,7 @@ void case_(GelNativeClosure *self, GValue *return_value,
 
 
 static
-void begin_(GelNativeClosure *self, GValue *return_value,
+void begin_(GClosure *self, GValue *return_value,
             guint n_values, const GValue *values, GelContext *context)
 {
     guint n_args = 1;
@@ -969,7 +954,7 @@ void begin_(GelNativeClosure *self, GValue *return_value,
 
 
 static
-void cond_(GelNativeClosure *self, GValue *return_value,
+void cond_(GClosure *self, GValue *return_value,
            guint n_values, const GValue *values, GelContext *context)
 {
     GList *list = NULL;
@@ -1002,7 +987,7 @@ void cond_(GelNativeClosure *self, GValue *return_value,
 
 
 static
-void array_(GelNativeClosure *self, GValue *return_value,
+void array_(GClosure *self, GValue *return_value,
             guint n_values, const GValue *values, GelContext *context)
 {
     GValueArray *array = g_value_array_new(n_values);
@@ -1023,7 +1008,7 @@ void array_(GelNativeClosure *self, GValue *return_value,
 
 
 static
-void for_(GelNativeClosure *self, GValue *return_value,
+void for_(GClosure *self, GValue *return_value,
           guint n_values, const GValue *values, GelContext *context)
 {
     const gchar *name;
@@ -1055,7 +1040,7 @@ void for_(GelNativeClosure *self, GValue *return_value,
 
 
 static
-void while_(GelNativeClosure *self, GValue *return_value,
+void while_(GClosure *self, GValue *return_value,
             guint n_values, const GValue *values, GelContext *context)
 {
     guint n_args = 2;
@@ -1091,7 +1076,7 @@ void while_(GelNativeClosure *self, GValue *return_value,
 
 
 static
-void break_(GelNativeClosure *self, GValue *return_value,
+void break_(GClosure *self, GValue *return_value,
             guint n_values, const GValue *values, GelContext *context)
 {
     GelContext *i;
@@ -1105,7 +1090,7 @@ void break_(GelNativeClosure *self, GValue *return_value,
 
 
 static
-void if_(GelNativeClosure *self, GValue *return_value,
+void if_(GClosure *self, GValue *return_value,
          guint n_values, const GValue *values, GelContext *context)
 {
     guint n_args = 3;
@@ -1129,7 +1114,7 @@ void if_(GelNativeClosure *self, GValue *return_value,
 
 
 static
-void when_(GelNativeClosure *self, GValue *return_value,
+void when_(GClosure *self, GValue *return_value,
            guint n_values, const GValue *values, GelContext *context)
 {
     guint n_args = 2;
@@ -1153,7 +1138,7 @@ void when_(GelNativeClosure *self, GValue *return_value,
 
 
 static
-void unless_(GelNativeClosure *self, GValue *return_value,
+void unless_(GClosure *self, GValue *return_value,
              guint n_values, const GValue *values, GelContext *context)
 {
     guint n_args = 2;
@@ -1176,7 +1161,7 @@ void unless_(GelNativeClosure *self, GValue *return_value,
 }
 
 static
-void str_(GelNativeClosure *self, GValue *return_value,
+void str_(GClosure *self, GValue *return_value,
           guint n_values, const GValue *values, GelContext *context)
 {
     guint n_args = 1;
@@ -1200,7 +1185,7 @@ void str_(GelNativeClosure *self, GValue *return_value,
 
 
 static
-void add_(GelNativeClosure *self, GValue *return_value,
+void add_(GClosure *self, GValue *return_value,
           guint n_values, const GValue *values, GelContext *context)
 {
     arithmetic(self, return_value, n_values, values, context, gel_values_add);
@@ -1208,7 +1193,7 @@ void add_(GelNativeClosure *self, GValue *return_value,
 
 
 static
-void sub_(GelNativeClosure *self, GValue *return_value,
+void sub_(GClosure *self, GValue *return_value,
           guint n_values, const GValue *values, GelContext *context)
 {
     arithmetic(self, return_value, n_values, values, context, gel_values_sub);
@@ -1216,7 +1201,7 @@ void sub_(GelNativeClosure *self, GValue *return_value,
 
 
 static
-void mul_(GelNativeClosure *self, GValue *return_value,
+void mul_(GClosure *self, GValue *return_value,
           guint n_values, const GValue *values, GelContext *context)
 {
     arithmetic(self, return_value, n_values, values, context, gel_values_mul);
@@ -1224,7 +1209,7 @@ void mul_(GelNativeClosure *self, GValue *return_value,
 
 
 static
-void div_(GelNativeClosure *self, GValue *return_value,
+void div_(GClosure *self, GValue *return_value,
           guint n_values, const GValue *values, GelContext *context)
 {
     arithmetic(self, return_value, n_values, values, context, gel_values_div);
@@ -1232,7 +1217,7 @@ void div_(GelNativeClosure *self, GValue *return_value,
 
 
 static
-void mod_(GelNativeClosure *self, GValue *return_value,
+void mod_(GClosure *self, GValue *return_value,
           guint n_values, const GValue *values, GelContext *context)
 {
     arithmetic(self, return_value, n_values, values, context, gel_values_mod);
@@ -1240,7 +1225,7 @@ void mod_(GelNativeClosure *self, GValue *return_value,
 
 
 static
-void gt_(GelNativeClosure *self, GValue *return_value,
+void gt_(GClosure *self, GValue *return_value,
          guint n_values, const GValue *values, GelContext *context)
 {
     logic(self, return_value, n_values, values, context, gel_values_gt);
@@ -1248,7 +1233,7 @@ void gt_(GelNativeClosure *self, GValue *return_value,
 
 
 static
-void ge_(GelNativeClosure *self, GValue *return_value,
+void ge_(GClosure *self, GValue *return_value,
          guint n_values, const GValue *values, GelContext *context)
 {
     logic(self, return_value, n_values, values, context, gel_values_ge);
@@ -1256,7 +1241,7 @@ void ge_(GelNativeClosure *self, GValue *return_value,
 
 
 static
-void eq_(GelNativeClosure *self, GValue *return_value,
+void eq_(GClosure *self, GValue *return_value,
          guint n_values, const GValue *values, GelContext *context)
 {
     logic(self, return_value, n_values, values, context, gel_values_eq);
@@ -1264,7 +1249,7 @@ void eq_(GelNativeClosure *self, GValue *return_value,
 
 
 static
-void le_(GelNativeClosure *self, GValue *return_value,
+void le_(GClosure *self, GValue *return_value,
          guint n_values, const GValue *values, GelContext *context)
 {
     logic(self, return_value, n_values, values, context, gel_values_le);
@@ -1272,7 +1257,7 @@ void le_(GelNativeClosure *self, GValue *return_value,
 
 
 static
-void lt_(GelNativeClosure *self, GValue *return_value,
+void lt_(GClosure *self, GValue *return_value,
          guint n_values, const GValue *values, GelContext *context)
 {
     logic(self, return_value, n_values, values, context, gel_values_lt);
@@ -1280,44 +1265,21 @@ void lt_(GelNativeClosure *self, GValue *return_value,
 
 
 static
-void ne_(GelNativeClosure *self, GValue *return_value,
+void ne_(GClosure *self, GValue *return_value,
          guint n_values, const GValue *values, GelContext *context)
 {
     logic(self, return_value, n_values, values, context, gel_values_ne);
 }
 
 
-static
-void gel_closure_marshal(GelNativeClosure *closure, GValue *return_value,
-                         guint n_values, const GValue *values,
-                         GelContext *context, gpointer marshal_data)
-{
-    closure->marshal(closure, return_value, n_values, values, context);
-}
-
-
-static
-GClosure* gel_closure_new_predefined(gchar *name,
-                                     GelPredefinedClosureMarshal marshal)
-{
-    GClosure *closure = g_closure_new_simple(sizeof (GelNativeClosure), NULL);
-    g_closure_set_marshal(closure, (GClosureMarshal)gel_closure_marshal);
-    GelNativeClosure *gel_closure = (GelNativeClosure*)closure;
-    gel_closure->name = name;
-    gel_closure->marshal = marshal;
-    return closure;
-}
-
-
-#define CLOSURE(S) {#S, S##_}
-
-#define CLOSURE_NAME(N, S) {N, S}
+#define CLOSURE_NAME(N, S) {N, (GClosureMarshal)S}
+#define CLOSURE(S) {#S, (GClosureMarshal)S##_}
 
 
 static
 GHashTable* gel_make_default_symbols(void)
 {
-    struct {gchar *name; GelPredefinedClosureMarshal marshal;} *c, closures[] =
+    struct {gchar *name; GClosureMarshal marshal;} *c, closures[] =
     {
         CLOSURE(set),/* string */
         CLOSURE(define),/* string */
@@ -1374,7 +1336,7 @@ GHashTable* gel_make_default_symbols(void)
     for(c = closures; c->name != NULL; c++)
     {
         value = gel_value_new_of_type(G_TYPE_CLOSURE);
-        GClosure *closure = gel_closure_new_predefined(c->name, c->marshal);
+        GClosure *closure = gel_closure_new_native(c->name, c->marshal);
         g_value_set_boxed(value, closure);
         g_hash_table_insert(symbols, c->name, value);
     }
@@ -1413,16 +1375,5 @@ GValue *gel_value_lookup_predefined(const gchar *name)
         g_once_init_leave(&symbols_once, 1);
     }
     return g_hash_table_lookup(symbols, name);
-}
-
-
-const gchar* gel_predefined_closure_get_name(const GClosure *closure)
-{
-    const gchar *name;
-    if(closure->marshal == (GClosureMarshal)gel_closure_marshal)
-        name = ((GelNativeClosure*)closure)->name;
-    else
-        name = NULL;
-    return name;
 }
 

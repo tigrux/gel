@@ -1,16 +1,28 @@
 #include <gelcontext.h>
 #include <gelvalue.h>
 #include <gelvalueprivate.h>
+#include <gelclosure.h>
 
 
 typedef struct _GelClosure GelClosure;
 
+typedef struct _GelNativeClosure GelNativeClosure;
+
+
 struct _GelClosure
 {
     GClosure closure;
-
+    gchar *name;
     gchar **args;
     GValueArray *code;
+};
+
+
+struct _GelNativeClosure
+{
+    GClosure closure;
+    const gchar *name;
+    GClosureMarshal marshal;
 };
 
 
@@ -66,36 +78,75 @@ void gel_closure_finalize(GelContext *self, GelClosure *closure)
 
 
 /**
- * gel_context_closure_new:
- * @self: #GelContext where to define a #GClosure
+ * gel_closure_new:
+ * @name: name of the closure.
  * @args: #NULL terminated array of strings with the closure argument names.
  * @code: #GValueArray with the code of the closure.
+ * @context: #GelContext where to define a #GClosure.
  *
- * Creates a new #GClosure where @self is used as the data of the new
- * closure, @args contains the names of the arguments of the closure, and
+ * Creates a new #GClosure where @context is used as the data of the new
+ * closure, @name will be the name of the closure,
+ * @args contains the names of the arguments of the closure, and
  * @code contains the values that the closure shall evaluate when invoked.
  *
  * The closure takes ownership of @args and @code so they should not be freed.
  *
  * Returns: a new #GClosure
  */
-GClosure* gel_context_closure_new(GelContext *self,
-                                  gchar **args, GValueArray *code)
+GClosure* gel_closure_new(const gchar *name, gchar **args, GValueArray *code,
+                          GelContext *context)
 {
-    g_return_val_if_fail(self != NULL, NULL);
+    g_return_val_if_fail(context != NULL, NULL);
+    g_return_val_if_fail(name != NULL, NULL);
     g_return_val_if_fail(args != NULL, NULL);
     g_return_val_if_fail(code != NULL, NULL);
 
-    GClosure *closure = g_closure_new_simple(sizeof(GelClosure), self);
+    GClosure *closure = g_closure_new_simple(sizeof(GelClosure), context);
 
     g_closure_set_marshal(closure, (GClosureMarshal)gel_closure_marshal);
     g_closure_add_finalize_notifier(closure,
-        self, (GClosureNotify)gel_closure_finalize);
+        context, (GClosureNotify)gel_closure_finalize);
 
     GelClosure *gel_closure = (GelClosure*)closure;
+    gel_closure->name = g_strdup(name);
     gel_closure->args = args;
     gel_closure->code = code;
 
     return closure;
+}
+
+
+static
+void gel_native_closure_marshal(GClosure *closure, GValue *return_value,
+                                guint n_values, const GValue *values,
+                                GelContext *context, gpointer marshal_data)
+{
+    ((GelNativeClosure *)closure)->marshal(
+        closure, return_value, n_values, values, context, marshal_data);
+}
+
+
+GClosure* gel_closure_new_native(gchar *name, GClosureMarshal marshal)
+{
+    GClosure *closure = g_closure_new_simple(sizeof (GelNativeClosure), NULL);
+    g_closure_set_marshal(closure, (GClosureMarshal)gel_native_closure_marshal);
+    GelNativeClosure *gel_closure = (GelNativeClosure*)closure;
+    gel_closure->name = name;
+    gel_closure->marshal = marshal;
+    return closure;
+}
+
+
+const gchar* gel_closure_get_name(const GClosure *closure)
+{
+    const gchar *name;
+    if(closure->marshal == (GClosureMarshal)gel_native_closure_marshal)
+        name = ((GelNativeClosure*)closure)->name;
+    else
+    if(closure->marshal == (GClosureMarshal)gel_closure_marshal)
+        name = ((GelClosure*)closure)->name;
+    else
+        name = NULL;
+    return name;
 }
 

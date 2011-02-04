@@ -28,5 +28,6 @@ noinst_HEADERS = \
 	gelvalueprivate.h \
 	gelsymbol.h \
 	geldebug.h \
-	gelvariable.h
+	gelvariable.h \
+	gelclosure.h
 
