@@ -7,7 +7,7 @@
 GClosure* gel_closure_new(const gchar *name, gchar **args, GValueArray *code,
                           GelContext *context);
 
-GClosure* gel_closure_new_native(gchar *name, GClosureMarshal marshal);
+GClosure* gel_closure_new_native(const gchar *name, GClosureMarshal marshal);
 
 const gchar* gel_closure_get_name(const GClosure *closure);
 

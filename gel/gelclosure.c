@@ -38,7 +38,7 @@ struct _GelClosure
 struct _GelNativeClosure
 {
     GClosure closure;
-    const gchar *name;
+    gchar *name;
     GClosureMarshal marshal;
 };
 
@@ -121,7 +121,7 @@ GClosure* gel_closure_new(const gchar *name, gchar **args, GValueArray *code,
     GClosure *closure = g_closure_new_simple(sizeof(GelClosure), context);
 
     g_closure_set_marshal(closure, (GClosureMarshal)gel_closure_marshal);
-    g_closure_add_finalize_notifier(closure,
+    g_closure_add_finalize_notifier(closure, 
         context, (GClosureNotify)gel_closure_finalize);
 
     GelClosure *gel_closure = (GelClosure*)closure;
@@ -145,7 +145,7 @@ void gel_native_closure_marshal(GClosure *closure, GValue *return_value,
 
 /**
  * gel_closure_new_native:
- * @name: name of the closure, must be a static string.
+ * @name: name of the closure
  * @marshal: a #GClosureMarshal to call when the closure is invoked.
  *
  * Creates a new #GClosure named @name that will call @marshal when invoked.
@@ -154,16 +154,18 @@ void gel_native_closure_marshal(GClosure *closure, GValue *return_value,
  *
  * Returns: a new gel native #GClosure
  */
-GClosure* gel_closure_new_native(gchar *name, GClosureMarshal marshal)
+GClosure* gel_closure_new_native(const gchar *name, GClosureMarshal marshal)
 {
     g_return_val_if_fail(name != NULL, NULL);
     g_return_val_if_fail(marshal != NULL, NULL);
 
     GClosure *closure = g_closure_new_simple(sizeof (GelNativeClosure), NULL);
+    GelNativeClosure *self = (GelNativeClosure*)closure;
+    gchar *dup_name = g_strdup(name);
+    self->name = dup_name;
+    self->marshal = marshal;
     g_closure_set_marshal(closure, (GClosureMarshal)gel_native_closure_marshal);
-    GelNativeClosure *gel_closure = (GelNativeClosure*)closure;
-    gel_closure->name = name;
-    gel_closure->marshal = marshal;
+    g_closure_add_finalize_notifier(closure, dup_name, (GClosureNotify)g_free);
     return closure;
 }
 
