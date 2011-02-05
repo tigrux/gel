@@ -6,6 +6,7 @@
 #include <gelvalueprivate.h>
 #include <gelsymbol.h>
 #include <gelvariable.h>
+#include <gelclosure.h>
 
 
 /**
@@ -560,41 +561,27 @@ void gel_context_insert_object(GelContext *self, const gchar *name,
 }
 
 
-static
-void gel_context_marshal(GClosure *closure, GValue *return_value,
-                         guint n_param_values, const GValue *param_values,
-                         gpointer invocation_hint, gpointer marshal_data)
-{
-    GCClosure *cc = (GCClosure*)closure;
-    GFunc callback = (GFunc)cc->callback;
-
-    if(n_param_values > 1)
-        callback(g_value_peek_pointer(param_values + 0), closure->data);
-    else
-        callback(NULL, closure->data);
-}
-
-
 /**
  * gel_context_insert_function:
  * @self: #GelContext where to insert the function
  * @name: name of the symbol to insert
- * @function: a #GFunc to invoke
+ * @function: a #GelFunction to invoke
  * @user_data: extra data to pass to @function
  *
- * A wrapper for #gel_context_insert_symbol that calls @function when
+ * A wrapper for #gel_context_insert_symbol that calls @marshal when
  * @self evaluates a call to a function named @name.
  */
 void gel_context_insert_function(GelContext *self, const gchar *name,
-                                 GFunc callback, gpointer user_data)
+                                 GelFunction function, gpointer user_data)
 {
     g_return_if_fail(self != NULL);
     g_return_if_fail(name != NULL);
-    g_return_if_fail(callback != NULL);
+    g_return_if_fail(function != NULL);
 
     GValue *value = gel_value_new_of_type(G_TYPE_CLOSURE);
-    GClosure *closure = g_cclosure_new(G_CALLBACK(callback), user_data, NULL);
-    g_closure_set_marshal(closure, (GClosureMarshal)gel_context_marshal);
+    GClosure *closure = gel_closure_new_native(
+            g_strdup(name), (GClosureMarshal)function);
+    closure->data = user_data;
     g_value_take_boxed(value, closure);
     gel_context_insert_symbol(self, name, value);
 }

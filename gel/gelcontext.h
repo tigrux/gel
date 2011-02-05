@@ -6,6 +6,23 @@
 
 typedef struct _GelContext GelContext;
 
+/**
+ * GelFunction:
+ * @closure: The #GClosure to which this function is assigned as marshal
+ * @return_value: The #GValue to store the return value, may be #NULL
+ * @n_param_values: The number of parameters
+ * @param_values: An array of #GValue with the parameters.
+ * @invocation_context: The #GelContext for which this function is invoked, may be #NULL
+ * @user_data: user data passed during the call to #gel_context_insert_function
+ *
+ * This type is used as the marshal of native closures.
+ * It is basically a #GClosureMarshal with its arguments used to pass specific information.
+ * 
+ */
+typedef void (*GelFunction)(GClosure *closure, GValue *return_value,
+                            guint n_param_values, GValue *param_values,
+                            GelContext *invocation_context, gpointer user_data);
+
 GelContext* gel_context_new(void);
 GelContext* gel_context_new_with_outer(GelContext *outer);
 GelContext* gel_context_dup(const GelContext *self);
@@ -20,7 +37,7 @@ void gel_context_insert_symbol(GelContext *self, const gchar *name,
 void gel_context_insert_object(GelContext *self, const gchar *name,
                                GObject *object);
 void gel_context_insert_function(GelContext *self, const gchar *name,
-                              GFunc function, gpointer user_data);
+                                 GelFunction function, void *user_data);
 gboolean gel_context_remove_symbol(GelContext *self, const gchar *name);
 
 gboolean gel_context_eval(GelContext *self,

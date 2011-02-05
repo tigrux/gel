@@ -2,10 +2,16 @@ class Demo : Object {
     ValueArray array;
     Gel.Context context;
 
+    public void quit(Closure closure, out Value? return_value) {
+        if(return_value != null)
+            return_value = "Bye!";
+        Gtk.main_quit();
+    }
+
     public Demo() {
         print("Instantiating a %s\n", typeof(Gel.Context).name());
         context = new Gel.Context();
-        context.insert_function("quit", Gtk.main_quit);
+        context.insert_function("quit", quit);
     }
 
     public bool run() {

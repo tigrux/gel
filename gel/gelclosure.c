@@ -136,10 +136,13 @@ GClosure* gel_closure_new(const gchar *name, gchar **args, GValueArray *code,
 static
 void gel_native_closure_marshal(GClosure *closure, GValue *return_value,
                                 guint n_values, const GValue *values,
-                                GelContext *context, gpointer marshal_data)
+                                GelContext *context)
 {
+    /* Hack to work around closures invoked as signal callbacks */
+    if(((GSignalInvocationHint*)context)->signal_id < 32767)
+        context = NULL;
     ((GelNativeClosure *)closure)->marshal(
-        closure, return_value, n_values, values, context, marshal_data);
+        closure, return_value, n_values, values, context, closure->data);
 }
 
 

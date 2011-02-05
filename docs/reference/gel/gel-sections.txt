@@ -9,6 +9,7 @@ gel_context_lookup_symbol
 gel_context_get_outer
 gel_context_insert_symbol
 gel_context_insert_object
+GelFunction
 gel_context_insert_function
 gel_context_remove_symbol
 gel_context_eval

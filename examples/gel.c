@@ -6,6 +6,20 @@ GelContext *context;
 GValueArray *array;
 
 
+void demo_quit(GClosure *closure, GValue *return_value,
+               guint n_param_values, GValue *param_values,
+               GelContext *invocation_context, gpointer user_data)
+{
+    if(return_value != NULL)
+    {
+        g_value_init(return_value, G_TYPE_STRING);
+        g_value_set_static_string(return_value, "Bye!");
+    }
+    g_print("Context = %p\n", invocation_context);
+    gtk_main_quit();
+}
+
+
 void demo_run(void)
 {
     guint n_values = array->n_values;
@@ -57,7 +71,7 @@ int main(int argc, char *argv[])
     }
 
     context = gel_context_new();
-    gel_context_insert_function(context, "quit", (GFunc)gtk_main_quit, NULL);
+    gel_context_insert_function(context, "quit", demo_quit, NULL);
 
     gtk_init_add((GtkFunction)demo_run, NULL);
     gtk_main();
