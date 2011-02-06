@@ -15,7 +15,6 @@ void demo_quit(GClosure *closure, GValue *return_value,
         g_value_init(return_value, G_TYPE_STRING);
         g_value_set_static_string(return_value, "Bye!");
     }
-    g_print("Context = %p\n", invocation_context);
     gtk_main_quit();
 }
 
