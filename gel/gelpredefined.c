@@ -1209,7 +1209,7 @@ void ne_(GClosure *self, GValue *return_value,
 static
 GHashTable* gel_make_default_symbols(void)
 {
-    struct {gchar *name; GClosureMarshal marshal;} *c, closures[] =
+    struct {const gchar *name; GClosureMarshal marshal;} *c, closures[] =
     {
         CLOSURE(set),/* string */
         CLOSURE(define),/* string */
@@ -1260,27 +1260,29 @@ GHashTable* gel_make_default_symbols(void)
     };
 
     GValue *value;
-    GHashTable *symbols = g_hash_table_new(g_str_hash, g_str_equal);
+    GHashTable *symbols = g_hash_table_new_full(
+            g_str_hash, g_str_equal,
+            (GDestroyNotify)g_free, (GDestroyNotify)gel_value_free);
 
     for(c = closures; c->name != NULL; c++)
     {
         value = gel_value_new_of_type(G_TYPE_CLOSURE);
         GClosure *closure = gel_closure_new_native(c->name, c->marshal);
         g_value_set_boxed(value, closure);
-        g_hash_table_insert(symbols, c->name, value);
+        g_hash_table_insert(symbols, g_strdup(c->name), value);
     }
 
     value = gel_value_new_of_type(G_TYPE_BOOLEAN);
     gel_value_set_boolean(value, TRUE);
-    g_hash_table_insert(symbols, "TRUE", value);
+    g_hash_table_insert(symbols, g_strdup("TRUE"), value);
 
     value = gel_value_new_of_type(G_TYPE_BOOLEAN);
     gel_value_set_boolean(value, FALSE);
-    g_hash_table_insert(symbols, "FALSE", value);
+    g_hash_table_insert(symbols, g_strdup("FALSE"), value);
 
     value = gel_value_new_of_type(G_TYPE_POINTER);
     gel_value_set_pointer(value, NULL);
-    g_hash_table_insert(symbols, "NULL", value);
+    g_hash_table_insert(symbols, g_strdup("NULL"), value);
 
     return symbols;
 }
@@ -1303,6 +1305,6 @@ GValue *gel_value_lookup_predefined(const gchar *name)
         symbols = gel_make_default_symbols();
         g_once_init_leave(&once, 1);
     }
-    return g_hash_table_lookup(symbols, name);
+    return (GValue*)g_hash_table_lookup(symbols, name);
 }
 
