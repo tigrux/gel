@@ -39,7 +39,7 @@ struct _GelNativeClosure
 {
     GClosure closure;
     gchar *name;
-    GClosureMarshal marshal;
+    GClosureMarshal native_marshal;
 };
 
 
@@ -125,10 +125,10 @@ GClosure* gel_closure_new(const gchar *name, gchar **args, GValueArray *code,
     g_closure_add_finalize_notifier(closure, 
         context, (GClosureNotify)gel_closure_finalize);
 
-    GelClosure *gel_closure = (GelClosure*)closure;
-    gel_closure->name = g_strdup(name);
-    gel_closure->args = args;
-    gel_closure->code = code;
+    GelClosure *self = (GelClosure*)closure;
+    self->name = g_strdup(name);
+    self->args = args;
+    self->code = code;
 
     return closure;
 }
@@ -142,7 +142,7 @@ void gel_native_closure_marshal(GClosure *closure, GValue *return_value,
     /* Hack to work around closures invoked as signal callbacks */
     if(((GSignalInvocationHint*)context)->signal_id < 32767)
         context = NULL;
-    ((GelNativeClosure *)closure)->marshal(
+    ((GelNativeClosure *)closure)->native_marshal(
         closure, return_value, n_values, values, context, closure->data);
 }
 
@@ -167,7 +167,7 @@ GClosure* gel_closure_new_native(const gchar *name, GClosureMarshal marshal)
     GelNativeClosure *self = (GelNativeClosure*)closure;
     gchar *dup_name = g_strdup(name);
     self->name = dup_name;
-    self->marshal = marshal;
+    self->native_marshal = marshal;
     g_closure_set_marshal(closure, (GClosureMarshal)gel_native_closure_marshal);
     g_closure_add_finalize_notifier(closure, dup_name, (GClosureNotify)g_free);
     return closure;
