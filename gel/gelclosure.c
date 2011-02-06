@@ -89,6 +89,7 @@ void gel_closure_finalize(GelContext *self, GelClosure *closure)
 {
     g_return_if_fail(self != NULL);
 
+    g_free(closure->name);
     g_strfreev(closure->args);
     g_value_array_free(closure->code);
 }
