@@ -1,6 +1,7 @@
 #include <string.h>
 
 #include <gelcontext.h>
+#include <gelcontextprivate.h>
 #include <geldebug.h>
 #include <gelvalue.h>
 #include <gelvalueprivate.h>
@@ -486,6 +487,20 @@ gboolean gel_context_eval_params(GelContext *self, const gchar *func,
 }
 
 
+GelVariable* gel_context_lookup_variable(const GelContext *self,
+                                         const gchar *name)
+{
+    g_return_val_if_fail(self != NULL, NULL);
+    g_return_val_if_fail(name != NULL, NULL);
+
+    GelVariable *variable = NULL;
+    const GelContext *c;
+    for(c = self; c != NULL && variable == NULL; c = c->outer)
+        variable = (GelVariable*)g_hash_table_lookup(c->variables, name);
+    return variable;
+}
+
+
 /**
  * gel_context_lookup_symbol:
  * @self: #GelContext where to look for the symbol named @name
@@ -502,17 +517,24 @@ GValue* gel_context_lookup_symbol(const GelContext *self, const gchar *name)
     g_return_val_if_fail(self != NULL, NULL);
     g_return_val_if_fail(name != NULL, NULL);
 
-    GelVariable *variable = NULL;
-    const GelContext *ic;
-    for(ic = self; ic != NULL && variable == NULL; ic = ic->outer)
-        variable = (GelVariable*)g_hash_table_lookup(ic->variables, name);
-
-    GValue *value;
+    GelVariable *variable = gel_context_lookup_variable(self, name);
+    GValue *result;
     if(variable != NULL)
-        value = gel_variable_get_value(variable);
+        result = gel_variable_get_value(variable);
     else
-        value = NULL;
-    return value;
+        result = NULL;
+    return result;
+}
+
+
+void gel_context_insert_variable(GelContext *self,
+                                 const gchar *name, GelVariable *variable)
+{
+    g_return_if_fail(self != NULL);
+    g_return_if_fail(name != NULL);
+    g_return_if_fail(variable != NULL);
+
+    g_hash_table_insert(self->variables, g_strdup(name), variable);
 }
 
 
@@ -532,8 +554,7 @@ void gel_context_insert_symbol(GelContext *self,
     g_return_if_fail(name != NULL);
     g_return_if_fail(value != NULL);
 
-    GelVariable *variable = gel_variable_new(value, TRUE);
-    g_hash_table_insert(self->variables, g_strdup(name), variable);
+    gel_context_insert_variable(self, name, gel_variable_new(value, TRUE));
 }
 
 
