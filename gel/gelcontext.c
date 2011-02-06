@@ -153,10 +153,9 @@ void gel_context_free(GelContext *self)
  *
  * Evaluates @value, stores the result in @dest
  *
- * Returns: #TRUE if @dest_value was written, #FALSE otherwise.
+ * Returns: #TRUE if @dest was written, #FALSE otherwise.
  */
-gboolean gel_context_eval(GelContext *self, 
-                          const GValue *value, GValue *dest)
+gboolean gel_context_eval(GelContext *self, const GValue *value, GValue *dest)
 {
     g_return_val_if_fail(self != NULL, FALSE);
     g_return_val_if_fail(value != NULL, FALSE);
