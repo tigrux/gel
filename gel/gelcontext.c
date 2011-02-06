@@ -522,7 +522,7 @@ GValue* gel_context_lookup_symbol(const GelContext *self, const gchar *name)
  * @name: name of the symbol to insert
  * @value: value of the symbol to insert
  *
- * Inserts a new symbol to @context with the name given by @name.
+ * Inserts a new symbol to @self with the name given by @name.
  * @self takes ownership of @value so it should not be freed or unset.
  */
 void gel_context_insert_symbol(GelContext *self,
@@ -591,7 +591,7 @@ void gel_context_insert_function(GelContext *self, const gchar *name,
  * @self: #GelContext where to remove the symbol
  * @name: name of the symbol to remove
  *
- * Removes the symbol gived by @name.
+ * Removes the symbol given by @name.
  *
  * Returns: #TRUE is the symbol was removed, #FALSE otherwise.
  */
@@ -642,8 +642,8 @@ gboolean gel_context_get_running(const GelContext *self)
  * @running: #TRUE to set the context as running
  *
  * Set @self's running state as @running
- * It stops the current execution loop (for, while)
- * and is used internally by the function break.
+ * If @running is #FALSE then current execution loop (for, while) is stopped.
+ * It is used internally by the function break.
  */
 void gel_context_set_running(GelContext *self, gboolean running)
 {
