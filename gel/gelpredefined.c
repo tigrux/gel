@@ -1296,12 +1296,12 @@ GHashTable* gel_make_default_symbols(void)
  */
 GValue *gel_value_lookup_predefined(const gchar *name)
 {
-    static volatile gsize symbols_once = 0;
     static GHashTable *symbols = NULL;
-    if(g_once_init_enter(&symbols_once))
+    static volatile gsize once = 0;
+    if(g_once_init_enter(&once))
     {
         symbols = gel_make_default_symbols();
-        g_once_init_leave(&symbols_once, 1);
+        g_once_init_leave(&once, 1);
     }
     return g_hash_table_lookup(symbols, name);
 }

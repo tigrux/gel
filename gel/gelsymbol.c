@@ -1,7 +1,19 @@
 #include <gelsymbol.h>
 
 
-G_DEFINE_BOXED_TYPE(GelSymbol, gel_symbol, gel_symbol_dup, gel_symbol_free)
+GType gel_symbol_get_type(void)
+{
+    static volatile gsize once = 0;
+    static GType type = G_TYPE_INVALID;
+    if(g_once_init_enter(&once))
+    {
+        type = g_boxed_type_register_static("GelSymbol",
+                (GBoxedCopyFunc)gel_symbol_dup,
+                (GBoxedFreeFunc)gel_symbol_free);
+        g_once_init_leave(&once, 1);
+    }
+    return type;
+}
 
 
 struct _GelSymbol

@@ -20,7 +20,19 @@
  */
 
 
-G_DEFINE_BOXED_TYPE(GelContext, gel_context, gel_context_dup, gel_context_free)
+GType gel_context_get_type(void)
+{
+    static volatile gsize once = 0;
+    static GType type = G_TYPE_INVALID;
+    if(g_once_init_enter(&once))
+    {
+        type = g_boxed_type_register_static("GelContext",
+                (GBoxedCopyFunc)gel_context_dup,
+                (GBoxedFreeFunc)gel_context_free);
+        g_once_init_leave(&once, 1);
+    }
+    return type;
+}
 
 
 struct _GelContext

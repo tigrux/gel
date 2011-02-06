@@ -2,7 +2,19 @@
 #include <gelvalueprivate.h>
 
 
-G_DEFINE_BOXED_TYPE(GelVariable, gel_variable, gel_variable_ref, gel_variable_unref)
+GType gel_variable_get_type(void)
+{
+    static volatile gsize once = 0;
+    static GType type = G_TYPE_INVALID;
+    if(g_once_init_enter(&once))
+    {
+        type = g_boxed_type_register_static("GelVariable",
+                (GBoxedCopyFunc)gel_variable_ref,
+                (GBoxedFreeFunc)gel_variable_unref);
+        g_once_init_leave(&once, 1);
+    }
+    return type;
+}
 
 
 struct _GelVariable
