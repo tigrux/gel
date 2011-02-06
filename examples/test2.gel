@@ -25,13 +25,9 @@
 
 
 (define (factorial n)
-    (cond
-        ((<= n 0)
-            1
-        )
-        ((> n 0)
-            (* n (factorial (- n 1)))
-        )
+    (if (<= n 0)
+        1
+        (* n (factorial (- n 1)))
     )
 )
 
@@ -40,10 +36,18 @@
 (print n " is " (if (== (% n 2) 0) "even" "odd"))
 
 (define (fibonacci n)
-    (case n
-        0 0
-        1 1
-          (+ (fibonacci (- n 1)) (fibonacci (- n 2)))
+    (cond
+        ((== n 0)
+            0
+        )
+        ((== n 1)
+            1
+        )
+        (TRUE
+            (+ (fibonacci (- n 1))
+               (fibonacci (- n 2))
+            )
+        )
     )
 )
 

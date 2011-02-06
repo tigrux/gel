@@ -858,76 +858,6 @@ void filter_(GClosure *self, GValue *return_value,
 
 
 static
-void branch(GelContext *outer, const GValue *case_value,
-            GValue *return_value, guint n_values, const GValue *values)
-{
-    gboolean match = FALSE;
-    gboolean testing = TRUE;
-
-    GelContext *context = gel_context_new_with_outer(outer);
-    while(testing)
-    {
-        if(n_values > 1)
-        {
-            GValue tmp_value = {0};
-            const GValue *if_value =
-                gel_context_eval_value(context, values + 0, &tmp_value);
-
-            if(case_value != NULL)
-                match = gel_values_eq(if_value, case_value);
-            else
-                match = gel_value_to_boolean(if_value);
-
-            if(GEL_IS_VALUE(&tmp_value))
-                g_value_unset(&tmp_value);
-
-            if(match)
-                n_values--, values++;
-            else
-                n_values -= 2, values += 2;
-        }
-        else if(n_values == 1)
-            match = TRUE;
-        else
-            testing = FALSE;
-        
-        if(match)
-        {
-            GValue tmp_value = {0};
-            const GValue *then_value =
-                gel_context_eval_value(context, values + 0, &tmp_value);
-            gel_value_copy(then_value, return_value);
-            if(GEL_IS_VALUE(&tmp_value))
-                g_value_unset(&tmp_value);
-            testing = FALSE;
-        }
-    }
-    gel_context_free(context);
-}
-
-
-static
-void case_(GClosure *self, GValue *return_value,
-           guint n_values, const GValue *values, GelContext *context)
-{
-    guint n_args = 2;
-    if(n_values < n_args)
-    {
-        gel_warning_needs_at_least_n_arguments(__FUNCTION__, n_args);
-        return;
-    }
-
-    GValue tmp_value = {0};
-    const GValue *case_value =
-        gel_context_eval_value(context, values + 0, &tmp_value);
-    n_values--, values++;
-    branch(context, case_value, return_value, n_values, values);
-    if(GEL_IS_VALUE(&tmp_value))
-        g_value_unset(&tmp_value);
-}
-
-
-static
 void begin_(GClosure *self, GValue *return_value,
             guint n_values, const GValue *values, GelContext *context)
 {
@@ -1289,7 +1219,6 @@ GHashTable* gel_make_default_symbols(void)
         CLOSURE(lambda),/* array */
         CLOSURE_NAME("object-connect", object_connect),
         CLOSURE(print),
-        CLOSURE(case),
         CLOSURE(cond),
         CLOSURE(begin),
         CLOSURE(array),
