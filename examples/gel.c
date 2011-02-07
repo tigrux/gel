@@ -24,7 +24,7 @@ void demo_run(void)
     guint n_values = array->n_values;
     const GValue *array_values = array->values;
 
-    register guint i;
+    guint i;
     for(i = 0; i < n_values; i++)
     {
         const GValue *iter_value = array_values + i;
