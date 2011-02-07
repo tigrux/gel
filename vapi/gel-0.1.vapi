@@ -2,7 +2,7 @@
 namespace Gel {
 
     [CCode (instance_pos = -1)]
-    public delegate void Function(GLib.Closure closure, out GLib.Value? return_value, [CCode (array_length_pos = 2.9, array_length_type = "guint")] GLib.Value[] param_values, Gel.Context? invocation_context);
+    public delegate void Function(GLib.Closure closure, out GLib.Value return_value, [CCode (array_length_pos = 2.9, array_length_type = "guint")] GLib.Value[] param_values, Gel.Context? invocation_context);
 
     [CCode (type_id = "GEL_CONTEXT_TYPE")]
     [Compact]
@@ -13,7 +13,7 @@ namespace Gel {
         public unowned Context outer {get;}
         public bool running {get; set;}
         public void insert_symbol(string name, owned GLib.Value value);
-        public void insert_object(string name, owned GLib.Object object);
+        public void insert_object(string name, GLib.Object object);
         public void insert_function(string name, Gel.Function function);
         public bool remove_symbol(string name);
         public bool eval(GLib.Value value, out GLib.Value dest_value);
