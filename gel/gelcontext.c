@@ -546,7 +546,8 @@ void gel_context_insert_variable(GelContext *self,
     g_return_if_fail(name != NULL);
     g_return_if_fail(variable != NULL);
 
-    g_hash_table_insert(self->variables, g_strdup(name), variable);
+    g_hash_table_insert(self->variables,
+        g_strdup(name), gel_variable_ref(variable));
 }
 
 
@@ -566,7 +567,8 @@ void gel_context_insert_symbol(GelContext *self,
     g_return_if_fail(name != NULL);
     g_return_if_fail(value != NULL);
 
-    gel_context_insert_variable(self, name, gel_variable_new(value, TRUE));
+    g_hash_table_insert(self->variables,
+        g_strdup(name), gel_variable_new(value, TRUE));
 }
 
 
@@ -577,7 +579,6 @@ void gel_context_insert_symbol(GelContext *self,
  * @object: object to insert
  *
  * A wrapper for #gel_context_insert_symbol.
- * @self takes ownership of @object so it should not be unreffed.
  */
 void gel_context_insert_object(GelContext *self, const gchar *name,
                                GObject *object)
@@ -588,7 +589,7 @@ void gel_context_insert_object(GelContext *self, const gchar *name,
     g_return_if_fail(G_IS_OBJECT(object));
 
     GValue *value = gel_value_new_of_type(G_OBJECT_TYPE(object));
-    g_value_take_object(value, object);
+    g_value_set_object(value, object);
     gel_context_insert_symbol(self, name, value);
 }
 

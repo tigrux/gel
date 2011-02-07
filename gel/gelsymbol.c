@@ -8,8 +8,7 @@ GType gel_symbol_get_type(void)
     if(g_once_init_enter(&once))
     {
         type = g_boxed_type_register_static("GelSymbol",
-                (GBoxedCopyFunc)gel_symbol_dup,
-                (GBoxedFreeFunc)gel_symbol_free);
+            (GBoxedCopyFunc)gel_symbol_dup, (GBoxedFreeFunc)gel_symbol_free);
         g_once_init_leave(&once, 1);
     }
     return type;
@@ -29,7 +28,10 @@ GelSymbol* gel_symbol_new(const gchar *name, GelVariable *variable)
 
     GelSymbol *self = g_slice_new0(GelSymbol);
     self->name = g_strdup(name);
-    self->variable = variable;
+    if(variable != NULL)
+        self->variable = gel_variable_ref(variable);
+    else
+        self->variable = NULL;
 
     return self;
 }
