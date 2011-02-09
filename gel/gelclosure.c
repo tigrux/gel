@@ -13,7 +13,7 @@
  * Gel provides two type of closures: native and written in gel.
  * All the predefined closures are native functions written in C.
  *
- * Closures written in gel behave as normal closures and the can be
+ * Closures written in gel behave as normal closures and can be
  * called via a #g_closure_invoke.
  *
  * Closures predefined or written in gel provide a name that can be queried
