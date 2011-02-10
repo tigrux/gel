@@ -2,6 +2,7 @@ AC_INIT([gel], [0.1], [tigrux@gmail.com], [gel])
 AC_CONFIG_SRCDIR([Makefile.am])
 AC_CONFIG_HEADERS(config.h)
 AM_INIT_AUTOMAKE([foreign])
+AM_SILENT_RULES([yes])
 
 AC_PROG_CC
 AC_PROG_LIBTOOL
