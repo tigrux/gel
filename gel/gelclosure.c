@@ -1,7 +1,9 @@
+#include <gelclosure.h>
 #include <gelcontext.h>
+#include <gelcontextprivate.h>
 #include <gelvalue.h>
 #include <gelvalueprivate.h>
-#include <gelclosure.h>
+#include <gelsymbol.h>
 
 
 /**
@@ -31,6 +33,7 @@ struct _GelClosure
     GClosure closure;
     gchar *name;
     gchar **args;
+    GHashTable *args_hash;
     GValueArray *code;
 };
 
@@ -91,7 +94,56 @@ void gel_closure_finalize(GelContext *self, GelClosure *closure)
 
     g_free(closure->name);
     g_strfreev(closure->args);
+    g_hash_table_unref(closure->args_hash);
     g_value_array_free(closure->code);
+}
+
+
+static
+GelContext* gel_closure_get_context(GelClosure *self)
+{
+    return (GelContext*)self->closure.data;
+}
+
+
+static
+gboolean gel_closure_has_variable(const GelClosure *self, const gchar *name)
+{
+
+    return g_hash_table_lookup(self->args_hash, name) != NULL;
+}
+
+
+static
+void gel_closure_bind_symbols(GelClosure *self, GValueArray *array)
+{
+    guint array_n_values = array->n_values;
+    GValue *array_values = array->values;
+
+    guint i;
+    for(i = 0; i < array_n_values; i++)
+    {
+        const GValue *value = array_values + i;
+        GType type = GEL_VALUE_TYPE(value);
+        if(type == G_TYPE_VALUE_ARRAY)
+            gel_closure_bind_symbols(self,
+                (GValueArray*)gel_value_get_boxed(value));
+        else
+        if(type == GEL_TYPE_SYMBOL)
+        {
+            GelSymbol *symbol = (GelSymbol*)gel_value_get_boxed(value);
+            const gchar *symbol_name = gel_symbol_get_name(symbol);
+            const GelContext *context = gel_closure_get_context(self);
+            if(gel_context_has_variable(context, symbol_name))
+                if(!gel_closure_has_variable(self, symbol_name))
+                {
+                    GelVariable *variable =
+                        gel_context_lookup_variable(context, symbol_name);
+                    if(variable != NULL)
+                        gel_symbol_set_variable(symbol, variable);
+                }
+        }
+    }
 }
 
 
@@ -120,15 +172,22 @@ GClosure* gel_closure_new(const gchar *name, gchar **args, GValueArray *code,
     g_return_val_if_fail(code != NULL, NULL);
 
     GClosure *closure = g_closure_new_simple(sizeof(GelClosure), context);
-
     g_closure_set_marshal(closure, (GClosureMarshal)gel_closure_marshal);
     g_closure_add_finalize_notifier(closure, 
         context, (GClosureNotify)gel_closure_finalize);
 
+    GHashTable *args_hash = g_hash_table_new(g_str_hash, g_str_equal);
+    guint i;
+    for(i = 0; args[i] != NULL; i++)
+        g_hash_table_insert(args_hash, args[i], args);
+
+
     GelClosure *self = (GelClosure*)closure;
+    self->args_hash = args_hash;
     self->name = g_strdup(name);
     self->args = args;
     self->code = code;
+    gel_closure_bind_symbols(self, code);
 
     return closure;
 }

@@ -499,6 +499,12 @@ gboolean gel_context_eval_params(GelContext *self, const gchar *func,
 }
 
 
+gboolean gel_context_has_variable(const GelContext *self, const gchar *name)
+{
+    return g_hash_table_lookup(self->variables, name) != NULL;
+}
+
+
 GelVariable* gel_context_lookup_variable(const GelContext *self,
                                          const gchar *name)
 {
