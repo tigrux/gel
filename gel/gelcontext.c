@@ -210,15 +210,22 @@ const GValue* gel_context_eval_value(GelContext *self,
 
     if(type == GEL_TYPE_SYMBOL)
     {
-        GelSymbol *symbol = (GelSymbol*)gel_value_get_boxed(value);
-        result = gel_symbol_get_value(symbol);
+        const GelSymbol *symbol = (GelSymbol*)gel_value_get_boxed(value);
+        const gchar *symbol_name = gel_symbol_get_name(symbol);
+        if(gel_context_has_variable(self, symbol_name))
+            result = gel_context_lookup_symbol(self, symbol_name);
+        else
+            result = gel_symbol_get_value(symbol);
+
         if(result == NULL)
         {
-            const gchar *symbol_name = gel_symbol_get_name(symbol);
-            result = gel_context_lookup_symbol(self, symbol_name);
-            if(result == NULL)
-                gel_warning_unknown_symbol(__FUNCTION__, symbol_name);
+            GelContext *outer = gel_context_get_outer(self);
+            if(outer != NULL)
+                result = gel_context_lookup_symbol(self, symbol_name);
         }
+
+        if(result == NULL)
+            gel_warning_unknown_symbol(__FUNCTION__, symbol_name);
     }
     else
     if(type == G_TYPE_VALUE_ARRAY)

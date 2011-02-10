@@ -1,4 +1,5 @@
 #include <gelcontext.h>
+#include <gelcontextprivate.h>
 #include <geldebug.h>
 #include <gelvalue.h>
 #include <gelvalueprivate.h>
@@ -199,7 +200,7 @@ void define_(GClosure *self, GValue *return_value,
         GValue *r_value = NULL;
         if(gel_context_eval_params(context, __FUNCTION__, &list,
                 "sV", &n_values, &values, &name, &r_value))
-            if(gel_context_lookup_symbol(context, name) == NULL)
+            if(!gel_context_has_variable(context, name))
             {
                 defined = FALSE;
                 value = gel_value_dup(r_value);
