@@ -40,7 +40,6 @@ S
     (lambda (n) (* n factor) )
 )
 
-
 (define A (range 1 4))
 (define B (map (multiply-by 10) A))
 (define C (map (multiply-by 10) B))
