@@ -42,7 +42,7 @@ GelVariable* gel_variable_ref(GelVariable *self)
 {
     g_return_val_if_fail(self != NULL, NULL);
 
-    g_atomic_int_add(&self->ref_count, 1);
+    g_atomic_int_inc(&self->ref_count);
     return self;
 }
 
