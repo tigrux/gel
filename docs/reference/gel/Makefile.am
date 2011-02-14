@@ -61,6 +61,7 @@ EXTRA_HFILES=
 IGNORE_HFILES= \
 gelcontextprivate.h \
 gelvalueprivate.h \
+gelclosureprivate.h \
 geldebug.h \
 gelsymbol.h \
 gelvariable.h

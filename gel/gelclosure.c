@@ -23,11 +23,6 @@
  */
 
 
-typedef struct _GelClosure GelClosure;
-
-typedef struct _GelNativeClosure GelNativeClosure;
-
-
 struct _GelClosure
 {
     GClosure closure;
@@ -37,6 +32,8 @@ struct _GelClosure
     GValueArray *code;
 };
 
+
+typedef struct _GelNativeClosure GelNativeClosure;
 
 struct _GelNativeClosure
 {
@@ -99,10 +96,15 @@ void gel_closure_finalize(GelContext *self, GelClosure *closure)
 }
 
 
-static
 GelContext* gel_closure_get_context(GelClosure *self)
 {
     return (GelContext*)self->closure.data;
+}
+
+
+void gel_closure_set_context(GelClosure *self, GelContext *context)
+{
+    self->closure.data = context;
 }
 
 
@@ -180,13 +182,13 @@ GClosure* gel_closure_new(const gchar *name, gchar **args, GValueArray *code,
     for(i = 0; args[i] != NULL; i++)
         g_hash_table_insert(args_hash, args[i], args);
 
-
     GelClosure *self = (GelClosure*)closure;
     self->args_hash = args_hash;
     self->name = g_strdup(name);
     self->args = args;
     self->code = code;
     gel_closure_bind_symbols(self, code);
+    gel_context_append_closure(context, self);
 
     return closure;
 }

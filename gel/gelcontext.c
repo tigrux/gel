@@ -39,6 +39,7 @@ struct _GelContext
 {
     GHashTable *variables;
     GelContext *outer;
+    GList *closures;
     gboolean running;
 };
 
@@ -101,10 +102,12 @@ GelContext* gel_context_new_with_outer(GelContext *outer)
     }
     else
         self = gel_context_alloc();
-    self->outer = outer;
-    self->running = TRUE;
     contexts_COUNT++;
     G_UNLOCK(contexts);
+
+    self->outer = outer;
+    self->closures = NULL;
+    self->running = TRUE;
 
     return self;
 }
@@ -146,7 +149,10 @@ void gel_context_free(GelContext *self)
 {
     g_return_if_fail(self != NULL);
 
+    g_list_foreach(self->closures, (GFunc)gel_closure_set_context, self->outer);
+    g_list_free(self->closures);
     g_hash_table_remove_all(self->variables);
+
     G_LOCK(contexts);
     contexts_POOL = g_list_append(contexts_POOL, self);
     if(--contexts_COUNT == 0)
@@ -630,6 +636,12 @@ void gel_context_insert_function(GelContext *self, const gchar *name,
     closure->data = user_data;
     g_value_take_boxed(value, closure);
     gel_context_insert_symbol(self, name, value);
+}
+
+
+void gel_context_append_closure(GelContext *self, GelClosure *closure)
+{
+    self->closures = g_list_append(self->closures, closure);
 }
 
 
