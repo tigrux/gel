@@ -378,7 +378,8 @@ void arithmetic(GClosure *self, GValue *return_value,
 
     if(running)
         gel_value_copy(v2, return_value);
-    g_value_unset(v2);
+    if(GEL_IS_VALUE(v2))
+        g_value_unset(v2);
 }
 
 
