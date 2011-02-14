@@ -28,6 +28,7 @@ libgel_include_HEADERS = \
 noinst_HEADERS = \
 	gelcontextprivate.h \
 	gelvalueprivate.h \
+	gelclosureprivate.h \
 	gelsymbol.h \
 	geldebug.h \
 	gelvariable.h
