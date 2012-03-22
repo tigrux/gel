@@ -9,6 +9,7 @@ libgel_la_LDFLAGS = -module -export-dynamic -version-info $(lib_VERSION)
 libgel_la_SOURCES = \
 	gelclosure.c \
 	gelcontext.c \
+	gelcontextparams.c \
 	geldebug.c \
 	gelparser.c \
 	gelpredefined.c \
