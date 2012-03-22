@@ -1,10 +1,10 @@
 #include <girepository.h>
 #include <gitypelib.h>
 
-void handle_arg(GITypeInfo *atype)
+void handle_arg(GITypeInfo *atype, const gchar *indent)
 {
     GITypeTag tag = g_type_info_get_tag(atype);
-    g_print(": %s", g_type_tag_to_string(tag));
+    g_print("%s: %s", indent, g_type_tag_to_string(tag));
     if(tag == GI_TYPE_TAG_ARRAY)
     {
         GITypeInfo *param = g_type_info_get_param_type(atype, 0);
@@ -25,11 +25,11 @@ void handle_arg(GITypeInfo *atype)
         g_print("\n");
 }
 
-void handle_callable(GIFunctionInfo *cinfo)
+void handle_callable(GIFunctionInfo *cinfo, const gchar *indent)
 {
     GITypeInfo *rtype = g_callable_info_get_return_type(cinfo);
-    g_print("\t\tReturns");
-    handle_arg(rtype);
+    g_print("%sReturns", indent);
+    handle_arg(rtype, "");
     g_base_info_unref((GIBaseInfo*)rtype);
 
     guint n = g_callable_info_get_n_args(cinfo);
@@ -38,8 +38,8 @@ void handle_callable(GIFunctionInfo *cinfo)
     {
         GIArgInfo *ainfo = g_callable_info_get_arg(cinfo, i);
         GITypeInfo *atype = g_arg_info_get_type(ainfo);
-        g_print("\t\t%s", g_base_info_get_name((GIBaseInfo*)ainfo));
-        handle_arg(atype);
+        g_print("%s%s", indent, g_base_info_get_name((GIBaseInfo*)ainfo));
+        handle_arg(atype, "");
         g_base_info_unref((GIBaseInfo*)atype);
         g_base_info_unref((GIBaseInfo*)ainfo);
     }
@@ -87,8 +87,70 @@ int main(int argc, char *argv[])
             guint i, n;
 
             case GI_INFO_TYPE_FUNCTION:
-                handle_callable(info);
+                handle_callable(info, "\t\t");
                 break;
+
+            case GI_INFO_TYPE_INTERFACE:
+            {
+                GIRegisteredTypeInfo *type_info = (GIRegisteredTypeInfo*)info;
+                GType type = g_registered_type_info_get_g_type(type_info);
+                g_print("\ttypename = %s\n", g_type_name(type));
+                n = g_interface_info_get_n_methods(info);
+                for (i = 0; i < n; i++)
+                {
+                    GIFunctionInfo *finfo = g_interface_info_get_method(info, i);
+                    g_print("\tmethod %s()\n",
+                        g_base_info_get_name((GIBaseInfo*)finfo));
+                    handle_callable(finfo, "\t\t");
+                    g_base_info_unref((GIBaseInfo*)finfo);
+                }
+                n = g_interface_info_get_n_vfuncs(info);
+                for (i = 0; i < n; i++)
+                {
+                    GIFunctionInfo *finfo = g_interface_info_get_vfunc(info, i);
+                    g_print("\tvfunc (*%s)()\n",
+                        g_base_info_get_name((GIBaseInfo*)finfo));
+                    handle_callable(finfo, "\t\t");
+                    g_base_info_unref((GIBaseInfo*)finfo);
+                }
+                n = g_interface_info_get_n_properties(info);
+                for (i = 0; i < n; i++)
+                {
+                    GIFunctionInfo *pinfo = g_interface_info_get_property(info, i);
+                    g_print("\tproperty :%s",
+                        g_base_info_get_name((GIBaseInfo*)pinfo));
+                    GITypeInfo *ptype = g_property_info_get_type(pinfo);
+                    handle_arg(ptype, "");
+                    g_base_info_unref((GIBaseInfo*)ptype);
+                    g_base_info_unref((GIBaseInfo*)pinfo);
+                }
+                n = g_interface_info_get_n_signals(info);
+                for (i = 0; i < n; i++)
+                {
+                    GIFunctionInfo *finfo = g_interface_info_get_signal(info, i);
+                    g_print("\tsignal ::%s\n",
+                        g_base_info_get_name((GIBaseInfo*)finfo));
+                    handle_callable(finfo, "\t\t");
+                    g_base_info_unref((GIBaseInfo*)finfo);
+                }
+                n = g_interface_info_get_n_constants(info);
+                for (i = 0; i < n; i++)
+                {
+                    GIFunctionInfo *finfo = g_interface_info_get_constant(info, i);
+                    g_print("\tconstant %s\n",
+                        g_base_info_get_name((GIBaseInfo*)finfo));
+                    g_base_info_unref((GIBaseInfo*)finfo);
+                }
+                n = g_interface_info_get_n_prerequisites(info);
+                for (i = 0; i < n; i++)
+                {
+                    GIFunctionInfo *finfo = g_interface_info_get_prerequisite(info, i);
+                    g_print("\trequires %s\n",
+                        g_base_info_get_name((GIBaseInfo*)finfo));
+                    g_base_info_unref((GIBaseInfo*)finfo);
+                }
+                break;
+            }
 
             case GI_INFO_TYPE_OBJECT:
             {
@@ -101,7 +163,7 @@ int main(int argc, char *argv[])
                     GIFunctionInfo *finfo = g_object_info_get_method(info, i);
                     g_print("\tmethod %s()\n",
                         g_base_info_get_name((GIBaseInfo*)finfo));
-                    handle_callable(finfo);
+                    handle_callable(finfo, "\t\t");
                     g_base_info_unref((GIBaseInfo*)finfo);
                 }
                 n = g_object_info_get_n_vfuncs(info);
@@ -110,7 +172,7 @@ int main(int argc, char *argv[])
                     GIFunctionInfo *finfo = g_object_info_get_vfunc(info, i);
                     g_print("\tvfunc (*%s)()\n",
                         g_base_info_get_name((GIBaseInfo*)finfo));
-                    handle_callable(finfo);
+                    handle_callable(finfo, "\t\t");
                     g_base_info_unref((GIBaseInfo*)finfo);
                 }
                 n = g_object_info_get_n_properties(info);
@@ -120,7 +182,7 @@ int main(int argc, char *argv[])
                     g_print("\tproperty :%s",
                         g_base_info_get_name((GIBaseInfo*)pinfo));
                     GITypeInfo *ptype = g_property_info_get_type(pinfo);
-                    handle_arg(ptype);
+                    handle_arg(ptype, "");
                     g_base_info_unref((GIBaseInfo*)ptype);
                     g_base_info_unref((GIBaseInfo*)pinfo);
                 }
@@ -130,7 +192,7 @@ int main(int argc, char *argv[])
                     GIFunctionInfo *finfo = g_object_info_get_signal(info, i);
                     g_print("\tsignal ::%s\n",
                         g_base_info_get_name((GIBaseInfo*)finfo));
-                    handle_callable(finfo);
+                    handle_callable(finfo, "\t\t");
                     g_base_info_unref((GIBaseInfo*)finfo);
                 }
                 n = g_object_info_get_n_constants(info);
@@ -151,6 +213,7 @@ int main(int argc, char *argv[])
                 }
                 break;
             }
+
             case GI_INFO_TYPE_STRUCT:
             {
                 GIRegisteredTypeInfo *type_info = (GIRegisteredTypeInfo*)info;
@@ -163,7 +226,7 @@ int main(int argc, char *argv[])
                     GIFunctionInfo *finfo = g_struct_info_get_method(info, i);
                     g_print("\tmethod %s()\n",
                         g_base_info_get_name((GIBaseInfo*)finfo));
-                    handle_callable(finfo);
+                    handle_callable(finfo, "\t\t");
                     g_base_info_unref((GIBaseInfo*)finfo);
                 }
                 n = g_struct_info_get_n_fields(info);
@@ -194,7 +257,49 @@ int main(int argc, char *argv[])
                 }
                 break;
             }
+            case GI_INFO_TYPE_CONSTANT:
+            {
+                GITypeInfo *info_type = g_constant_info_get_type(info);
+                GIArgument value = { 0 };
+                g_constant_info_get_value(info, &value);
+                g_print("\tvalue = %d", value.v_int32);
+                handle_arg(info_type, "");
+                g_constant_info_free_value(info, &value);
+                break;
+            }
+
+            case GI_INFO_TYPE_CALLBACK:
+                handle_callable(info, "\t");
+                break;
+
+            case GI_INFO_TYPE_UNION:
+            {
+                GIRegisteredTypeInfo *type_info = (GIRegisteredTypeInfo*)info;
+                GType type = g_registered_type_info_get_g_type(type_info);
+                if(type != G_TYPE_NONE)
+                    g_print("\ttypename = %s\n", g_type_name(type));
+                n = g_union_info_get_n_methods(info);
+                for (i = 0; i < n; i++)
+                {
+                    GIFunctionInfo *finfo = g_union_info_get_method(info, i);
+                    g_print("\tmethod %s()\n",
+                        g_base_info_get_name((GIBaseInfo*)finfo));
+                    handle_callable(finfo, "\t\t");
+                    g_base_info_unref((GIBaseInfo*)finfo);
+                }
+                n = g_union_info_get_n_fields(info);
+                for (i = 0; i < n; i++)
+                {
+                    GIFunctionInfo *finfo = g_union_info_get_field(info, i);
+                    g_print("\tfield .%s\n",
+                        g_base_info_get_name((GIBaseInfo*)finfo));
+                    g_base_info_unref((GIBaseInfo*)finfo);
+                }
+                break;
+            }
+
             default:
+                g_error("*** Unhandled %s\n", g_info_type_to_string(info_type));
                 break;
         }
 
