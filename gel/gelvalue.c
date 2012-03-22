@@ -151,11 +151,11 @@ gchar* gel_value_to_string(const GValue *value)
                 gchar *s = gel_value_to_string(array_values + i);
                 g_string_append(buffer, s);
                 if(i != last)
-                    g_string_append(buffer, " ");
+                    g_string_append_c(buffer, ' ');
                 g_free(s);
             }
         }
-        g_string_append(buffer, ")");
+        g_string_append_c(buffer, ')');
         result =  g_string_free(buffer, FALSE);
     }
     else
