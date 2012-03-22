@@ -188,7 +188,6 @@ GClosure* gel_closure_new(const gchar *name, gchar **args, GValueArray *code,
     self->args = args;
     self->code = code;
     gel_closure_bind_symbols(self, code);
-    gel_context_append_closure(context, self);
 
     return closure;
 }
