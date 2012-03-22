@@ -41,12 +41,7 @@ GelSymbol* gel_symbol_dup(const GelSymbol *self)
 {
     g_return_val_if_fail(self != NULL, NULL);
 
-    GelSymbol *symbol = gel_symbol_new(self->name, NULL);
-    if(self->variable != NULL)
-        symbol->variable = gel_variable_ref(self->variable);
-    else
-        symbol->variable = NULL;
-
+    GelSymbol *symbol = gel_symbol_new(self->name, self->variable);
     return symbol;
 }
 
