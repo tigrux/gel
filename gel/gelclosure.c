@@ -51,7 +51,7 @@ void gel_closure_marshal(GelClosure *closure, GValue *return_value,
     const guint n_args = g_strv_length(closure->args);
     g_return_if_fail(n_values == n_args);
 
-    GelContext *outer = (GelContext*)closure->closure.data;
+    GelContext *outer = gel_closure_get_context(closure);
     GelContext *context = gel_context_new_with_outer(outer);
 
     gchar **closure_args = closure->args;
