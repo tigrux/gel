@@ -29,7 +29,7 @@ GelContext* gel_context_dup(const GelContext *self);
 void gel_context_free(GelContext *self);
 GType gel_context_get_type(void) G_GNUC_CONST;
 
-GValue* gel_context_lookup_symbol(const GelContext *self, const gchar *name);
+GValue* gel_context_lookup(const GelContext *self, const gchar *name);
 GelContext* gel_context_get_outer(const GelContext *self);
 
 void gel_context_insert(GelContext *self, const gchar *name, GValue *value);

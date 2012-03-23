@@ -19,7 +19,7 @@ void set_(GClosure *self, GValue *return_value,
             "sV", &n_values, &values, &symbol, &value))
         return;
 
-    GValue *symbol_value = gel_context_lookup_symbol(context, symbol);
+    GValue *symbol_value = gel_context_lookup(context, symbol);
     if(symbol_value != NULL)
         gel_value_copy(value, symbol_value);
     else
@@ -219,7 +219,7 @@ void define_(GClosure *self, GValue *return_value,
                     "s*", &array_n_values, &array_values, &name))
                 type = G_TYPE_INVALID;
             else
-                if(gel_context_lookup_symbol(context, name) == NULL)
+                if(gel_context_lookup(context, name) == NULL)
                 {
                     defined = FALSE;
                     GClosure *closure = new_closure(context, name,

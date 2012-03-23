@@ -214,7 +214,7 @@ const GValue* gel_context_eval_into_value(GelContext *self,
         const GelSymbol *symbol = (GelSymbol*)gel_value_get_boxed(value);
         const gchar *symbol_name = gel_symbol_get_name(symbol);
         if(gel_context_has_variable(self, symbol_name))
-            result = gel_context_lookup_symbol(self, symbol_name);
+            result = gel_context_lookup(self, symbol_name);
         else
             result = gel_symbol_get_value(symbol);
 
@@ -222,7 +222,7 @@ const GValue* gel_context_eval_into_value(GelContext *self,
         {
             GelContext *outer = gel_context_get_outer(self);
             if(outer != NULL)
-                result = gel_context_lookup_symbol(self, symbol_name);
+                result = gel_context_lookup(self, symbol_name);
         }
 
         if(result == NULL)
@@ -287,7 +287,7 @@ GelVariable* gel_context_lookup_variable(const GelContext *self,
 
 
 /**
- * gel_context_lookup_symbol:
+ * gel_context_lookup:
  * @self: #GelContext where to look for the symbol named @name
  * @name: name of the symbol to lookup
  *
@@ -297,7 +297,7 @@ GelVariable* gel_context_lookup_variable(const GelContext *self,
  *
  * Returns: The value corresponding to @name, or #NULL if could not find it.
  */
-GValue* gel_context_lookup_symbol(const GelContext *self, const gchar *name)
+GValue* gel_context_lookup(const GelContext *self, const gchar *name)
 {
     g_return_val_if_fail(self != NULL, NULL);
     g_return_val_if_fail(name != NULL, NULL);
