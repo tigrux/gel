@@ -9,7 +9,7 @@ namespace Gel {
     public class Context {
         public Context();
         public Context.with_outer(Gel.Context outer);
-        public unowned GLib.Value lookup_symbol(string name);
+        public unowned GLib.Value lookup(string name);
         public unowned Context outer {get;}
         public bool running {get; set;}
         public void insert(string name, owned GLib.Value value);
