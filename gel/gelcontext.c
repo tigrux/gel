@@ -260,6 +260,12 @@ const GValue* gel_context_eval_into_value(GelContext *self,
 }
 
 
+GList* gel_context_get_variables(const GelContext *self)
+{
+    return g_hash_table_get_keys(self->variables);
+}
+
+
 gboolean gel_context_has_variable(const GelContext *self, const gchar *name)
 {
     return g_hash_table_lookup(self->variables, name) != NULL;
