@@ -352,6 +352,7 @@ void gel_context_insert(GelContext *self,
  * @object: object to insert
  *
  * A wrapper for #gel_context_insert.
+ * @self takes ownership of @object so it should not be freed or unset.
  */
 void gel_context_insert_object(GelContext *self, const gchar *name,
                                GObject *object)
@@ -362,7 +363,9 @@ void gel_context_insert_object(GelContext *self, const gchar *name,
     g_return_if_fail(G_IS_OBJECT(object));
 
     GValue *value = gel_value_new_of_type(G_OBJECT_TYPE(object));
-    g_value_set_object(value, object);
+    if(G_IS_INITIALLY_UNOWNED(object))
+        g_object_ref_sink(object);
+    g_value_take_object(value, object);
     gel_context_insert(self, name, value);
 }
 

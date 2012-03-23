@@ -13,7 +13,7 @@ namespace Gel {
         public unowned Context outer {get;}
         public bool running {get; set;}
         public void insert(string name, owned GLib.Value value);
-        public void insert_object(string name, GLib.Object object);
+        public void insert_object(string name, owned GLib.Object object);
         public void insert_function(string name, Gel.Function function);
         public bool remove(string name);
         public bool eval(GLib.Value value, out GLib.Value dest_value);

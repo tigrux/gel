@@ -9,6 +9,8 @@
 (object-set window "child" box)
 (object-set box "border-width" 12)
 
+(object-set box "child" label)
+
 (define button (object-new "GtkButton"))
 (object-set box "child" button)
 (object-set button "label" "Click me!")
@@ -27,6 +29,7 @@
     )
 )
 
+(object-set label "visible" TRUE)
 (object-set button "visible" TRUE)
 (object-set entry "visible" TRUE)
 (object-set box "visible" TRUE)
