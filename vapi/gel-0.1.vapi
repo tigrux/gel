@@ -17,7 +17,7 @@ namespace Gel {
         public void insert_function(string name, Gel.Function function);
         public bool remove_symbol(string name);
         public bool eval(GLib.Value value, out GLib.Value dest_value);
-        public unowned GLib.Value eval_value(GLib.Value value, out GLib.Value tmp_value);
+        public unowned GLib.Value eval_into_value(GLib.Value value, out GLib.Value tmp_value);
     }
 
     GLib.ValueArray parse_file(string file) throws GLib.FileError;

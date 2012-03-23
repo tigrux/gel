@@ -316,7 +316,7 @@ void print_(GClosure *self, GValue *return_value,
     {
         GValue tmp_value = {0};
         const GValue *value =
-            gel_context_eval_value(context, values + i, &tmp_value);
+            gel_context_eval_into_value(context, values + i, &tmp_value);
         if(GEL_IS_VALUE(value))
         {
             gchar *value_string = gel_value_to_string(value);
@@ -348,8 +348,8 @@ void arithmetic(GClosure *self, GValue *return_value,
     GValue *v2 = &tmp3;
 
     gboolean running = values_function(
-            gel_context_eval_value(context, values + 0, &tmp1),
-            gel_context_eval_value(context, values + 1, &tmp2),
+            gel_context_eval_into_value(context, values + 0, &tmp1),
+            gel_context_eval_into_value(context, values + 1, &tmp2),
             &tmp3);
 
     if(GEL_IS_VALUE(&tmp1))
@@ -368,7 +368,7 @@ void arithmetic(GClosure *self, GValue *return_value,
             v2 = &tmp3, v1 = &tmp2;
 
         running = values_function(
-            v1, gel_context_eval_value(context, values + i, &tmp1), v2);
+            v1, gel_context_eval_into_value(context, values + i, &tmp1), v2);
 
         if(GEL_IS_VALUE(v1))
             g_value_unset(v1);
@@ -405,8 +405,8 @@ void logic(GClosure *self, GValue *return_value,
         GValue tmp2 = {0};
         const GValue *i_value = values + i;
         result = values_function(
-            gel_context_eval_value(context, i_value, &tmp1),
-            gel_context_eval_value(context, i_value+1, &tmp2));
+            gel_context_eval_into_value(context, i_value, &tmp1),
+            gel_context_eval_into_value(context, i_value+1, &tmp2));
 
         if(GEL_IS_VALUE(&tmp1))
             g_value_unset(&tmp1);
@@ -432,7 +432,7 @@ void not_(GClosure *self, GValue *return_value,
 
     GValue tmp_value = {0};
     const GValue *value =
-        gel_context_eval_value(context, values + 0, &tmp_value);
+        gel_context_eval_into_value(context, values + 0, &tmp_value);
     gboolean value_bool = gel_value_to_boolean(value);
     if(GEL_IS_VALUE(&tmp_value))
         g_value_unset(&tmp_value);
@@ -460,7 +460,7 @@ void and_(GClosure *self, GValue *return_value,
     {
         GValue tmp_value = {0};
         const GValue *value =
-            gel_context_eval_value(context, values + i, &tmp_value);
+            gel_context_eval_into_value(context, values + i, &tmp_value);
         result = gel_value_to_boolean(value);
         if(!result || i == last)
             gel_value_copy(value, return_value);
@@ -488,7 +488,7 @@ void or_(GClosure *self, GValue *return_value,
     {
         GValue tmp_value = {0};
         const GValue *value =
-            gel_context_eval_value(context, values + i, &tmp_value);
+            gel_context_eval_into_value(context, values + i, &tmp_value);
         result = gel_value_to_boolean(value);
         if(result || i == last)
             gel_value_copy(value, return_value);
@@ -609,7 +609,7 @@ void append_(GClosure *self, GValue *return_value,
     for(i = 0; i < n_values; i++)
     {
         GValue tmp = {0};
-        const GValue *value = gel_context_eval_value(context, values + i, &tmp);
+        const GValue *value = gel_context_eval_into_value(context, values + i, &tmp);
         g_value_array_append(array, value);
         if(GEL_IS_VALUE(&tmp))
             g_value_unset(&tmp);
@@ -876,7 +876,7 @@ void begin_(GClosure *self, GValue *return_value,
     {
         GValue tmp_value = {0};
         const GValue *value =
-            gel_context_eval_value(context, values + i, &tmp_value);
+            gel_context_eval_into_value(context, values + i, &tmp_value);
         if(i == last && GEL_IS_VALUE(value))
             gel_value_copy(value, return_value);
         if(GEL_IS_VALUE(&tmp_value))
@@ -928,7 +928,7 @@ void array_(GClosure *self, GValue *return_value,
     {
         GValue tmp_value = {0};
         const GValue *value =
-            gel_context_eval_value(context, values + i, &tmp_value);
+            gel_context_eval_into_value(context, values + i, &tmp_value);
         g_value_array_append(array, value);
         if(GEL_IS_VALUE(&tmp_value))
             g_value_unset(&tmp_value);
@@ -988,7 +988,7 @@ void while_(GClosure *self, GValue *return_value,
     {
         GValue tmp_value = {0};
         const GValue *cond_value =
-            gel_context_eval_value(context, values + 0, &tmp_value);
+            gel_context_eval_into_value(context, values + 0, &tmp_value);
         if(gel_value_to_boolean(cond_value))
         {
             run = TRUE;
@@ -1034,7 +1034,7 @@ void if_(GClosure *self, GValue *return_value,
 
     GValue tmp_value = {0};
     const GValue *cond_value =
-        gel_context_eval_value(context, values + 0, &tmp_value);
+        gel_context_eval_into_value(context, values + 0, &tmp_value);
 
     if(gel_value_to_boolean(cond_value))
         gel_context_eval(context, values + 1, return_value);
@@ -1058,7 +1058,7 @@ void when_(GClosure *self, GValue *return_value,
 
     GValue tmp_value = {0};
     const GValue *cond_value =
-        gel_context_eval_value(context, values + 0, &tmp_value);
+        gel_context_eval_into_value(context, values + 0, &tmp_value);
 
     if(gel_value_to_boolean(cond_value))
         begin_(self, return_value, n_values-1, values+1, context);
@@ -1082,7 +1082,7 @@ void unless_(GClosure *self, GValue *return_value,
 
     GValue tmp_value = {0};
     const GValue *cond_value =
-        gel_context_eval_value(context, values + 0, &tmp_value);
+        gel_context_eval_into_value(context, values + 0, &tmp_value);
 
     if(!gel_value_to_boolean(cond_value))
         begin_(self, return_value, n_values-1, values+1, context);
@@ -1105,7 +1105,7 @@ void str_(GClosure *self, GValue *return_value,
 
     GValue tmp_value = {0};
     const GValue *value =
-        gel_context_eval_value(context, values + 0, &tmp_value);
+        gel_context_eval_into_value(context, values + 0, &tmp_value);
 
     gchar *value_string = gel_value_to_string(value);
     if(GEL_IS_VALUE(&tmp_value))

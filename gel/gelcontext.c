@@ -130,8 +130,7 @@ GelContext* gel_context_dup(const GelContext *self)
     GelContext *context = gel_context_new_with_outer(self->outer);
     g_hash_table_iter_init(&iter, self->variables);
     while(g_hash_table_iter_next(&iter, (gpointer*)&name, (gpointer*)&variable))
-        g_hash_table_insert(context->variables,
-            g_strdup(name), gel_variable_ref(variable));
+        gel_context_insert_variable(context, name, variable);
 
     return context;
 }
@@ -176,7 +175,7 @@ gboolean gel_context_eval(GelContext *self, const GValue *value, GValue *dest)
     g_return_val_if_fail(value != NULL, FALSE);
     g_return_val_if_fail(dest != NULL, FALSE);
 
-    const GValue *result = gel_context_eval_value(self, value, dest);
+    const GValue *result = gel_context_eval_into_value(self, value, dest);
     if(GEL_IS_VALUE(result))
     {
         if(result != dest)
@@ -188,7 +187,7 @@ gboolean gel_context_eval(GelContext *self, const GValue *value, GValue *dest)
 
 
 /**
- * gel_context_eval_value:
+ * gel_context_eval_into_value:
  * @self: #GelContext where to evaluate @value
  * @value: value to evaluate
  * @out_value: value where a result may be written.
@@ -200,7 +199,7 @@ gboolean gel_context_eval(GelContext *self, const GValue *value, GValue *dest)
  *
  * Returns: A #GValue with the result
  */
-const GValue* gel_context_eval_value(GelContext *self,
+const GValue* gel_context_eval_into_value(GelContext *self,
                                      const GValue *value, GValue *out_value)
 {
     g_return_val_if_fail(self != NULL, NULL);
@@ -240,7 +239,7 @@ const GValue* gel_context_eval_value(GelContext *self,
 
             GValue tmp_value = {0};
             const GValue *first_value =
-                gel_context_eval_value(self, array_values + 0, &tmp_value);
+                gel_context_eval_into_value(self, array_values + 0, &tmp_value);
 
             if(GEL_VALUE_HOLDS(first_value, G_TYPE_CLOSURE))
             {

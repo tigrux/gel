@@ -71,7 +71,7 @@ void gel_closure_marshal(GelClosure *closure, GValue *return_value,
         for(i = 0; i <= last; i++)
         {
             GValue tmp_value = {0};
-            const GValue *value = gel_context_eval_value(context,
+            const GValue *value = gel_context_eval_into_value(context,
                 closure_code_values + i, &tmp_value);
             if(i == last && return_value != NULL && GEL_IS_VALUE(value))
                 gel_value_copy(value, return_value);
