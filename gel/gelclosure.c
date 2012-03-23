@@ -60,7 +60,7 @@ void gel_closure_marshal(GelClosure *closure, GValue *return_value,
     {
         GValue *value = gel_value_new();
         gel_context_eval(invocation_context, values + i, value);
-        gel_context_insert_symbol(context, closure_args[i], value);
+        gel_context_insert(context, closure_args[i], value);
     }
 
     guint closure_code_n_values = closure->code->n_values;

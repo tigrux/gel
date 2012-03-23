@@ -242,7 +242,7 @@ void define_(GClosure *self, GValue *return_value,
             g_warning("%s: Symbol '%s' already exists", __FUNCTION__, name);
         else
             if(value != NULL)
-                gel_context_insert_symbol(context, name, value);
+                gel_context_insert(context, name, value);
 
     gel_value_list_free(list);
 }
@@ -956,7 +956,7 @@ void for_(GClosure *self, GValue *return_value,
 
     GelContext *loop_context = gel_context_new_with_outer(context);
     GValue *value = gel_value_new();
-    gel_context_insert_symbol(loop_context, name, value);
+    gel_context_insert(loop_context, name, value);
 
     guint i;
     for(i = 0; i < last && gel_context_get_running(loop_context); i++)

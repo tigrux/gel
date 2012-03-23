@@ -32,13 +32,12 @@ GType gel_context_get_type(void) G_GNUC_CONST;
 GValue* gel_context_lookup_symbol(const GelContext *self, const gchar *name);
 GelContext* gel_context_get_outer(const GelContext *self);
 
-void gel_context_insert_symbol(GelContext *self, const gchar *name,
-                               GValue *value);
+void gel_context_insert(GelContext *self, const gchar *name, GValue *value);
 void gel_context_insert_object(GelContext *self, const gchar *name,
                                GObject *object);
 void gel_context_insert_function(GelContext *self, const gchar *name,
                                  GelFunction function, void *user_data);
-gboolean gel_context_remove_symbol(GelContext *self, const gchar *name);
+gboolean gel_context_remove(GelContext *self, const gchar *name);
 
 gboolean gel_context_eval(GelContext *self,
                           const GValue *value, GValue *dest);

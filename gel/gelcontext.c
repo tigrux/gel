@@ -325,7 +325,7 @@ void gel_context_insert_variable(GelContext *self,
 
 
 /**
- * gel_context_insert_symbol:
+ * gel_context_insert:
  * @self: #GelContext where to insert the symbol
  * @name: name of the symbol to insert
  * @value: value of the symbol to insert
@@ -333,8 +333,8 @@ void gel_context_insert_variable(GelContext *self,
  * Inserts a new symbol to @self with the name given by @name.
  * @self takes ownership of @value so it should not be freed or unset.
  */
-void gel_context_insert_symbol(GelContext *self,
-                               const gchar *name, GValue *value)
+void gel_context_insert(GelContext *self,
+                        const gchar *name, GValue *value)
 {
     g_return_if_fail(self != NULL);
     g_return_if_fail(name != NULL);
@@ -351,7 +351,7 @@ void gel_context_insert_symbol(GelContext *self,
  * @name: name of the symbol to insert
  * @object: object to insert
  *
- * A wrapper for #gel_context_insert_symbol.
+ * A wrapper for #gel_context_insert.
  */
 void gel_context_insert_object(GelContext *self, const gchar *name,
                                GObject *object)
@@ -363,7 +363,7 @@ void gel_context_insert_object(GelContext *self, const gchar *name,
 
     GValue *value = gel_value_new_of_type(G_OBJECT_TYPE(object));
     g_value_set_object(value, object);
-    gel_context_insert_symbol(self, name, value);
+    gel_context_insert(self, name, value);
 }
 
 
@@ -374,7 +374,7 @@ void gel_context_insert_object(GelContext *self, const gchar *name,
  * @function: a #GelFunction to invoke
  * @user_data: extra data to pass to @function
  *
- * A wrapper for #gel_context_insert_symbol that calls @marshal when
+ * A wrapper for #gel_context_insert that calls @marshal when
  * @self evaluates a call to a function named @name.
  */
 void gel_context_insert_function(GelContext *self, const gchar *name,
@@ -389,20 +389,20 @@ void gel_context_insert_function(GelContext *self, const gchar *name,
             g_strdup(name), (GClosureMarshal)function);
     closure->data = user_data;
     g_value_take_boxed(value, closure);
-    gel_context_insert_symbol(self, name, value);
+    gel_context_insert(self, name, value);
 }
 
 
 /**
- * gel_context_remove_symbol:
- * @self: #GelContext where to remove the symbol
- * @name: name of the symbol to remove
+ * gel_context_remove:
+ * @self: #GelContext where to remove the value
+ * @name: name of the value to remove
  *
- * Removes the symbol given by @name.
+ * Removes the value given by @name.
  *
- * Returns: #TRUE is the symbol was removed, #FALSE otherwise.
+ * Returns: #TRUE is the value was removed, #FALSE otherwise.
  */
-gboolean gel_context_remove_symbol(GelContext *self, const gchar *name)
+gboolean gel_context_remove(GelContext *self, const gchar *name)
 {
     g_return_val_if_fail(self != NULL, FALSE);
     g_return_val_if_fail(name != NULL, FALSE);
