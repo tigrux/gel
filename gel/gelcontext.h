@@ -31,6 +31,7 @@ GType gel_context_get_type(void) G_GNUC_CONST;
 
 GValue* gel_context_lookup(const GelContext *self, const gchar *name);
 GelContext* gel_context_get_outer(const GelContext *self);
+GList* gel_context_get_variables(const GelContext *self);
 
 void gel_context_insert(GelContext *self, const gchar *name, GValue *value);
 void gel_context_insert_object(GelContext *self, const gchar *name,

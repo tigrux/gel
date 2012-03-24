@@ -260,6 +260,16 @@ const GValue* gel_context_eval_into_value(GelContext *self,
 }
 
 
+/**
+ * gel_context_get_variables:
+ * @self: #GelContext where to get the variables
+ *
+ * Retrieves the name of every variable defined in the context @self
+ * The content of the list is owned by the content and should not be modified.
+ * Use g_list_free() when done using the list.
+ *
+ * Returns: A #GList containing the name of the variables
+ */
 GList* gel_context_get_variables(const GelContext *self)
 {
     return g_hash_table_get_keys(self->variables);
