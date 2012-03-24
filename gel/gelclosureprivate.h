@@ -6,6 +6,6 @@ typedef struct _GelClosure GelClosure;
 
 GelContext* gel_closure_get_context(GelClosure *self);
 void gel_closure_set_context(GelClosure *self, GelContext *context);
-
+void gel_closure_bind(GClosure *closure);
 
 #endif

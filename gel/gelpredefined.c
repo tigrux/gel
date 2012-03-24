@@ -192,6 +192,7 @@ void define_(GClosure *self, GValue *return_value,
     gchar *name = NULL;
     GValue *value = NULL;
     gboolean defined = TRUE;
+    GClosure *closure = NULL;
 
     GType type = GEL_VALUE_TYPE(values + 0);
 
@@ -222,7 +223,7 @@ void define_(GClosure *self, GValue *return_value,
                 if(gel_context_lookup(context, name) == NULL)
                 {
                     defined = FALSE;
-                    GClosure *closure = new_closure(context, name,
+                    closure = new_closure(context, name,
                             array_n_values, array_values, n_values, values);
                     if(closure != NULL)
                     {
@@ -242,7 +243,11 @@ void define_(GClosure *self, GValue *return_value,
             g_warning("%s: Symbol '%s' already exists", __FUNCTION__, name);
         else
             if(value != NULL)
+            {
                 gel_context_insert(context, name, value);
+                if(closure != NULL)
+                    gel_closure_bind(closure);
+            }
 
     gel_value_list_free(list);
 }
@@ -264,6 +269,7 @@ void lambda_(GClosure *self, GValue *return_value,
 
     if(closure != NULL)
     {
+        gel_closure_bind(closure);
         g_value_init(return_value, G_TYPE_CLOSURE);
         g_value_take_boxed(return_value, closure);
     }

@@ -117,7 +117,7 @@ gboolean gel_closure_has_argument(const GelClosure *self, const gchar *name)
 
 
 static
-void gel_closure_bind_symbols(GelClosure *self, GValueArray *array)
+void gel_closure_bind_array(GelClosure *self, GValueArray *array)
 {
     guint array_n_values = array->n_values;
     GValue *array_values = array->values;
@@ -128,7 +128,7 @@ void gel_closure_bind_symbols(GelClosure *self, GValueArray *array)
         const GValue *value = array_values + i;
         GType type = GEL_VALUE_TYPE(value);
         if(type == G_TYPE_VALUE_ARRAY)
-            gel_closure_bind_symbols(self,
+            gel_closure_bind_array(self,
                 (GValueArray*)gel_value_get_boxed(value));
         else
         if(type == GEL_TYPE_SYMBOL)
@@ -136,16 +136,22 @@ void gel_closure_bind_symbols(GelClosure *self, GValueArray *array)
             GelSymbol *symbol = (GelSymbol*)gel_value_get_boxed(value);
             const gchar *symbol_name = gel_symbol_get_name(symbol);
             const GelContext *context = gel_closure_get_context(self);
-            if(gel_context_has_variable(context, symbol_name))
-                if(!gel_closure_has_argument(self, symbol_name))
-                {
-                    GelVariable *variable =
-                        gel_context_lookup_variable(context, symbol_name);
-                    if(variable != NULL)
-                        gel_symbol_set_variable(symbol, variable);
-                }
+            if(!gel_closure_has_argument(self, symbol_name))
+            {
+                GelVariable *variable =
+                    gel_context_lookup_variable(context, symbol_name);
+                if(variable != NULL)
+                    gel_symbol_set_variable(symbol, variable);
+            }
         }
     }
+}
+
+
+void gel_closure_bind(GClosure *closure)
+{
+    GelClosure *self = (GelClosure *)closure;
+    gel_closure_bind_array(self, self->code);
 }
 
 
@@ -190,7 +196,6 @@ GClosure* gel_closure_new(const gchar *name, gchar **args, GValueArray *code,
     self->name = g_strdup(name);
     self->args = args;
     self->code = code;
-    gel_closure_bind_symbols(self, code);
 
     return closure;
 }
