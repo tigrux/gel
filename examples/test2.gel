@@ -1,17 +1,17 @@
 
 (define (primes-lesser-than top)
-    (define sieve (array 2))
+    (define primes (array 2))
     (define n 3)
-    (define (remains i)
+    (define (cannot-divide-n i)
         (% n i)
     )
     (while (< n top)
-        (when (all remains sieve)
-            (append sieve n)
+        (when (all cannot-divide-n primes)
+            (append primes n)
         )
         (= n (+ n 2))
     )
-    sieve
+    primes
 )
 
 (define first-primes (primes-lesser-than 100))

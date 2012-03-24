@@ -1,19 +1,19 @@
 
-(define sieve (array 2))
+(define primes (array 2))
 
 (for n (range 3 1000000)
-    (for i sieve
+    (for i primes
         (when (== (% n i) 0)
             (break)
         )
         (when (>= (* i i) n)
-            (append sieve n)
+            (append primes n)
             (break)
         )
     )
 )
 
-(print "Calculated " (len sieve) " primes")
+(print "Calculated " (len primes) " primes")
 
 (quit)
 
