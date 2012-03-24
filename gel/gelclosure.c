@@ -93,6 +93,7 @@ void gel_closure_finalize(GelContext *self, GelClosure *closure)
     g_strfreev(closure->args);
     g_hash_table_unref(closure->args_hash);
     g_value_array_free(closure->code);
+    gel_context_free(self);
 }
 
 
@@ -172,7 +173,9 @@ GClosure* gel_closure_new(const gchar *name, gchar **args, GValueArray *code,
     g_return_val_if_fail(args != NULL, NULL);
     g_return_val_if_fail(code != NULL, NULL);
 
-    GClosure *closure = g_closure_new_simple(sizeof(GelClosure), context);
+    GelContext *new_context = gel_context_dup(context);
+    gel_context_set_outer(new_context, context);
+    GClosure *closure = g_closure_new_simple(sizeof(GelClosure), new_context);
     g_closure_set_marshal(closure, (GClosureMarshal)gel_closure_marshal);
     g_closure_add_finalize_notifier(closure, 
         context, (GClosureNotify)gel_closure_finalize);

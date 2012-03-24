@@ -439,6 +439,13 @@ GelContext* gel_context_get_outer(const GelContext* self)
 }
 
 
+void gel_context_set_outer(GelContext *self, GelContext *context)
+{
+    g_return_if_fail(self != NULL);
+    self->outer = context;
+}
+
+
 /**
  * gel_context_get_running:
  * @self: #GelContext to check if it is running or not

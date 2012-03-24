@@ -17,5 +17,6 @@ gboolean gel_context_has_variable(const GelContext *self, const gchar *name);
 
 void gel_context_append_closure(GelContext *self, GelClosure *closure);
 
+void gel_context_set_outer(GelContext *self, GelContext *context);
 
 #endif
