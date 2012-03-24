@@ -6,6 +6,7 @@ class Demo : Object {
         print("Instantiating a %s\n", typeof(Gel.Context).name());
         context = new Gel.Context();
         context.insert_function("quit", quit);
+        context.insert_object("label", new Gtk.Label("Added from Vala"));
     }
 
     public void quit(Closure closure, out Value return_value) {

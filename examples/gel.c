@@ -70,8 +70,10 @@ int main(int argc, char *argv[])
     }
 
     context = gel_context_new();
-    gel_context_insert_function(context, "quit", demo_quit, NULL);
-    gel_context_insert_object(context, "label", gtk_label_new("This is gel"));
+    gel_context_insert_function(context,
+        "quit", demo_quit, NULL);
+    gel_context_insert_object(context,
+        "label", (GObject*)gtk_label_new("Added from C"));
 
     gtk_init_add((GtkFunction)demo_run, NULL);
     gtk_main();
