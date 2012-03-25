@@ -997,17 +997,23 @@ void cond_(GClosure *self, GValue *return_value,
            guint n_values, const GValue *values, GelContext *context)
 {
     GList *list = NULL;
+    GelContext *cond_context = gel_context_new_with_outer(context);
+
+    GValue *default_value = gel_value_new_of_type(G_TYPE_BOOLEAN);
+    gel_value_set_boolean(default_value, TRUE);
+    gel_context_insert(cond_context, "default", default_value);
+
     gboolean running = TRUE;
     while(n_values > 0 && running)
     {
         GValueArray *array = NULL;
-        if(gel_context_eval_params(context, __FUNCTION__, &list,
+        if(gel_context_eval_params(cond_context, __FUNCTION__, &list,
                 "a*", &n_values, &values, &array))
         {
             const GValue *array_values = array->values;
             guint array_n_values = array->n_values;
             GValue *cond_value = NULL;
-            if(!gel_context_eval_params(context, __FUNCTION__, &list,
+            if(!gel_context_eval_params(cond_context, __FUNCTION__, &list,
                     "V*", &array_n_values, &array_values, &cond_value))
                 running = FALSE;
             else
@@ -1021,6 +1027,7 @@ void cond_(GClosure *self, GValue *return_value,
         else
             running = FALSE;
     }
+    gel_context_free(cond_context);
     gel_value_list_free(list);
 }
 
