@@ -48,7 +48,7 @@
         ((= n 1)
             1
         )
-        (TRUE
+        (#t
             (+ (fibonacci (- n 1))
                (fibonacci (- n 2))
             )

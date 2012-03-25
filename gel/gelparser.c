@@ -180,7 +180,7 @@ GValueArray* gel_parse_text(const gchar *text, guint text_len)
     GScanner *scanner = g_scanner_new(NULL);
 
     scanner->config->cset_identifier_first =
-        (gchar*)G_CSET_a_2_z G_CSET_A_2_Z "=_+-*/%!<>.";
+        (gchar*)G_CSET_a_2_z G_CSET_A_2_Z "#=_+-*/%!<>.";
     scanner->config->cset_identifier_nth =
         (gchar*)G_CSET_a_2_z G_CSET_A_2_Z "=_+-*/%!<>." G_CSET_DIGITS;
     scanner->config->scan_identifier_1char = TRUE;

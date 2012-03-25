@@ -1387,11 +1387,11 @@ GHashTable* gel_make_default_symbols(void)
 
     value = gel_value_new_of_type(G_TYPE_BOOLEAN);
     gel_value_set_boolean(value, TRUE);
-    g_hash_table_insert(symbols, g_strdup("TRUE"), value);
+    g_hash_table_insert(symbols, g_strdup("#t"), value);
 
     value = gel_value_new_of_type(G_TYPE_BOOLEAN);
     gel_value_set_boolean(value, FALSE);
-    g_hash_table_insert(symbols, g_strdup("FALSE"), value);
+    g_hash_table_insert(symbols, g_strdup("#f"), value);
 
     value = gel_value_new_of_type(G_TYPE_POINTER);
     gel_value_set_pointer(value, NULL);
