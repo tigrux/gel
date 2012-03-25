@@ -71,7 +71,7 @@ gboolean gel_context_eval_params(GelContext *self, const gchar *func,
     guint n_args = 0;
     guint i;
     for(i = 0; format[i] != 0; i++)
-        if(strchr("asASIOCV", format[i]) != NULL)
+        if(strchr("asvASIOCV", format[i]) != NULL)
             n_args++;
 
     gboolean exact = (strchr(format, '*') == NULL);
@@ -130,6 +130,12 @@ gboolean gel_context_eval_params(GelContext *self, const gchar *func,
                     gel_warning_value_not_of_type(func,
                         *values, GEL_TYPE_SYMBOL);
                     parsed = FALSE;
+                }
+                break;
+            case 'v':
+                {
+                    const GValue **v = va_arg(args, const GValue **);
+                    *v = *values;
                 }
                 break;
             case 'O':
