@@ -30,6 +30,9 @@
  *     s: get a literal string (#gchararray).
  *   </para></listitem>
  *   <listitem><para>
+ *     v: get a literal value (#GValue *).
+ *   </para></listitem>
+ *   <listitem><para>
  *     A: evaluate and get an array (#GValueArray *).
  *   </para></listitem>
  *   <listitem><para>
