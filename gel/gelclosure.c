@@ -103,12 +103,6 @@ GelContext* gel_closure_get_context(GelClosure *self)
 }
 
 
-void gel_closure_set_context(GelClosure *self, GelContext *context)
-{
-    self->closure.data = context;
-}
-
-
 static
 gboolean gel_closure_has_argument(const GelClosure *self, const gchar *name)
 {
