@@ -2,14 +2,17 @@
 if which gtkdocize; then
     gtkdocize
 else
-    echo You must install gtk-doc-tools
+    echo The package gtk-doc-tools is not installed
     exit 1
 fi
 
 if which autoreconf; then
-  autoreconf -i
+    autoreconf -i
 else
-    echo You must install autoconf
+    echo The package autoreconf is not install
     exit 1
 fi
 
+if test -f configure; then
+    ./configure $@
+fi
