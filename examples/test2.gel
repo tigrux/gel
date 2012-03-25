@@ -18,10 +18,13 @@
 
 (for iter first-primes
     (display "Primes(" (index first-primes iter) ") = " iter)
+    (newline)
 )
 
 (display "The first prime is " (nth first-primes 0))
+(newline)
 (display "The last prime is " (nth first-primes -1))
+(newline)
 
 
 (define (factorial n)
@@ -33,7 +36,9 @@
 
 (define n 10)
 (display "Factorial of " n " is " (factorial n))
+(newline)
 (display n " is " (if (= (% n 2) 0) "even" "odd"))
+(newline)
 
 (define (fibonacci n)
     (cond
@@ -53,6 +58,7 @@
 
 (for i (range 10 0)
     (display "Fibonacci(" i ") = " (fibonacci i))
+    (newline)
 )
 
 

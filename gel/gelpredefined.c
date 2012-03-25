@@ -332,9 +332,21 @@ void display_(GClosure *self, GValue *return_value,
         if(GEL_IS_VALUE(&tmp_value))
             g_value_unset(&tmp_value);
     }
-    g_print("\n");
 }
 
+
+static
+void newline_(GClosure *self, GValue *return_value,
+              guint n_values, const GValue *values, GelContext *context)
+{
+    guint n_args = 0;
+    if(n_values != n_args)
+    {
+        gel_warning_needs_n_arguments(__FUNCTION__, n_args);
+        return;
+    }
+    g_print("\n");
+}
 
 static
 void arithmetic(GClosure *self, GValue *return_value,
@@ -1318,6 +1330,7 @@ GHashTable* gel_make_default_symbols(void)
         CLOSURE(lambda),/* array */
         CLOSURE_NAME("object-connect", object_connect),
         CLOSURE(display),
+        CLOSURE(newline),
         CLOSURE(cond),
         CLOSURE(let),/* value */
         CLOSURE(begin),

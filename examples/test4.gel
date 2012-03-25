@@ -10,7 +10,9 @@
             (if (< i vertices)
                 (begin
                     (display "move " side)
+                    (newline)
                     (display "turn " angle)
+                    (newline)
                     (iterate (+ i 1))
                 )
             )
@@ -45,6 +47,7 @@
 
 (for i (range 1 12)
     (display "Primes(" i ") = " (next-prime))
+    (newline)
 )
 
 
