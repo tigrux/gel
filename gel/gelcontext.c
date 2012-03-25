@@ -9,6 +9,7 @@
 #include <gelvariable.h>
 #include <gelclosure.h>
 
+#define GEL_CONTEXT_USE_POOL 1
 
 /**
  * SECTION:gelcontext
@@ -43,18 +44,20 @@ struct _GelContext
 };
 
 
+#if GEL_CONTEXT_USE_POOL
 static guint contexts_COUNT;
 static GList *contexts_POOL;
 G_LOCK_DEFINE_STATIC(contexts);
-
+#endif
 
 static
-GelContext *gel_context_alloc(void)
+GelContext* gel_context_alloc(void)
 {
     GelContext *self = g_slice_new0(GelContext);
     self->variables = g_hash_table_new_full(
         g_str_hash, g_str_equal,
         (GDestroyNotify)g_free, (GDestroyNotify)gel_variable_unref);
+    self->outer = NULL;
     return self;
 }
 
@@ -63,6 +66,7 @@ static
 void gel_context_dispose(GelContext *self)
 {
     g_hash_table_unref(self->variables);
+    memset(self, 0, sizeof(GelContext));
     g_slice_free(GelContext, self);
 }
 
@@ -93,6 +97,7 @@ GelContext* gel_context_new(void)
 GelContext* gel_context_new_with_outer(GelContext *outer)
 {
     GelContext *self;
+#if GEL_CONTEXT_USE_POOL
     G_LOCK(contexts);
     if(contexts_POOL != NULL)
     {
@@ -103,7 +108,9 @@ GelContext* gel_context_new_with_outer(GelContext *outer)
         self = gel_context_alloc();
     contexts_COUNT++;
     G_UNLOCK(contexts);
-
+#else
+    self = gel_context_alloc();
+#endif
     self->outer = outer;
     self->running = TRUE;
 
@@ -146,6 +153,7 @@ void gel_context_free(GelContext *self)
 {
     g_return_if_fail(self != NULL);
 
+#if GEL_CONTEXT_USE_POOL
     g_hash_table_remove_all(self->variables);
 
     G_LOCK(contexts);
@@ -156,6 +164,9 @@ void gel_context_free(GelContext *self)
         g_list_free(contexts_POOL);
     }
     G_UNLOCK(contexts);
+#else
+    gel_context_dispose(self);
+#endif
 }
 
 
