@@ -1,3 +1,6 @@
+#include <stdlib.h>
+#include <string.h>
+
 #include <gelparser.h>
 #include <gelsymbol.h>
 #include <gelvalue.h>
@@ -33,7 +36,6 @@ static
 GValueArray* gel_parse_scanner(GScanner *scanner)
 {
     GValueArray *array = g_value_array_new(ARRAY_N_PREALLOCATED);
-    gint sign = 1;
 
     gboolean parsing = TRUE;
     while(parsing)
@@ -51,14 +53,12 @@ GValueArray* gel_parse_scanner(GScanner *scanner)
             case G_TOKEN_FLOAT:
                 g_scanner_get_next_token(scanner);
                 g_value_init(&value, G_TYPE_DOUBLE);
-                g_value_set_double(&value, scanner->value.v_float * sign);
-                sign = 1;
+                g_value_set_double(&value, scanner->value.v_float);
                 break;
             case G_TOKEN_INT:
                 g_scanner_get_next_token(scanner);
                 g_value_init(&value, G_TYPE_LONG);
-                g_value_set_long(&value, scanner->value.v_int * sign);
-                sign = 1;
+                g_value_set_long(&value, scanner->value.v_int);
                 break;
             case G_TOKEN_LEFT_PAREN:
                 g_scanner_get_next_token(scanner);
@@ -75,82 +75,6 @@ GValueArray* gel_parse_scanner(GScanner *scanner)
                 g_value_init(&value, G_TYPE_STRING);
                 g_value_set_string(&value, scanner->value.v_string);
                 break;
-            case '=':
-                g_scanner_get_next_token(scanner);
-                token = g_scanner_peek_next_token(scanner);
-                if(token == '=')
-                {
-                    g_scanner_get_next_token(scanner);
-                    name = "eq";
-                }
-                else
-                    name = "set";
-                break;
-            case '!':
-                g_scanner_get_next_token(scanner);
-                token = g_scanner_peek_next_token(scanner);
-                if(token == '=')
-                {
-                    g_scanner_get_next_token(scanner);
-                    name = "ne";
-                }
-                else
-                    name = "not";
-                break;
-            case '+':
-                g_scanner_get_next_token(scanner);
-                name = "add";
-                break;
-            case '*':
-                g_scanner_get_next_token(scanner);
-                name = "mul";
-                break;
-            case '/':
-                g_scanner_get_next_token(scanner);
-                name = "div";
-                break;
-            case '%':
-                g_scanner_get_next_token(scanner);
-                name = "mod";
-                break;
-            case '&':
-                g_scanner_get_next_token(scanner);
-                name = "and";
-                break;
-            case '|':
-                g_scanner_get_next_token(scanner);
-                name = "or";
-                break;
-            case '<':
-                g_scanner_get_next_token(scanner);
-                token = g_scanner_peek_next_token(scanner);
-                if(token == '=')
-                {
-                    g_scanner_get_next_token(scanner);
-                    name = "le";
-                }
-                else
-                    name = "lt";
-                break;
-            case '>':
-                g_scanner_get_next_token(scanner);
-                token = g_scanner_peek_next_token(scanner);
-                if(token == '=')
-                {
-                    g_scanner_get_next_token(scanner);
-                    name = "ge";
-                }
-                else
-                    name = "gt";
-                break;
-            case '-':
-                g_scanner_get_next_token(scanner);
-                token = g_scanner_peek_next_token(scanner);
-                if(token == G_TOKEN_INT || token == G_TOKEN_FLOAT)
-                    sign = -sign;
-                else
-                    name = "sub";
-                break;
             case G_TOKEN_ERROR:
                 g_scanner_get_next_token(scanner);
                 g_error("%s at line %u, char %u",
@@ -164,13 +88,43 @@ GValueArray* gel_parse_scanner(GScanner *scanner)
 
         if(name != NULL)
         {
-            GValue *symbol = gel_value_lookup_predefined(name);
-            if(symbol != NULL)
-                g_value_array_append(array, symbol);
-            else
+            gboolean is_number = FALSE;
+            guint len = strlen(name);
+            if(name[0] == '-' && len > 1)
             {
-                g_value_init(&value, GEL_TYPE_SYMBOL);
-                g_value_take_boxed(&value, gel_symbol_new(name, NULL));
+                GScanner *num_scanner = g_scanner_new(NULL);
+                g_scanner_input_text(num_scanner, name+1, len-1);
+                guint num_token = g_scanner_get_next_token(num_scanner);
+                if(g_scanner_peek_next_token(num_scanner) != G_TOKEN_EOF)
+                    num_token = G_TOKEN_EOF;
+                switch(num_token)
+                {
+                    case G_TOKEN_FLOAT:
+                        g_value_init(&value, G_TYPE_DOUBLE);
+                        g_value_set_double(&value, -num_scanner->value.v_float);
+                        is_number = TRUE;
+                        break;
+                    case G_TOKEN_INT:
+                        g_value_init(&value, G_TYPE_LONG);
+                        g_value_set_long(&value, -num_scanner->value.v_int);
+                        is_number = TRUE;
+                        break;
+                    default:
+                        break;
+                }
+                g_scanner_destroy(num_scanner);
+            }
+            
+            if(!is_number)
+            {
+                GValue *symbol = gel_value_lookup_predefined(name);
+                if(symbol != NULL)
+                    g_value_array_append(array, symbol);
+                else
+                {
+                    g_value_init(&value, GEL_TYPE_SYMBOL);
+                    g_value_take_boxed(&value, gel_symbol_new(name, NULL));
+                }
             }
         }
 
@@ -225,8 +179,10 @@ GValueArray* gel_parse_text(const gchar *text, guint text_len)
 {
     GScanner *scanner = g_scanner_new(NULL);
 
+    scanner->config->cset_identifier_first =
+        (gchar*)G_CSET_a_2_z G_CSET_A_2_Z "=_+-*/%!<>.";
     scanner->config->cset_identifier_nth =
-        (gchar*)G_CSET_a_2_z G_CSET_A_2_Z "_-" G_CSET_DIGITS;
+        (gchar*)G_CSET_a_2_z G_CSET_A_2_Z "=_+-*/%!<>." G_CSET_DIGITS;
     scanner->config->scan_identifier_1char = TRUE;
     g_scanner_input_text(scanner, text, text_len);
 

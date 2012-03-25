@@ -306,8 +306,8 @@ void object_connect(GClosure *self, GValue *return_value,
 
 
 static
-void print_(GClosure *self, GValue *return_value,
-            guint n_values, const GValue *values, GelContext *context)
+void display_(GClosure *self, GValue *return_value,
+              guint n_values, const GValue *values, GelContext *context)
 {
     guint n_args = 1;
     if(n_values < n_args)
@@ -1310,14 +1310,14 @@ GHashTable* gel_make_default_symbols(void)
 {
     struct {const gchar *name; GClosureMarshal marshal;} *c, closures[] =
     {
-        CLOSURE(set),/* string */
+        CLOSURE_NAME("set!", set_),/* string */
         CLOSURE(define),/* string */
         CLOSURE_NAME("object-new", object_new),
         CLOSURE_NAME("object-get", object_get),
         CLOSURE_NAME("object-set", object_set),
         CLOSURE(lambda),/* array */
         CLOSURE_NAME("object-connect", object_connect),
-        CLOSURE(print),
+        CLOSURE(display),
         CLOSURE(cond),
         CLOSURE(let),/* value */
         CLOSURE(begin),
@@ -1329,20 +1329,20 @@ GHashTable* gel_make_default_symbols(void)
         CLOSURE(when),
         CLOSURE(unless),
         CLOSURE(str),
-        CLOSURE(add),
-        CLOSURE(sub),
-        CLOSURE(mul),
-        CLOSURE(div),
-        CLOSURE(mod),
+        CLOSURE_NAME("+", add_),
+        CLOSURE_NAME("-", sub_),
+        CLOSURE_NAME("*", mul_),
+        CLOSURE_NAME("/", div_),
+        CLOSURE_NAME("%", mod_),
         CLOSURE(and),
         CLOSURE(not),
         CLOSURE(or),
-        CLOSURE(gt),
-        CLOSURE(ge),
-        CLOSURE(eq),
-        CLOSURE(lt),
-        CLOSURE(le),
-        CLOSURE(ne),
+        CLOSURE_NAME(">", gt_),
+        CLOSURE_NAME(">=", ge_),
+        CLOSURE_NAME("=", eq_),
+        CLOSURE_NAME("<", lt_),
+        CLOSURE_NAME("<=", le_),
+        CLOSURE_NAME("!=", ne_),
         CLOSURE(range),
         CLOSURE(any),
         CLOSURE(all),

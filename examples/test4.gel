@@ -9,8 +9,8 @@
             )
             (if (< i vertices)
                 (begin
-                    (print "move " side)
-                    (print "turn " angle)
+                    (display "move " side)
+                    (display "turn " angle)
                     (iterate (+ i 1))
                 )
             )
@@ -33,9 +33,9 @@
             (when (all cannot-divide-candidate primes)
                 (append primes candidate)
                 (define result candidate)
-                (set calculating FALSE)
+                (set! calculating FALSE)
             )
-            (= candidate (+ candidate 1))
+            (set! candidate (+ candidate 1))
         )
         result
     )
@@ -44,7 +44,9 @@
 (define next-prime (generate-primes))
 
 (for i (range 1 12)
-    (print "Primes(" i ") = " (next-prime))
+    (display "Primes(" i ") = " (next-prime))
 )
 
+
 (quit)
+

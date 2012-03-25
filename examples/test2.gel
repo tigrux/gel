@@ -9,7 +9,7 @@
         (when (all cannot-divide-n primes)
             (append primes n)
         )
-        (= n (+ n 2))
+        (set! n (+ n 2))
     )
     primes
 )
@@ -17,11 +17,11 @@
 (define first-primes (primes-lesser-than 100))
 
 (for iter first-primes
-    (print "Primes(" (index first-primes iter) ") = " iter)
+    (display "Primes(" (index first-primes iter) ") = " iter)
 )
 
-(print "The first prime is " (nth first-primes 0))
-(print "The last prime is " (nth first-primes -1))
+(display "The first prime is " (nth first-primes 0))
+(display "The last prime is " (nth first-primes -1))
 
 
 (define (factorial n)
@@ -32,15 +32,15 @@
 )
 
 (define n 10)
-(print "Factorial of " n " is " (factorial n))
-(print n " is " (if (== (% n 2) 0) "even" "odd"))
+(display "Factorial of " n " is " (factorial n))
+(display n " is " (if (= (% n 2) 0) "even" "odd"))
 
 (define (fibonacci n)
     (cond
-        ((== n 0)
+        ((= n 0)
             0
         )
-        ((== n 1)
+        ((= n 1)
             1
         )
         (TRUE
@@ -52,7 +52,7 @@
 )
 
 (for i (range 10 0)
-    (print "Fibonacci(" i ") = " (fibonacci i))
+    (display "Fibonacci(" i ") = " (fibonacci i))
 )
 
 

@@ -8,7 +8,7 @@
 
 
 (define (negative-of n)
-    (sub 0 n)
+    (- 0 n)
 )
 
 (map negative-of S)
@@ -23,7 +23,7 @@
 
 (sort S)
 S
-(== S (array -15 -6 0.0 30.6 77))
+(= S (array -15 -6 0.0 30.6 77))
 
 
 (define values (array 4.5 2))

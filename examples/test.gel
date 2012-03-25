@@ -22,9 +22,9 @@
 
 (object-connect button "clicked"
     (lambda (widget)
-        (print "Previous label " (object-get widget "label"))
+        (display "Previous label " (object-get widget "label"))
         (object-set widget "label" "Thanks!")
-        (set counter (add counter 1))
+        (set! counter (+ counter 1))
         (object-set entry "text" counter)
     )
 )
