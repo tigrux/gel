@@ -7,10 +7,12 @@
         (let iterate (
             (i 0)
             )
-            (when (< i vertices)
-                (print "move " side)
-                (print "turn " angle)
-                (iterate (+ i 1))
+            (if (< i vertices)
+                (begin
+                    (print "move " side)
+                    (print "turn " angle)
+                    (iterate (+ i 1))
+                )
             )
         )
     )

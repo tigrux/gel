@@ -1120,10 +1120,10 @@ static
 void if_(GClosure *self, GValue *return_value,
          guint n_values, const GValue *values, GelContext *context)
 {
-    guint n_args = 3;
+    guint n_args = 2;
     if(n_values != n_args)
     {
-        gel_warning_needs_n_arguments(__FUNCTION__, n_args);
+        gel_warning_needs_at_least_n_arguments(__FUNCTION__, n_args);
         return;
     }
 
@@ -1134,7 +1134,9 @@ void if_(GClosure *self, GValue *return_value,
     if(gel_value_to_boolean(cond_value))
         gel_context_eval(context, values + 1, return_value);
     else
-        gel_context_eval(context, values + 2, return_value);
+        if(n_values > 2)
+            gel_context_eval(context, values + 2, return_value);
+
     if(GEL_IS_VALUE(&tmp_value))
         g_value_unset(&tmp_value);
 }
