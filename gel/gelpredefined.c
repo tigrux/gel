@@ -866,6 +866,95 @@ void filter_(GClosure *self, GValue *return_value,
 
 
 static
+void let_(GClosure *self, GValue *return_value,
+            guint n_values, const GValue *values, GelContext *context)
+{
+    guint n_args = 2;
+    if(n_values < n_args)
+    {
+        gel_warning_needs_at_least_n_arguments(__FUNCTION__, n_args);
+        return;
+    }
+
+    GList *list = NULL;
+    gchar *name = NULL;
+    GValue *body = NULL;
+    
+    GType type = GEL_VALUE_TYPE(values + 0);
+
+    if(type == GEL_TYPE_SYMBOL)
+    {
+        if(gel_context_eval_params(context, __FUNCTION__, &list,
+             "s*", &n_values, &values, &name));
+    }
+
+    GValueArray *bindings = NULL;
+
+    if(gel_context_eval_params(context, __FUNCTION__, &list,
+           "a*", &n_values, &values, &bindings))
+    {
+        guint bindings_n_values = bindings->n_values;
+        const GValue *bindings_values = bindings->values;
+        guint n_vars =  bindings_n_values;
+        gchar **var_names = g_new0(gchar *, n_vars+1);
+        GValue **var_values = g_new(GValue *, n_vars);
+        guint i;
+        for(i = 0; i < n_vars; i++)
+        {
+            GValueArray *binding = NULL;
+            if(gel_context_eval_params(context, __FUNCTION__, &list,
+                "a*", &bindings_n_values, &bindings_values, &binding))
+            {
+                guint binding_n_values = binding->n_values;
+                const GValue *binding_values = binding->values;
+                gchar *var_name = NULL;
+                GValue *var_value = NULL;
+                if(gel_context_eval_params(context, __FUNCTION__, &list,
+                    "sV", &binding_n_values, &binding_values,
+                    &var_name, &var_value))
+                {
+                    var_names[i] = g_strdup(var_name);
+                    var_values[i] = var_value;
+                }
+            }
+        }
+
+        if(gel_context_eval_params(context, __FUNCTION__, &list,
+            "v", &n_values, &values, &body))
+        {
+            GelContext *let_context = gel_context_new_with_outer(context);
+            if(name != NULL)
+            {
+                GValueArray *code = g_value_array_new(1);
+                g_value_array_append(code, body);
+                GClosure *closure =
+                    gel_closure_new(name, var_names, code, let_context);
+                if(closure != NULL)
+                {
+                    GValue *value = gel_value_new_of_type(G_TYPE_CLOSURE);
+                    g_value_take_boxed(value, closure);
+                    gel_context_insert(let_context, name, value);
+                    gel_closure_bind(closure);
+                }
+            }
+
+            guint i;
+            for(i = 0; i < n_vars; i++)
+            {
+                gel_context_insert(let_context,
+                    var_names[i], gel_value_dup(var_values[i]));
+            }
+
+            gel_context_eval_into_value(let_context, body, return_value);
+            g_free(var_values);
+            gel_context_free(let_context);
+        }
+    }
+    gel_value_list_free(list);
+}
+
+
+static
 void begin_(GClosure *self, GValue *return_value,
             guint n_values, const GValue *values, GelContext *context)
 {
@@ -1228,6 +1317,7 @@ GHashTable* gel_make_default_symbols(void)
         CLOSURE_NAME("object-connect", object_connect),
         CLOSURE(print),
         CLOSURE(cond),
+        CLOSURE(let),/* value */
         CLOSURE(begin),
         CLOSURE(array),
         CLOSURE(for),/* string */
