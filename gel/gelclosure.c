@@ -184,7 +184,7 @@ GClosure* gel_closure_new(const gchar *name, gchar **args, GValueArray *code,
     GClosure *closure = g_closure_new_simple(sizeof(GelClosure), new_context);
     g_closure_set_marshal(closure, (GClosureMarshal)gel_closure_marshal);
     g_closure_add_finalize_notifier(closure, 
-        context, (GClosureNotify)gel_closure_finalize);
+        new_context, (GClosureNotify)gel_closure_finalize);
 
     GHashTable *args_hash = g_hash_table_new(g_str_hash, g_str_equal);
     guint i;
