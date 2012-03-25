@@ -3,7 +3,7 @@ completely written in GObject and C, but inspired in scheme and python.
 
 It is very easy to use, since everything is an array, number or symbol.
 
-Code is very small, just 6 files of code.
+The Code is very small, just 8 modules.
 
 What makes gel different is that everything is implemented in glib:
 - Symbols are GValues.
@@ -22,7 +22,7 @@ However, the syntax is not a direct copy of scheme or lisp:
 Bindings for Vala are provided (see examples/gel.vala)
 Support for gobject-introspection will be optional and available soon.
 
-However, the project has just started, so speed or elegance is not a
+However, the project is not mature yet, so speed or elegance is not a
 priority yet. The current goal is to prevent memory leaks and provide
 an API comfortable to use from both C and Gel.
 
