@@ -1031,7 +1031,7 @@ void cond_(GClosure *self, GValue *return_value,
 
     GValue *default_value = gel_value_new_of_type(G_TYPE_BOOLEAN);
     gel_value_set_boolean(default_value, TRUE);
-    gel_context_insert(cond_context, "default", default_value);
+    gel_context_insert(cond_context, "else", default_value);
 
     gboolean running = TRUE;
     while(n_values > 0 && running)
