@@ -224,17 +224,7 @@ const GValue* gel_context_eval_into_value(GelContext *self,
     {
         const GelSymbol *symbol = (GelSymbol*)gel_value_get_boxed(value);
         const gchar *symbol_name = gel_symbol_get_name(symbol);
-        if(gel_context_has_variable(self, symbol_name))
-            result = gel_context_lookup(self, symbol_name);
-        else
-            result = gel_symbol_get_value(symbol);
-
-        if(result == NULL)
-        {
-            GelContext *outer = gel_context_get_outer(self);
-            if(outer != NULL)
-                result = gel_context_lookup(self, symbol_name);
-        }
+        result = gel_context_lookup(self, symbol_name);
 
         if(result == NULL)
             gel_warning_unknown_symbol(__FUNCTION__, symbol_name);
