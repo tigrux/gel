@@ -188,12 +188,34 @@ gboolean gel_context_eval(GelContext *self, const GValue *value, GValue *dest)
 
     const GValue *result = gel_context_eval_into_value(self, value, dest);
     if(GEL_IS_VALUE(result))
-    {
         if(result != dest)
+        {
+            if(GEL_IS_VALUE(dest))
+                g_value_unset(dest);
             gel_value_copy(result, dest);
-        return TRUE;
-    }
+            return TRUE;
+        }
+
     return FALSE;
+}
+
+
+const GValue* gel_context_eval_param_into_value(GelContext *self,
+                                     const GValue *value, GValue *out_value)
+{
+    const GValue *result_value =
+        gel_context_eval_into_value(self, value, out_value);
+    if(GEL_VALUE_HOLDS(result_value, GEL_TYPE_SYMBOL))
+    {
+        const GelSymbol *symbol = (GelSymbol*)g_value_get_boxed(result_value);
+        if(symbol != NULL)
+        {
+            const GValue *symbol_value = gel_symbol_get_value(symbol);
+            if(symbol_value != NULL)
+                result_value = symbol_value;
+        }
+    }
+    return result_value;
 }
 
 

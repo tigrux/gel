@@ -1,0 +1,14 @@
+
+(define ls (array "red" "green" "blue"))
+
+(define (ref-ls)
+    (& ls)
+)
+
+
+(append (ref-ls) "white")
+
+(display ls)
+
+(quit)
+

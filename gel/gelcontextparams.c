@@ -1,6 +1,7 @@
 #include <string.h>
 
 #include <gelcontext.h>
+#include <gelcontextprivate.h>
 #include <geldebug.h>
 #include <gelvalue.h>
 #include <gelvalueprivate.h>
@@ -144,7 +145,7 @@ gboolean gel_context_eval_params(GelContext *self, const gchar *func,
             case 'O':
                 value = gel_value_new();
                 result_value =
-                    gel_context_eval_into_value(self, *values, value);
+                    gel_context_eval_param_into_value(self, *values, value);
                 if(GEL_VALUE_HOLDS(result_value, G_TYPE_OBJECT))
                 {
                     GObject **obj = va_arg(args, GObject **);
@@ -160,7 +161,7 @@ gboolean gel_context_eval_params(GelContext *self, const gchar *func,
             case 'A':
                 value = gel_value_new();
                 result_value =
-                    gel_context_eval_into_value(self, *values, value);
+                    gel_context_eval_param_into_value(self, *values, value);
                 if(GEL_VALUE_HOLDS(result_value, G_TYPE_VALUE_ARRAY))
                 {
                     GValueArray **a = va_arg(args, GValueArray **);
@@ -176,7 +177,7 @@ gboolean gel_context_eval_params(GelContext *self, const gchar *func,
             case 'S':
                 value = gel_value_new();
                 result_value =
-                    gel_context_eval_into_value(self, *values, value);
+                    gel_context_eval_param_into_value(self, *values, value);
                 if(GEL_VALUE_HOLDS(result_value, G_TYPE_STRING))
                 {
                     const gchar **s = va_arg(args, const gchar **);
@@ -192,7 +193,7 @@ gboolean gel_context_eval_params(GelContext *self, const gchar *func,
             case 'I':
                 value = gel_value_new();
                 result_value =
-                    gel_context_eval_into_value(self, *values, value);
+                    gel_context_eval_param_into_value(self, *values, value);
                 if(GEL_VALUE_HOLDS(result_value, G_TYPE_LONG))
                 {
                     glong *i = va_arg(args, glong *);
@@ -208,7 +209,7 @@ gboolean gel_context_eval_params(GelContext *self, const gchar *func,
             case 'C':
                 value = gel_value_new();
                 result_value =
-                    gel_context_eval_into_value(self, *values, value);
+                    gel_context_eval_param_into_value(self, *values, value);
                 if(GEL_VALUE_HOLDS(result_value, G_TYPE_CLOSURE))
                 {
                     GClosure **closure = va_arg(args, GClosure **);
@@ -224,7 +225,7 @@ gboolean gel_context_eval_params(GelContext *self, const gchar *func,
             case 'V':
                 value = gel_value_new();
                 result_value =
-                    gel_context_eval_into_value(self, *values, value);
+                    gel_context_eval_param_into_value(self, *values, value);
                 if(GEL_IS_VALUE(result_value))
                 {
                     const GValue **v = va_arg(args, const GValue **);

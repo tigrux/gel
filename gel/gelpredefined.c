@@ -178,6 +178,35 @@ GClosure* new_closure(GelContext *context, const gchar *name,
 
 
 static
+void ref_(GClosure *self, GValue *return_value,
+          guint n_values, const GValue *values, GelContext *context)
+{
+    guint n_args = 1;
+    if(n_values != n_args)
+    {
+        gel_warning_needs_n_arguments(__FUNCTION__, n_args);
+        return;
+    }
+
+    GList *list = NULL;
+    gchar *name;
+    if(gel_context_eval_params(context, __FUNCTION__, &list,
+            "s", &n_values, &values, &name))
+    {
+        GelVariable *variable = gel_context_lookup_variable(context, name);
+        if(variable != NULL)
+        {
+            GelSymbol *symbol =
+                gel_symbol_new(name, gel_variable_ref(variable));
+            g_value_init(return_value, GEL_TYPE_SYMBOL);
+            g_value_take_boxed(return_value, symbol);
+        }
+    }
+    gel_value_list_free(list);
+}
+
+
+static
 void define_(GClosure *self, GValue *return_value,
              guint n_values, const GValue *values, GelContext *context)
 {
@@ -627,7 +656,8 @@ void append_(GClosure *self, GValue *return_value,
     for(i = 0; i < n_values; i++)
     {
         GValue tmp = {0};
-        const GValue *value = gel_context_eval_into_value(context, values + i, &tmp);
+        const GValue *value =
+            gel_context_eval_into_value(context,values + i, &tmp);
         g_value_array_append(array, value);
         if(GEL_IS_VALUE(&tmp))
             g_value_unset(&tmp);
@@ -1330,6 +1360,7 @@ GHashTable* gel_make_default_symbols(void)
     struct {const gchar *name; GClosureMarshal marshal;} *c, closures[] =
     {
         CLOSURE_NAME("set!", set_),/* string */
+        CLOSURE(ref),/* string */
         CLOSURE(define),/* string */
         CLOSURE_NAME("object-new", object_new),
         CLOSURE_NAME("object-get", object_get),
