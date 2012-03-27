@@ -188,13 +188,15 @@ gboolean gel_context_eval(GelContext *self, const GValue *value, GValue *dest)
 
     const GValue *result = gel_context_eval_into_value(self, value, dest);
     if(GEL_IS_VALUE(result))
+    {
         if(result != dest)
         {
             if(GEL_IS_VALUE(dest))
                 g_value_unset(dest);
             gel_value_copy(result, dest);
-            return TRUE;
         }
+        return TRUE;
+    }
 
     return FALSE;
 }
