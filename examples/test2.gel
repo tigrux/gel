@@ -6,7 +6,7 @@
         (% n i)
     )
     (while (< n top)
-        (when (all cannot-divide-n primes)
+        (if (all cannot-divide-n primes)
             (append primes n)
         )
         (set! n (+ n 2))
@@ -17,14 +17,11 @@
 (define first-primes (primes-lesser-than 100))
 
 (for iter first-primes
-    (display "Primes(" (index first-primes iter) ") = " iter)
-    (newline)
+    (display "Primes(" (index first-primes iter) ") = " iter  "\n")
 )
 
-(display "The first prime is " (nth first-primes 0))
-(newline)
-(display "The last prime is " (nth first-primes -1))
-(newline)
+(display "The first prime is " (nth first-primes 0) "\n")
+(display "The last prime is " (nth first-primes -1) "\n")
 
 
 (define (factorial n)
@@ -35,10 +32,8 @@
 )
 
 (define n 10)
-(display "Factorial of " n " is " (factorial n))
-(newline)
-(display n " is " (if (= (% n 2) 0) "even" "odd"))
-(newline)
+(display "Factorial of " n " is " (factorial n) "\n")
+(display n " is " (if (= (% n 2) 0) "even" "odd") "\n")
 
 (define (fibonacci n)
     (cond
@@ -57,8 +52,7 @@
 )
 
 (for i (range 10 0)
-    (display "Fibonacci(" i ") = " (fibonacci i))
-    (newline)
+    (display "Fibonacci(" i ") = " (fibonacci i) "\n")
 )
 
 

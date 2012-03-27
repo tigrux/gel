@@ -365,19 +365,6 @@ void display_(GClosure *self, GValue *return_value,
 
 
 static
-void newline_(GClosure *self, GValue *return_value,
-              guint n_values, const GValue *values, GelContext *context)
-{
-    guint n_args = 0;
-    if(n_values != n_args)
-    {
-        gel_warning_needs_n_arguments(__FUNCTION__, n_args);
-        return;
-    }
-    g_print("\n");
-}
-
-static
 void arithmetic(GClosure *self, GValue *return_value,
                 guint n_values, const GValue *values,
                 GelContext *context, GelValuesArithmetic values_function)
@@ -463,29 +450,6 @@ void logic(GClosure *self, GValue *return_value,
 
     g_value_init(return_value, G_TYPE_BOOLEAN);
     gel_value_set_boolean(return_value, result);
-}
-
-
-static
-void not_(GClosure *self, GValue *return_value,
-          guint n_values, const GValue *values, GelContext *context)
-{
-    guint n_args = 1;
-    if(n_values != n_args)
-    {
-        gel_warning_needs_n_arguments(__FUNCTION__, n_args);
-        return;
-    }
-
-    GValue tmp_value = {0};
-    const GValue *value =
-        gel_context_eval_into_value(context, values + 0, &tmp_value);
-    gboolean value_bool = gel_value_to_boolean(value);
-    if(GEL_IS_VALUE(&tmp_value))
-        g_value_unset(&tmp_value);
-
-    g_value_init(return_value, G_TYPE_BOOLEAN);
-    gel_value_set_boolean(return_value, !value_bool);
 }
 
 
@@ -1192,53 +1156,6 @@ void if_(GClosure *self, GValue *return_value,
 
 
 static
-void when_(GClosure *self, GValue *return_value,
-           guint n_values, const GValue *values, GelContext *context)
-{
-    guint n_args = 2;
-    if(n_values < n_args)
-    {
-        gel_warning_needs_at_least_n_arguments(__FUNCTION__, n_args);
-        return;
-    }
-
-    GValue tmp_value = {0};
-    const GValue *cond_value =
-        gel_context_eval_into_value(context, values + 0, &tmp_value);
-
-    if(gel_value_to_boolean(cond_value))
-        begin_(self, return_value, n_values-1, values+1, context);
-    else
-        gel_value_copy(cond_value, return_value);
-    if(GEL_IS_VALUE(&tmp_value))
-        g_value_unset(&tmp_value);
-}
-
-
-static
-void unless_(GClosure *self, GValue *return_value,
-             guint n_values, const GValue *values, GelContext *context)
-{
-    guint n_args = 2;
-    if(n_values < n_args)
-    {
-        gel_warning_needs_at_least_n_arguments(__FUNCTION__, n_args);
-        return;
-    }
-
-    GValue tmp_value = {0};
-    const GValue *cond_value =
-        gel_context_eval_into_value(context, values + 0, &tmp_value);
-
-    if(!gel_value_to_boolean(cond_value))
-        begin_(self, return_value, n_values-1, values+1, context);
-    else
-        gel_value_copy(cond_value, return_value);
-    if(GEL_IS_VALUE(&tmp_value))
-        g_value_unset(&tmp_value);
-}
-
-static
 void str_(GClosure *self, GValue *return_value,
           guint n_values, const GValue *values, GelContext *context)
 {
@@ -1368,7 +1285,6 @@ GHashTable* gel_make_default_symbols(void)
         CLOSURE(lambda),/* array */
         CLOSURE_NAME("object-connect", object_connect),
         CLOSURE(display),
-        CLOSURE(newline),
         CLOSURE(cond),
         CLOSURE(let),/* value */
         CLOSURE(begin),
@@ -1377,8 +1293,6 @@ GHashTable* gel_make_default_symbols(void)
         CLOSURE(while),
         CLOSURE(break),
         CLOSURE(if),
-        CLOSURE(when),
-        CLOSURE(unless),
         CLOSURE(str),
         CLOSURE_NAME("+", add_),
         CLOSURE_NAME("-", sub_),
@@ -1386,7 +1300,6 @@ GHashTable* gel_make_default_symbols(void)
         CLOSURE_NAME("/", div_),
         CLOSURE_NAME("%", mod_),
         CLOSURE(and),
-        CLOSURE(not),
         CLOSURE(or),
         CLOSURE_NAME(">", gt_),
         CLOSURE_NAME(">=", ge_),
