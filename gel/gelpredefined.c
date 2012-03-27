@@ -220,7 +220,7 @@ void define_(GClosure *self, GValue *return_value,
     GList *list = NULL;
     gchar *name = NULL;
     GValue *value = NULL;
-    gboolean defined = TRUE;
+    gboolean defined = FALSE;
     GClosure *closure = NULL;
 
     GType type = GEL_VALUE_TYPE(values + 0);
@@ -230,11 +230,12 @@ void define_(GClosure *self, GValue *return_value,
         GValue *r_value = NULL;
         if(gel_context_eval_params(context, __FUNCTION__, &list,
                 "sV", &n_values, &values, &name, &r_value))
+        {
             if(!gel_context_has_variable(context, name))
-            {
-                defined = FALSE;
                 value = gel_value_dup(r_value);
-            }
+            else
+                defined = TRUE;
+        }
     }
     else
     if(type == G_TYPE_VALUE_ARRAY)
@@ -251,7 +252,6 @@ void define_(GClosure *self, GValue *return_value,
             else
                 if(gel_context_lookup(context, name) == NULL)
                 {
-                    defined = FALSE;
                     closure = new_closure(context, name,
                             array_n_values, array_values, n_values, values);
                     if(closure != NULL)
@@ -260,6 +260,8 @@ void define_(GClosure *self, GValue *return_value,
                         g_value_take_boxed(value, closure);
                     }
                 }
+                else
+                    defined = FALSE;
         }
         else
             type = G_TYPE_INVALID;

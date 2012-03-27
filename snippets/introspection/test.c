@@ -61,7 +61,7 @@ int main(int argc, char *argv[])
     if(argc > 2)
         version = argv[2];
     GTypelib *typelib = g_irepository_require(repo,
-        namespace_, version, (GIRepositoryLoadFlags)0, NULL);
+        namespace_, version, G_IREPOSITORY_LOAD_FLAG_LAZY, NULL);
 
     if(typelib == NULL)
     {
