@@ -25,8 +25,8 @@
     (define primes (array))
     (define candidate 2)
 
-    (define (none-of ls predicate)
-        (= (find ls predicate) -1)
+    (define (none-prime predicate)
+        (= (find primes predicate) -1)
     )
 
     (define (can-divide-candidate i)
@@ -36,7 +36,7 @@
     (lambda ()
         (define calculating #t)
         (while calculating
-            (if (none-of primes can-divide-candidate)
+            (if (none-prime can-divide-candidate)
                 (begin
                     (append primes candidate)
                     (define result candidate)
