@@ -1,12 +1,12 @@
 
 (define ls (array "red" "green" "blue"))
 
-(define (ref-ls)
-    (& ls)
+(define (reference-to-ls)
+    (get& ls)
 )
 
 
-(append (ref-ls) "white")
+(append (reference-to-ls) "white")
 
 (display ls)
 

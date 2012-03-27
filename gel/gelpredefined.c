@@ -178,7 +178,7 @@ GClosure* new_closure(GelContext *context, const gchar *name,
 
 
 static
-void ref_(GClosure *self, GValue *return_value,
+void get_(GClosure *self, GValue *return_value,
           guint n_values, const GValue *values, GelContext *context)
 {
     guint n_args = 1;
@@ -1360,7 +1360,7 @@ GHashTable* gel_make_default_symbols(void)
     struct {const gchar *name; GClosureMarshal marshal;} *c, closures[] =
     {
         CLOSURE_NAME("set!", set_),/* string */
-        CLOSURE(ref),/* string */
+        CLOSURE_NAME("get&", get_),/* string */
         CLOSURE(define),/* string */
         CLOSURE_NAME("object-new", object_new),
         CLOSURE_NAME("object-get", object_get),
