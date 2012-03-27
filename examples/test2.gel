@@ -1,12 +1,20 @@
 
+(define (none-of ls predicate)
+    (= (find ls predicate) -1)
+)
+
+(define (index ls value)
+    (find ls (lambda (i) (= i value)))
+)
+
 (define (primes-lesser-than top)
     (define primes (array 2))
     (define n 3)
-    (define (cannot-divide-n i)
-        (% n i)
+    (define (can-divide-n i)
+        (= (% n i) 0)
     )
     (while (< n top)
-        (if (all cannot-divide-n primes)
+        (if (none-of primes can-divide-n )
             (append primes n)
         )
         (set! n (+ n 2))
@@ -21,7 +29,7 @@
 )
 
 (display "The first prime is " (nth first-primes 0) "\n")
-(display "The last prime is " (nth first-primes -1) "\n")
+(display "The last prime is " (nth first-primes (- (length first-primes) 1)) "\n")
 
 
 (define (factorial n)

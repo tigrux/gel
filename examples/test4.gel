@@ -24,13 +24,19 @@
 (define (generate-primes)
     (define primes (array))
     (define candidate 2)
-    (define (cannot-divide-candidate i)
-        (!= (% candidate i) 0)
+
+    (define (none-of ls predicate)
+        (= (find ls predicate) -1)
     )
+
+    (define (can-divide-candidate i)
+        (= (% candidate i) 0)
+    )
+
     (lambda ()
         (define calculating #t)
         (while calculating
-            (if (all cannot-divide-candidate primes)
+            (if (none-of primes can-divide-candidate)
                 (begin
                     (append primes candidate)
                     (define result candidate)
