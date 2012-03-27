@@ -1,6 +1,6 @@
 
 (define (draw-polygon circumference vertices)
-    (let body (
+    (let (
         (side (/ circumference vertices))
         (angle (/ 360 vertices))
         )
