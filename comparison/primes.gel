@@ -3,17 +3,19 @@
 
 (for n (range 3 1000000)
     (for i primes
-        (when (== (% n i) 0)
+        (if (= (% n i) 0)
             (break)
         )
-        (when (>= (* i i) n)
-            (append primes n)
-            (break)
+        (if (>= (* i i) n)
+            (begin
+                (append primes n)
+                (break)
+            )
         )
     )
 )
 
-(print "Calculated " (len primes) " primes")
+(display "Calculated " (length primes) " primes\n")
 
 (quit)
 

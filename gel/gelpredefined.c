@@ -712,8 +712,8 @@ void remove_(GClosure *self, GValue *return_value,
 
 
 static
-void len_(GClosure *self, GValue *return_value,
-          guint n_values, const GValue *values, GelContext *context)
+void length_(GClosure *self, GValue *return_value,
+             guint n_values, const GValue *values, GelContext *context)
 {
     GList *list = NULL;
     GValueArray *array = NULL;
@@ -1314,7 +1314,7 @@ GHashTable* gel_make_default_symbols(void)
         CLOSURE(nth),
         CLOSURE(index),
         CLOSURE(remove),
-        CLOSURE(len),
+        CLOSURE(length),
         CLOSURE(apply),
         CLOSURE(filter),
         CLOSURE(map),
