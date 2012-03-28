@@ -579,8 +579,8 @@ void find_(GClosure *self, GValue *return_value,
 
 
 static
-void append_(GClosure *self, GValue *return_value,
-             guint n_values, const GValue *values, GelContext *context)
+void array_append_(GClosure *self, GValue *return_value,
+                   guint n_values, const GValue *values, GelContext *context)
 {
     GList *list = NULL;
     GValueArray *array = NULL;
@@ -605,8 +605,8 @@ void append_(GClosure *self, GValue *return_value,
 
 
 static
-void nth_(GClosure *self, GValue *return_value,
-          guint n_values, const GValue *values, GelContext *context)
+void array_get_(GClosure *self, GValue *return_value,
+                guint n_values, const GValue *values, GelContext *context)
 {
     GList *list = NULL;
     GValueArray *array = NULL;
@@ -632,8 +632,8 @@ void nth_(GClosure *self, GValue *return_value,
 
 
 static
-void remove_(GClosure *self, GValue *return_value,
-             guint n_values, const GValue *values, GelContext *context)
+void array_remove_(GClosure *self, GValue *return_value,
+                   guint n_values, const GValue *values, GelContext *context)
 {
     GList *list = NULL;
     GValueArray *array = NULL;
@@ -659,8 +659,8 @@ void remove_(GClosure *self, GValue *return_value,
 
 
 static
-void length_(GClosure *self, GValue *return_value,
-             guint n_values, const GValue *values, GelContext *context)
+void array_length_(GClosure *self, GValue *return_value,
+                   guint n_values, const GValue *values, GelContext *context)
 {
     GList *list = NULL;
     GValueArray *array = NULL;
@@ -676,8 +676,8 @@ void length_(GClosure *self, GValue *return_value,
 
 
 static
-void sort_(GClosure *self, GValue *return_value,
-           guint n_values, const GValue *values, GelContext *context)
+void array_sort_(GClosure *self, GValue *return_value,
+                 guint n_values, const GValue *values, GelContext *context)
 {
     GList *list = NULL;
     GValueArray *array = NULL;
@@ -1254,17 +1254,18 @@ GHashTable* gel_make_default_symbols(void)
         CLOSURE_NAME("<", lt_),
         CLOSURE_NAME("<=", le_),
         CLOSURE_NAME("!=", ne_),
+        CLOSURE_NAME("array-append!", array_append_),
+        CLOSURE_NAME("array-get", array_get_),
+        CLOSURE_NAME("array-remove", array_remove_),
+        CLOSURE_NAME("array-length", array_length_),
+        CLOSURE_NAME("array-sort!", array_sort_),
         CLOSURE(range),
         CLOSURE(find),
-        CLOSURE(append),
-        CLOSURE(nth),
-        CLOSURE(remove),
-        CLOSURE(length),
         CLOSURE(apply),
         CLOSURE(filter),
         CLOSURE(map),
         CLOSURE(zip),
-        CLOSURE(sort),
+
         {NULL,NULL}
     };
 

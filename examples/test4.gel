@@ -1,24 +1,19 @@
 
 (define (draw-polygon circumference vertices)
-    (let (
-        (side (/ circumference vertices))
-        (angle (/ 360 vertices))
-        )
-        (let iterate (
-            (i 0)
-            )
-            (if (< i vertices)
-                (begin
-                    (print "move " side)
-                    (print "turn " angle)
-                    (iterate (+ i 1))
-                )
+    (define side (/ circumference vertices))
+    (define angle (/ 360 vertices))
+    (let iterate ( (i 0) )
+        (if (< i vertices)
+            (begin
+                (print "move " side)
+                (print "turn " angle)
+                (iterate (+ i 1))
             )
         )
     )
 )
 
-(draw-polygon 120 4)
+(draw-polygon 300 3)
 
 
 (define (generate-primes)
@@ -38,14 +33,14 @@
         (while calculating
             (if (none-prime can-divide-candidate)
                 (begin
-                    (append primes candidate)
-                    (define result candidate)
+                    (array-append! primes candidate)
+                    (define calculated-prime candidate)
                     (set! calculating #f)
                 )
             )
             (set! candidate (+ candidate 1))
         )
-        result
+        calculated-prime
     )
 )
 

@@ -15,7 +15,7 @@
     )
     (while (< n top)
         (if (none-of primes can-divide-n )
-            (append primes n)
+            (array-append! primes n)
         )
         (set! n (+ n 2))
     )
@@ -28,8 +28,16 @@
     (print "Primes(" (index first-primes iter) ") = " iter)
 )
 
-(print "The first prime is " (nth first-primes 0))
-(print "The last prime is " (nth first-primes (- (length first-primes) 1)))
+(define (first-of ls)
+    (array-get ls 0)
+)
+
+(define (last-of ls)
+    (array-get ls (- (array-length ls) 1))
+)
+
+(print "The first prime is " (first-of first-primes))
+(print "The last prime is " (last-of first-primes))
 
 
 (define (factorial n)

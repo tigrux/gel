@@ -1,13 +1,13 @@
 
-(define ls (array "red" "green" "blue"))
+(define colors (array "red" "green" "blue"))
 
-(define (reference-to-ls)
-    (get& ls)
+(define (palette)
+    (get& colors)
 )
 
-(append (reference-to-ls) "white")
+(append (palette) "white")
 
-(print ls)
+(print colors)
 
 
 (define message "hello")
