@@ -309,7 +309,7 @@ GList* gel_context_get_variables(const GelContext *self)
 }
 
 
-const GelVariable* gel_context_get_variable(const GelContext *self,
+GelVariable* gel_context_get_variable(const GelContext *self,
                                             const gchar *name)
 {
     return g_hash_table_lookup(self->variables, name);
@@ -323,9 +323,12 @@ GelVariable* gel_context_lookup_variable(const GelContext *self,
     g_return_val_if_fail(name != NULL, NULL);
 
     GelVariable *variable = NULL;
-    const GelContext *c;
-    for(c = self; c != NULL && variable == NULL; c = c->outer)
-        variable = (GelVariable*)g_hash_table_lookup(c->variables, name);
+    const GelContext *context = self;
+    while(context != NULL && variable == NULL)
+    {
+        variable = gel_context_get_variable(context, name);
+        context = gel_context_get_outer(context);
+    }
     return variable;
 }
 
