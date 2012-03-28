@@ -231,7 +231,7 @@ void define_(GClosure *self, GValue *return_value,
         if(gel_context_eval_params(context, __FUNCTION__, &list,
                 "sV", &n_values, &values, &name, &r_value))
         {
-            if(!gel_context_has_variable(context, name))
+            if(gel_context_get_variable(context, name) == NULL)
                 value = gel_value_dup(r_value);
             else
                 defined = TRUE;

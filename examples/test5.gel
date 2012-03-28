@@ -5,10 +5,20 @@
     (get& ls)
 )
 
-
 (append (reference-to-ls) "white")
 
 (display ls)
+
+
+(define message "hello")
+
+(define (salutation)
+    (define message "hallo")
+    (display message)
+)
+
+(salutation)
+
 
 (quit)
 

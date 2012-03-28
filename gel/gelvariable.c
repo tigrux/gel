@@ -60,14 +60,14 @@ void gel_variable_unref(GelVariable *self)
 }
 
 
-GValue* gel_variable_get_value(GelVariable *self)
+GValue* gel_variable_get_value(const GelVariable *self)
 {
     g_return_val_if_fail(self != NULL, NULL);
     return self->value;
 }
 
 
-gboolean gel_variable_get_owned(GelVariable *self)
+gboolean gel_variable_get_owned(const GelVariable *self)
 {
     g_return_val_if_fail(self != NULL, FALSE);
     return self->owned;

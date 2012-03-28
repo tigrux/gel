@@ -247,13 +247,19 @@ const GValue* gel_context_eval_into_value(GelContext *self,
     if(type == GEL_TYPE_SYMBOL)
     {
         const GelSymbol *symbol = (GelSymbol*)gel_value_get_boxed(value);
-        const gchar *symbol_name = gel_symbol_get_name(symbol);
-        result = gel_symbol_get_value(symbol);
-        if(result == NULL)
-            result = gel_context_lookup(self, symbol_name);
+        const gchar *name = gel_symbol_get_name(symbol);
+
+        const GelVariable *variable = gel_context_get_variable(self, name);
+        if(variable != NULL)
+            result = gel_variable_get_value(variable);
+        else
+        {
+            const GelContext *outer = gel_context_get_outer(self);
+            result = gel_context_lookup(outer, name);
+        }
 
         if(result == NULL)
-            gel_warning_unknown_symbol(__FUNCTION__, symbol_name);
+            gel_warning_unknown_symbol(__FUNCTION__, name);
     }
     else
     if(type == G_TYPE_VALUE_ARRAY)
@@ -303,9 +309,10 @@ GList* gel_context_get_variables(const GelContext *self)
 }
 
 
-gboolean gel_context_has_variable(const GelContext *self, const gchar *name)
+const GelVariable* gel_context_get_variable(const GelContext *self,
+                                            const gchar *name)
 {
-    return g_hash_table_lookup(self->variables, name) != NULL;
+    return g_hash_table_lookup(self->variables, name);
 }
 
 
