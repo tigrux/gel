@@ -22,22 +22,15 @@
     primes
 )
 
-(define first-primes (primes-lesser-than 100))
+(define primes (primes-lesser-than 100))
 
-(for iter first-primes
-    (print "Primes(" (index first-primes iter) ") = " iter)
+(for iter primes
+    (print "Primes(" (index primes iter) ") = " iter)
 )
 
-(define (first-of ls)
-    (array-get ls 0)
-)
 
-(define (last-of ls)
-    (array-get ls (- (array-length ls) 1))
-)
-
-(print "The first prime is " (first-of first-primes))
-(print "The last prime is " (last-of first-primes))
+(print "The first prime is " (array-get primes 0))
+(print "The last prime is " (array-get primes -1))
 
 
 (define (factorial n)
