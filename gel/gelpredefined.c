@@ -337,8 +337,8 @@ void object_connect(GClosure *self, GValue *return_value,
 
 
 static
-void display_(GClosure *self, GValue *return_value,
-              guint n_values, const GValue *values, GelContext *context)
+void print_(GClosure *self, GValue *return_value,
+            guint n_values, const GValue *values, GelContext *context)
 {
     guint n_args = 1;
     if(n_values < n_args)
@@ -363,6 +363,7 @@ void display_(GClosure *self, GValue *return_value,
         if(GEL_IS_VALUE(&tmp_value))
             g_value_unset(&tmp_value);
     }
+    g_print("\n");
 }
 
 
@@ -1230,7 +1231,7 @@ GHashTable* gel_make_default_symbols(void)
         CLOSURE_NAME("object-set", object_set),
         CLOSURE(lambda),/* array */
         CLOSURE_NAME("object-connect", object_connect),
-        CLOSURE(display),
+        CLOSURE(print),
         CLOSURE(cond),
         CLOSURE(let),/* value */
         CLOSURE(begin),

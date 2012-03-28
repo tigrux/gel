@@ -25,11 +25,11 @@
 (define first-primes (primes-lesser-than 100))
 
 (for iter first-primes
-    (display "Primes(" (index first-primes iter) ") = " iter  "\n")
+    (print "Primes(" (index first-primes iter) ") = " iter)
 )
 
-(display "The first prime is " (nth first-primes 0) "\n")
-(display "The last prime is " (nth first-primes (- (length first-primes) 1)) "\n")
+(print "The first prime is " (nth first-primes 0))
+(print "The last prime is " (nth first-primes (- (length first-primes) 1)))
 
 
 (define (factorial n)
@@ -40,8 +40,8 @@
 )
 
 (define n 10)
-(display "Factorial of " n " is " (factorial n) "\n")
-(display n " is " (if (= (% n 2) 0) "even" "odd") "\n")
+(print "Factorial of " n " is " (factorial n))
+(print n " is " (if (= (% n 2) 0) "even" "odd"))
 
 (define (fibonacci n)
     (cond
@@ -60,7 +60,7 @@
 )
 
 (for i (range 10 0)
-    (display "Fibonacci(" i ") = " (fibonacci i) "\n")
+    (print "Fibonacci(" i ") = " (fibonacci i))
 )
 
 

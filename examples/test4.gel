@@ -9,8 +9,8 @@
             )
             (if (< i vertices)
                 (begin
-                    (display "move " side "\n")
-                    (display "turn " angle "\n")
+                    (print "move " side)
+                    (print "turn " angle)
                     (iterate (+ i 1))
                 )
             )
@@ -52,7 +52,7 @@
 (define next-prime (generate-primes))
 
 (for i (range 1 12)
-    (display "Primes(" i ") = " (next-prime) "\n")
+    (print "Primes(" i ") = " (next-prime))
 )
 
 

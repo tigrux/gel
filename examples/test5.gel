@@ -7,14 +7,14 @@
 
 (append (reference-to-ls) "white")
 
-(display ls)
+(print ls)
 
 
 (define message "hello")
 
 (define (salutation)
     (define message "hallo")
-    (display message)
+    (print message)
 )
 
 (salutation)
