@@ -10,6 +10,7 @@
 #define NODE_DATA(node) (GPOINTER_TO_INT((node)->data))
 
 
+static
 GNode *gel_params_format_to_node(const gchar *format, guint *pos)
 {
     GNode *root = g_node_new(NULL);
@@ -32,6 +33,7 @@ GNode *gel_params_format_to_node(const gchar *format, guint *pos)
 }
 
 
+static
 gboolean gel_context_eval_param(GelContext *self, const gchar *func,
                                 GList **list, gchar format,
                                 guint *n_values, const GValue **values,
