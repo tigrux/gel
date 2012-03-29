@@ -5,7 +5,7 @@
     (get& colors)
 )
 
-(append (palette) "white")
+(array-append! (palette) "white")
 
 (print colors)
 
