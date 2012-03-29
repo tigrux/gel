@@ -75,7 +75,7 @@ gboolean gel_context_eval_params(GelContext *self, const gchar *func,
     guint n_args = 0;
     guint i;
     for(i = 0; format[i] != 0; i++)
-        if(strchr("asvASIOCV", format[i]) != NULL)
+        if(strchr("vVaAsSIOC", format[i]) != NULL)
             n_args++;
 
     gboolean exact = (strchr(format, '*') == NULL);
@@ -108,6 +108,27 @@ gboolean gel_context_eval_params(GelContext *self, const gchar *func,
 
         switch(*format)
         {
+            case 'v':
+                {
+                    const GValue **v = va_arg(args, const GValue **);
+                    *v = *values;
+                }
+                break;
+            case 'V':
+                value = gel_value_new();
+                result_value =
+                    gel_context_eval_param_into_value(self, *values, value);
+                if(GEL_IS_VALUE(result_value))
+                {
+                    const GValue **v = va_arg(args, const GValue **);
+                    *v = result_value;
+                }
+                else
+                {
+                    g_warning("%s: Not a GValue", func);
+                    parsed = FALSE;
+                }
+                break;
             case 'a':
                 if(GEL_VALUE_HOLDS(*values, G_TYPE_VALUE_ARRAY))
                 {
@@ -118,43 +139,6 @@ gboolean gel_context_eval_params(GelContext *self, const gchar *func,
                 {
                     gel_warning_value_not_of_type(func,
                         *values, G_TYPE_VALUE_ARRAY);
-                    parsed = FALSE;
-                }
-                break;
-            case 's':
-                if(GEL_VALUE_HOLDS(*values, GEL_TYPE_SYMBOL))
-                {
-                    const gchar **s = va_arg(args, const gchar **);
-                    GelSymbol *symbol =
-                        (GelSymbol*)gel_value_get_boxed(*values);
-                    *s = gel_symbol_get_name(symbol);
-                }
-                else
-                {
-                    gel_warning_value_not_of_type(func,
-                        *values, GEL_TYPE_SYMBOL);
-                    parsed = FALSE;
-                }
-                break;
-            case 'v':
-                {
-                    const GValue **v = va_arg(args, const GValue **);
-                    *v = *values;
-                }
-                break;
-            case 'O':
-                value = gel_value_new();
-                result_value =
-                    gel_context_eval_param_into_value(self, *values, value);
-                if(GEL_VALUE_HOLDS(result_value, G_TYPE_OBJECT))
-                {
-                    GObject **obj = va_arg(args, GObject **);
-                    *obj = (GObject*)g_value_get_object(result_value);
-                }
-                else
-                {
-                    gel_warning_value_not_of_type(func,
-                        result_value, G_TYPE_OBJECT);
                     parsed = FALSE;
                 }
                 break;
@@ -171,6 +155,21 @@ gboolean gel_context_eval_params(GelContext *self, const gchar *func,
                 {
                     gel_warning_value_not_of_type(func,
                         result_value, G_TYPE_VALUE_ARRAY);
+                    parsed = FALSE;
+                }
+                break;
+            case 's':
+                if(GEL_VALUE_HOLDS(*values, GEL_TYPE_SYMBOL))
+                {
+                    const gchar **s = va_arg(args, const gchar **);
+                    GelSymbol *symbol =
+                        (GelSymbol*)gel_value_get_boxed(*values);
+                    *s = gel_symbol_get_name(symbol);
+                }
+                else
+                {
+                    gel_warning_value_not_of_type(func,
+                        *values, GEL_TYPE_SYMBOL);
                     parsed = FALSE;
                 }
                 break;
@@ -206,6 +205,22 @@ gboolean gel_context_eval_params(GelContext *self, const gchar *func,
                     parsed = FALSE;
                 }
                 break;
+            case 'O':
+                value = gel_value_new();
+                result_value =
+                    gel_context_eval_param_into_value(self, *values, value);
+                if(GEL_VALUE_HOLDS(result_value, G_TYPE_OBJECT))
+                {
+                    GObject **obj = va_arg(args, GObject **);
+                    *obj = (GObject*)g_value_get_object(result_value);
+                }
+                else
+                {
+                    gel_warning_value_not_of_type(func,
+                        result_value, G_TYPE_OBJECT);
+                    parsed = FALSE;
+                }
+                break;
             case 'C':
                 value = gel_value_new();
                 result_value =
@@ -219,21 +234,6 @@ gboolean gel_context_eval_params(GelContext *self, const gchar *func,
                 {
                     gel_warning_value_not_of_type(func,
                         result_value, G_TYPE_CLOSURE);
-                    parsed = FALSE;
-                }
-                break;
-            case 'V':
-                value = gel_value_new();
-                result_value =
-                    gel_context_eval_param_into_value(self, *values, value);
-                if(GEL_IS_VALUE(result_value))
-                {
-                    const GValue **v = va_arg(args, const GValue **);
-                    *v = result_value;
-                }
-                else
-                {
-                    g_warning("%s: Not a GValue", func);
                     parsed = FALSE;
                 }
                 break;
