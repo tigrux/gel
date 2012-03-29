@@ -255,7 +255,8 @@ const GValue* gel_context_eval_into_value(GelContext *self,
         else
         {
             const GelContext *outer = gel_context_get_outer(self);
-            result = gel_context_lookup(outer, name);
+            if(outer != NULL)
+                result = gel_context_lookup(outer, name);
         }
 
         if(result == NULL)
