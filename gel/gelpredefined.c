@@ -842,7 +842,6 @@ void let_(GClosure *self, GValue *return_value,
     }
 
     GValueArray *bindings = NULL;
-
     if(gel_context_eval_params(context, __FUNCTION__, &list,
            "a*", &n_values, &values, &bindings))
     {
@@ -854,21 +853,14 @@ void let_(GClosure *self, GValue *return_value,
         guint i;
         for(i = 0; i < n_vars; i++)
         {
-            GValueArray *binding = NULL;
+            gchar *var_name = NULL;
+            GValue *var_value = NULL;
             if(gel_context_eval_params(context, __FUNCTION__, &list,
-                "a*", &bindings_n_values, &bindings_values, &binding))
+                "(sV)", &bindings_n_values, &bindings_values,
+                &var_name, &var_value))
             {
-                guint binding_n_values = binding->n_values;
-                const GValue *binding_values = binding->values;
-                gchar *var_name = NULL;
-                GValue *var_value = NULL;
-                if(gel_context_eval_params(context, __FUNCTION__, &list,
-                    "sV", &binding_n_values, &binding_values,
-                    &var_name, &var_value))
-                {
-                    var_names[i] = g_strdup(var_name);
-                    var_values[i] = var_value;
-                }
+                var_names[i] = g_strdup(var_name);
+                var_values[i] = var_value;
             }
         }
 
