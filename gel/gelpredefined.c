@@ -988,6 +988,82 @@ void cond_(GClosure *self, GValue *return_value,
 
 
 static
+void case_(GClosure *self, GValue *return_value,
+            guint n_values, const GValue *values, GelContext *context)
+{
+
+    guint n_args = 2;
+    if(n_values < n_args)
+    {
+        gel_warning_needs_at_least_n_arguments(__FUNCTION__, n_args);
+        return;
+    }
+
+    GList *list = NULL;
+    gboolean running = TRUE;
+
+    GValue *probe_value = NULL;
+    if(!gel_context_eval_params(context, __FUNCTION__, &list,
+            "V*", &n_values, &values, &probe_value))
+        return;
+
+    while(n_values > 0 && running)
+    {
+        GValueArray *cases = NULL;
+        if(gel_context_eval_params(context, __FUNCTION__, &list,
+                "a*", &n_values, &values, &cases))
+        {
+            guint cases_n_values = cases->n_values;
+            const GValue *cases_values = cases->values;
+            if(cases_n_values > 0 && running)
+            {
+                gboolean are_equals = FALSE;
+                GValueArray *tests = NULL;
+                GType type = GEL_VALUE_TYPE(cases_values + 0);
+                if(type == GEL_TYPE_SYMBOL)
+                {
+                    GelSymbol *symbol =
+                        (GelSymbol*)gel_value_get_boxed(cases_values + 0);
+                    const gchar *name = gel_symbol_get_name(symbol);
+                    if(g_strcmp0(name, "else") == 0)
+                    {
+                        are_equals = TRUE;
+                        cases_values++;
+                        cases_n_values--;
+                    }
+                }
+                else
+                if(gel_context_eval_params(context, __FUNCTION__, &list,
+                    "a*", &cases_n_values, &cases_values, &tests))
+                {
+                    guint tests_n_values = tests->n_values;
+                    const GValue *tests_values = tests->values;
+                    while(tests_n_values > 0 && running)
+                    {
+                        GValue *test_value = 0;
+                        if(gel_context_eval_params(context, __FUNCTION__,
+                            &list, "v*", &tests_n_values, &tests_values,
+                            &test_value))
+                            if(gel_values_eq(probe_value, test_value))
+                                are_equals = TRUE;
+                    }
+                }
+
+                if(are_equals)
+                {
+                    begin_(self, return_value,
+                        cases_n_values, cases_values, context);
+                    running = FALSE;
+                }
+            }
+        }
+    }
+
+    gel_value_list_free(list);
+}
+
+
+static
 void array_(GClosure *self, GValue *return_value,
             guint n_values, const GValue *values, GelContext *context)
 {
@@ -1247,6 +1323,7 @@ GHashTable* gel_make_default_symbols(void)
         CLOSURE_NAME("object-connect", object_connect),
         CLOSURE(print),
         CLOSURE(cond),
+        CLOSURE(case),/* array */
         CLOSURE(let),/* value */
         CLOSURE(begin),
         CLOSURE(array),
