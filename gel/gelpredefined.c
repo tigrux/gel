@@ -930,37 +930,59 @@ void cond_(GClosure *self, GValue *return_value,
            guint n_values, const GValue *values, GelContext *context)
 {
     GList *list = NULL;
-    GelContext *cond_context = gel_context_new_with_outer(context);
-
-    GValue *default_value = gel_value_new_of_type(G_TYPE_BOOLEAN);
-    gel_value_set_boolean(default_value, TRUE);
-    gel_context_insert(cond_context, "else", default_value);
 
     gboolean running = TRUE;
     while(n_values > 0 && running)
     {
         GValueArray *array = NULL;
-        if(gel_context_eval_params(cond_context, __FUNCTION__, &list,
+        if(gel_context_eval_params(context, __FUNCTION__, &list,
                 "a*", &n_values, &values, &array))
         {
-            const GValue *array_values = array->values;
             guint array_n_values = array->n_values;
-            GValue *cond_value = NULL;
-            if(!gel_context_eval_params(cond_context, __FUNCTION__, &list,
-                    "V*", &array_n_values, &array_values, &cond_value))
-                running = FALSE;
-            else
-                if(gel_value_to_boolean(cond_value))
+            GValue *array_values = array->values;
+            gboolean predicate_is_true = FALSE;
+
+            GType type = GEL_VALUE_TYPE(array_values + 0);
+            if(type == GEL_TYPE_SYMBOL)
+            {
+                GelSymbol *symbol =
+                    (GelSymbol*)g_value_get_boxed(array_values + 0);
+                const gchar *name = gel_symbol_get_name(symbol);
+                if(g_strcmp0(name, "else") == 0)
                 {
+                    predicate_is_true = TRUE;
+                    array_n_values--;
+                    array_values++;
+                }
+            }
+
+            GValue *cond_value = NULL;
+            if(!predicate_is_true)
+            {
+                const GValue *array_values = array->values;
+                guint array_n_values = array->n_values;
+                if(!gel_context_eval_params(context, __FUNCTION__, &list,
+                        "V*", &array_n_values, &array_values, &cond_value))
+                    running = FALSE;
+                else
+                    predicate_is_true = gel_value_to_boolean(cond_value);
+            }
+
+            if(running && predicate_is_true)
+            {
+                if(array_n_values > 0)
                     begin_(self, return_value,
                         array_n_values, array_values, context);
-                    running = FALSE;
-                }
+                else
+                    if(cond_value != NULL)
+                        gel_value_copy(cond_value, return_value);
+                running = FALSE;
+            }
         }
         else
             running = FALSE;
     }
-    gel_context_free(cond_context);
+
     gel_value_list_free(list);
 }
 
