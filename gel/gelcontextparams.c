@@ -198,7 +198,7 @@ gboolean gel_context_eval_params_va(GelContext *self, const gchar *func,
     g_return_val_if_fail(n_values != NULL, FALSE);
     g_return_val_if_fail(values != NULL, FALSE);
 
-    gboolean exact;
+    gboolean exact = TRUE;
 
     GNode *last_child = g_node_last_child(format_node);
     if(NODE_DATA(last_child) == '*')
@@ -263,7 +263,6 @@ gboolean gel_context_eval_params_va(GelContext *self, const gchar *func,
 
     if(!parsed)
     {
-        gel_value_list_free(*list);
         *list = o_list;
         *n_values = o_n_values;
         *values = o_values;
