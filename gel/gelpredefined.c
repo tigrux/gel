@@ -947,13 +947,13 @@ void cond_(GClosure *self, GValue *return_value,
             {
                 GelSymbol *symbol =
                     (GelSymbol*)g_value_get_boxed(array_values + 0);
+                array_n_values--;
+                array_values++;
                 const gchar *name = gel_symbol_get_name(symbol);
                 if(g_strcmp0(name, "else") == 0)
-                {
                     predicate_is_true = TRUE;
-                    array_n_values--;
-                    array_values++;
-                }
+                else
+                    gel_warning_invalid_argument_name(__FUNCTION__, name);
             }
 
             GValue *cond_value = NULL;
@@ -1024,13 +1024,13 @@ void case_(GClosure *self, GValue *return_value,
                 {
                     GelSymbol *symbol =
                         (GelSymbol*)gel_value_get_boxed(cases_values + 0);
+                    cases_n_values--;
+                    cases_values++;
                     const gchar *name = gel_symbol_get_name(symbol);
                     if(g_strcmp0(name, "else") == 0)
-                    {
                         are_equals = TRUE;
-                        cases_values++;
-                        cases_n_values--;
-                    }
+                    else
+                        gel_warning_invalid_argument_name(__FUNCTION__, name);
                 }
                 else
                 if(gel_context_eval_params(context, __FUNCTION__, &list,
