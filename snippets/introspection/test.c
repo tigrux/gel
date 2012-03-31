@@ -308,6 +308,9 @@ int main(int argc, char *argv[])
                 break;
             }
 
+            case GI_INFO_TYPE_BOXED:
+                break;
+
             default:
                 g_error("*** Unhandled %s\n", g_info_type_to_string(info_type));
                 break;
