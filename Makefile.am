@@ -1,5 +1,5 @@
 SUBDIRS = \
-	gel \
+	libgel \
 	vapi \
 	examples \
 	docs
