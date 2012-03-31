@@ -216,6 +216,7 @@ void require_(GClosure *self, GValue *return_value,
     const gchar *namespace_ = NULL;
     const gchar *version = NULL;
     GList *list = NULL;
+    gboolean result = FALSE;
 
      if(!gel_context_eval_params(context, __FUNCTION__, &list,
             "sS", &n_values, &values, &namespace_, &version))
@@ -224,25 +225,30 @@ void require_(GClosure *self, GValue *return_value,
     GITypelib *typelib = g_irepository_require(
         NULL, namespace_, version, 0, NULL);
 
-    guint n = g_irepository_get_n_infos (NULL, namespace_);
-    guint i;
-    for(i = 0; i < n; i++)
+    if(typelib != NULL)
     {
-        GIBaseInfo *info = g_irepository_get_info (NULL, namespace_, i);
-        GIInfoType info_type = g_base_info_get_type(info);
-        switch(info_type)
+        guint n = g_irepository_get_n_infos (NULL, namespace_);
+        guint i;
+        for(i = 0; i < n; i++)
         {
-            case GI_INFO_TYPE_OBJECT:
-                g_registered_type_info_get_g_type(info);
-                break;
-            default:
-                break;
+            GIBaseInfo *info = g_irepository_get_info (NULL, namespace_, i);
+            GIInfoType info_type = g_base_info_get_type(info);
+            switch(info_type)
+            {
+                case GI_INFO_TYPE_OBJECT:
+                    g_registered_type_info_get_g_type(info);
+                    break;
+                default:
+                    break;
+            }
+            g_base_info_unref(info);
         }
-        g_base_info_unref(info);
+
+        result = TRUE;
     }
 
     g_value_init(return_value, G_TYPE_BOOLEAN);
-    gel_value_set_boolean(return_value, typelib != NULL);
+    gel_value_set_boolean(return_value, result);
 
     gel_value_list_free(list);
 }
