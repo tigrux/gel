@@ -1,10 +1,10 @@
-noinst_PROGRAMS = gel
+noinst_PROGRAMS = test
 
-gel_CPPFLAGS = -Wall -ggdb
-gel_CFLAGS = $(GTK_CFLAGS) $(GI_CFLAGS) -I$(top_srcdir)/libgel
-gel_LDFLAGS = $(GTK_LIBS) $(GI_LIBS)
-gel_LDADD = $(top_srcdir)/libgel/libgel.la
+test_CPPFLAGS = -Wall -ggdb
+test_CFLAGS = $(GTK_CFLAGS) $(GI_CFLAGS) -I$(top_srcdir)/libgel
+test_LDFLAGS = $(GTK_LIBS) $(GI_LIBS)
+test_LDADD = $(top_srcdir)/libgel/libgel.la
 
-gel_SOURCES = gel.c
+gel_SOURCES = test.c
 
-EXTRA_DIST = gel.vala test.gel test2.gel test3.gel test4.gel test5.gel
+EXTRA_DIST = test.vala test.gel test2.gel test3.gel test4.gel test5.gel
