@@ -1,24 +1,35 @@
 #include <girepository.h>
 #include <gitypelib.h>
 
-void handle_arg(GITypeInfo *atype, const gchar *indent)
+void handle_type(GITypeInfo *atype, GIArgInfo *ainfo, const gchar *indent)
 {
+    const gchar *dir = "";
+    if(ainfo != NULL)
+        switch(g_arg_info_get_direction(ainfo))
+        {
+            case GI_DIRECTION_OUT:
+                dir = "OUT ";
+                break;
+            case GI_DIRECTION_INOUT:
+                dir = "INOUT ";
+                break;
+            default:
+                break;
+        }
+
     GITypeTag tag = g_type_info_get_tag(atype);
-    g_print("%s: %s", indent, g_type_tag_to_string(tag));
+    g_print("%s: %s%s", indent, dir, g_type_tag_to_string(tag));
     if(tag == GI_TYPE_TAG_ARRAY)
     {
         GITypeInfo *param = g_type_info_get_param_type(atype, 0);
-        g_print(" of %s\n",
-            g_type_tag_to_string(
-                g_type_info_get_tag(param)));
+        g_print(" of %s\n", g_type_tag_to_string(g_type_info_get_tag(param)));
         g_base_info_unref((GIBaseInfo*)param);
     }
     else
     if(tag == GI_TYPE_TAG_INTERFACE)
     {
         GIBaseInfo *info = g_type_info_get_interface(atype);
-        g_print(" for %s\n",
-            g_base_info_get_name(info));
+        g_print(" for %s\n", g_base_info_get_name(info));
         g_base_info_unref((GIBaseInfo*)info);
     }
     else
@@ -29,7 +40,7 @@ void handle_callable(GIFunctionInfo *cinfo, const gchar *indent)
 {
     GITypeInfo *rtype = g_callable_info_get_return_type(cinfo);
     g_print("%sReturns", indent);
-    handle_arg(rtype, "");
+    handle_type(rtype, NULL, "");
     g_base_info_unref((GIBaseInfo*)rtype);
 
     guint n = g_callable_info_get_n_args(cinfo);
@@ -39,7 +50,7 @@ void handle_callable(GIFunctionInfo *cinfo, const gchar *indent)
         GIArgInfo *ainfo = g_callable_info_get_arg(cinfo, i);
         GITypeInfo *atype = g_arg_info_get_type(ainfo);
         g_print("%s%s", indent, g_base_info_get_name((GIBaseInfo*)ainfo));
-        handle_arg(atype, "");
+        handle_type(atype, ainfo, "");
         g_base_info_unref((GIBaseInfo*)atype);
         g_base_info_unref((GIBaseInfo*)ainfo);
     }
@@ -119,7 +130,7 @@ int main(int argc, char *argv[])
                     g_print("\tproperty :%s",
                         g_base_info_get_name((GIBaseInfo*)pinfo));
                     GITypeInfo *ptype = g_property_info_get_type(pinfo);
-                    handle_arg(ptype, "");
+                    handle_type(ptype, NULL, "");
                     g_base_info_unref((GIBaseInfo*)ptype);
                     g_base_info_unref((GIBaseInfo*)pinfo);
                 }
@@ -181,7 +192,7 @@ int main(int argc, char *argv[])
                     g_print("\tproperty :%s",
                         g_base_info_get_name((GIBaseInfo*)pinfo));
                     GITypeInfo *ptype = g_property_info_get_type(pinfo);
-                    handle_arg(ptype, "");
+                    handle_type(ptype, NULL, "");
                     g_base_info_unref((GIBaseInfo*)ptype);
                     g_base_info_unref((GIBaseInfo*)pinfo);
                 }
@@ -262,7 +273,7 @@ int main(int argc, char *argv[])
                 GIArgument value = { 0 };
                 g_constant_info_get_value(info, &value);
                 g_print("\tvalue = %d", value.v_int32);
-                handle_arg(info_type, "");
+                handle_type(info_type, NULL, "");
                 g_constant_info_free_value(info, &value);
                 break;
             }
