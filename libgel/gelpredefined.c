@@ -1,3 +1,6 @@
+#include <girepository.h>
+#include <gitypelib.h>
+
 #include <gelcontext.h>
 #include <gelcontextprivate.h>
 #include <geldebug.h>
@@ -202,6 +205,45 @@ void get_(GClosure *self, GValue *return_value,
             g_value_take_boxed(return_value, symbol);
         }
     }
+    gel_value_list_free(list);
+}
+
+
+static
+void require_(GClosure *self, GValue *return_value,
+              guint n_values, const GValue *values, GelContext *context)
+{
+    const gchar *namespace_ = NULL;
+    const gchar *version = NULL;
+    GList *list = NULL;
+
+     if(!gel_context_eval_params(context, __FUNCTION__, &list,
+            "sS", &n_values, &values, &namespace_, &version))
+        return;
+
+    GITypelib *typelib = g_irepository_require(
+        NULL, namespace_, version, 0, NULL);
+
+    guint n = g_irepository_get_n_infos (NULL, namespace_);
+    guint i;
+    for(i = 0; i < n; i++)
+    {
+        GIBaseInfo *info = g_irepository_get_info (NULL, namespace_, i);
+        GIInfoType info_type = g_base_info_get_type(info);
+        switch(info_type)
+        {
+            case GI_INFO_TYPE_OBJECT:
+                g_registered_type_info_get_g_type(info);
+                break;
+            default:
+                break;
+        }
+        g_base_info_unref(info);
+    }
+
+    g_value_init(return_value, G_TYPE_BOOLEAN);
+    gel_value_set_boolean(return_value, typelib != NULL);
+
     gel_value_list_free(list);
 }
 
@@ -1313,6 +1355,7 @@ GHashTable* gel_make_default_symbols(void)
 {
     struct {const gchar *name; GClosureMarshal marshal;} *c, closures[] =
     {
+        CLOSURE(require),/* string */
         CLOSURE_NAME("set!", set_),/* string */
         CLOSURE_NAME("get&", get_),/* string */
         CLOSURE(define),/* string */
