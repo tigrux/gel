@@ -57,11 +57,10 @@ int main(int argc, char *argv[])
     g_type_init();
     const gchar *namespace_ = argv[1];
     const gchar *version = NULL;
-    GIRepository *repo = g_irepository_get_default();
     if(argc > 2)
         version = argv[2];
-    GTypelib *typelib = g_irepository_require(repo,
-        namespace_, version, G_IREPOSITORY_LOAD_FLAG_LAZY, NULL);
+    GITypelib *typelib = g_irepository_require(NULL,
+        namespace_, version, 0, NULL);
 
     if(typelib == NULL)
     {
@@ -70,12 +69,12 @@ int main(int argc, char *argv[])
         return 1;
     }
 
-    guint n = g_irepository_get_n_infos (repo, namespace_);
+    guint n = g_irepository_get_n_infos (NULL, namespace_);
     guint i;
 
     for(i = 0; i < n; i++)
     {
-        GIBaseInfo *info = g_irepository_get_info (repo, namespace_, i);
+        GIBaseInfo *info = g_irepository_get_info (NULL, namespace_, i);
         GIInfoType info_type = g_base_info_get_type(info);
 
         g_print("%s %s\n",
@@ -306,8 +305,6 @@ int main(int argc, char *argv[])
         g_base_info_unref(info);
     }
 
-    if(typelib != NULL)
-        g_typelib_free(typelib);
     return 0;
 }
 
