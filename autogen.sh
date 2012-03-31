@@ -1,4 +1,5 @@
 #!/bin/sh
+
 if which gtkdocize; then
     gtkdocize
 else
@@ -9,7 +10,7 @@ fi
 if which autoreconf; then
     autoreconf -i
 else
-    echo The package autoreconf is not install
+    echo The package autoreconf is not installed
     exit 1
 fi
 
