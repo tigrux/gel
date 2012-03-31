@@ -1,8 +1,8 @@
 noinst_PROGRAMS = gel
 
 gel_CPPFLAGS = -Wall -ggdb
-gel_CFLAGS = $(GTK_CFLAGS) -I$(top_srcdir)/libgel
-gel_LDFLAGS = $(GTK_LIBS)
+gel_CFLAGS = $(GTK_CFLAGS) $(GI_CFLAGS) -I$(top_srcdir)/libgel
+gel_LDFLAGS = $(GTK_LIBS) $(GI_LIBS)
 gel_LDADD = $(top_srcdir)/libgel/libgel.la
 
 gel_SOURCES = gel.c
