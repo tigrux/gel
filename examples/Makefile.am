@@ -7,4 +7,4 @@ gel_LDADD = $(top_srcdir)/libgel/libgel.la
 
 gel_SOURCES = gel.c
 
-EXTRA_DIST = gel.vala test.gel test2.gel test3.gel
+EXTRA_DIST = gel.vala test.gel test2.gel test3.gel test4.gel test5.gel
