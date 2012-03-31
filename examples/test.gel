@@ -1,3 +1,4 @@
+(require Gtk "2.0")
 
 (define window (object-new "GtkWindow"))
 (object-set window "title" "Hello world")

@@ -34,13 +34,6 @@ class Demo : Object {
 int main(string[] args) {
     Gtk.init(ref args);
 
-    Type type;
-    type = typeof(Gtk.Window);
-    type = typeof(Gtk.VBox);
-    type = typeof(Gtk.HBox);
-    type = typeof(Gtk.Entry);
-    type = typeof(Gtk.Button);
-
     if(args.length != 2) {
         printerr("%s requires an argument\n", args[0]);
         return 1;

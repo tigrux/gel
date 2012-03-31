@@ -49,13 +49,6 @@ int main(int argc, char *argv[])
 {
     gtk_init(&argc, &argv);
 
-    volatile GType type;
-    type = gtk_window_get_type();
-    type = gtk_vbox_get_type();
-    type = gtk_hbox_get_type();
-    type = gtk_entry_get_type();
-    type = gtk_button_get_type();
-
     if(argc != 2)
     {
         g_printerr("%s requires an argument\n", argv[0]);
