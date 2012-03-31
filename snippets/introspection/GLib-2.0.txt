@@ -1,0 +1,5109 @@
+constant ALLOCATOR_LIST
+	value = 1: gint32
+constant ALLOCATOR_NODE
+	value = 3: gint32
+constant ALLOCATOR_SLIST
+	value = 2: gint32
+constant ALLOC_AND_FREE
+	value = 2: gint32
+constant ALLOC_ONLY
+	value = 1: gint32
+constant ASCII_DTOSTR_BUF_SIZE
+	value = 39: gint32
+constant ATOMIC_OP_USE_GCC_BUILTINS
+	value = 1: gint32
+struct Allocator
+	method free()
+		Returns: void
+struct Array
+	typename = GArray
+	method free()
+		Returns: utf8
+		array: array of void
+		free_segment: gboolean
+	method get_element_size()
+		Returns: guint32
+		array: array of void
+	method unref()
+		Returns: void
+		array: array of void
+	field .data
+	field .len
+flags AsciiType
+	alnum = 1
+	alpha = 2
+	cntrl = 4
+	digit = 8
+	graph = 16
+	lower = 32
+	print = 64
+	punct = 128
+	space = 256
+	upper = 512
+	xdigit = 1024
+struct AsyncQueue
+	method length()
+		Returns: gint32
+	method length_unlocked()
+		Returns: gint32
+	method lock()
+		Returns: void
+	method push()
+		Returns: void
+		data: void
+	method push_unlocked()
+		Returns: void
+		data: void
+	method ref_unlocked()
+		Returns: void
+	method unlock()
+		Returns: void
+	method unref()
+		Returns: void
+	method unref_and_unlock()
+		Returns: void
+constant BIG_ENDIAN
+	value = 4321: gint32
+struct BookmarkFile
+	method add_application()
+		Returns: void
+		uri: utf8
+		name: utf8
+		exec: utf8
+	method add_group()
+		Returns: void
+		uri: utf8
+		group: utf8
+	method free()
+		Returns: void
+	method get_added()
+		Returns: gint64
+		uri: utf8
+	method get_app_info()
+		Returns: gboolean
+		uri: utf8
+		name: utf8
+		exec: utf8
+		count: guint32
+		stamp: gint64
+	method get_description()
+		Returns: utf8
+		uri: utf8
+	method get_icon()
+		Returns: gboolean
+		uri: utf8
+		href: utf8
+		mime_type: utf8
+	method get_is_private()
+		Returns: gboolean
+		uri: utf8
+	method get_mime_type()
+		Returns: utf8
+		uri: utf8
+	method get_modified()
+		Returns: gint64
+		uri: utf8
+	method get_size()
+		Returns: gint32
+	method get_title()
+		Returns: utf8
+		uri: utf8
+	method get_visited()
+		Returns: gint64
+		uri: utf8
+	method has_application()
+		Returns: gboolean
+		uri: utf8
+		name: utf8
+	method has_group()
+		Returns: gboolean
+		uri: utf8
+		group: utf8
+	method has_item()
+		Returns: gboolean
+		uri: utf8
+	method load_from_data()
+		Returns: gboolean
+		data: utf8
+		length: guint64
+	method load_from_data_dirs()
+		Returns: gboolean
+		file: utf8
+		full_path: utf8
+	method load_from_file()
+		Returns: gboolean
+		filename: utf8
+	method move_item()
+		Returns: gboolean
+		old_uri: utf8
+		new_uri: utf8
+	method remove_application()
+		Returns: gboolean
+		uri: utf8
+		name: utf8
+	method remove_group()
+		Returns: gboolean
+		uri: utf8
+		group: utf8
+	method remove_item()
+		Returns: gboolean
+		uri: utf8
+	method set_added()
+		Returns: void
+		uri: utf8
+		added: gint64
+	method set_app_info()
+		Returns: gboolean
+		uri: utf8
+		name: utf8
+		exec: utf8
+		count: gint32
+		stamp: gint64
+	method set_description()
+		Returns: void
+		uri: utf8
+		description: utf8
+	method set_groups()
+		Returns: void
+		uri: utf8
+		groups: utf8
+		length: guint64
+	method set_icon()
+		Returns: void
+		uri: utf8
+		href: utf8
+		mime_type: utf8
+	method set_is_private()
+		Returns: void
+		uri: utf8
+		is_private: gboolean
+	method set_mime_type()
+		Returns: void
+		uri: utf8
+		mime_type: utf8
+	method set_modified()
+		Returns: void
+		uri: utf8
+		modified: gint64
+	method set_title()
+		Returns: void
+		uri: utf8
+		title: utf8
+	method set_visited()
+		Returns: void
+		uri: utf8
+		visited: gint64
+	method to_data()
+		Returns: utf8
+		length: guint64
+	method to_file()
+		Returns: gboolean
+		filename: utf8
+	method error_quark()
+		Returns: guint32
+enum BookmarkFileError
+	invalid_uri = 0
+	invalid_value = 1
+	app_not_registered = 2
+	uri_not_found = 3
+	read = 4
+	unknown_encoding = 5
+	write = 6
+	file_not_found = 7
+struct ByteArray
+	typename = GByteArray
+	method free()
+		Returns: guint8
+		array: array of guint8
+		free_segment: gboolean
+	method unref()
+		Returns: void
+		array: array of guint8
+	field .data
+	field .len
+constant CAN_INLINE
+	value = 1: gint32
+constant CSET_A_2_Z
+	value = 12074016: utf8
+constant CSET_DIGITS
+	value = 12074800: utf8
+constant CSET_a_2_z
+	value = 12074016: utf8
+struct Cache
+	method destroy()
+		Returns: void
+	method remove()
+		Returns: void
+		value: void
+callback CacheDestroyFunc
+	Returns: void
+	value: void
+struct Checksum
+	method free()
+		Returns: void
+	method get_digest()
+		Returns: void
+		buffer: guint8
+		digest_len: guint64
+	method get_string()
+		Returns: utf8
+	method reset()
+		Returns: void
+	method update()
+		Returns: void
+		data: guint8
+		length: gint64
+	method type_get_length()
+		Returns: gint64
+		checksum_type: interface for ChecksumType
+enum ChecksumType
+	md5 = 0
+	sha1 = 1
+	sha256 = 2
+callback ChildWatchFunc
+	Returns: void
+	pid: gint32
+	status: gint32
+	user_data: void
+callback CompareDataFunc
+	Returns: gint32
+	a: void
+	b: void
+	user_data: void
+callback CompareFunc
+	Returns: gint32
+	a: void
+	b: void
+struct Completion
+	method clear_items()
+		Returns: void
+	method free()
+		Returns: void
+	field .items
+	field .func
+	field .prefix
+	field .cache
+	field .strncmp_func
+callback CompletionFunc
+	Returns: utf8
+	unknown: void
+callback CompletionStrncmpFunc
+	Returns: gint32
+	s1: utf8
+	s2: utf8
+	n: guint64
+struct Cond
+enum ConvertError
+	no_conversion = 0
+	illegal_sequence = 1
+	failed = 2
+	partial_input = 3
+	bad_uri = 4
+	not_absolute_path = 5
+constant DATALIST_FLAGS_MASK
+	value = 3: gint32
+constant DATE_BAD_DAY
+	value = 0: gint32
+constant DATE_BAD_JULIAN
+	value = 0: gint32
+constant DATE_BAD_YEAR
+	value = 0: gint32
+constant DIR_SEPARATOR
+	value = 92: gint32
+constant DIR_SEPARATOR_S
+	value = 12074736: utf8
+struct Data
+callback DataForeachFunc
+	Returns: void
+	key_id: guint32
+	data: void
+	user_data: void
+struct Date
+	typename = GDate
+	method new()
+		Returns: interface for Date
+	method new_dmy()
+		Returns: interface for Date
+		day: guint8
+		month: interface for DateMonth
+		year: guint16
+	method new_julian()
+		Returns: interface for Date
+		julian_day: guint32
+	method add_days()
+		Returns: void
+		n_days: guint32
+	method add_months()
+		Returns: void
+		n_months: guint32
+	method add_years()
+		Returns: void
+		n_years: guint32
+	method clamp()
+		Returns: void
+		min_date: interface for Date
+		max_date: interface for Date
+	method clear()
+		Returns: void
+		n_dates: guint32
+	method compare()
+		Returns: gint32
+		rhs: interface for Date
+	method days_between()
+		Returns: gint32
+		date2: interface for Date
+	method free()
+		Returns: void
+	method get_day()
+		Returns: guint8
+	method get_day_of_year()
+		Returns: guint32
+	method get_iso8601_week_of_year()
+		Returns: guint32
+	method get_julian()
+		Returns: guint32
+	method get_monday_week_of_year()
+		Returns: guint32
+	method get_month()
+		Returns: interface for DateMonth
+	method get_sunday_week_of_year()
+		Returns: guint32
+	method get_weekday()
+		Returns: interface for DateWeekday
+	method get_year()
+		Returns: guint16
+	method is_first_of_month()
+		Returns: gboolean
+	method is_last_of_month()
+		Returns: gboolean
+	method order()
+		Returns: void
+		date2: interface for Date
+	method set_day()
+		Returns: void
+		day: guint8
+	method set_dmy()
+		Returns: void
+		day: guint8
+		month: interface for DateMonth
+		y: guint16
+	method set_julian()
+		Returns: void
+		julian_date: guint32
+	method set_month()
+		Returns: void
+		month: interface for DateMonth
+	method set_parse()
+		Returns: void
+		str: utf8
+	method set_time()
+		Returns: void
+		time_: gint32
+	method set_time_t()
+		Returns: void
+		timet: gint64
+	method set_time_val()
+		Returns: void
+		timeval: interface for TimeVal
+	method set_year()
+		Returns: void
+		year: guint16
+	method subtract_days()
+		Returns: void
+		n_days: guint32
+	method subtract_months()
+		Returns: void
+		n_months: guint32
+	method subtract_years()
+		Returns: void
+		n_years: guint32
+	method to_struct_tm()
+		Returns: void
+		tm: void
+	method valid()
+		Returns: gboolean
+	method get_days_in_month()
+		Returns: guint8
+		month: interface for DateMonth
+		year: guint16
+	method get_monday_weeks_in_year()
+		Returns: guint8
+		year: guint16
+	method get_sunday_weeks_in_year()
+		Returns: guint8
+		year: guint16
+	method is_leap_year()
+		Returns: gboolean
+		year: guint16
+	method strftime()
+		Returns: guint64
+		s: utf8
+		slen: guint64
+		format: utf8
+		date: interface for Date
+	method valid_day()
+		Returns: gboolean
+		day: guint8
+	method valid_dmy()
+		Returns: gboolean
+		day: guint8
+		month: interface for DateMonth
+		year: guint16
+	method valid_julian()
+		Returns: gboolean
+		julian_date: guint32
+	method valid_month()
+		Returns: gboolean
+		month: interface for DateMonth
+	method valid_weekday()
+		Returns: gboolean
+		weekday: interface for DateWeekday
+	method valid_year()
+		Returns: gboolean
+		year: guint16
+	field .julian_days
+	field .julian
+	field .dmy
+	field .day
+	field .month
+	field .year
+enum DateDMY
+	day = 0
+	month = 1
+	year = 2
+enum DateMonth
+	bad_month = 0
+	january = 1
+	february = 2
+	march = 3
+	april = 4
+	may = 5
+	june = 6
+	july = 7
+	august = 8
+	september = 9
+	october = 10
+	november = 11
+	december = 12
+struct DateTime
+	typename = GDateTime
+	method new()
+		Returns: interface for DateTime
+		tz: interface for TimeZone
+		year: gint32
+		month: gint32
+		day: gint32
+		hour: gint32
+		minute: gint32
+		seconds: gdouble
+	method new_from_timeval_local()
+		Returns: interface for DateTime
+		tv: interface for TimeVal
+	method new_from_timeval_utc()
+		Returns: interface for DateTime
+		tv: interface for TimeVal
+	method new_from_unix_local()
+		Returns: interface for DateTime
+		t: gint64
+	method new_from_unix_utc()
+		Returns: interface for DateTime
+		t: gint64
+	method new_local()
+		Returns: interface for DateTime
+		year: gint32
+		month: gint32
+		day: gint32
+		hour: gint32
+		minute: gint32
+		seconds: gdouble
+	method new_now()
+		Returns: interface for DateTime
+		tz: interface for TimeZone
+	method new_now_local()
+		Returns: interface for DateTime
+	method new_now_utc()
+		Returns: interface for DateTime
+	method new_utc()
+		Returns: interface for DateTime
+		year: gint32
+		month: gint32
+		day: gint32
+		hour: gint32
+		minute: gint32
+		seconds: gdouble
+	method add()
+		Returns: interface for DateTime
+		timespan: gint64
+	method add_days()
+		Returns: interface for DateTime
+		days: gint32
+	method add_full()
+		Returns: interface for DateTime
+		years: gint32
+		months: gint32
+		days: gint32
+		hours: gint32
+		minutes: gint32
+		seconds: gdouble
+	method add_hours()
+		Returns: interface for DateTime
+		hours: gint32
+	method add_minutes()
+		Returns: interface for DateTime
+		minutes: gint32
+	method add_months()
+		Returns: interface for DateTime
+		months: gint32
+	method add_seconds()
+		Returns: interface for DateTime
+		seconds: gdouble
+	method add_weeks()
+		Returns: interface for DateTime
+		weeks: gint32
+	method add_years()
+		Returns: interface for DateTime
+		years: gint32
+	method difference()
+		Returns: gint64
+		begin: interface for DateTime
+	method format()
+		Returns: utf8
+		format: utf8
+	method get_day_of_month()
+		Returns: gint32
+	method get_day_of_week()
+		Returns: gint32
+	method get_day_of_year()
+		Returns: gint32
+	method get_hour()
+		Returns: gint32
+	method get_microsecond()
+		Returns: gint32
+	method get_minute()
+		Returns: gint32
+	method get_month()
+		Returns: gint32
+	method get_second()
+		Returns: gint32
+	method get_seconds()
+		Returns: gdouble
+	method get_timezone_abbreviation()
+		Returns: utf8
+	method get_utc_offset()
+		Returns: gint64
+	method get_week_numbering_year()
+		Returns: gint32
+	method get_week_of_year()
+		Returns: gint32
+	method get_year()
+		Returns: gint32
+	method get_ymd()
+		Returns: void
+		year: OUT gint32
+		month: OUT gint32
+		day: OUT gint32
+	method is_daylight_savings()
+		Returns: gboolean
+	method ref()
+		Returns: interface for DateTime
+	method to_local()
+		Returns: interface for DateTime
+	method to_timeval()
+		Returns: gboolean
+		tv: interface for TimeVal
+	method to_timezone()
+		Returns: interface for DateTime
+		tz: interface for TimeZone
+	method to_unix()
+		Returns: gint64
+	method to_utc()
+		Returns: interface for DateTime
+	method unref()
+		Returns: void
+	method compare()
+		Returns: gint32
+		dt1: void
+		dt2: void
+	method equal()
+		Returns: gboolean
+		dt1: void
+		dt2: void
+	method hash()
+		Returns: guint32
+		datetime: void
+enum DateWeekday
+	bad_weekday = 0
+	monday = 1
+	tuesday = 2
+	wednesday = 3
+	thursday = 4
+	friday = 5
+	saturday = 6
+	sunday = 7
+struct DebugKey
+	field .key
+	field .value
+callback DestroyNotify
+	Returns: void
+	data: void
+struct Dir
+	method close()
+		Returns: void
+	method read_name()
+		Returns: utf8
+	method rewind()
+		Returns: void
+	method make_tmp()
+		Returns: filename
+		tmpl: filename
+union DoubleIEEE754
+	field .v_double
+constant E
+	value = -1575325285: gdouble
+callback EqualFunc
+	Returns: gboolean
+	a: void
+	b: void
+struct Error
+	typename = GError
+	method new_literal()
+		Returns: error
+		domain: guint32
+		code: gint32
+		message: utf8
+	method copy()
+		Returns: error
+	method free()
+		Returns: void
+	method matches()
+		Returns: gboolean
+		domain: guint32
+		code: gint32
+	field .domain
+	field .code
+	field .message
+enum ErrorType
+	unknown = 0
+	unexp_eof = 1
+	unexp_eof_in_string = 2
+	unexp_eof_in_comment = 3
+	non_digit_in_const = 4
+	digit_radix = 5
+	float_radix = 6
+	float_malformed = 7
+enum FileError
+	exist = 0
+	isdir = 1
+	acces = 2
+	nametoolong = 3
+	noent = 4
+	notdir = 5
+	nxio = 6
+	nodev = 7
+	rofs = 8
+	txtbsy = 9
+	fault = 10
+	loop = 11
+	nospc = 12
+	nomem = 13
+	mfile = 14
+	nfile = 15
+	badf = 16
+	inval = 17
+	pipe = 18
+	again = 19
+	intr = 20
+	io = 21
+	perm = 22
+	nosys = 23
+	failed = 24
+flags FileTest
+	is_regular = 1
+	is_symlink = 2
+	is_dir = 4
+	is_executable = 8
+	exists = 16
+union FloatIEEE754
+	field .v_float
+flags FormatSizeFlags
+	default = 0
+	long_format = 1
+	iec_units = 2
+callback FreeFunc
+	Returns: void
+	data: void
+callback Func
+	Returns: void
+	data: void
+	user_data: void
+constant GINT16_FORMAT
+	value = 12053808: utf8
+constant GINT16_MODIFIER
+	value = 12053696: utf8
+constant GINT32_FORMAT
+	value = 12053696: utf8
+constant GINT32_MODIFIER
+	value = 12053696: utf8
+constant GINT64_FORMAT
+	value = 12053696: utf8
+constant GINT64_MODIFIER
+	value = 12053696: utf8
+constant GINTPTR_FORMAT
+	value = 12053696: utf8
+constant GINTPTR_MODIFIER
+	value = 12053696: utf8
+constant GNUC_FUNCTION
+	value = 12053696: utf8
+constant GNUC_PRETTY_FUNCTION
+	value = 12053696: utf8
+constant GSIZE_FORMAT
+	value = 12053696: utf8
+constant GSIZE_MODIFIER
+	value = 12081184: utf8
+constant GSSIZE_FORMAT
+	value = 12081184: utf8
+constant GUINT16_FORMAT
+	value = 12081184: utf8
+constant GUINT32_FORMAT
+	value = 12081184: utf8
+constant GUINT64_FORMAT
+	value = 12081184: utf8
+constant GUINTPTR_FORMAT
+	value = 12081184: utf8
+constant HAVE_GINT64
+	value = 1: gint32
+constant HAVE_GNUC_VARARGS
+	value = 1: gint32
+constant HAVE_GNUC_VISIBILITY
+	value = 1: gint32
+constant HAVE_GROWING_STACK
+	value = 1: gint32
+constant HAVE_INLINE
+	value = 1: gint32
+constant HAVE_ISO_VARARGS
+	value = 1: gint32
+constant HAVE___INLINE
+	value = 1: gint32
+constant HAVE___INLINE__
+	value = 1: gint32
+callback HFunc
+	Returns: void
+	key: void
+	value: void
+	user_data: void
+constant HOOK_FLAG_USER_SHIFT
+	value = 4: gint32
+callback HRFunc
+	Returns: gboolean
+	key: void
+	value: void
+	user_data: void
+callback HashFunc
+	Returns: guint32
+	key: void
+struct HashTable
+	typename = GHashTable
+	method destroy()
+		Returns: void
+		hash_table: ghash
+	method insert()
+		Returns: void
+		hash_table: ghash
+		key: void
+		value: void
+	method lookup_extended()
+		Returns: gboolean
+		hash_table: ghash
+		lookup_key: void
+		orig_key: void
+		value: void
+	method remove()
+		Returns: gboolean
+		hash_table: ghash
+		key: void
+	method remove_all()
+		Returns: void
+		hash_table: ghash
+	method replace()
+		Returns: void
+		hash_table: ghash
+		key: void
+		value: void
+	method size()
+		Returns: guint32
+		hash_table: ghash
+	method steal()
+		Returns: gboolean
+		hash_table: ghash
+		key: void
+	method steal_all()
+		Returns: void
+		hash_table: ghash
+	method unref()
+		Returns: void
+		hash_table: ghash
+struct HashTableIter
+	method init()
+		Returns: void
+		hash_table: ghash
+	method next()
+		Returns: gboolean
+		key: void
+		value: void
+	method remove()
+		Returns: void
+	method replace()
+		Returns: void
+		value: void
+	method steal()
+		Returns: void
+	field .dummy1
+	field .dummy2
+	field .dummy3
+	field .dummy4
+	field .dummy5
+	field .dummy6
+struct Hmac
+	method get_digest()
+		Returns: void
+		buffer: guint8
+		digest_len: guint64
+	method get_string()
+		Returns: utf8
+	method unref()
+		Returns: void
+	method update()
+		Returns: void
+		data: array of guint8
+		length: gint64
+struct Hook
+	method compare_ids()
+		Returns: gint32
+		sibling: interface for Hook
+	method destroy()
+		Returns: gboolean
+		hook_list: interface for HookList
+		hook_id: guint64
+	method destroy_link()
+		Returns: void
+		hook_list: interface for HookList
+		hook: interface for Hook
+	method free()
+		Returns: void
+		hook_list: interface for HookList
+		hook: interface for Hook
+	method insert_before()
+		Returns: void
+		hook_list: interface for HookList
+		sibling: interface for Hook
+		hook: interface for Hook
+	method prepend()
+		Returns: void
+		hook_list: interface for HookList
+		hook: interface for Hook
+	method unref()
+		Returns: void
+		hook_list: interface for HookList
+		hook: interface for Hook
+	field .data
+	field .next
+	field .prev
+	field .ref_count
+	field .hook_id
+	field .flags
+	field .func
+	field .destroy
+callback HookCheckFunc
+	Returns: gboolean
+	data: void
+callback HookCheckMarshaller
+	Returns: gboolean
+	hook: interface for Hook
+	marshal_data: void
+callback HookCompareFunc
+	Returns: gint32
+	new_hook: interface for Hook
+	sibling: interface for Hook
+callback HookFinalizeFunc
+	Returns: void
+	hook_list: interface for HookList
+	hook: interface for Hook
+callback HookFindFunc
+	Returns: gboolean
+	hook: interface for Hook
+	data: void
+flags HookFlagMask
+	active = 1
+	in_call = 2
+	mask = 15
+callback HookFunc
+	Returns: void
+	data: void
+struct HookList
+	method clear()
+		Returns: void
+	method init()
+		Returns: void
+		hook_size: guint32
+	method invoke()
+		Returns: void
+		may_recurse: gboolean
+	method invoke_check()
+		Returns: void
+		may_recurse: gboolean
+	field .seq_id
+	field .hook_size
+	field .is_setup
+	field .hooks
+	field .dummy3
+	field .finalize_hook
+	field .dummy
+callback HookMarshaller
+	Returns: void
+	hook: interface for Hook
+	marshal_data: void
+struct IConv
+	method ()
+		Returns: guint64
+		inbuf: utf8
+		inbytes_left: guint64
+		outbuf: utf8
+		outbytes_left: guint64
+	method close()
+		Returns: gint32
+constant IEEE754_DOUBLE_BIAS
+	value = 1023: gint32
+constant IEEE754_FLOAT_BIAS
+	value = 127: gint32
+struct IOChannel
+	typename = GIOChannel
+	method new_file()
+		Returns: interface for IOChannel
+		filename: utf8
+		mode: utf8
+	method unix_new()
+		Returns: interface for IOChannel
+		fd: gint32
+	method close()
+		Returns: void
+	method flush()
+		Returns: interface for IOStatus
+	method get_buffer_condition()
+		Returns: interface for IOCondition
+	method get_buffer_size()
+		Returns: guint64
+	method get_buffered()
+		Returns: gboolean
+	method get_close_on_unref()
+		Returns: gboolean
+	method get_encoding()
+		Returns: utf8
+	method get_flags()
+		Returns: interface for IOFlags
+	method get_line_term()
+		Returns: utf8
+		length: gint32
+	method init()
+		Returns: void
+	method read()
+		Returns: interface for IOError
+		buf: utf8
+		count: guint64
+		bytes_read: guint64
+	method read_chars()
+		Returns: interface for IOStatus
+		buf: utf8
+		count: guint64
+		bytes_read: guint64
+	method read_line()
+		Returns: interface for IOStatus
+		str_return: utf8
+		length: guint64
+		terminator_pos: guint64
+	method read_line_string()
+		Returns: interface for IOStatus
+		buffer: interface for String
+		terminator_pos: guint64
+	method read_to_end()
+		Returns: interface for IOStatus
+		str_return: utf8
+		length: guint64
+	method read_unichar()
+		Returns: interface for IOStatus
+		thechar: gunichar
+	method ref()
+		Returns: interface for IOChannel
+	method seek()
+		Returns: interface for IOError
+		offset: gint64
+		type: interface for SeekType
+	method seek_position()
+		Returns: interface for IOStatus
+		offset: gint64
+		type: interface for SeekType
+	method set_buffer_size()
+		Returns: void
+		size: guint64
+	method set_buffered()
+		Returns: void
+		buffered: gboolean
+	method set_close_on_unref()
+		Returns: void
+		do_close: gboolean
+	method set_encoding()
+		Returns: interface for IOStatus
+		encoding: utf8
+	method set_flags()
+		Returns: interface for IOStatus
+		flags: interface for IOFlags
+	method set_line_term()
+		Returns: void
+		line_term: utf8
+		length: gint32
+	method shutdown()
+		Returns: interface for IOStatus
+		flush: gboolean
+	method unix_get_fd()
+		Returns: gint32
+	method unref()
+		Returns: void
+	method write()
+		Returns: interface for IOError
+		buf: utf8
+		count: guint64
+		bytes_written: guint64
+	method write_chars()
+		Returns: interface for IOStatus
+		buf: utf8
+		count: gint64
+		bytes_written: guint64
+	method write_unichar()
+		Returns: interface for IOStatus
+		thechar: gunichar
+	method error_from_errno()
+		Returns: interface for IOChannelError
+		en: gint32
+	method error_quark()
+		Returns: guint32
+	field .ref_count
+	field .funcs
+	field .encoding
+	field .read_cd
+	field .write_cd
+	field .line_term
+	field .line_term_len
+	field .buf_size
+	field .read_buf
+	field .encoded_read_buf
+	field .write_buf
+	field .partial_write_buf
+	field .use_buffer
+	field .do_encode
+	field .close_on_unref
+	field .is_readable
+	field .is_writeable
+	field .is_seekable
+	field .reserved1
+	field .reserved2
+enum IOChannelError
+	fbig = 0
+	inval = 1
+	io = 2
+	isdir = 3
+	nospc = 4
+	nxio = 5
+	overflow = 6
+	pipe = 7
+	failed = 8
+flags IOCondition
+	typename = GIOCondition
+	in = 1
+	out = 4
+	pri = 2
+	err = 8
+	hup = 16
+	nval = 32
+enum IOError
+	none = 0
+	again = 1
+	inval = 2
+	unknown = 3
+flags IOFlags
+	append = 1
+	nonblock = 2
+	is_readable = 4
+	is_writeable = 8
+	is_seekable = 16
+	mask = 31
+	get_mask = 31
+	set_mask = 3
+callback IOFunc
+	Returns: gboolean
+	source: interface for IOChannel
+	condition: interface for IOCondition
+	data: void
+struct IOFuncs
+	field .io_read
+	field .io_write
+	field .io_seek
+	field .io_close
+	field .io_create_watch
+	field .io_free
+	field .io_set_flags
+	field .io_get_flags
+enum IOStatus
+	error = 0
+	normal = 1
+	eof = 2
+	again = 3
+constant KEY_FILE_DESKTOP_GROUP
+	value = 12074944: utf8
+constant KEY_FILE_DESKTOP_KEY_CATEGORIES
+	value = 12074944: utf8
+constant KEY_FILE_DESKTOP_KEY_COMMENT
+	value = 12074944: utf8
+constant KEY_FILE_DESKTOP_KEY_EXEC
+	value = 12074944: utf8
+constant KEY_FILE_DESKTOP_KEY_FULLNAME
+	value = 12074944: utf8
+constant KEY_FILE_DESKTOP_KEY_GENERIC_NAME
+	value = 12074944: utf8
+constant KEY_FILE_DESKTOP_KEY_GETTEXT_DOMAIN
+	value = 12074944: utf8
+constant KEY_FILE_DESKTOP_KEY_HIDDEN
+	value = 12074944: utf8
+constant KEY_FILE_DESKTOP_KEY_ICON
+	value = 12081520: utf8
+constant KEY_FILE_DESKTOP_KEY_KEYWORDS
+	value = 12081520: utf8
+constant KEY_FILE_DESKTOP_KEY_MIME_TYPE
+	value = 12074944: utf8
+constant KEY_FILE_DESKTOP_KEY_NAME
+	value = 12074944: utf8
+constant KEY_FILE_DESKTOP_KEY_NOT_SHOW_IN
+	value = 12074944: utf8
+constant KEY_FILE_DESKTOP_KEY_NO_DISPLAY
+	value = 12074944: utf8
+constant KEY_FILE_DESKTOP_KEY_ONLY_SHOW_IN
+	value = 12074944: utf8
+constant KEY_FILE_DESKTOP_KEY_PATH
+	value = 12074944: utf8
+constant KEY_FILE_DESKTOP_KEY_STARTUP_NOTIFY
+	value = 12074944: utf8
+constant KEY_FILE_DESKTOP_KEY_STARTUP_WM_CLASS
+	value = 12074944: utf8
+constant KEY_FILE_DESKTOP_KEY_TERMINAL
+	value = 12074944: utf8
+constant KEY_FILE_DESKTOP_KEY_TRY_EXEC
+	value = 12081520: utf8
+constant KEY_FILE_DESKTOP_KEY_TYPE
+	value = 12081520: utf8
+constant KEY_FILE_DESKTOP_KEY_URL
+	value = 12081520: utf8
+constant KEY_FILE_DESKTOP_KEY_VERSION
+	value = 12081520: utf8
+constant KEY_FILE_DESKTOP_TYPE_APPLICATION
+	value = 12074944: utf8
+constant KEY_FILE_DESKTOP_TYPE_DIRECTORY
+	value = 12074944: utf8
+constant KEY_FILE_DESKTOP_TYPE_LINK
+	value = 12074944: utf8
+struct KeyFile
+	method get_boolean()
+		Returns: gboolean
+		group_name: utf8
+		key: utf8
+	method get_boolean_list()
+		Returns: array of gboolean
+		group_name: utf8
+		key: utf8
+		length: OUT guint64
+	method get_comment()
+		Returns: utf8
+		group_name: utf8
+		key: utf8
+	method get_double()
+		Returns: gdouble
+		group_name: utf8
+		key: utf8
+	method get_double_list()
+		Returns: array of gdouble
+		group_name: utf8
+		key: utf8
+		length: OUT guint64
+	method get_groups()
+		Returns: array of utf8
+		length: OUT guint64
+	method get_int64()
+		Returns: gint64
+		group_name: utf8
+		key: utf8
+	method get_integer()
+		Returns: gint32
+		group_name: utf8
+		key: utf8
+	method get_integer_list()
+		Returns: array of gint32
+		group_name: utf8
+		key: utf8
+		length: OUT guint64
+	method get_keys()
+		Returns: array of utf8
+		group_name: utf8
+		length: OUT guint64
+	method get_locale_string()
+		Returns: utf8
+		group_name: utf8
+		key: utf8
+		locale: utf8
+	method get_locale_string_list()
+		Returns: array of utf8
+		group_name: utf8
+		key: utf8
+		locale: utf8
+		length: OUT guint64
+	method get_start_group()
+		Returns: utf8
+	method get_string()
+		Returns: utf8
+		group_name: utf8
+		key: utf8
+	method get_string_list()
+		Returns: array of utf8
+		group_name: utf8
+		key: utf8
+		length: OUT guint64
+	method get_uint64()
+		Returns: guint64
+		group_name: utf8
+		key: utf8
+	method get_value()
+		Returns: utf8
+		group_name: utf8
+		key: utf8
+	method has_group()
+		Returns: gboolean
+		group_name: utf8
+	method load_from_data()
+		Returns: gboolean
+		data: array of utf8
+		length: guint64
+		flags: interface for KeyFileFlags
+	method load_from_data_dirs()
+		Returns: gboolean
+		file: filename
+		full_path: OUT filename
+		flags: interface for KeyFileFlags
+	method load_from_dirs()
+		Returns: gboolean
+		file: filename
+		search_dirs: array of filename
+		full_path: OUT filename
+		flags: interface for KeyFileFlags
+	method load_from_file()
+		Returns: gboolean
+		file: filename
+		flags: interface for KeyFileFlags
+	method remove_comment()
+		Returns: gboolean
+		group_name: utf8
+		key: utf8
+	method remove_group()
+		Returns: gboolean
+		group_name: utf8
+	method remove_key()
+		Returns: gboolean
+		group_name: utf8
+		key: utf8
+	method set_boolean()
+		Returns: void
+		group_name: utf8
+		key: utf8
+		value: gboolean
+	method set_boolean_list()
+		Returns: void
+		group_name: utf8
+		key: utf8
+		list: array of gboolean
+		length: guint64
+	method set_comment()
+		Returns: gboolean
+		group_name: utf8
+		key: utf8
+		comment: utf8
+	method set_double()
+		Returns: void
+		group_name: utf8
+		key: utf8
+		value: gdouble
+	method set_double_list()
+		Returns: void
+		group_name: utf8
+		key: utf8
+		list: array of gdouble
+		length: guint64
+	method set_int64()
+		Returns: void
+		group_name: utf8
+		key: utf8
+		value: gint64
+	method set_integer()
+		Returns: void
+		group_name: utf8
+		key: utf8
+		value: gint32
+	method set_integer_list()
+		Returns: void
+		group_name: utf8
+		key: utf8
+		list: array of gint32
+		length: guint64
+	method set_list_separator()
+		Returns: void
+		separator: guint8
+	method set_locale_string()
+		Returns: void
+		group_name: utf8
+		key: utf8
+		locale: utf8
+		string: utf8
+	method set_locale_string_list()
+		Returns: void
+		group_name: utf8
+		key: utf8
+		locale: utf8
+		list: array of utf8
+		length: guint64
+	method set_string()
+		Returns: void
+		group_name: utf8
+		key: utf8
+		string: utf8
+	method set_string_list()
+		Returns: void
+		group_name: utf8
+		key: utf8
+		list: array of utf8
+		length: guint64
+	method set_uint64()
+		Returns: void
+		group_name: utf8
+		key: utf8
+		value: guint64
+	method set_value()
+		Returns: void
+		group_name: utf8
+		key: utf8
+		value: utf8
+	method to_data()
+		Returns: utf8
+		length: OUT guint64
+	method error_quark()
+		Returns: guint32
+enum KeyFileError
+	unknown_encoding = 0
+	parse = 1
+	not_found = 2
+	key_not_found = 3
+	group_not_found = 4
+	invalid_value = 5
+flags KeyFileFlags
+	none = 0
+	keep_comments = 1
+	keep_translations = 2
+constant LITTLE_ENDIAN
+	value = 1234: gint32
+constant LN10
+	value = -1355148081: gdouble
+constant LN2
+	value = -1643495006: gdouble
+constant LOG_2_BASE_10
+	value = 1430739506: gdouble
+constant LOG_FATAL_MASK
+	value = 0: gint32
+constant LOG_LEVEL_USER_SHIFT
+	value = 8: gint32
+struct List
+	method pop_allocator()
+		Returns: void
+	method push_allocator()
+		Returns: void
+		allocator: void
+	field .data
+	field .next
+	field .prev
+callback LogFunc
+	Returns: void
+	log_domain: utf8
+	log_level: interface for LogLevelFlags
+	message: utf8
+	user_data: void
+flags LogLevelFlags
+	flag_recursion = 1
+	flag_fatal = 2
+	level_error = 4
+	level_critical = 8
+	level_warning = 16
+	level_message = 32
+	level_info = 64
+	level_debug = 128
+	level_mask = -4
+constant MAJOR_VERSION
+	value = 2: gint32
+constant MICRO_VERSION
+	value = 2: gint32
+constant MINOR_VERSION
+	value = 30: gint32
+constant MODULE_SUFFIX
+	value = 12074944: utf8
+constant MUTEX_DEBUG_MAGIC
+	value = -119436585: gint32
+struct MainContext
+	typename = GMainContext
+	method new()
+		Returns: interface for MainContext
+	method acquire()
+		Returns: gboolean
+	method add_poll()
+		Returns: void
+		fd: interface for PollFD
+		priority: gint32
+	method check()
+		Returns: gint32
+		max_priority: gint32
+		fds: array of interface
+		n_fds: gint32
+	method dispatch()
+		Returns: void
+	method find_source_by_funcs_user_data()
+		Returns: interface for Source
+		funcs: interface for SourceFuncs
+		user_data: void
+	method find_source_by_id()
+		Returns: interface for Source
+		source_id: guint32
+	method find_source_by_user_data()
+		Returns: interface for Source
+		user_data: void
+	method invoke_full()
+		Returns: void
+		priority: gint32
+		function: interface for SourceFunc
+		data: void
+		notify: interface for DestroyNotify
+	method is_owner()
+		Returns: gboolean
+	method iteration()
+		Returns: gboolean
+		may_block: gboolean
+	method pending()
+		Returns: gboolean
+	method pop_thread_default()
+		Returns: void
+	method prepare()
+		Returns: gboolean
+		priority: gint32
+	method push_thread_default()
+		Returns: void
+	method query()
+		Returns: gint32
+		max_priority: gint32
+		timeout_: OUT gint32
+		fds: OUT array of interface
+		n_fds: OUT gint32
+	method ref()
+		Returns: interface for MainContext
+	method release()
+		Returns: void
+	method remove_poll()
+		Returns: void
+		fd: interface for PollFD
+	method unref()
+		Returns: void
+	method wait()
+		Returns: gboolean
+		cond: interface for Cond
+		mutex: interface for Mutex
+	method wakeup()
+		Returns: void
+	method default()
+		Returns: interface for MainContext
+	method get_thread_default()
+		Returns: interface for MainContext
+struct MainLoop
+	typename = GMainLoop
+	method new()
+		Returns: interface for MainLoop
+		context: interface for MainContext
+		is_running: gboolean
+	method get_context()
+		Returns: interface for MainContext
+	method is_running()
+		Returns: gboolean
+	method quit()
+		Returns: void
+	method ref()
+		Returns: interface for MainLoop
+	method run()
+		Returns: void
+	method unref()
+		Returns: void
+struct MappedFile
+	method free()
+		Returns: void
+	method get_contents()
+		Returns: utf8
+	method get_length()
+		Returns: guint64
+	method unref()
+		Returns: void
+flags MarkupCollectType
+	invalid = 0
+	string = 1
+	strdup = 2
+	boolean = 3
+	tristate = 4
+	optional = 65536
+enum MarkupError
+	bad_utf8 = 0
+	empty = 1
+	parse = 2
+	unknown_element = 3
+	unknown_attribute = 4
+	invalid_content = 5
+	missing_attribute = 6
+struct MarkupParseContext
+	method end_parse()
+		Returns: gboolean
+	method free()
+		Returns: void
+	method get_element()
+		Returns: utf8
+	method get_position()
+		Returns: void
+		line_number: gint32
+		char_number: gint32
+	method parse()
+		Returns: gboolean
+		text: utf8
+		text_len: gint64
+	method push()
+		Returns: void
+		parser: interface for MarkupParser
+		user_data: void
+flags MarkupParseFlags
+	do_not_use_this_unsupported_flag = 1
+	treat_cdata_as_text = 2
+	prefix_error_position = 4
+struct MarkupParser
+	field .start_element
+	field .end_element
+	field .text
+	field .passthrough
+	field .error
+struct MatchInfo
+	typename = GMatchInfo
+	method expand_references()
+		Returns: utf8
+		string_to_expand: utf8
+	method fetch()
+		Returns: utf8
+		match_num: gint32
+	method fetch_named()
+		Returns: utf8
+		name: utf8
+	method fetch_named_pos()
+		Returns: gboolean
+		name: utf8
+		start_pos: OUT gint32
+		end_pos: OUT gint32
+	method fetch_pos()
+		Returns: gboolean
+		match_num: gint32
+		start_pos: OUT gint32
+		end_pos: OUT gint32
+	method free()
+		Returns: void
+	method get_match_count()
+		Returns: gint32
+	method get_regex()
+		Returns: interface for Regex
+	method get_string()
+		Returns: utf8
+	method is_partial_match()
+		Returns: gboolean
+	method matches()
+		Returns: gboolean
+	method next()
+		Returns: gboolean
+	method ref()
+		Returns: interface for MatchInfo
+	method unref()
+		Returns: void
+struct MemChunk
+	method clean()
+		Returns: void
+	method destroy()
+		Returns: void
+	method free()
+		Returns: void
+		mem: void
+	method print()
+		Returns: void
+	method reset()
+		Returns: void
+	method info()
+		Returns: void
+struct MemVTable
+	field .malloc
+	field .realloc
+	field .free
+	field .calloc
+	field .try_malloc
+	field .try_realloc
+struct Mutex
+struct Node
+	method child_index()
+		Returns: gint32
+		data: void
+	method child_position()
+		Returns: gint32
+		child: interface for Node
+	method depth()
+		Returns: guint32
+	method destroy()
+		Returns: void
+	method is_ancestor()
+		Returns: gboolean
+		descendant: interface for Node
+	method max_height()
+		Returns: guint32
+	method n_children()
+		Returns: guint32
+	method n_nodes()
+		Returns: guint32
+		flags: interface for TraverseFlags
+	method reverse_children()
+		Returns: void
+	method unlink()
+		Returns: void
+	method pop_allocator()
+		Returns: void
+	method push_allocator()
+		Returns: void
+		dummy: void
+	field .data
+	field .next
+	field .prev
+	field .parent
+	field .children
+callback NodeForeachFunc
+	Returns: void
+	node: interface for Node
+	data: void
+callback NodeTraverseFunc
+	Returns: gboolean
+	node: interface for Node
+	data: void
+enum NormalizeMode
+	default = 0
+	nfd = 0
+	default_compose = 1
+	nfc = 1
+	all = 2
+	nfkd = 2
+	all_compose = 3
+	nfkc = 3
+constant OPTION_REMAINING
+	value = 12053760: utf8
+struct Once
+	method init_enter()
+		Returns: gboolean
+		value_location: guint64
+	method init_enter_impl()
+		Returns: gboolean
+		value_location: guint64
+	method init_leave()
+		Returns: void
+		value_location: guint64
+		initialization_value: guint64
+	field .status
+	field .retval
+enum OnceStatus
+	notcalled = 0
+	progress = 1
+	ready = 2
+enum OptionArg
+	none = 0
+	string = 1
+	int = 2
+	callback = 3
+	filename = 4
+	string_array = 5
+	filename_array = 6
+	double = 7
+	int64 = 8
+callback OptionArgFunc
+	Returns: gboolean
+	option_name: utf8
+	value: utf8
+	data: void
+struct OptionContext
+	method add_group()
+		Returns: void
+		group: interface for OptionGroup
+	method add_main_entries()
+		Returns: void
+		entries: interface for OptionEntry
+		translation_domain: utf8
+	method free()
+		Returns: void
+	method get_description()
+		Returns: utf8
+	method get_help()
+		Returns: utf8
+		main_help: gboolean
+		group: interface for OptionGroup
+	method get_help_enabled()
+		Returns: gboolean
+	method get_ignore_unknown_options()
+		Returns: gboolean
+	method get_summary()
+		Returns: utf8
+	method parse()
+		Returns: gboolean
+		argc: INOUT gint32
+		argv: INOUT array of utf8
+	method set_description()
+		Returns: void
+		description: utf8
+	method set_help_enabled()
+		Returns: void
+		help_enabled: gboolean
+	method set_ignore_unknown_options()
+		Returns: void
+		ignore_unknown: gboolean
+	method set_main_group()
+		Returns: void
+		group: interface for OptionGroup
+	method set_summary()
+		Returns: void
+		summary: utf8
+	method set_translate_func()
+		Returns: void
+		func: interface for TranslateFunc
+		data: void
+		destroy_notify: interface for DestroyNotify
+	method set_translation_domain()
+		Returns: void
+		domain: utf8
+struct OptionEntry
+	field .long_name
+	field .short_name
+	field .flags
+	field .arg
+	field .arg_data
+	field .description
+	field .arg_description
+enum OptionError
+	unknown_option = 0
+	bad_value = 1
+	failed = 2
+callback OptionErrorFunc
+	Returns: void
+	context: interface for OptionContext
+	group: interface for OptionGroup
+	data: void
+flags OptionFlags
+	hidden = 1
+	in_main = 2
+	reverse = 4
+	no_arg = 8
+	filename = 16
+	optional_arg = 32
+	noalias = 64
+struct OptionGroup
+	method add_entries()
+		Returns: void
+		entries: interface for OptionEntry
+	method free()
+		Returns: void
+	method set_translate_func()
+		Returns: void
+		func: interface for TranslateFunc
+		data: void
+		destroy_notify: interface for DestroyNotify
+	method set_translation_domain()
+		Returns: void
+		domain: utf8
+callback OptionParseFunc
+	Returns: gboolean
+	context: interface for OptionContext
+	group: interface for OptionGroup
+	data: void
+constant PDP_ENDIAN
+	value = 3412: gint32
+constant PI
+	value = -2101166721: gdouble
+constant PI_2
+	value = -57999238: gdouble
+constant PI_4
+	value = -57999238: gdouble
+constant POLLFD_FORMAT
+	value = 12053760: utf8
+constant PRIORITY_DEFAULT
+	value = 0: gint32
+constant PRIORITY_DEFAULT_IDLE
+	value = 200: gint32
+constant PRIORITY_HIGH
+	value = -100: gint32
+constant PRIORITY_HIGH_IDLE
+	value = 100: gint32
+constant PRIORITY_LOW
+	value = 300: gint32
+struct PatternSpec
+	method equal()
+		Returns: gboolean
+		pspec2: interface for PatternSpec
+	method free()
+		Returns: void
+struct PollFD
+	field .fd
+	field .events
+	field .revents
+callback PollFunc
+	Returns: gint32
+	ufds: interface for PollFD
+	nfsd: guint32
+	timeout_: gint32
+callback PrintFunc
+	Returns: void
+	string: utf8
+struct Private
+struct PtrArray
+	typename = GPtrArray
+	method add()
+		Returns: void
+		array: array of void
+		data: void
+	method remove()
+		Returns: gboolean
+		array: array of void
+		data: void
+	method remove_fast()
+		Returns: gboolean
+		array: array of void
+		data: void
+	method remove_range()
+		Returns: void
+		array: array of void
+		index_: guint32
+		length: guint32
+	method set_free_func()
+		Returns: void
+		array: array of void
+		element_free_func: interface for DestroyNotify
+	method set_size()
+		Returns: void
+		array: array of void
+		length: gint32
+	method unref()
+		Returns: void
+		array: array of void
+	field .pdata
+	field .len
+struct Queue
+	method clear()
+		Returns: void
+	method free()
+		Returns: void
+	method get_length()
+		Returns: guint32
+	method index()
+		Returns: gint32
+		data: void
+	method init()
+		Returns: void
+	method is_empty()
+		Returns: gboolean
+	method push_head()
+		Returns: void
+		data: void
+	method push_nth()
+		Returns: void
+		data: void
+		n: gint32
+	method push_tail()
+		Returns: void
+		data: void
+	method remove()
+		Returns: gboolean
+		data: void
+	method remove_all()
+		Returns: guint32
+		data: void
+	method reverse()
+		Returns: void
+	field .head
+	field .tail
+	field .length
+struct Rand
+	method double()
+		Returns: gdouble
+	method double_range()
+		Returns: gdouble
+		begin: gdouble
+		end: gdouble
+	method free()
+		Returns: void
+	method int()
+		Returns: guint32
+	method int_range()
+		Returns: gint32
+		begin: gint32
+		end: gint32
+	method set_seed()
+		Returns: void
+		seed: guint32
+	method set_seed_array()
+		Returns: void
+		seed: guint32
+		seed_length: guint32
+struct Regex
+	typename = GRegex
+	method new()
+		Returns: interface for Regex
+		pattern: utf8
+		compile_options: interface for RegexCompileFlags
+		match_options: interface for RegexMatchFlags
+	method get_capture_count()
+		Returns: gint32
+	method get_compile_flags()
+		Returns: interface for RegexCompileFlags
+	method get_match_flags()
+		Returns: interface for RegexMatchFlags
+	method get_max_backref()
+		Returns: gint32
+	method get_pattern()
+		Returns: utf8
+	method get_string_number()
+		Returns: gint32
+		name: utf8
+	method match()
+		Returns: gboolean
+		string: utf8
+		match_options: interface for RegexMatchFlags
+		match_info: OUT interface for MatchInfo
+	method match_all()
+		Returns: gboolean
+		string: utf8
+		match_options: interface for RegexMatchFlags
+		match_info: OUT interface for MatchInfo
+	method match_all_full()
+		Returns: gboolean
+		string: array of utf8
+		string_len: gint64
+		start_position: gint32
+		match_options: interface for RegexMatchFlags
+		match_info: OUT interface for MatchInfo
+	method match_full()
+		Returns: gboolean
+		string: array of utf8
+		string_len: gint64
+		start_position: gint32
+		match_options: interface for RegexMatchFlags
+		match_info: OUT interface for MatchInfo
+	method ref()
+		Returns: interface for Regex
+	method replace()
+		Returns: utf8
+		string: array of utf8
+		string_len: gint64
+		start_position: gint32
+		replacement: utf8
+		match_options: interface for RegexMatchFlags
+	method replace_literal()
+		Returns: utf8
+		string: array of utf8
+		string_len: gint64
+		start_position: gint32
+		replacement: utf8
+		match_options: interface for RegexMatchFlags
+	method unref()
+		Returns: void
+	method check_replacement()
+		Returns: gboolean
+		replacement: utf8
+		has_references: OUT gboolean
+	method error_quark()
+		Returns: guint32
+	method escape_nul()
+		Returns: utf8
+		string: utf8
+		length: gint32
+	method escape_string()
+		Returns: utf8
+		string: array of utf8
+		length: gint32
+	method match_simple()
+		Returns: gboolean
+		pattern: utf8
+		string: utf8
+		compile_options: interface for RegexCompileFlags
+		match_options: interface for RegexMatchFlags
+flags RegexCompileFlags
+	caseless = 1
+	multiline = 2
+	dotall = 4
+	extended = 8
+	anchored = 16
+	dollar_endonly = 32
+	ungreedy = 512
+	raw = 2048
+	no_auto_capture = 4096
+	optimize = 8192
+	dupnames = 524288
+	newline_cr = 1048576
+	newline_lf = 2097152
+	newline_crlf = 3145728
+enum RegexError
+	compile = 0
+	optimize = 1
+	replace = 2
+	match = 3
+	internal = 4
+	stray_backslash = 101
+	missing_control_char = 102
+	unrecognized_escape = 103
+	quantifiers_out_of_order = 104
+	quantifier_too_big = 105
+	unterminated_character_class = 106
+	invalid_escape_in_character_class = 107
+	range_out_of_order = 108
+	nothing_to_repeat = 109
+	unrecognized_character = 112
+	posix_named_class_outside_class = 113
+	unmatched_parenthesis = 114
+	inexistent_subpattern_reference = 115
+	unterminated_comment = 118
+	expression_too_large = 120
+	memory_error = 121
+	variable_length_lookbehind = 125
+	malformed_condition = 126
+	too_many_conditional_branches = 127
+	assertion_expected = 128
+	unknown_posix_class_name = 130
+	posix_collating_elements_not_supported = 131
+	hex_code_too_large = 134
+	invalid_condition = 135
+	single_byte_match_in_lookbehind = 136
+	infinite_loop = 140
+	missing_subpattern_name_terminator = 142
+	duplicate_subpattern_name = 143
+	malformed_property = 146
+	unknown_property = 147
+	subpattern_name_too_long = 148
+	too_many_subpatterns = 149
+	invalid_octal_value = 151
+	too_many_branches_in_define = 154
+	define_repetion = 155
+	inconsistent_newline_options = 156
+	missing_back_reference = 157
+callback RegexEvalCallback
+	Returns: gboolean
+	match_info: interface for MatchInfo
+	result: interface for String
+	user_data: void
+flags RegexMatchFlags
+	anchored = 16
+	notbol = 128
+	noteol = 256
+	notempty = 1024
+	partial = 32768
+	newline_cr = 1048576
+	newline_lf = 2097152
+	newline_crlf = 3145728
+	newline_any = 4194304
+struct Relation
+	method count()
+		Returns: gint32
+		key: void
+		field: gint32
+	method delete()
+		Returns: gint32
+		key: void
+		field: gint32
+	method destroy()
+		Returns: void
+	method print()
+		Returns: void
+constant SEARCHPATH_SEPARATOR
+	value = 59: gint32
+constant SEARCHPATH_SEPARATOR_S
+	value = 12054880: utf8
+constant SIZEOF_LONG
+	value = 8: gint32
+constant SIZEOF_SIZE_T
+	value = 8: gint32
+constant SIZEOF_VOID_P
+	value = 8: gint32
+struct SList
+	method pop_allocator()
+		Returns: void
+	method push_allocator()
+		Returns: void
+		dummy: void
+	field .data
+	field .next
+constant SQRT2
+	value = -604456517: gdouble
+constant STR_DELIMITERS
+	value = 12054880: utf8
+constant SYSDEF_AF_INET
+	value = 2: gint32
+constant SYSDEF_AF_INET6
+	value = 10: gint32
+constant SYSDEF_AF_UNIX
+	value = 1: gint32
+constant SYSDEF_MSG_DONTROUTE
+	value = 4: gint32
+constant SYSDEF_MSG_OOB
+	value = 1: gint32
+constant SYSDEF_MSG_PEEK
+	value = 2: gint32
+struct Scanner
+	method cur_line()
+		Returns: guint32
+	method cur_position()
+		Returns: guint32
+	method cur_token()
+		Returns: interface for TokenType
+	method destroy()
+		Returns: void
+	method eof()
+		Returns: gboolean
+	method get_next_token()
+		Returns: interface for TokenType
+	method input_file()
+		Returns: void
+		input_fd: gint32
+	method input_text()
+		Returns: void
+		text: utf8
+		text_len: guint32
+	method peek_next_token()
+		Returns: interface for TokenType
+	method scope_add_symbol()
+		Returns: void
+		scope_id: guint32
+		symbol: utf8
+		value: void
+	method scope_remove_symbol()
+		Returns: void
+		scope_id: guint32
+		symbol: utf8
+	method set_scope()
+		Returns: guint32
+		scope_id: guint32
+	method sync_file_offset()
+		Returns: void
+	method unexp_token()
+		Returns: void
+		expected_token: interface for TokenType
+		identifier_spec: utf8
+		symbol_spec: utf8
+		symbol_name: utf8
+		message: utf8
+		is_error: gint32
+	field .user_data
+	field .max_parse_errors
+	field .parse_errors
+	field .input_name
+	field .qdata
+	field .config
+	field .token
+	field .value
+	field .line
+	field .position
+	field .next_token
+	field .next_value
+	field .next_line
+	field .next_position
+	field .symbol_table
+	field .input_fd
+	field .text
+	field .text_end
+	field .buffer
+	field .scope_id
+	field .msg_handler
+struct ScannerConfig
+	field .cset_skip_characters
+	field .cset_identifier_first
+	field .cset_identifier_nth
+	field .cpair_comment_single
+	field .case_sensitive
+	field .skip_comment_multi
+	field .skip_comment_single
+	field .scan_comment_multi
+	field .scan_identifier
+	field .scan_identifier_1char
+	field .scan_identifier_NULL
+	field .scan_symbols
+	field .scan_binary
+	field .scan_octal
+	field .scan_float
+	field .scan_hex
+	field .scan_hex_dollar
+	field .scan_string_sq
+	field .scan_string_dq
+	field .numbers_2_int
+	field .int_2_float
+	field .identifier_2_string
+	field .char_2_token
+	field .symbol_2_token
+	field .scope_0_fallback
+	field .store_int64
+	field .padding_dummy
+callback ScannerMsgFunc
+	Returns: void
+	scanner: interface for Scanner
+	message: utf8
+	error: gboolean
+enum SeekType
+	cur = 0
+	set = 1
+	end = 2
+struct Sequence
+	method free()
+		Returns: void
+	method get_length()
+		Returns: gint32
+	method move()
+		Returns: void
+		src: interface for SequenceIter
+		dest: interface for SequenceIter
+	method move_range()
+		Returns: void
+		dest: interface for SequenceIter
+		begin: interface for SequenceIter
+		end: interface for SequenceIter
+	method remove()
+		Returns: void
+		iter: interface for SequenceIter
+	method remove_range()
+		Returns: void
+		begin: interface for SequenceIter
+		end: interface for SequenceIter
+	method set()
+		Returns: void
+		iter: interface for SequenceIter
+		data: void
+	method swap()
+		Returns: void
+		a: interface for SequenceIter
+		b: interface for SequenceIter
+struct SequenceIter
+	method compare()
+		Returns: gint32
+		b: interface for SequenceIter
+	method get_position()
+		Returns: gint32
+	method is_begin()
+		Returns: gboolean
+	method is_end()
+		Returns: gboolean
+callback SequenceIterCompareFunc
+	Returns: gint32
+	a: interface for SequenceIter
+	b: interface for SequenceIter
+	data: void
+enum ShellError
+	bad_quoting = 0
+	empty_string = 1
+	failed = 2
+enum SliceConfig
+	always_malloc = 1
+	bypass_magazines = 2
+	working_set_msecs = 3
+	color_increment = 4
+	chunk_sizes = 5
+	contention_counter = 6
+struct Source
+	typename = GSource
+	method new()
+		Returns: interface for Source
+		source_funcs: interface for SourceFuncs
+		struct_size: guint32
+	method add_child_source()
+		Returns: void
+		child_source: interface for Source
+	method add_poll()
+		Returns: void
+		fd: interface for PollFD
+	method attach()
+		Returns: guint32
+		context: interface for MainContext
+	method destroy()
+		Returns: void
+	method get_can_recurse()
+		Returns: gboolean
+	method get_context()
+		Returns: interface for MainContext
+	method get_current_time()
+		Returns: void
+		timeval: interface for TimeVal
+	method get_id()
+		Returns: guint32
+	method get_name()
+		Returns: utf8
+	method get_priority()
+		Returns: gint32
+	method get_time()
+		Returns: gint64
+	method is_destroyed()
+		Returns: gboolean
+	method ref()
+		Returns: interface for Source
+	method remove_child_source()
+		Returns: void
+		child_source: interface for Source
+	method remove_poll()
+		Returns: void
+		fd: interface for PollFD
+	method set_callback()
+		Returns: void
+		func: interface for SourceFunc
+		data: void
+		notify: interface for DestroyNotify
+	method set_callback_indirect()
+		Returns: void
+		callback_data: void
+		callback_funcs: interface for SourceCallbackFuncs
+	method set_can_recurse()
+		Returns: void
+		can_recurse: gboolean
+	method set_funcs()
+		Returns: void
+		funcs: interface for SourceFuncs
+	method set_name()
+		Returns: void
+		name: utf8
+	method set_priority()
+		Returns: void
+		priority: gint32
+	method unref()
+		Returns: void
+	method remove()
+		Returns: gboolean
+		tag: guint32
+	method remove_by_funcs_user_data()
+		Returns: gboolean
+		funcs: interface for SourceFuncs
+		user_data: void
+	method remove_by_user_data()
+		Returns: gboolean
+		user_data: void
+	method set_name_by_id()
+		Returns: void
+		tag: guint32
+		name: utf8
+	field .callback_data
+	field .callback_funcs
+	field .source_funcs
+	field .ref_count
+	field .context
+	field .priority
+	field .flags
+	field .source_id
+	field .poll_fds
+	field .prev
+	field .next
+	field .name
+	field .priv
+struct SourceCallbackFuncs
+	field .ref
+	field .unref
+	field .get
+callback SourceDummyMarshal
+	Returns: void
+callback SourceFunc
+	Returns: gboolean
+	user_data: void
+struct SourceFuncs
+	field .prepare
+	field .check
+	field .dispatch
+	field .finalize
+	field .closure_callback
+	field .closure_marshal
+struct SourcePrivate
+callback SpawnChildSetupFunc
+	Returns: void
+	user_data: void
+enum SpawnError
+	fork = 0
+	read = 1
+	chdir = 2
+	acces = 3
+	perm = 4
+	2big = 5
+	noexec = 6
+	nametoolong = 7
+	noent = 8
+	nomem = 9
+	notdir = 10
+	loop = 11
+	txtbusy = 12
+	io = 13
+	nfile = 14
+	mfile = 15
+	inval = 16
+	isdir = 17
+	libbad = 18
+	failed = 19
+flags SpawnFlags
+	leave_descriptors_open = 1
+	do_not_reap_child = 2
+	search_path = 4
+	stdout_to_dev_null = 8
+	stderr_to_dev_null = 16
+	child_inherits_stdin = 32
+	file_and_argv_zero = 64
+struct StatBuf
+struct StaticMutex
+	method free()
+		Returns: void
+	method init()
+		Returns: void
+	field .runtime_mutex
+struct StaticPrivate
+	method free()
+		Returns: void
+	method init()
+		Returns: void
+	method set()
+		Returns: void
+		data: void
+		notify: interface for DestroyNotify
+	field .index
+struct StaticRWLock
+	method free()
+		Returns: void
+	method init()
+		Returns: void
+	method reader_lock()
+		Returns: void
+	method reader_trylock()
+		Returns: gboolean
+	method reader_unlock()
+		Returns: void
+	method writer_lock()
+		Returns: void
+	method writer_trylock()
+		Returns: gboolean
+	method writer_unlock()
+		Returns: void
+	field .mutex
+	field .read_cond
+	field .write_cond
+	field .read_counter
+	field .have_writer
+	field .want_to_read
+	field .want_to_write
+struct StaticRecMutex
+	method free()
+		Returns: void
+	method init()
+		Returns: void
+	method lock()
+		Returns: void
+	method lock_full()
+		Returns: void
+		depth: guint32
+	method trylock()
+		Returns: gboolean
+	method unlock()
+		Returns: void
+	method unlock_full()
+		Returns: guint32
+	field .mutex
+	field .depth
+	field .owner
+struct String
+	typename = GString
+	method append()
+		Returns: interface for String
+		val: utf8
+	method append_c()
+		Returns: interface for String
+		c: guint8
+	method append_len()
+		Returns: interface for String
+		val: utf8
+		len: gint64
+	method append_unichar()
+		Returns: interface for String
+		wc: gunichar
+	method append_uri_escaped()
+		Returns: interface for String
+		unescaped: utf8
+		reserved_chars_allowed: utf8
+		allow_utf8: gboolean
+	method ascii_down()
+		Returns: interface for String
+	method ascii_up()
+		Returns: interface for String
+	method assign()
+		Returns: interface for String
+		rval: utf8
+	method down()
+		Returns: interface for String
+	method equal()
+		Returns: gboolean
+		v2: interface for String
+	method erase()
+		Returns: interface for String
+		pos: gint64
+		len: gint64
+	method free()
+		Returns: utf8
+		free_segment: gboolean
+	method hash()
+		Returns: guint32
+	method insert()
+		Returns: interface for String
+		pos: gint64
+		val: utf8
+	method insert_c()
+		Returns: interface for String
+		pos: gint64
+		c: guint8
+	method insert_len()
+		Returns: interface for String
+		pos: gint64
+		val: utf8
+		len: gint64
+	method insert_unichar()
+		Returns: interface for String
+		pos: gint64
+		wc: gunichar
+	method overwrite()
+		Returns: interface for String
+		pos: guint64
+		val: utf8
+	method overwrite_len()
+		Returns: interface for String
+		pos: guint64
+		val: utf8
+		len: gint64
+	method prepend()
+		Returns: interface for String
+		val: utf8
+	method prepend_c()
+		Returns: interface for String
+		c: guint8
+	method prepend_len()
+		Returns: interface for String
+		val: utf8
+		len: gint64
+	method prepend_unichar()
+		Returns: interface for String
+		wc: gunichar
+	method set_size()
+		Returns: interface for String
+		len: guint64
+	method truncate()
+		Returns: interface for String
+		len: guint64
+	method up()
+		Returns: interface for String
+	field .str
+	field .len
+	field .allocated_len
+struct StringChunk
+	method clear()
+		Returns: void
+	method free()
+		Returns: void
+	method insert()
+		Returns: utf8
+		string: utf8
+	method insert_const()
+		Returns: utf8
+		string: utf8
+	method insert_len()
+		Returns: utf8
+		string: utf8
+		len: gint64
+union SystemThread
+	field .data
+	field .dummy_double
+	field .dummy_pointer
+	field .dummy_long
+struct TestCase
+struct TestConfig
+	field .test_initialized
+	field .test_quick
+	field .test_perf
+	field .test_verbose
+	field .test_quiet
+callback TestDataFunc
+	Returns: void
+	user_data: void
+callback TestFixtureFunc
+	Returns: void
+	fixture: void
+	user_data: void
+callback TestFunc
+	Returns: void
+struct TestLogBuffer
+	method free()
+		Returns: void
+	method push()
+		Returns: void
+		n_bytes: guint32
+		bytes: guint8
+	field .data
+	field .msgs
+callback TestLogFatalFunc
+	Returns: gboolean
+	log_domain: utf8
+	log_level: interface for LogLevelFlags
+	message: utf8
+	user_data: void
+struct TestLogMsg
+	method free()
+		Returns: void
+	field .log_type
+	field .n_strings
+	field .strings
+	field .n_nums
+	field .nums
+enum TestLogType
+	none = 0
+	error = 1
+	start_binary = 2
+	list_case = 3
+	skip_case = 4
+	start_case = 5
+	stop_case = 6
+	min_result = 7
+	max_result = 8
+	message = 9
+struct TestSuite
+	method add()
+		Returns: void
+		test_case: interface for TestCase
+	method add_suite()
+		Returns: void
+		nestedsuite: interface for TestSuite
+flags TestTrapFlags
+	silence_stdout = 128
+	silence_stderr = 256
+	inherit_stdin = 512
+struct Thread
+	method set_priority()
+		Returns: void
+		priority: interface for ThreadPriority
+	method error_quark()
+		Returns: guint32
+	method exit()
+		Returns: void
+		retval: void
+	method get_initialized()
+		Returns: gboolean
+	method init()
+		Returns: void
+		vtable: interface for ThreadFunctions
+	method init_with_errorcheck_mutexes()
+		Returns: void
+		vtable: interface for ThreadFunctions
+	field .func
+	field .data
+	field .joinable
+	field .priority
+enum ThreadError
+	thread_error_again = 0
+struct ThreadFunctions
+	field .mutex_new
+	field .mutex_lock
+	field .mutex_trylock
+	field .mutex_unlock
+	field .mutex_free
+	field .cond_new
+	field .cond_signal
+	field .cond_broadcast
+	field .cond_wait
+	field .cond_timed_wait
+	field .cond_free
+	field .private_new
+	field .private_get
+	field .private_set
+	field .thread_create
+	field .thread_yield
+	field .thread_join
+	field .thread_exit
+	field .thread_set_priority
+	field .thread_self
+	field .thread_equal
+struct ThreadPool
+	method free()
+		Returns: void
+		immediate: gboolean
+		wait_: gboolean
+	method get_max_threads()
+		Returns: gint32
+	method get_num_threads()
+		Returns: guint32
+	method push()
+		Returns: void
+		data: void
+	method set_max_threads()
+		Returns: void
+		max_threads: gint32
+	method unprocessed()
+		Returns: guint32
+	method get_max_idle_time()
+		Returns: guint32
+	method get_max_unused_threads()
+		Returns: gint32
+	method get_num_unused_threads()
+		Returns: guint32
+	method set_max_idle_time()
+		Returns: void
+		interval: guint32
+	method set_max_unused_threads()
+		Returns: void
+		max_threads: gint32
+	method stop_unused_threads()
+		Returns: void
+	field .func
+	field .user_data
+	field .exclusive
+enum ThreadPriority
+	low = 0
+	normal = 1
+	high = 2
+	urgent = 3
+enum TimeType
+	standard = 0
+	daylight = 1
+	universal = 2
+struct TimeVal
+	method add()
+		Returns: void
+		microseconds: gint64
+	method to_iso8601()
+		Returns: utf8
+	method from_iso8601()
+		Returns: gboolean
+		iso_date: utf8
+		time_: OUT interface for TimeVal
+	field .tv_sec
+	field .tv_usec
+struct TimeZone
+	method adjust_time()
+		Returns: gint32
+		type: interface for TimeType
+		time_: gint64
+	method find_interval()
+		Returns: gint32
+		type: interface for TimeType
+		time_: gint64
+	method get_abbreviation()
+		Returns: utf8
+		interval: gint32
+	method get_offset()
+		Returns: gint32
+		interval: gint32
+	method is_dst()
+		Returns: gboolean
+		interval: gint32
+	method unref()
+		Returns: void
+struct Timer
+	method continue()
+		Returns: void
+	method destroy()
+		Returns: void
+	method elapsed()
+		Returns: gdouble
+		microseconds: guint64
+	method reset()
+		Returns: void
+	method start()
+		Returns: void
+	method stop()
+		Returns: void
+enum TokenType
+	eof = 0
+	left_paren = 40
+	right_paren = 41
+	left_curly = 123
+	right_curly = 125
+	left_brace = 91
+	right_brace = 93
+	equal_sign = 61
+	comma = 44
+	none = 256
+	error = 257
+	char = 258
+	binary = 259
+	octal = 260
+	int = 261
+	hex = 262
+	float = 263
+	string = 264
+	symbol = 265
+	identifier = 266
+	identifier_null = 267
+	comment_single = 268
+	comment_multi = 269
+	last = 270
+union TokenValue
+	field .v_symbol
+	field .v_identifier
+	field .v_binary
+	field .v_octal
+	field .v_int
+	field .v_int64
+	field .v_float
+	field .v_hex
+	field .v_string
+	field .v_comment
+	field .v_char
+	field .v_error
+callback TranslateFunc
+	Returns: utf8
+	str: utf8
+	data: void
+struct TrashStack
+	method height()
+		Returns: guint32
+		stack_p: interface for TrashStack
+	method push()
+		Returns: void
+		stack_p: interface for TrashStack
+		data_p: void
+	field .next
+flags TraverseFlags
+	leaves = 1
+	non_leaves = 2
+	all = 3
+	mask = 3
+	leafs = 1
+	non_leafs = 2
+callback TraverseFunc
+	Returns: gboolean
+	key: void
+	value: void
+	data: void
+enum TraverseType
+	in_order = 0
+	pre_order = 1
+	post_order = 2
+	level_order = 3
+struct Tree
+	method destroy()
+		Returns: void
+	method height()
+		Returns: gint32
+	method insert()
+		Returns: void
+		key: void
+		value: void
+	method lookup_extended()
+		Returns: gboolean
+		lookup_key: void
+		orig_key: void
+		value: void
+	method nnodes()
+		Returns: gint32
+	method remove()
+		Returns: gboolean
+		key: void
+	method replace()
+		Returns: void
+		key: void
+		value: void
+	method steal()
+		Returns: gboolean
+		key: void
+	method unref()
+		Returns: void
+struct Tuples
+	method destroy()
+		Returns: void
+	field .len
+constant URI_RESERVED_CHARS_GENERIC_DELIMITERS
+	value = 12081760: utf8
+constant URI_RESERVED_CHARS_SUBCOMPONENT_DELIMITERS
+	value = 12081760: utf8
+constant USEC_PER_SEC
+	value = 1000000: gint32
+enum UnicodeBreakType
+	mandatory = 0
+	carriage_return = 1
+	line_feed = 2
+	combining_mark = 3
+	surrogate = 4
+	zero_width_space = 5
+	inseparable = 6
+	non_breaking_glue = 7
+	contingent = 8
+	space = 9
+	after = 10
+	before = 11
+	before_and_after = 12
+	hyphen = 13
+	non_starter = 14
+	open_punctuation = 15
+	close_punctuation = 16
+	quotation = 17
+	exclamation = 18
+	ideographic = 19
+	numeric = 20
+	infix_separator = 21
+	symbol = 22
+	alphabetic = 23
+	prefix = 24
+	postfix = 25
+	complex_context = 26
+	ambiguous = 27
+	unknown = 28
+	next_line = 29
+	word_joiner = 30
+	hangul_l_jamo = 31
+	hangul_v_jamo = 32
+	hangul_t_jamo = 33
+	hangul_lv_syllable = 34
+	hangul_lvt_syllable = 35
+	close_paranthesis = 36
+enum UnicodeScript
+	invalid_code = -1
+	common = 0
+	inherited = 1
+	arabic = 2
+	armenian = 3
+	bengali = 4
+	bopomofo = 5
+	cherokee = 6
+	coptic = 7
+	cyrillic = 8
+	deseret = 9
+	devanagari = 10
+	ethiopic = 11
+	georgian = 12
+	gothic = 13
+	greek = 14
+	gujarati = 15
+	gurmukhi = 16
+	han = 17
+	hangul = 18
+	hebrew = 19
+	hiragana = 20
+	kannada = 21
+	katakana = 22
+	khmer = 23
+	lao = 24
+	latin = 25
+	malayalam = 26
+	mongolian = 27
+	myanmar = 28
+	ogham = 29
+	old_italic = 30
+	oriya = 31
+	runic = 32
+	sinhala = 33
+	syriac = 34
+	tamil = 35
+	telugu = 36
+	thaana = 37
+	thai = 38
+	tibetan = 39
+	canadian_aboriginal = 40
+	yi = 41
+	tagalog = 42
+	hanunoo = 43
+	buhid = 44
+	tagbanwa = 45
+	braille = 46
+	cypriot = 47
+	limbu = 48
+	osmanya = 49
+	shavian = 50
+	linear_b = 51
+	tai_le = 52
+	ugaritic = 53
+	new_tai_lue = 54
+	buginese = 55
+	glagolitic = 56
+	tifinagh = 57
+	syloti_nagri = 58
+	old_persian = 59
+	kharoshthi = 60
+	unknown = 61
+	balinese = 62
+	cuneiform = 63
+	phoenician = 64
+	phags_pa = 65
+	nko = 66
+	kayah_li = 67
+	lepcha = 68
+	rejang = 69
+	sundanese = 70
+	saurashtra = 71
+	cham = 72
+	ol_chiki = 73
+	vai = 74
+	carian = 75
+	lycian = 76
+	lydian = 77
+	avestan = 78
+	bamum = 79
+	egyptian_hieroglyphs = 80
+	imperial_aramaic = 81
+	inscriptional_pahlavi = 82
+	inscriptional_parthian = 83
+	javanese = 84
+	kaithi = 85
+	lisu = 86
+	meetei_mayek = 87
+	old_south_arabian = 88
+	old_turkic = 89
+	samaritan = 90
+	tai_tham = 91
+	tai_viet = 92
+	batak = 93
+	brahmi = 94
+	mandaic = 95
+enum UnicodeType
+	control = 0
+	format = 1
+	unassigned = 2
+	private_use = 3
+	surrogate = 4
+	lowercase_letter = 5
+	modifier_letter = 6
+	other_letter = 7
+	titlecase_letter = 8
+	uppercase_letter = 9
+	spacing_mark = 10
+	enclosing_mark = 11
+	non_spacing_mark = 12
+	decimal_number = 13
+	letter_number = 14
+	other_number = 15
+	connect_punctuation = 16
+	dash_punctuation = 17
+	close_punctuation = 18
+	final_punctuation = 19
+	initial_punctuation = 20
+	other_punctuation = 21
+	open_punctuation = 22
+	currency_symbol = 23
+	modifier_symbol = 24
+	math_symbol = 25
+	other_symbol = 26
+	line_separator = 27
+	paragraph_separator = 28
+	space_separator = 29
+enum UserDirectory
+	directory_desktop = 0
+	directory_documents = 1
+	directory_download = 2
+	directory_music = 3
+	directory_pictures = 4
+	directory_public_share = 5
+	directory_templates = 6
+	directory_videos = 7
+	n_directories = 8
+constant VA_COPY_AS_ARRAY
+	value = 1: gint32
+struct Variant
+	typename = GVariant
+	method new_array()
+		Returns: interface for Variant
+		child_type: interface for VariantType
+		children: array of interface
+		n_children: guint64
+	method new_boolean()
+		Returns: interface for Variant
+		value: gboolean
+	method new_byte()
+		Returns: interface for Variant
+		value: guint8
+	method new_bytestring()
+		Returns: interface for Variant
+		string: array of guint8
+	method new_bytestring_array()
+		Returns: interface for Variant
+		strv: array of utf8
+		length: gint64
+	method new_dict_entry()
+		Returns: interface for Variant
+		key: interface for Variant
+		value: interface for Variant
+	method new_double()
+		Returns: interface for Variant
+		value: gdouble
+	method new_from_data()
+		Returns: interface for Variant
+		type: interface for VariantType
+		data: array of guint8
+		size: guint64
+		trusted: gboolean
+		notify: interface for DestroyNotify
+		user_data: void
+	method new_handle()
+		Returns: interface for Variant
+		value: gint32
+	method new_int16()
+		Returns: interface for Variant
+		value: gint16
+	method new_int32()
+		Returns: interface for Variant
+		value: gint32
+	method new_int64()
+		Returns: interface for Variant
+		value: gint64
+	method new_maybe()
+		Returns: interface for Variant
+		child_type: interface for VariantType
+		child: interface for Variant
+	method new_object_path()
+		Returns: interface for Variant
+		object_path: utf8
+	method new_objv()
+		Returns: interface for Variant
+		strv: array of utf8
+		length: gint64
+	method new_signature()
+		Returns: interface for Variant
+		signature: utf8
+	method new_string()
+		Returns: interface for Variant
+		string: utf8
+	method new_strv()
+		Returns: interface for Variant
+		strv: array of utf8
+		length: gint64
+	method new_tuple()
+		Returns: interface for Variant
+		children: array of interface
+		n_children: guint64
+	method new_uint16()
+		Returns: interface for Variant
+		value: guint16
+	method new_uint32()
+		Returns: interface for Variant
+		value: guint32
+	method new_uint64()
+		Returns: interface for Variant
+		value: guint64
+	method new_variant()
+		Returns: interface for Variant
+		value: interface for Variant
+	method byteswap()
+		Returns: interface for Variant
+	method classify()
+		Returns: interface for VariantClass
+	method compare()
+		Returns: gint32
+		two: interface for Variant
+	method dup_bytestring()
+		Returns: utf8
+		length: OUT guint64
+	method dup_bytestring_array()
+		Returns: array of utf8
+		length: OUT guint64
+	method dup_objv()
+		Returns: array of utf8
+		length: OUT guint64
+	method dup_string()
+		Returns: utf8
+		length: OUT guint64
+	method dup_strv()
+		Returns: array of utf8
+		length: OUT guint64
+	method equal()
+		Returns: gboolean
+		two: interface for Variant
+	method get_boolean()
+		Returns: gboolean
+	method get_byte()
+		Returns: guint8
+	method get_bytestring()
+		Returns: array of guint8
+	method get_bytestring_array()
+		Returns: array of utf8
+		length: OUT guint64
+	method get_child_value()
+		Returns: interface for Variant
+		index_: guint64
+	method get_data()
+		Returns: void
+	method get_double()
+		Returns: gdouble
+	method get_fixed_array()
+		Returns: array of void
+		n_elements: OUT guint64
+		element_size: guint64
+	method get_handle()
+		Returns: gint32
+	method get_int16()
+		Returns: gint16
+	method get_int32()
+		Returns: gint32
+	method get_int64()
+		Returns: gint64
+	method get_maybe()
+		Returns: interface for Variant
+	method get_normal_form()
+		Returns: interface for Variant
+	method get_objv()
+		Returns: array of utf8
+		length: OUT guint64
+	method get_size()
+		Returns: guint64
+	method get_string()
+		Returns: utf8
+		length: OUT guint64
+	method get_strv()
+		Returns: array of utf8
+		length: OUT guint64
+	method get_type_string()
+		Returns: utf8
+	method get_uint16()
+		Returns: guint16
+	method get_uint32()
+		Returns: guint32
+	method get_uint64()
+		Returns: guint64
+	method get_variant()
+		Returns: interface for Variant
+	method hash()
+		Returns: guint32
+	method is_container()
+		Returns: gboolean
+	method is_floating()
+		Returns: gboolean
+	method is_normal_form()
+		Returns: gboolean
+	method is_of_type()
+		Returns: gboolean
+		type: interface for VariantType
+	method lookup_value()
+		Returns: interface for Variant
+		key: utf8
+		expected_type: interface for VariantType
+	method n_children()
+		Returns: guint64
+	method print()
+		Returns: utf8
+		type_annotate: gboolean
+	method ref()
+		Returns: interface for Variant
+	method ref_sink()
+		Returns: interface for Variant
+	method store()
+		Returns: void
+		data: void
+	method take_ref()
+		Returns: interface for Variant
+	method unref()
+		Returns: void
+	method is_object_path()
+		Returns: gboolean
+		string: utf8
+	method is_signature()
+		Returns: gboolean
+		string: utf8
+	method parse()
+		Returns: interface for Variant
+		type: interface for VariantType
+		text: utf8
+		limit: utf8
+		endptr: utf8
+	method parser_get_error_quark()
+		Returns: guint32
+struct VariantBuilder
+	typename = GVariantBuilder
+	method new()
+		Returns: interface for VariantBuilder
+		type: interface for VariantType
+	method add_value()
+		Returns: void
+		value: interface for Variant
+	method close()
+		Returns: void
+	method end()
+		Returns: interface for Variant
+	method open()
+		Returns: void
+		type: interface for VariantType
+	method ref()
+		Returns: interface for VariantBuilder
+	method unref()
+		Returns: void
+	field .x
+enum VariantClass
+	boolean = 98
+	byte = 121
+	int16 = 110
+	uint16 = 113
+	int32 = 105
+	uint32 = 117
+	int64 = 120
+	uint64 = 116
+	handle = 104
+	double = 100
+	string = 115
+	object_path = 111
+	signature = 103
+	variant = 118
+	maybe = 109
+	array = 97
+	tuple = 40
+	dict_entry = 123
+enum VariantParseError
+	failed = 0
+	basic_type_expected = 1
+	cannot_infer_type = 2
+	definite_type_expected = 3
+	input_not_at_end = 4
+	invalid_character = 5
+	invalid_format_string = 6
+	invalid_object_path = 7
+	invalid_signature = 8
+	invalid_type_string = 9
+	no_common_type = 10
+	number_out_of_range = 11
+	number_too_big = 12
+	type_error = 13
+	unexpected_token = 14
+	unknown_keyword = 15
+	unterminated_string_constant = 16
+	value_expected = 17
+struct VariantType
+	typename = GVariantType
+	method new()
+		Returns: interface for VariantType
+		type_string: utf8
+	method new_tuple()
+		Returns: interface for VariantType
+		items: array of interface
+		length: gint32
+	method copy()
+		Returns: interface for VariantType
+	method dup_string()
+		Returns: utf8
+	method element()
+		Returns: interface for VariantType
+	method equal()
+		Returns: gboolean
+		type2: interface for VariantType
+	method first()
+		Returns: interface for VariantType
+	method free()
+		Returns: void
+	method get_string_length()
+		Returns: guint64
+	method hash()
+		Returns: guint32
+	method is_array()
+		Returns: gboolean
+	method is_basic()
+		Returns: gboolean
+	method is_container()
+		Returns: gboolean
+	method is_definite()
+		Returns: gboolean
+	method is_dict_entry()
+		Returns: gboolean
+	method is_maybe()
+		Returns: gboolean
+	method is_subtype_of()
+		Returns: gboolean
+		supertype: interface for VariantType
+	method is_tuple()
+		Returns: gboolean
+	method is_variant()
+		Returns: gboolean
+	method key()
+		Returns: interface for VariantType
+	method n_items()
+		Returns: guint64
+	method new_array()
+		Returns: interface for VariantType
+	method new_dict_entry()
+		Returns: interface for VariantType
+		value: interface for VariantType
+	method new_maybe()
+		Returns: interface for VariantType
+	method next()
+		Returns: interface for VariantType
+	method value()
+		Returns: interface for VariantType
+	method checked_()
+		Returns: interface for VariantType
+		unknown: utf8
+	method string_is_valid()
+		Returns: gboolean
+		type_string: utf8
+	method string_scan()
+		Returns: gboolean
+		string: utf8
+		limit: utf8
+		endptr: OUT utf8
+callback VoidFunc
+	Returns: void
+constant WIN32_MSG_HANDLE
+	value = 19981206: gint32
+function access
+		Returns: gint32
+		filename: utf8
+		mode: gint32
+function array_free
+		Returns: utf8
+		array: array of void
+		free_segment: gboolean
+function array_get_element_size
+		Returns: guint32
+		array: array of void
+function array_unref
+		Returns: void
+		array: array of void
+function ascii_digit_value
+		Returns: gint32
+		c: guint8
+function ascii_dtostr
+		Returns: utf8
+		buffer: utf8
+		buf_len: gint32
+		d: gdouble
+function ascii_formatd
+		Returns: utf8
+		buffer: utf8
+		buf_len: gint32
+		format: utf8
+		d: gdouble
+function ascii_strcasecmp
+		Returns: gint32
+		s1: utf8
+		s2: utf8
+function ascii_strdown
+		Returns: utf8
+		str: utf8
+		len: gint64
+function ascii_strncasecmp
+		Returns: gint32
+		s1: utf8
+		s2: utf8
+		n: guint64
+function ascii_strtod
+		Returns: gdouble
+		nptr: utf8
+		endptr: utf8
+function ascii_strtoll
+		Returns: gint64
+		nptr: utf8
+		endptr: utf8
+		base: guint32
+function ascii_strtoull
+		Returns: guint64
+		nptr: utf8
+		endptr: utf8
+		base: guint32
+function ascii_strup
+		Returns: utf8
+		str: utf8
+		len: gint64
+function ascii_tolower
+		Returns: guint8
+		c: guint8
+function ascii_toupper
+		Returns: guint8
+		c: guint8
+function ascii_xdigit_value
+		Returns: gint32
+		c: guint8
+function assert_warning
+		Returns: void
+		log_domain: utf8
+		file: utf8
+		line: gint32
+		pretty_function: utf8
+		expression: utf8
+function assertion_message
+		Returns: void
+		domain: utf8
+		file: utf8
+		line: gint32
+		func: utf8
+		message: utf8
+function assertion_message_cmpstr
+		Returns: void
+		domain: utf8
+		file: utf8
+		line: gint32
+		func: utf8
+		expr: utf8
+		arg1: utf8
+		cmp: utf8
+		arg2: utf8
+function assertion_message_error
+		Returns: void
+		domain: utf8
+		file: utf8
+		line: gint32
+		func: utf8
+		expr: utf8
+		error: error
+		error_domain: guint32
+		error_code: gint32
+function assertion_message_expr
+		Returns: void
+		domain: utf8
+		file: utf8
+		line: gint32
+		func: utf8
+		expr: utf8
+function atexit
+		Returns: void
+		func: interface for VoidFunc
+function atomic_int_add
+		Returns: gint32
+		atomic: gint32
+		val: gint32
+function atomic_int_and
+		Returns: guint32
+		atomic: guint32
+		val: guint32
+function atomic_int_compare_and_exchange
+		Returns: gboolean
+		atomic: gint32
+		oldval: gint32
+		newval: gint32
+function atomic_int_dec_and_test
+		Returns: gboolean
+		atomic: gint32
+function atomic_int_exchange_and_add
+		Returns: gint32
+		atomic: gint32
+		val: gint32
+function atomic_int_get
+		Returns: gint32
+		atomic: gint32
+function atomic_int_inc
+		Returns: void
+		atomic: gint32
+function atomic_int_or
+		Returns: guint32
+		atomic: guint32
+		val: guint32
+function atomic_int_set
+		Returns: void
+		atomic: gint32
+		newval: gint32
+function atomic_int_xor
+		Returns: guint32
+		atomic: guint32
+		val: guint32
+function atomic_pointer_add
+		Returns: gint64
+		atomic: void
+		val: gint64
+function atomic_pointer_and
+		Returns: guint64
+		atomic: void
+		val: guint64
+function atomic_pointer_compare_and_exchange
+		Returns: gboolean
+		atomic: void
+		oldval: void
+		newval: void
+function atomic_pointer_or
+		Returns: guint64
+		atomic: void
+		val: guint64
+function atomic_pointer_set
+		Returns: void
+		atomic: void
+		newval: void
+function atomic_pointer_xor
+		Returns: guint64
+		atomic: void
+		val: guint64
+function base64_decode
+		Returns: array of guint8
+		text: utf8
+		out_len: OUT guint64
+function base64_decode_inplace
+		Returns: guint8
+		text: INOUT array of guint8
+		out_len: INOUT guint64
+function base64_decode_step
+		Returns: guint64
+		in: array of guint8
+		len: guint64
+		out: OUT array of guint8
+		state: INOUT gint32
+		save: INOUT guint32
+function base64_encode
+		Returns: utf8
+		data: array of guint8
+		len: guint64
+function base64_encode_close
+		Returns: guint64
+		break_lines: gboolean
+		out: OUT array of guint8
+		state: INOUT gint32
+		save: INOUT gint32
+function base64_encode_step
+		Returns: guint64
+		in: array of guint8
+		len: guint64
+		break_lines: gboolean
+		out: OUT array of guint8
+		state: INOUT gint32
+		save: INOUT gint32
+function basename
+		Returns: utf8
+		file_name: utf8
+function bit_lock
+		Returns: void
+		address: gint32
+		lock_bit: gint32
+function bit_nth_lsf
+		Returns: gint32
+		mask: guint64
+		nth_bit: gint32
+function bit_nth_msf
+		Returns: gint32
+		mask: guint64
+		nth_bit: gint32
+function bit_storage
+		Returns: guint32
+		number: guint64
+function bit_trylock
+		Returns: gboolean
+		address: gint32
+		lock_bit: gint32
+function bit_unlock
+		Returns: void
+		address: gint32
+		lock_bit: gint32
+function blow_chunks
+		Returns: void
+function bookmark_file_error_quark
+		Returns: guint32
+function build_filenamev
+		Returns: utf8
+		args: array of utf8
+function build_pathv
+		Returns: utf8
+		separator: utf8
+		args: array of utf8
+function byte_array_free
+		Returns: guint8
+		array: array of guint8
+		free_segment: gboolean
+function byte_array_unref
+		Returns: void
+		array: array of guint8
+function chdir
+		Returns: gint32
+		path: utf8
+function check_version
+		Returns: utf8
+		required_major: guint32
+		required_minor: guint32
+		required_micro: guint32
+function checksum_type_get_length
+		Returns: gint64
+		checksum_type: interface for ChecksumType
+function child_watch_add
+		Returns: guint32
+		priority: gint32
+		pid: gint32
+		function: interface for ChildWatchFunc
+		data: void
+		notify: interface for DestroyNotify
+function child_watch_source_new
+		Returns: interface for Source
+		pid: gint32
+function clear_error
+		Returns: void
+function compute_checksum_for_data
+		Returns: utf8
+		checksum_type: interface for ChecksumType
+		data: guint8
+		length: guint64
+function compute_checksum_for_string
+		Returns: utf8
+		checksum_type: interface for ChecksumType
+		str: utf8
+		length: gint64
+function compute_hmac_for_data
+		Returns: utf8
+		digest_type: interface for ChecksumType
+		key: array of guint8
+		key_len: guint64
+		data: guint8
+		length: guint64
+function compute_hmac_for_string
+		Returns: utf8
+		digest_type: interface for ChecksumType
+		key: array of guint8
+		key_len: guint64
+		str: utf8
+		length: gint64
+function convert
+		Returns: utf8
+		str: utf8
+		len: gint64
+		to_codeset: utf8
+		from_codeset: utf8
+		bytes_read: OUT guint64
+		bytes_written: OUT guint64
+function convert_error_quark
+		Returns: guint32
+function convert_with_fallback
+		Returns: utf8
+		str: utf8
+		len: gint64
+		to_codeset: utf8
+		from_codeset: utf8
+		fallback: utf8
+		bytes_read: guint64
+		bytes_written: guint64
+function convert_with_iconv
+		Returns: utf8
+		str: utf8
+		len: gint64
+		converter: interface for IConv
+		bytes_read: guint64
+		bytes_written: guint64
+function datalist_clear
+		Returns: void
+		datalist: interface for Data
+function datalist_get_flags
+		Returns: guint32
+		datalist: interface for Data
+function datalist_id_set_data_full
+		Returns: void
+		datalist: interface for Data
+		key_id: guint32
+		data: void
+		destroy_func: interface for DestroyNotify
+function datalist_init
+		Returns: void
+		datalist: interface for Data
+function datalist_set_flags
+		Returns: void
+		datalist: interface for Data
+		flags: guint32
+function datalist_unset_flags
+		Returns: void
+		datalist: interface for Data
+		flags: guint32
+function dataset_destroy
+		Returns: void
+		dataset_location: void
+function dataset_id_set_data_full
+		Returns: void
+		dataset_location: void
+		key_id: guint32
+		data: void
+		destroy_func: interface for DestroyNotify
+function date_get_days_in_month
+		Returns: guint8
+		month: interface for DateMonth
+		year: guint16
+function date_get_monday_weeks_in_year
+		Returns: guint8
+		year: guint16
+function date_get_sunday_weeks_in_year
+		Returns: guint8
+		year: guint16
+function date_is_leap_year
+		Returns: gboolean
+		year: guint16
+function date_strftime
+		Returns: guint64
+		s: utf8
+		slen: guint64
+		format: utf8
+		date: interface for Date
+function date_time_compare
+		Returns: gint32
+		dt1: void
+		dt2: void
+function date_time_equal
+		Returns: gboolean
+		dt1: void
+		dt2: void
+function date_time_hash
+		Returns: guint32
+		datetime: void
+function date_valid_day
+		Returns: gboolean
+		day: guint8
+function date_valid_dmy
+		Returns: gboolean
+		day: guint8
+		month: interface for DateMonth
+		year: guint16
+function date_valid_julian
+		Returns: gboolean
+		julian_date: guint32
+function date_valid_month
+		Returns: gboolean
+		month: interface for DateMonth
+function date_valid_weekday
+		Returns: gboolean
+		weekday: interface for DateWeekday
+function date_valid_year
+		Returns: gboolean
+		year: guint16
+function dcgettext
+		Returns: utf8
+		domain: utf8
+		msgid: utf8
+		category: gint32
+function dgettext
+		Returns: utf8
+		domain: utf8
+		msgid: utf8
+function dir_make_tmp
+		Returns: filename
+		tmpl: filename
+function direct_equal
+		Returns: gboolean
+		v1: void
+		v2: void
+function direct_hash
+		Returns: guint32
+		v: void
+function dngettext
+		Returns: utf8
+		domain: utf8
+		msgid: utf8
+		msgid_plural: utf8
+		n: guint64
+function double_equal
+		Returns: gboolean
+		v1: void
+		v2: void
+function double_hash
+		Returns: guint32
+		v: void
+function dpgettext
+		Returns: utf8
+		domain: utf8
+		msgctxtid: utf8
+		msgidoffset: guint64
+function dpgettext2
+		Returns: utf8
+		domain: utf8
+		context: utf8
+		msgid: utf8
+function dummy_decl
+		Returns: void
+function file_error_from_errno
+		Returns: interface for FileError
+		err_no: gint32
+function file_error_quark
+		Returns: guint32
+function file_get_contents
+		Returns: gboolean
+		filename: filename
+		contents: OUT array of guint8
+		length: OUT guint64
+function file_open_tmp
+		Returns: gint32
+		tmpl: filename
+		name_used: OUT filename
+function file_read_link
+		Returns: utf8
+		filename: utf8
+function file_set_contents
+		Returns: gboolean
+		filename: filename
+		contents: array of guint8
+		length: gint64
+function file_test
+		Returns: gboolean
+		filename: utf8
+		test: interface for FileTest
+function filename_display_basename
+		Returns: utf8
+		filename: utf8
+function filename_display_name
+		Returns: utf8
+		filename: utf8
+function filename_from_uri
+		Returns: utf8
+		uri: utf8
+		hostname: utf8
+function filename_from_utf8
+		Returns: utf8
+		utf8string: utf8
+		len: gint64
+		bytes_read: guint64
+		bytes_written: guint64
+function filename_to_uri
+		Returns: utf8
+		filename: utf8
+		hostname: utf8
+function filename_to_utf8
+		Returns: utf8
+		opsysstring: utf8
+		len: gint64
+		bytes_read: guint64
+		bytes_written: guint64
+function find_program_in_path
+		Returns: utf8
+		program: utf8
+function format_size
+		Returns: utf8
+		size: guint64
+function format_size_for_display
+		Returns: utf8
+		size: gint64
+function format_size_full
+		Returns: utf8
+		size: guint64
+		flags: interface for FormatSizeFlags
+function free
+		Returns: void
+		mem: void
+function get_application_name
+		Returns: utf8
+function get_charset
+		Returns: gboolean
+		charset: utf8
+function get_current_dir
+		Returns: utf8
+function get_current_time
+		Returns: void
+		result: interface for TimeVal
+function get_environ
+		Returns: array of utf8
+function get_filename_charsets
+		Returns: gboolean
+		charsets: utf8
+function get_home_dir
+		Returns: utf8
+function get_host_name
+		Returns: utf8
+function get_language_names
+		Returns: array of utf8
+function get_locale_variants
+		Returns: array of utf8
+		locale: utf8
+function get_monotonic_time
+		Returns: gint64
+function get_prgname
+		Returns: utf8
+function get_real_name
+		Returns: utf8
+function get_real_time
+		Returns: gint64
+function get_system_config_dirs
+		Returns: array of utf8
+function get_system_data_dirs
+		Returns: array of utf8
+function get_tmp_dir
+		Returns: utf8
+function get_user_cache_dir
+		Returns: utf8
+function get_user_config_dir
+		Returns: utf8
+function get_user_data_dir
+		Returns: utf8
+function get_user_name
+		Returns: utf8
+function get_user_runtime_dir
+		Returns: utf8
+function get_user_special_dir
+		Returns: utf8
+		directory: interface for UserDirectory
+function getenv
+		Returns: utf8
+		variable: utf8
+function hash_table_destroy
+		Returns: void
+		hash_table: ghash
+function hash_table_insert
+		Returns: void
+		hash_table: ghash
+		key: void
+		value: void
+function hash_table_lookup_extended
+		Returns: gboolean
+		hash_table: ghash
+		lookup_key: void
+		orig_key: void
+		value: void
+function hash_table_remove
+		Returns: gboolean
+		hash_table: ghash
+		key: void
+function hash_table_remove_all
+		Returns: void
+		hash_table: ghash
+function hash_table_replace
+		Returns: void
+		hash_table: ghash
+		key: void
+		value: void
+function hash_table_size
+		Returns: guint32
+		hash_table: ghash
+function hash_table_steal
+		Returns: gboolean
+		hash_table: ghash
+		key: void
+function hash_table_steal_all
+		Returns: void
+		hash_table: ghash
+function hash_table_unref
+		Returns: void
+		hash_table: ghash
+function hook_destroy
+		Returns: gboolean
+		hook_list: interface for HookList
+		hook_id: guint64
+function hook_destroy_link
+		Returns: void
+		hook_list: interface for HookList
+		hook: interface for Hook
+function hook_free
+		Returns: void
+		hook_list: interface for HookList
+		hook: interface for Hook
+function hook_insert_before
+		Returns: void
+		hook_list: interface for HookList
+		sibling: interface for Hook
+		hook: interface for Hook
+function hook_prepend
+		Returns: void
+		hook_list: interface for HookList
+		hook: interface for Hook
+function hook_unref
+		Returns: void
+		hook_list: interface for HookList
+		hook: interface for Hook
+function hostname_is_ascii_encoded
+		Returns: gboolean
+		hostname: utf8
+function hostname_is_ip_address
+		Returns: gboolean
+		hostname: utf8
+function hostname_is_non_ascii
+		Returns: gboolean
+		hostname: utf8
+function hostname_to_ascii
+		Returns: utf8
+		hostname: utf8
+function hostname_to_unicode
+		Returns: utf8
+		hostname: utf8
+function idle_add
+		Returns: guint32
+		priority: gint32
+		function: interface for SourceFunc
+		data: void
+		notify: interface for DestroyNotify
+function idle_remove_by_data
+		Returns: gboolean
+		data: void
+function idle_source_new
+		Returns: interface for Source
+function int64_equal
+		Returns: gboolean
+		v1: void
+		v2: void
+function int64_hash
+		Returns: guint32
+		v: void
+function int_equal
+		Returns: gboolean
+		v1: void
+		v2: void
+function int_hash
+		Returns: guint32
+		v: void
+function intern_static_string
+		Returns: utf8
+		string: utf8
+function intern_string
+		Returns: utf8
+		string: utf8
+function io_add_watch
+		Returns: guint32
+		channel: interface for IOChannel
+		priority: gint32
+		condition: interface for IOCondition
+		func: interface for IOFunc
+		user_data: void
+		notify: interface for DestroyNotify
+function io_channel_error_from_errno
+		Returns: interface for IOChannelError
+		en: gint32
+function io_channel_error_quark
+		Returns: guint32
+function io_create_watch
+		Returns: interface for Source
+		channel: interface for IOChannel
+		condition: interface for IOCondition
+function key_file_error_quark
+		Returns: guint32
+function list_pop_allocator
+		Returns: void
+function list_push_allocator
+		Returns: void
+		allocator: void
+function listenv
+		Returns: array of utf8
+function locale_from_utf8
+		Returns: utf8
+		utf8string: utf8
+		len: gint64
+		bytes_read: guint64
+		bytes_written: guint64
+function locale_to_utf8
+		Returns: utf8
+		opsysstring: utf8
+		len: gint64
+		bytes_read: guint64
+		bytes_written: guint64
+function log_default_handler
+		Returns: void
+		log_domain: utf8
+		log_level: interface for LogLevelFlags
+		message: utf8
+		unused_data: void
+function log_remove_handler
+		Returns: void
+		log_domain: utf8
+		handler_id: guint32
+function log_set_always_fatal
+		Returns: interface for LogLevelFlags
+		fatal_mask: interface for LogLevelFlags
+function log_set_fatal_mask
+		Returns: interface for LogLevelFlags
+		log_domain: utf8
+		fatal_mask: interface for LogLevelFlags
+function main_context_default
+		Returns: interface for MainContext
+function main_context_get_thread_default
+		Returns: interface for MainContext
+function main_current_source
+		Returns: interface for Source
+function main_depth
+		Returns: gint32
+function markup_error_quark
+		Returns: guint32
+function markup_escape_text
+		Returns: utf8
+		text: utf8
+		length: gint64
+function mem_chunk_info
+		Returns: void
+function mem_is_system_malloc
+		Returns: gboolean
+function mem_profile
+		Returns: void
+function mem_set_vtable
+		Returns: void
+		vtable: interface for MemVTable
+function mkdir_with_parents
+		Returns: gint32
+		pathname: utf8
+		mode: gint32
+function mkdtemp
+		Returns: utf8
+		tmpl: filename
+function mkdtemp_full
+		Returns: utf8
+		tmpl: filename
+		mode: gint32
+function mkstemp
+		Returns: gint32
+		tmpl: filename
+function mkstemp_full
+		Returns: gint32
+		tmpl: filename
+		flags: gint32
+		mode: gint32
+function node_pop_allocator
+		Returns: void
+function node_push_allocator
+		Returns: void
+		dummy: void
+function nullify_pointer
+		Returns: void
+		nullify_location: void
+function on_error_query
+		Returns: void
+		prg_name: utf8
+function on_error_stack_trace
+		Returns: void
+		prg_name: utf8
+function once_init_enter
+		Returns: gboolean
+		value_location: guint64
+function once_init_enter_impl
+		Returns: gboolean
+		value_location: guint64
+function once_init_leave
+		Returns: void
+		value_location: guint64
+		initialization_value: guint64
+function option_error_quark
+		Returns: guint32
+function parse_debug_string
+		Returns: guint32
+		string: utf8
+		keys: array of interface
+		nkeys: guint32
+function path_get_basename
+		Returns: utf8
+		file_name: utf8
+function path_get_dirname
+		Returns: utf8
+		file_name: utf8
+function path_is_absolute
+		Returns: gboolean
+		file_name: utf8
+function path_skip_root
+		Returns: utf8
+		file_name: utf8
+function pattern_match
+		Returns: gboolean
+		pspec: interface for PatternSpec
+		string_length: guint32
+		string: utf8
+		string_reversed: utf8
+function pattern_match_simple
+		Returns: gboolean
+		pattern: utf8
+		string: utf8
+function pattern_match_string
+		Returns: gboolean
+		pspec: interface for PatternSpec
+		string: utf8
+function pointer_bit_lock
+		Returns: void
+		address: void
+		lock_bit: gint32
+function pointer_bit_trylock
+		Returns: gboolean
+		address: void
+		lock_bit: gint32
+function pointer_bit_unlock
+		Returns: void
+		address: void
+		lock_bit: gint32
+function poll
+		Returns: gint32
+		fds: interface for PollFD
+		nfds: guint32
+		timeout: gint32
+function propagate_error
+		Returns: void
+		dest: error
+		src: error
+function ptr_array_add
+		Returns: void
+		array: array of void
+		data: void
+function ptr_array_remove
+		Returns: gboolean
+		array: array of void
+		data: void
+function ptr_array_remove_fast
+		Returns: gboolean
+		array: array of void
+		data: void
+function ptr_array_remove_range
+		Returns: void
+		array: array of void
+		index_: guint32
+		length: guint32
+function ptr_array_set_free_func
+		Returns: void
+		array: array of void
+		element_free_func: interface for DestroyNotify
+function ptr_array_set_size
+		Returns: void
+		array: array of void
+		length: gint32
+function ptr_array_unref
+		Returns: void
+		array: array of void
+function quark_from_static_string
+		Returns: guint32
+		string: utf8
+function quark_from_string
+		Returns: guint32
+		string: utf8
+function quark_to_string
+		Returns: utf8
+		quark: guint32
+function quark_try_string
+		Returns: guint32
+		string: utf8
+function random_double
+		Returns: gdouble
+function random_double_range
+		Returns: gdouble
+		begin: gdouble
+		end: gdouble
+function random_int
+		Returns: guint32
+function random_int_range
+		Returns: gint32
+		begin: gint32
+		end: gint32
+function random_set_seed
+		Returns: void
+		seed: guint32
+function regex_check_replacement
+		Returns: gboolean
+		replacement: utf8
+		has_references: OUT gboolean
+function regex_error_quark
+		Returns: guint32
+function regex_escape_nul
+		Returns: utf8
+		string: utf8
+		length: gint32
+function regex_escape_string
+		Returns: utf8
+		string: array of utf8
+		length: gint32
+function regex_match_simple
+		Returns: gboolean
+		pattern: utf8
+		string: utf8
+		compile_options: interface for RegexCompileFlags
+		match_options: interface for RegexMatchFlags
+function reload_user_special_dirs_cache
+		Returns: void
+function return_if_fail_warning
+		Returns: void
+		log_domain: utf8
+		pretty_function: utf8
+		expression: utf8
+function rmdir
+		Returns: gint32
+		filename: utf8
+function sequence_move
+		Returns: void
+		src: interface for SequenceIter
+		dest: interface for SequenceIter
+function sequence_move_range
+		Returns: void
+		dest: interface for SequenceIter
+		begin: interface for SequenceIter
+		end: interface for SequenceIter
+function sequence_remove
+		Returns: void
+		iter: interface for SequenceIter
+function sequence_remove_range
+		Returns: void
+		begin: interface for SequenceIter
+		end: interface for SequenceIter
+function sequence_set
+		Returns: void
+		iter: interface for SequenceIter
+		data: void
+function sequence_swap
+		Returns: void
+		a: interface for SequenceIter
+		b: interface for SequenceIter
+function set_application_name
+		Returns: void
+		application_name: utf8
+function set_error_literal
+		Returns: void
+		err: error
+		domain: guint32
+		code: gint32
+		message: utf8
+function set_prgname
+		Returns: void
+		prgname: utf8
+function setenv
+		Returns: gboolean
+		variable: utf8
+		value: utf8
+		overwrite: gboolean
+function shell_error_quark
+		Returns: guint32
+function shell_parse_argv
+		Returns: gboolean
+		command_line: utf8
+		argcp: OUT gint32
+		argvp: OUT array of utf8
+function shell_quote
+		Returns: utf8
+		unquoted_string: utf8
+function shell_unquote
+		Returns: utf8
+		quoted_string: utf8
+function slice_free1
+		Returns: void
+		block_size: guint64
+		mem_block: void
+function slice_free_chain_with_offset
+		Returns: void
+		block_size: guint64
+		mem_chain: void
+		next_offset: guint64
+function slice_get_config
+		Returns: gint64
+		ckey: interface for SliceConfig
+function slice_get_config_state
+		Returns: gint64
+		ckey: interface for SliceConfig
+		address: gint64
+		n_values: guint32
+function slice_set_config
+		Returns: void
+		ckey: interface for SliceConfig
+		value: gint64
+function slist_pop_allocator
+		Returns: void
+function slist_push_allocator
+		Returns: void
+		dummy: void
+function source_remove
+		Returns: gboolean
+		tag: guint32
+function source_remove_by_funcs_user_data
+		Returns: gboolean
+		funcs: interface for SourceFuncs
+		user_data: void
+function source_remove_by_user_data
+		Returns: gboolean
+		user_data: void
+function source_set_name_by_id
+		Returns: void
+		tag: guint32
+		name: utf8
+function spaced_primes_closest
+		Returns: guint32
+		num: guint32
+function spawn_async
+		Returns: gboolean
+		working_directory: utf8
+		argv: array of utf8
+		envp: array of utf8
+		flags: interface for SpawnFlags
+		child_setup: interface for SpawnChildSetupFunc
+		user_data: void
+		child_pid: OUT gint32
+function spawn_async_with_pipes
+		Returns: gboolean
+		working_directory: utf8
+		argv: array of utf8
+		envp: array of utf8
+		flags: interface for SpawnFlags
+		child_setup: interface for SpawnChildSetupFunc
+		user_data: void
+		child_pid: OUT gint32
+		standard_input: OUT gint32
+		standard_output: OUT gint32
+		standard_error: OUT gint32
+function spawn_close_pid
+		Returns: void
+		pid: gint32
+function spawn_command_line_async
+		Returns: gboolean
+		command_line: utf8
+function spawn_command_line_sync
+		Returns: gboolean
+		command_line: utf8
+		standard_output: OUT array of guint8
+		standard_error: OUT array of guint8
+		exit_status: OUT gint32
+function spawn_error_quark
+		Returns: guint32
+function spawn_sync
+		Returns: gboolean
+		working_directory: utf8
+		argv: array of utf8
+		envp: array of utf8
+		flags: interface for SpawnFlags
+		child_setup: interface for SpawnChildSetupFunc
+		user_data: void
+		standard_output: OUT array of guint8
+		standard_error: OUT array of guint8
+		exit_status: OUT gint32
+function stpcpy
+		Returns: utf8
+		dest: utf8
+		src: utf8
+function str_equal
+		Returns: gboolean
+		v1: void
+		v2: void
+function str_has_prefix
+		Returns: gboolean
+		str: utf8
+		prefix: utf8
+function str_has_suffix
+		Returns: gboolean
+		str: utf8
+		suffix: utf8
+function str_hash
+		Returns: guint32
+		v: void
+function strcanon
+		Returns: utf8
+		string: utf8
+		valid_chars: utf8
+		substitutor: guint8
+function strcasecmp
+		Returns: gint32
+		s1: utf8
+		s2: utf8
+function strchomp
+		Returns: utf8
+		string: utf8
+function strchug
+		Returns: utf8
+		string: utf8
+function strcmp0
+		Returns: gint32
+		str1: utf8
+		str2: utf8
+function strcompress
+		Returns: utf8
+		source: utf8
+function strdelimit
+		Returns: utf8
+		string: utf8
+		delimiters: utf8
+		new_delimiter: guint8
+function strdown
+		Returns: utf8
+		string: utf8
+function strdup
+		Returns: utf8
+		str: utf8
+function strerror
+		Returns: utf8
+		errnum: gint32
+function strescape
+		Returns: utf8
+		source: utf8
+		exceptions: utf8
+function strfreev
+		Returns: void
+		str_array: utf8
+function string_new
+		Returns: interface for String
+		init: utf8
+function string_new_len
+		Returns: interface for String
+		init: utf8
+		len: gint64
+function string_sized_new
+		Returns: interface for String
+		dfl_size: guint64
+function strip_context
+		Returns: utf8
+		msgid: utf8
+		msgval: utf8
+function strjoinv
+		Returns: utf8
+		separator: utf8
+		str_array: utf8
+function strlcat
+		Returns: guint64
+		dest: utf8
+		src: utf8
+		dest_size: guint64
+function strlcpy
+		Returns: guint64
+		dest: utf8
+		src: utf8
+		dest_size: guint64
+function strncasecmp
+		Returns: gint32
+		s1: utf8
+		s2: utf8
+		n: guint32
+function strndup
+		Returns: utf8
+		str: utf8
+		n: guint64
+function strnfill
+		Returns: utf8
+		length: guint64
+		fill_char: guint8
+function strreverse
+		Returns: utf8
+		string: utf8
+function strrstr
+		Returns: utf8
+		haystack: utf8
+		needle: utf8
+function strrstr_len
+		Returns: utf8
+		haystack: utf8
+		haystack_len: gint64
+		needle: utf8
+function strsignal
+		Returns: utf8
+		signum: gint32
+function strstr_len
+		Returns: utf8
+		haystack: utf8
+		haystack_len: gint64
+		needle: utf8
+function strtod
+		Returns: gdouble
+		nptr: utf8
+		endptr: utf8
+function strup
+		Returns: utf8
+		string: utf8
+function strv_get_type
+		Returns: GType
+function strv_length
+		Returns: guint32
+		str_array: utf8
+function test_bug
+		Returns: void
+		bug_uri_snippet: utf8
+function test_bug_base
+		Returns: void
+		uri_pattern: utf8
+function test_fail
+		Returns: void
+function test_log_type_name
+		Returns: utf8
+		log_type: interface for TestLogType
+function test_queue_destroy
+		Returns: void
+		destroy_func: interface for DestroyNotify
+		destroy_data: void
+function test_queue_free
+		Returns: void
+		gfree_pointer: void
+function test_rand_double
+		Returns: gdouble
+function test_rand_double_range
+		Returns: gdouble
+		range_start: gdouble
+		range_end: gdouble
+function test_rand_int
+		Returns: gint32
+function test_rand_int_range
+		Returns: gint32
+		begin: gint32
+		end: gint32
+function test_run
+		Returns: gint32
+function test_run_suite
+		Returns: gint32
+		suite: interface for TestSuite
+function test_timer_elapsed
+		Returns: gdouble
+function test_timer_last
+		Returns: gdouble
+function test_timer_start
+		Returns: void
+function test_trap_assertions
+		Returns: void
+		domain: utf8
+		file: utf8
+		line: gint32
+		func: utf8
+		assertion_flags: guint64
+		pattern: utf8
+function test_trap_fork
+		Returns: gboolean
+		usec_timeout: guint64
+		test_trap_flags: interface for TestTrapFlags
+function test_trap_has_passed
+		Returns: gboolean
+function test_trap_reached_timeout
+		Returns: gboolean
+function thread_error_quark
+		Returns: guint32
+function thread_exit
+		Returns: void
+		retval: void
+function thread_get_initialized
+		Returns: gboolean
+function thread_init
+		Returns: void
+		vtable: interface for ThreadFunctions
+function thread_init_with_errorcheck_mutexes
+		Returns: void
+		vtable: interface for ThreadFunctions
+function thread_pool_get_max_idle_time
+		Returns: guint32
+function thread_pool_get_max_unused_threads
+		Returns: gint32
+function thread_pool_get_num_unused_threads
+		Returns: guint32
+function thread_pool_set_max_idle_time
+		Returns: void
+		interval: guint32
+function thread_pool_set_max_unused_threads
+		Returns: void
+		max_threads: gint32
+function thread_pool_stop_unused_threads
+		Returns: void
+function time_val_from_iso8601
+		Returns: gboolean
+		iso_date: utf8
+		time_: OUT interface for TimeVal
+function timeout_add
+		Returns: guint32
+		priority: gint32
+		interval: guint32
+		function: interface for SourceFunc
+		data: void
+		notify: interface for DestroyNotify
+function timeout_add_seconds
+		Returns: guint32
+		priority: gint32
+		interval: guint32
+		function: interface for SourceFunc
+		data: void
+		notify: interface for DestroyNotify
+function timeout_source_new
+		Returns: interface for Source
+		interval: guint32
+function timeout_source_new_seconds
+		Returns: interface for Source
+		interval: guint32
+function trash_stack_height
+		Returns: guint32
+		stack_p: interface for TrashStack
+function trash_stack_push
+		Returns: void
+		stack_p: interface for TrashStack
+		data_p: void
+function ucs4_to_utf16
+		Returns: guint16
+		str: gunichar
+		len: gint64
+		items_read: gint64
+		items_written: gint64
+function ucs4_to_utf8
+		Returns: utf8
+		str: gunichar
+		len: gint64
+		items_read: gint64
+		items_written: gint64
+function unichar_break_type
+		Returns: interface for UnicodeBreakType
+		c: gunichar
+function unichar_combining_class
+		Returns: gint32
+		uc: gunichar
+function unichar_compose
+		Returns: gboolean
+		a: gunichar
+		b: gunichar
+		ch: gunichar
+function unichar_decompose
+		Returns: gboolean
+		ch: gunichar
+		a: gunichar
+		b: gunichar
+function unichar_digit_value
+		Returns: gint32
+		c: gunichar
+function unichar_fully_decompose
+		Returns: guint64
+		ch: gunichar
+		compat: gboolean
+		result: gunichar
+		result_len: guint64
+function unichar_get_mirror_char
+		Returns: gboolean
+		ch: gunichar
+		mirrored_ch: gunichar
+function unichar_get_script
+		Returns: interface for UnicodeScript
+		ch: gunichar
+function unichar_isalnum
+		Returns: gboolean
+		c: gunichar
+function unichar_isalpha
+		Returns: gboolean
+		c: gunichar
+function unichar_iscntrl
+		Returns: gboolean
+		c: gunichar
+function unichar_isdefined
+		Returns: gboolean
+		c: gunichar
+function unichar_isdigit
+		Returns: gboolean
+		c: gunichar
+function unichar_isgraph
+		Returns: gboolean
+		c: gunichar
+function unichar_islower
+		Returns: gboolean
+		c: gunichar
+function unichar_ismark
+		Returns: gboolean
+		c: gunichar
+function unichar_isprint
+		Returns: gboolean
+		c: gunichar
+function unichar_ispunct
+		Returns: gboolean
+		c: gunichar
+function unichar_isspace
+		Returns: gboolean
+		c: gunichar
+function unichar_istitle
+		Returns: gboolean
+		c: gunichar
+function unichar_isupper
+		Returns: gboolean
+		c: gunichar
+function unichar_iswide
+		Returns: gboolean
+		c: gunichar
+function unichar_iswide_cjk
+		Returns: gboolean
+		c: gunichar
+function unichar_isxdigit
+		Returns: gboolean
+		c: gunichar
+function unichar_iszerowidth
+		Returns: gboolean
+		c: gunichar
+function unichar_to_utf8
+		Returns: gint32
+		c: gunichar
+		outbuf: utf8
+function unichar_tolower
+		Returns: gunichar
+		c: gunichar
+function unichar_totitle
+		Returns: gunichar
+		c: gunichar
+function unichar_toupper
+		Returns: gunichar
+		c: gunichar
+function unichar_type
+		Returns: interface for UnicodeType
+		c: gunichar
+function unichar_validate
+		Returns: gboolean
+		ch: gunichar
+function unichar_xdigit_value
+		Returns: gint32
+		c: gunichar
+function unicode_canonical_decomposition
+		Returns: gunichar
+		ch: gunichar
+		result_len: guint64
+function unicode_canonical_ordering
+		Returns: void
+		string: gunichar
+		len: guint64
+function unicode_script_from_iso15924
+		Returns: interface for UnicodeScript
+		iso15924: guint32
+function unicode_script_to_iso15924
+		Returns: guint32
+		script: interface for UnicodeScript
+function unlink
+		Returns: gint32
+		filename: utf8
+function unsetenv
+		Returns: void
+		variable: utf8
+function uri_escape_string
+		Returns: utf8
+		unescaped: utf8
+		reserved_chars_allowed: utf8
+		allow_utf8: gboolean
+function uri_parse_scheme
+		Returns: utf8
+		uri: utf8
+function uri_unescape_segment
+		Returns: utf8
+		escaped_string: utf8
+		escaped_string_end: utf8
+		illegal_characters: utf8
+function uri_unescape_string
+		Returns: utf8
+		escaped_string: utf8
+		illegal_characters: utf8
+function usleep
+		Returns: void
+		microseconds: guint64
+function utf16_to_ucs4
+		Returns: gunichar
+		str: guint16
+		len: gint64
+		items_read: gint64
+		items_written: gint64
+function utf16_to_utf8
+		Returns: utf8
+		str: guint16
+		len: gint64
+		items_read: gint64
+		items_written: gint64
+function utf8_casefold
+		Returns: utf8
+		str: utf8
+		len: gint64
+function utf8_collate
+		Returns: gint32
+		str1: utf8
+		str2: utf8
+function utf8_collate_key
+		Returns: utf8
+		str: utf8
+		len: gint64
+function utf8_collate_key_for_filename
+		Returns: utf8
+		str: utf8
+		len: gint64
+function utf8_find_next_char
+		Returns: utf8
+		p: utf8
+		end: utf8
+function utf8_find_prev_char
+		Returns: utf8
+		str: utf8
+		p: utf8
+function utf8_get_char
+		Returns: gunichar
+		p: utf8
+function utf8_get_char_validated
+		Returns: gunichar
+		p: utf8
+		max_len: gint64
+function utf8_normalize
+		Returns: utf8
+		str: utf8
+		len: gint64
+		mode: interface for NormalizeMode
+function utf8_offset_to_pointer
+		Returns: utf8
+		str: utf8
+		offset: gint64
+function utf8_pointer_to_offset
+		Returns: gint64
+		str: utf8
+		pos: utf8
+function utf8_prev_char
+		Returns: utf8
+		p: utf8
+function utf8_strchr
+		Returns: utf8
+		p: utf8
+		len: gint64
+		c: gunichar
+function utf8_strdown
+		Returns: utf8
+		str: utf8
+		len: gint64
+function utf8_strlen
+		Returns: gint64
+		p: utf8
+		max: gint64
+function utf8_strncpy
+		Returns: utf8
+		dest: utf8
+		src: utf8
+		n: guint64
+function utf8_strrchr
+		Returns: utf8
+		p: utf8
+		len: gint64
+		c: gunichar
+function utf8_strreverse
+		Returns: utf8
+		str: utf8
+		len: gint64
+function utf8_strup
+		Returns: utf8
+		str: utf8
+		len: gint64
+function utf8_substring
+		Returns: utf8
+		str: utf8
+		start_pos: gint64
+		end_pos: gint64
+function utf8_to_ucs4
+		Returns: gunichar
+		str: utf8
+		len: gint64
+		items_read: gint64
+		items_written: gint64
+function utf8_to_ucs4_fast
+		Returns: gunichar
+		str: utf8
+		len: gint64
+		items_written: gint64
+function utf8_to_utf16
+		Returns: guint16
+		str: utf8
+		len: gint64
+		items_read: gint64
+		items_written: gint64
+function utf8_validate
+		Returns: gboolean
+		str: utf8
+		max_len: gint64
+		end: OUT utf8
+function variant_get_gtype
+		Returns: GType
+function variant_get_type
+		Returns: interface for VariantType
+		value: interface for Variant
+function variant_is_object_path
+		Returns: gboolean
+		string: utf8
+function variant_is_signature
+		Returns: gboolean
+		string: utf8
+function variant_parse
+		Returns: interface for Variant
+		type: interface for VariantType
+		text: utf8
+		limit: utf8
+		endptr: utf8
+function variant_parser_get_error_quark
+		Returns: guint32
+function variant_type_checked_
+		Returns: interface for VariantType
+		unknown: utf8
+function variant_type_string_is_valid
+		Returns: gboolean
+		type_string: utf8
+function variant_type_string_scan
+		Returns: gboolean
+		string: utf8
+		limit: utf8
+		endptr: OUT utf8
+function warn_message
+		Returns: void
+		domain: utf8
+		file: utf8
+		line: gint32
+		func: utf8
+		warnexpr: utf8
