@@ -1,0 +1,21 @@
+
+(define fundamentals
+    (hash
+        ("e" 2.718281828459045)
+        ("pi" 3.141592653589793)
+        ("c" 299792458)
+    )
+)
+
+(hash-size fundamentals)
+
+(hash-set! fundamentals "g" 9.822)
+
+(hash-remove! fundamentals "c")
+
+(hash-keys fundamentals)
+
+(hash-get fundamentals "pi")
+
+
+(quit)
