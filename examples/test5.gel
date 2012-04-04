@@ -6,9 +6,10 @@
 )
 
 (array-append! (palette) "white")
-
 (print colors)
 
+(array-set! (palette) 3 "black")
+(print colors)
 
 (define message "hello")
 

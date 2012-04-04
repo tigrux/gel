@@ -905,6 +905,34 @@ void array_get_(GClosure *self, GValue *return_value,
 
 
 static
+void array_set_(GClosure *self, GValue *return_value,
+                guint n_values, const GValue *values, GelContext *context)
+{
+    GList *list = NULL;
+    GValueArray *array = NULL;
+    glong index = 0;
+    GValue *value = NULL;
+
+    if(!gel_context_eval_params(context, __FUNCTION__, &list,
+            "AIV", &n_values, &values, &array, &index, &value))
+        return;
+
+    guint array_n_values = array->n_values;
+    if(index < 0)
+        index += array_n_values;
+
+    if(index < 0 || index >= array_n_values)
+    {
+        gel_warning_index_out_of_bounds(__FUNCTION__);
+        return;
+    }
+
+    gel_value_copy(value, array->values + index);
+    gel_value_list_free(list);
+}
+
+
+static
 void array_remove_(GClosure *self, GValue *return_value,
                    guint n_values, const GValue *values, GelContext *context)
 {
@@ -1367,6 +1395,7 @@ GHashTable* gel_make_default_symbols(void)
         CLOSURE(array),
         CLOSURE_NAME("array-append!", array_append_),
         CLOSURE_NAME("array-get", array_get_),
+        CLOSURE_NAME("array-set!", array_set_),
         CLOSURE_NAME("array-remove!", array_remove_),
         CLOSURE_NAME("array-length", array_length_),
 
