@@ -960,8 +960,8 @@ void array_remove_(GClosure *self, GValue *return_value,
 
 
 static
-void array_length_(GClosure *self, GValue *return_value,
-                   guint n_values, const GValue *values, GelContext *context)
+void array_size_(GClosure *self, GValue *return_value,
+                 guint n_values, const GValue *values, GelContext *context)
 {
     GList *list = NULL;
     GValueArray *array = NULL;
@@ -1275,8 +1275,8 @@ void hash_remove_(GClosure *self, GValue *return_value,
 
 
 static
-void hash_length_(GClosure *self, GValue *return_value,
-                  guint n_values, const GValue *values, GelContext *context)
+void hash_size_(GClosure *self, GValue *return_value,
+                guint n_values, const GValue *values, GelContext *context)
 {
     GList *list = NULL;
     GHashTable *hash = NULL;
@@ -1544,7 +1544,7 @@ GHashTable* gel_make_default_symbols(void)
         CLOSURE_NAME("array-get", array_get_),
         CLOSURE_NAME("array-set!", array_set_),
         CLOSURE_NAME("array-remove!", array_remove_),
-        CLOSURE_NAME("array-length", array_length_),
+        CLOSURE_NAME("array-size", array_size_),
 
         /* array management */
         CLOSURE(range),
@@ -1559,7 +1559,7 @@ GHashTable* gel_make_default_symbols(void)
         CLOSURE_NAME("hash-get", hash_get_),
         CLOSURE_NAME("hash-set!", hash_set_),
         CLOSURE_NAME("hash-remove!", hash_remove_),
-        CLOSURE_NAME("hash-length", hash_length_),
+        CLOSURE_NAME("hash-size", hash_size_),
         CLOSURE_NAME("hash-keys", hash_keys_),
 
         /* introspection */
