@@ -1367,7 +1367,7 @@ GHashTable* gel_make_default_symbols(void)
         CLOSURE(array),
         CLOSURE_NAME("array-append!", array_append_),
         CLOSURE_NAME("array-get", array_get_),
-        CLOSURE_NAME("array-remove", array_remove_),
+        CLOSURE_NAME("array-remove!", array_remove_),
         CLOSURE_NAME("array-length", array_length_),
 
         /* array management */
