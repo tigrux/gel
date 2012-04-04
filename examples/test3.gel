@@ -21,11 +21,6 @@
 (filter is-positive S)
 
 
-(array-sort! S)
-S
-(= S (array -15 -6 0.0 30.6 77))
-
-
 (define values (array 4.5 2))
 (define operators (array + - * /))
 

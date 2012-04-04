@@ -598,30 +598,6 @@ void print_(GClosure *self, GValue *return_value,
 
 
 static
-void str_(GClosure *self, GValue *return_value,
-          guint n_values, const GValue *values, GelContext *context)
-{
-    guint n_args = 1;
-    if(n_values != n_args)
-    {
-        gel_warning_needs_n_arguments(__FUNCTION__, n_args);
-        return;
-    }
-
-    GValue tmp_value = {0};
-    const GValue *value =
-        gel_context_eval_into_value(context, values + 0, &tmp_value);
-
-    gchar *value_string = gel_value_to_string(value);
-    if(GEL_IS_VALUE(&tmp_value))
-        g_value_unset(&tmp_value);
-
-    g_value_init(return_value, G_TYPE_STRING);
-    g_value_take_string(return_value, value_string);
-}
-
-
-static
 void arithmetic(GClosure *self, GValue *return_value,
                 guint n_values, const GValue *values,
                 GelContext *context, GelValuesArithmetic values_function)
@@ -968,22 +944,6 @@ void array_length_(GClosure *self, GValue *return_value,
 
     g_value_init(return_value, G_TYPE_UINT);
     gel_value_set_uint(return_value, array->n_values);
-    gel_value_list_free(list);
-}
-
-
-static
-void array_sort_(GClosure *self, GValue *return_value,
-                 guint n_values, const GValue *values, GelContext *context)
-{
-    GList *list = NULL;
-    GValueArray *array = NULL;
-
-    if(!gel_context_eval_params(context, __FUNCTION__, &list,
-            "A", &n_values, &values, &array))
-        return;
-
-    g_value_array_sort(array, (GCompareFunc)gel_values_cmp);
     gel_value_list_free(list);
 }
 
@@ -1385,7 +1345,6 @@ GHashTable* gel_make_default_symbols(void)
 
         /* output */
         CLOSURE(print),
-        CLOSURE(str),
 
         /* arithmetic */
         CLOSURE_NAME("+", add_),
@@ -1410,7 +1369,6 @@ GHashTable* gel_make_default_symbols(void)
         CLOSURE_NAME("array-get", array_get_),
         CLOSURE_NAME("array-remove", array_remove_),
         CLOSURE_NAME("array-length", array_length_),
-        CLOSURE_NAME("array-sort!", array_sort_),
 
         /* array management */
         CLOSURE(range),
