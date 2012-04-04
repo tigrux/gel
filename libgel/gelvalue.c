@@ -159,6 +159,36 @@ gchar* gel_value_to_string(const GValue *value)
         result =  g_string_free(buffer, FALSE);
     }
     else
+    if(GEL_VALUE_HOLDS(value, G_TYPE_HASH_TABLE))
+    {
+        GHashTable *hash = (GHashTable*)gel_value_get_boxed(value);
+        GString *buffer = g_string_new("(");
+        guint n_values = g_hash_table_size(hash);
+        if(n_values > 0)
+        {
+            GHashTableIter iter;
+            GValue *key;
+            GValue *value;
+            guint last = n_values - 1;
+            guint i = 0;
+
+            g_hash_table_iter_init(&iter, hash);
+            while(g_hash_table_iter_next(&iter, (void*)&key, (void*)&value))
+            {
+                gchar *ks = gel_value_to_string(key);
+                gchar *vs = gel_value_to_string(value);
+                g_string_append_printf(buffer, "(%s %s)", ks, vs);
+                if(i != last)
+                    g_string_append_c(buffer, ' ');
+                g_free(ks);
+                g_free(vs);
+                i++;
+            }
+        }
+        g_string_append_c(buffer, ')');
+        result =  g_string_free(buffer, FALSE);
+    }
+    else
     if(GEL_VALUE_HOLDS(value, GEL_TYPE_SYMBOL))
     {
         const GelSymbol *symbol = (GelSymbol*)gel_value_get_boxed(value);

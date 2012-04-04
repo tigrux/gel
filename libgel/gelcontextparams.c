@@ -95,6 +95,22 @@ gboolean gel_context_eval_param(GelContext *self, const gchar *func,
                 parsed = FALSE;
             }
             break;
+        case 'H':
+            value = gel_value_new();
+            result_value =
+                gel_context_eval_param_into_value(self, *values, value);
+            if(GEL_VALUE_HOLDS(result_value, G_TYPE_HASH_TABLE))
+            {
+                GHashTable **a = va_arg(args, GHashTable **);
+                *a = (GHashTable*)gel_value_get_boxed(result_value);
+            }
+            else
+            {
+                gel_warning_value_not_of_type(func,
+                    result_value, G_TYPE_HASH_TABLE);
+                parsed = FALSE;
+            }
+            break;
         case 's':
             if(GEL_VALUE_HOLDS(*values, GEL_TYPE_SYMBOL))
             {
@@ -283,20 +299,29 @@ gboolean gel_context_eval_params_va(GelContext *self, const gchar *func,
  * Convenience method to be used in implementation of new closures.
  *
  * Each character in @format indicates the type of variable you are parsing.
- * Posible formats are: asASIOCV
+ * Posible formats are: vVaAhHsSIOC
  *
  * <itemizedlist>
+  *   <listitem><para>
+ *     v: get a literal value (#GValue *).
+ *   </para></listitem>
+ *   <listitem><para>
+ *     V: evaluate and get a value (#GValue *).
+ *   </para></listitem>
  *   <listitem><para>
  *     a: get a literal array (#GValueArray *).
  *   </para></listitem>
  *   <listitem><para>
- *     s: get a literal string (#gchararray).
- *   </para></listitem>
- *   <listitem><para>
- *     v: get a literal value (#GValue *).
- *   </para></listitem>
- *   <listitem><para>
  *     A: evaluate and get an array (#GValueArray *).
+ *   </para></listitem>
+ *   <listitem><para>
+ *     h: get a literal hash (#GHashTable *).
+ *   </para></listitem>
+ *   <listitem><para>
+ *     H: evaluate and get a hash (#GHashTable *).
+ *   </para></listitem>
+ *   <listitem><para>
+ *     s: get a literal string (#gchararray).
  *   </para></listitem>
  *   <listitem><para>
  *     S: evaluate and get a string (#gchararray).
@@ -309,9 +334,6 @@ gboolean gel_context_eval_params_va(GelContext *self, const gchar *func,
  *   </para></listitem>
  *   <listitem><para>
  *     C: evaluate and get a closure (#GClosure *).
- *   </para></listitem>
- *   <listitem><para>
- *     V: evaluate and get a value (#GValue *).
  *   </para></listitem>
  *   <listitem><para>
  *     *: Do not check for exact number or arguments.
