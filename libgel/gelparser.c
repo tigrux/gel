@@ -82,7 +82,9 @@ GValueArray* gel_parse_scanner(GScanner *scanner, gint level)
                     scanner->line, scanner->position);
                 break;
             default:
-                g_error("Unknown token (%d) '%c'", token, token);
+                g_error("Unknown token '%c' (%d) at line %u, char %u",
+                    token, token,
+                    scanner->next_line, scanner->next_position);
                 g_scanner_get_next_token(scanner);
         }
 
