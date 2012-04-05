@@ -70,6 +70,8 @@ GValueArray* gel_parse_scanner(GScanner *scanner, gint level)
                 parsing = FALSE;
                 break;
             case G_TOKEN_EOF:
+                if(level != 0)
+                    g_error("Expected a ')' but reached end of file");
                 parsing = FALSE;
                 break;
             case G_TOKEN_STRING:
