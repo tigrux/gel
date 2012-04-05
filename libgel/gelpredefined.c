@@ -1191,12 +1191,8 @@ gel_value_hash(const GValue *value)
             return g_str_hash(s);
         }
         default:
-        {
-            gchar *s = gel_value_to_string(value);
-            guint hash = g_str_hash(s);
-            g_free(s);
-            return hash;
-        }
+            g_warn_if_reached();
+            return g_direct_hash(value);
     }
 }
 
