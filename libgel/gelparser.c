@@ -64,8 +64,7 @@ GValueArray* gel_parse_scanner(GScanner *scanner, gint level,
             case G_TOKEN_LEFT_PAREN:
                 g_scanner_get_next_token(scanner);
                 g_value_init(&value, G_TYPE_VALUE_ARRAY);
-                g_value_take_boxed(&value,
-                    gel_parse_scanner(scanner, level+1,
+                g_value_take_boxed(&value,gel_parse_scanner(scanner, level+1,
                     scanner->line, scanner->position));
                 break;
             case G_TOKEN_RIGHT_PAREN:
@@ -91,8 +90,7 @@ GValueArray* gel_parse_scanner(GScanner *scanner, gint level,
                 break;
             default:
                 g_error("Unknown token '%c' (%d) at line %u, char %u",
-                    token, token,
-                    scanner->next_line, scanner->next_position);
+                    token, token, scanner->next_line, scanner->next_position);
                 g_scanner_get_next_token(scanner);
         }
 
