@@ -7,15 +7,30 @@
     )
 )
 
+(print fundamentals)
+
 (hash-size fundamentals)
 
 (hash-set! fundamentals "g" 9.822)
 
+(print fundamentals)
+
 (hash-remove! fundamentals "c")
+
+(hash-get fundamentals "pi")
 
 (hash-keys fundamentals)
 
-(hash-get fundamentals "pi")
+(define (hash-values h)
+    (map
+        (lambda (k)
+            (hash-get h k)
+        )
+        (hash-keys h)
+    )
+)
+
+(hash-values fundamentals)
 
 
 (quit)
