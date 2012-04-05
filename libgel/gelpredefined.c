@@ -1334,8 +1334,7 @@ void require_(GClosure *self, GValue *return_value,
             "sS", &n_values, &values, &namespace_, &version))
         return;
 
-    GITypelib *typelib = g_irepository_require(
-        NULL, namespace_, version, 0, NULL);
+    void *typelib = g_irepository_require(NULL, namespace_, version, 0, NULL);
 
     if(typelib != NULL)
     {
