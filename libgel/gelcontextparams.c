@@ -299,7 +299,7 @@ gboolean gel_context_eval_params_va(GelContext *self, const gchar *func,
  * Convenience method to be used in implementation of new closures.
  *
  * Each character in @format indicates the type of variable you are parsing.
- * Posible formats are: vVaAhHsSIOC
+ * Posible formats are: vVaAHsSIOC
  *
  * <itemizedlist>
   *   <listitem><para>
@@ -313,9 +313,6 @@ gboolean gel_context_eval_params_va(GelContext *self, const gchar *func,
  *   </para></listitem>
  *   <listitem><para>
  *     A: evaluate and get an array (#GValueArray *).
- *   </para></listitem>
- *   <listitem><para>
- *     h: get a literal hash (#GHashTable *).
  *   </para></listitem>
  *   <listitem><para>
  *     H: evaluate and get a hash (#GHashTable *).
