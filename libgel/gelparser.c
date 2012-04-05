@@ -33,7 +33,7 @@ const gchar *scanner_errors[] = {
 
 
 static
-GValueArray* gel_parse_scanner(GScanner *scanner)
+GValueArray* gel_parse_scanner(GScanner *scanner, gint level)
 {
     GValueArray *array = g_value_array_new(ARRAY_N_PREALLOCATED);
 
@@ -63,7 +63,7 @@ GValueArray* gel_parse_scanner(GScanner *scanner)
             case G_TOKEN_LEFT_PAREN:
                 g_scanner_get_next_token(scanner);
                 g_value_init(&value, G_TYPE_VALUE_ARRAY);
-                g_value_take_boxed(&value, gel_parse_scanner(scanner));
+                g_value_take_boxed(&value, gel_parse_scanner(scanner, level+1));
                 break;
             case G_TOKEN_RIGHT_PAREN:
                 g_scanner_get_next_token(scanner);
@@ -187,7 +187,7 @@ GValueArray* gel_parse_text(const gchar *text, guint text_len)
     scanner->config->scan_identifier_1char = TRUE;
     g_scanner_input_text(scanner, text, text_len);
 
-    GValueArray *array = gel_parse_scanner(scanner);
+    GValueArray *array = gel_parse_scanner(scanner, 0);
     g_scanner_destroy(scanner);
 
     return array;
