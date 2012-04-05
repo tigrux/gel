@@ -67,6 +67,8 @@ GValueArray* gel_parse_scanner(GScanner *scanner, gint level)
                 break;
             case G_TOKEN_RIGHT_PAREN:
                 g_scanner_get_next_token(scanner);
+                parsing = FALSE;
+                break;
             case G_TOKEN_EOF:
                 parsing = FALSE;
                 break;
