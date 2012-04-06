@@ -19,6 +19,14 @@
  */
 
 
+GValue* gel_value_new_from_boxed(GType type, gpointer boxed)
+{
+    GValue *value = gel_value_new_of_type(type);
+    g_value_take_boxed(value, boxed);
+    return value;
+}
+
+
 GValue *gel_value_dup(const GValue *value)
 {
     g_return_val_if_fail(value != NULL, NULL);

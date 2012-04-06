@@ -106,10 +106,8 @@ void define_(GClosure *self, GValue *return_value,
                     closure = new_closure(context, name,
                             array_n_values, array_values, n_values, values);
                     if(closure != NULL)
-                    {
-                        value = gel_value_new_of_type(G_TYPE_CLOSURE);
-                        g_value_take_boxed(value, closure);
-                    }
+                        value =
+                            gel_value_new_from_boxed(G_TYPE_CLOSURE, closure);
                 }
                 else
                     defined = FALSE;
@@ -218,8 +216,8 @@ void let_(GClosure *self, GValue *return_value,
                     gel_closure_new(name, var_names, code, let_context);
                 if(closure != NULL)
                 {
-                    GValue *value = gel_value_new_of_type(G_TYPE_CLOSURE);
-                    g_value_take_boxed(value, closure);
+                    GValue *value =
+                        gel_value_new_from_boxed(G_TYPE_CLOSURE, closure);
                     gel_context_insert(let_context, name, value);
                     gel_closure_bind(closure);
                 }
@@ -1345,14 +1343,14 @@ void require_(GClosure *self, GValue *return_value,
             GValue *key = gel_value_new_of_type(G_TYPE_STRING);
             g_value_set_string(key, g_base_info_get_name(info));
 
-            GValue *value = gel_value_new_of_type(GEL_BASE_INFO_TYPE);
-            g_value_take_boxed(value, gel_base_info_new(info));
+            GValue *value = gel_value_new_from_boxed(
+                    GEL_BASE_INFO_TYPE, gel_base_info_new(info));
 
             g_hash_table_insert(infos, key, value);
         }
 
-        GValue *repository_value = gel_value_new_of_type(G_TYPE_HASH_TABLE);
-        g_value_take_boxed(repository_value, infos);
+        GValue *repository_value =
+            gel_value_new_from_boxed(G_TYPE_HASH_TABLE, infos);
         gel_context_insert(context, namespace_, repository_value);
         result = TRUE;
     }
@@ -1584,9 +1582,8 @@ GHashTable* gel_make_default_symbols(void)
 
     for(c = closures; c->name != NULL; c++)
     {
-        value = gel_value_new_of_type(G_TYPE_CLOSURE);
         GClosure *closure = gel_closure_new_native(c->name, c->marshal);
-        g_value_set_boxed(value, closure);
+        value = gel_value_new_from_boxed(G_TYPE_CLOSURE, closure);
         g_hash_table_insert(symbols, g_strdup(c->name), value);
     }
 
