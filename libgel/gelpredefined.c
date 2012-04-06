@@ -1407,9 +1407,6 @@ void dot_(GClosure *self, GValue *return_value,
                 info = gel_namespace_lookup(ns, name);
         }
         else
-        if(ns == NULL)
-            info = gel_base_info_lookup(info, name);
-        else
             info = gel_base_info_lookup(info, name);
 
         if(info == NULL)
