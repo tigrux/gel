@@ -53,9 +53,6 @@ GelNamespace* gel_namespace_new(const gchar *namespace_, const gchar *version)
         for(i = 0; i < n; i++)
         {
             GIBaseInfo *info = g_irepository_get_info(NULL, namespace_, i);
-            if(g_base_info_get_type(info) == GI_INFO_TYPE_OBJECT)
-                g_registered_type_info_get_g_type(info);
-
             g_hash_table_insert(infos,
                 (void*)g_base_info_get_name(info), gel_base_info_new(info));
         }
