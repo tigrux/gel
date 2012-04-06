@@ -3,7 +3,6 @@
 
 #include <girepository.h>
 
-
 typedef struct _GelBaseInfo GelBaseInfo;
 
 GType gel_base_info_get_type(void);

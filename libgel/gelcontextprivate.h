@@ -1,11 +1,10 @@
-#ifndef __GEL_CONTEXT_PRIVATE_H
-#define __GEL_CONTEXT_PRIVATE_H
+#ifndef __GEL_CONTEXT_PRIVATE_H__
+#define __GEL_CONTEXT_PRIVATE_H__
 
 #include <gelcontext.h>
 #include <gelvariable.h>
 #include <gelclosure.h>
 #include <gelclosureprivate.h>
-
 
 void gel_context_insert_variable(GelContext *self,
                                  const gchar *name, GelVariable *variable);

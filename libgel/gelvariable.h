@@ -3,7 +3,6 @@
 
 #include <glib-object.h>
 
-
 typedef struct _GelVariable GelVariable;
 
 GType gel_variable_get_type(void) G_GNUC_CONST;

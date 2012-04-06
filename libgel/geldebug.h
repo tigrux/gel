@@ -3,7 +3,6 @@
 
 #include <glib-object.h>
 
-
 void gel_warning_needs_at_least_n_arguments(const gchar *func, guint n);
 
 void gel_warning_needs_n_arguments(const gchar *func, guint n);
@@ -26,7 +25,6 @@ void gel_warning_type_name_invalid(const gchar *func, const gchar *name);
 void gel_warning_invalid_argument_name(const gchar *func, const gchar *name);
 
 void gel_warning_index_out_of_bounds(const gchar *func);
-
 
 #endif
 

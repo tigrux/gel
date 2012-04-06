@@ -25,7 +25,6 @@
 #define gel_value_new() (g_new0(GValue, 1))
 #define gel_value_new_of_type(t) (g_value_init(gel_value_new(), t))
 
-
 typedef
 gboolean (*GelValuesArithmetic)(const GValue *l_value, const GValue *r_value,
                                 GValue *dest_value);
@@ -36,7 +35,6 @@ gboolean (*GelValuesLogic)(const GValue *l_value, const GValue *r_value);
 GValue* gel_value_new_from_boxed(GType type, gpointer boxed);
 GValue* gel_value_dup(const GValue *value);
 void gel_value_free(GValue *value);
-
 
 #endif
 

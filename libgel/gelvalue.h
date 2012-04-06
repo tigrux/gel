@@ -3,7 +3,6 @@
 
 #include <glib-object.h>
 
-
 gchar *gel_value_to_string(const GValue *value);
 gboolean gel_value_to_boolean(const GValue *value);
 
@@ -24,7 +23,6 @@ gboolean gel_values_eq(const GValue *v1, const GValue *v2);
 gboolean gel_values_le(const GValue *v1, const GValue *v2);
 gboolean gel_values_lt(const GValue *v1, const GValue *v2);
 gboolean gel_values_ne(const GValue *v1, const GValue *v2);
-
 
 #endif
 

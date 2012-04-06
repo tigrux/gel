@@ -3,7 +3,6 @@
 
 #include <glib-object.h>
 
-
 typedef struct _GelContext GelContext;
 
 /**
