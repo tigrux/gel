@@ -1,6 +1,3 @@
-#include <girepository.h>
-#include <gitypelib.h>
-
 #include <gelcontext.h>
 #include <gelcontextprivate.h>
 #include <geldebug.h>
@@ -8,6 +5,7 @@
 #include <gelvalueprivate.h>
 #include <gelsymbol.h>
 #include <gelclosure.h>
+#include <gelbaseinfo.h>
 
 
 static
@@ -1324,33 +1322,38 @@ void require_(GClosure *self, GValue *return_value,
     const gchar *namespace_ = NULL;
     const gchar *version = NULL;
     GList *list = NULL;
-    gboolean result = FALSE;
 
      if(!gel_context_eval_params(context, __FUNCTION__, &list,
             "sS", &n_values, &values, &namespace_, &version))
         return;
 
-    void *typelib = g_irepository_require(NULL, namespace_, version, 0, NULL);
-
-    if(typelib != NULL)
+    gboolean result = FALSE;
+    if(g_irepository_require(NULL, namespace_, version, 0, NULL) != NULL)
     {
-        guint n = g_irepository_get_n_infos (NULL, namespace_);
+        GHashTable *infos = g_hash_table_new_full(
+            (GHashFunc)gel_value_hash, (GEqualFunc)gel_values_eq,
+            (GDestroyNotify)gel_value_free, (GDestroyNotify)gel_value_free);
+
+        guint n = g_irepository_get_n_infos(NULL, namespace_);
         guint i;
         for(i = 0; i < n; i++)
         {
-            GIBaseInfo *info = g_irepository_get_info (NULL, namespace_, i);
-            GIInfoType info_type = g_base_info_get_type(info);
-            switch(info_type)
-            {
-                case GI_INFO_TYPE_OBJECT:
-                    g_registered_type_info_get_g_type(info);
-                    break;
-                default:
-                    break;
-            }
-            g_base_info_unref(info);
+            GIBaseInfo *info = g_irepository_get_info(NULL, namespace_, i);
+            if(g_base_info_get_type(info) == GI_INFO_TYPE_OBJECT)
+                g_registered_type_info_get_g_type(info);
+
+            GValue *key = gel_value_new_of_type(G_TYPE_STRING);
+            g_value_set_string(key, g_base_info_get_name(info));
+
+            GValue *value = gel_value_new_of_type(GEL_BASE_INFO_TYPE);
+            g_value_take_boxed(value, gel_base_info_new(info));
+
+            g_hash_table_insert(infos, key, value);
         }
 
+        GValue *repository_value = gel_value_new_of_type(G_TYPE_HASH_TABLE);
+        g_value_take_boxed(repository_value, infos);
+        gel_context_insert(context, namespace_, repository_value);
         result = TRUE;
     }
 

@@ -1,5 +1,6 @@
 (require Gtk "2.0")
 
+
 (define window (object-new "GtkWindow"))
 (object-set window "title" "Hello world")
 (object-set window "default-width" 320)
@@ -38,3 +39,6 @@
 (object-set box "visible" #t)
 (object-set window "visible" #t)
 
+(for info (hash-keys Gtk)
+    (print (hash-get Gtk info))
+)
