@@ -1,14 +1,21 @@
 #include <geltypeinfo.h>
 
 
+struct _GelTypeinfo
+{
+    GIBaseInfo *info;
+    GHashTable *infos;
+    volatile gint ref_count;
+};
+
+
 static
 void gel_typeinfo_to_string_transform(const GValue *source, GValue *dest)
 {
-    GelTypeinfo *gel_info = (GelTypeinfo *)g_value_get_boxed(source);
-    GIBaseInfo *base_info = gel_typeinfo_get_info(gel_info);
+    GelTypeinfo *info = (GelTypeinfo *)g_value_get_boxed(source);
 
-    const gchar *type = g_info_type_to_string(g_base_info_get_type(base_info));
-    const gchar *name = g_base_info_get_name(base_info);
+    const gchar *type = g_info_type_to_string(g_base_info_get_type(info->info));
+    const gchar *name = g_base_info_get_name(info->info);
     gchar *buffer = g_strdup_printf("<GelTypeinfo %s %s>", type, name);
     g_value_take_string(dest, buffer);
 }
@@ -31,14 +38,6 @@ GType gel_typeinfo_get_type(void)
     }
     return type;
 }
-
-
-struct _GelTypeinfo
-{
-    GIBaseInfo *info;
-    GHashTable *infos;
-    volatile gint ref_count;
-};
 
 
 static
@@ -177,14 +176,6 @@ const gchar* gel_typeinfo_get_name(const GelTypeinfo *self)
     g_return_val_if_fail(self != NULL, NULL);
 
     return g_base_info_get_name(self->info);
-}
-
-
-GIBaseInfo* gel_typeinfo_get_info(const GelTypeinfo *self)
-{
-    g_return_val_if_fail(self != NULL, NULL);
-
-    return self->info;
 }
 
 
