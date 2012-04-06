@@ -1,5 +1,5 @@
-#ifndef GEL_BASE_INFO_TYPE
-#define GEL_BASE_INFO_TYPE (gel_base_info_get_type())
+#ifndef GEL_TYPE_BASE_INFO
+#define GEL_TYPE_BASE_INFO (gel_base_info_get_type())
 
 #include <girepository.h>
 

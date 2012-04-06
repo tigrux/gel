@@ -1,5 +1,5 @@
-#ifndef GEL_CONTEXT_TYPE
-#define GEL_CONTEXT_TYPE (gel_context_get_type())
+#ifndef GEL_TYPE_CONTEXT
+#define GEL_TYPE_CONTEXT (gel_context_get_type())
 
 #include <glib-object.h>
 

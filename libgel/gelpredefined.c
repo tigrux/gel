@@ -1344,7 +1344,7 @@ void require_(GClosure *self, GValue *return_value,
             g_value_set_string(key, g_base_info_get_name(info));
 
             GValue *value = gel_value_new_from_boxed(
-                    GEL_BASE_INFO_TYPE, gel_base_info_new(info));
+                    GEL_TYPE_BASE_INFO, gel_base_info_new(info));
 
             g_hash_table_insert(infos, key, value);
         }
