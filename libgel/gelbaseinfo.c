@@ -41,14 +41,110 @@ struct _GelBaseInfo
 };
 
 
+static
+void gel_base_info_insert_multiple(GelBaseInfo *self,
+                               gint (*get_n_nodes)(GIBaseInfo *info),
+                               GIBaseInfo* (*get_node)(GIBaseInfo *info, gint n)
+)
+{
+    guint n = get_n_nodes(self->info);
+    guint i;
+    for(i = 0; i < n; i++)
+    {
+        GIBaseInfo *node_info = get_node(self->info, i);
+        g_hash_table_insert(self->infos,
+            (void*)g_base_info_get_name(node_info),
+            gel_base_info_new(node_info));
+    }
+}
+
+
 GelBaseInfo* gel_base_info_new(GIBaseInfo *info)
 {
     GelBaseInfo *self = g_slice_new0(GelBaseInfo);
+    self->ref_count = 1;
     self->info = info;
     self->infos = g_hash_table_new_full(
         g_str_hash, g_str_equal,
-        NULL, (GDestroyNotify)g_base_info_unref);
-    self->ref_count = 1;
+        NULL, (GDestroyNotify)gel_base_info_unref);
+
+    switch(g_base_info_get_type(info))
+    {
+        case GI_INFO_TYPE_INTERFACE:
+        {
+            g_registered_type_info_get_g_type(info);
+
+            gel_base_info_insert_multiple(self,
+                g_interface_info_get_n_methods,
+                g_interface_info_get_method);
+
+            gel_base_info_insert_multiple(self,
+                g_interface_info_get_n_constants,
+                g_interface_info_get_constant);
+
+            break;
+        }
+
+        case GI_INFO_TYPE_OBJECT:
+        {
+            g_registered_type_info_get_g_type(info);
+
+            gel_base_info_insert_multiple(self,
+                g_object_info_get_n_methods,
+                g_object_info_get_method);
+
+            gel_base_info_insert_multiple(self,
+                g_object_info_get_n_constants,
+                g_object_info_get_constant);
+
+            break;
+        }
+
+        case GI_INFO_TYPE_STRUCT:
+        {
+            g_registered_type_info_get_g_type(info);
+
+            gel_base_info_insert_multiple(self,
+                g_struct_info_get_n_methods,
+                g_struct_info_get_method);
+
+            gel_base_info_insert_multiple(self,
+                g_struct_info_get_n_fields,
+                g_struct_info_get_field);
+
+            break;
+        }
+
+        case GI_INFO_TYPE_FLAGS:
+        case GI_INFO_TYPE_ENUM:
+        {
+            g_registered_type_info_get_g_type(info);
+
+            gel_base_info_insert_multiple(self,
+                g_enum_info_get_n_values,
+                g_enum_info_get_value);
+
+            break;
+        }
+
+        case GI_INFO_TYPE_UNION:
+        {
+            g_registered_type_info_get_g_type(info);
+
+            gel_base_info_insert_multiple(self,
+                g_union_info_get_n_methods,
+                g_union_info_get_method);
+
+            gel_base_info_insert_multiple(self,
+                g_union_info_get_n_fields,
+                g_union_info_get_field);
+
+            break;
+        }
+
+        default:
+            break;
+    }
 
     return self;
 }
@@ -69,8 +165,8 @@ void gel_base_info_unref(GelBaseInfo *self)
 
     if(g_atomic_int_dec_and_test(&self->ref_count))
     {
-        g_base_info_unref(self->info);
         g_hash_table_unref(self->infos);
+        g_base_info_unref(self->info);
         g_slice_free(GelBaseInfo, self);
     }
 }
