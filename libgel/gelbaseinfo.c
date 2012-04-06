@@ -36,7 +36,7 @@ GType gel_base_info_get_type(void)
 struct _GelBaseInfo
 {
     GIBaseInfo *info;
-    GHashTable *nodes;
+    GHashTable *infos;
     volatile gint ref_count;
 };
 
@@ -45,7 +45,7 @@ GelBaseInfo* gel_base_info_new(GIBaseInfo *info)
 {
     GelBaseInfo *self = g_slice_new0(GelBaseInfo);
     self->info = info;
-    self->nodes = g_hash_table_new_full(
+    self->infos = g_hash_table_new_full(
         g_str_hash, g_str_equal,
         NULL, (GDestroyNotify)g_base_info_unref);
     self->ref_count = 1;
@@ -70,7 +70,7 @@ void gel_base_info_unref(GelBaseInfo *self)
     if(g_atomic_int_dec_and_test(&self->ref_count))
     {
         g_base_info_unref(self->info);
-        g_hash_table_unref(self->nodes);
+        g_hash_table_unref(self->infos);
         g_slice_free(GelBaseInfo, self);
     }
 }
@@ -92,11 +92,11 @@ GIBaseInfo* gel_base_info_get_info(const GelBaseInfo *self)
 }
 
 
-const GelBaseInfo* gel_base_info_get_node(const GelBaseInfo *self,
-                                          const gchar *name)
+const GelBaseInfo* gel_base_info_lookup(const GelBaseInfo *self,
+                                        const gchar *name)
 {
     g_return_val_if_fail(self != NULL, NULL);
 
-    return (GelBaseInfo *)g_hash_table_lookup(self->nodes, name);
+    return (GelBaseInfo *)g_hash_table_lookup(self->infos, name);
 }
 

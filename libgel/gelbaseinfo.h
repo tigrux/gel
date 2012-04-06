@@ -12,8 +12,8 @@ void gel_base_info_unref(GelBaseInfo *self);
 
 const gchar* gel_base_info_get_name(const GelBaseInfo *self);
 GIBaseInfo* gel_base_info_get_info(const GelBaseInfo *self);
-const GelBaseInfo* gel_base_info_get_node(const GelBaseInfo *self,
-                                          const gchar *name);
+const GelBaseInfo* gel_base_info_lookup(const GelBaseInfo *self,
+                                        const gchar *name);
 
 #endif
 
