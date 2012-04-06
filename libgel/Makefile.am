@@ -15,7 +15,8 @@ libgel_la_SOURCES = \
 	gelpredefined.c \
 	gelvalue.c \
 	gelsymbol.c \
-	gelvariable.c
+	gelvariable.c \
+	gelbaseinfo.c
 
 
 libgel_includedir = $(includedir)/gel-0.1
@@ -32,5 +33,6 @@ noinst_HEADERS = \
 	gelclosureprivate.h \
 	gelsymbol.h \
 	geldebug.h \
-	gelvariable.h
+	gelvariable.h \
+	gelbaseinfo.h
 
