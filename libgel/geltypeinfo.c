@@ -1,31 +1,31 @@
-#include <gelbaseinfo.h>
+#include <geltypeinfo.h>
 
 
 static
-void gel_base_info_to_string_transform(const GValue *source, GValue *dest)
+void gel_typeinfo_to_string_transform(const GValue *source, GValue *dest)
 {
-    GelBaseInfo *gel_info = (GelBaseInfo *)g_value_get_boxed(source);
-    GIBaseInfo *base_info = gel_base_info_get_info(gel_info);
+    GelTypeinfo *gel_info = (GelTypeinfo *)g_value_get_boxed(source);
+    GIBaseInfo *base_info = gel_typeinfo_get_info(gel_info);
 
     const gchar *type = g_info_type_to_string(g_base_info_get_type(base_info));
     const gchar *name = g_base_info_get_name(base_info);
-    gchar *buffer = g_strdup_printf("<GelBaseInfo %s %s>", type, name);
+    gchar *buffer = g_strdup_printf("<GelTypeinfo %s %s>", type, name);
     g_value_take_string(dest, buffer);
 }
 
 
-GType gel_base_info_get_type(void)
+GType gel_typeinfo_get_type(void)
 {
     static volatile gsize once = 0;
     static GType type = G_TYPE_INVALID;
     if(g_once_init_enter(&once))
     {
-        type = g_boxed_type_register_static("GelBaseInfo",
-                (GBoxedCopyFunc)gel_base_info_ref,
-                (GBoxedFreeFunc)gel_base_info_unref);
+        type = g_boxed_type_register_static("GelTypeinfo",
+                (GBoxedCopyFunc)gel_typeinfo_ref,
+                (GBoxedFreeFunc)gel_typeinfo_unref);
 
         g_value_register_transform_func(type, G_TYPE_STRING,
-            gel_base_info_to_string_transform);
+            gel_typeinfo_to_string_transform);
 
         g_once_init_leave(&once, 1);
     }
@@ -33,7 +33,7 @@ GType gel_base_info_get_type(void)
 }
 
 
-struct _GelBaseInfo
+struct _GelTypeinfo
 {
     GIBaseInfo *info;
     GHashTable *infos;
@@ -42,7 +42,7 @@ struct _GelBaseInfo
 
 
 static
-void gel_base_info_insert_multiple(GelBaseInfo *self,
+void gel_typeinfo_insert_multiple(GelTypeinfo *self,
                                gint (*get_n_nodes)(GIBaseInfo *info),
                                GIBaseInfo* (*get_node)(GIBaseInfo *info, gint n)
 )
@@ -54,19 +54,19 @@ void gel_base_info_insert_multiple(GelBaseInfo *self,
         GIBaseInfo *node_info = get_node(self->info, i);
         g_hash_table_insert(self->infos,
             (void*)g_base_info_get_name(node_info),
-            gel_base_info_new(node_info));
+            gel_typeinfo_new(node_info));
     }
 }
 
 
-GelBaseInfo* gel_base_info_new(GIBaseInfo *info)
+GelTypeinfo* gel_typeinfo_new(GIBaseInfo *info)
 {
-    GelBaseInfo *self = g_slice_new0(GelBaseInfo);
+    GelTypeinfo *self = g_slice_new0(GelTypeinfo);
     self->ref_count = 1;
     self->info = info;
     self->infos = g_hash_table_new_full(
         g_str_hash, g_str_equal,
-        NULL, (GDestroyNotify)gel_base_info_unref);
+        NULL, (GDestroyNotify)gel_typeinfo_unref);
 
     switch(g_base_info_get_type(info))
     {
@@ -74,11 +74,11 @@ GelBaseInfo* gel_base_info_new(GIBaseInfo *info)
         {
             g_registered_type_info_get_g_type(info);
 
-            gel_base_info_insert_multiple(self,
+            gel_typeinfo_insert_multiple(self,
                 g_interface_info_get_n_methods,
                 g_interface_info_get_method);
 
-            gel_base_info_insert_multiple(self,
+            gel_typeinfo_insert_multiple(self,
                 g_interface_info_get_n_constants,
                 g_interface_info_get_constant);
 
@@ -89,11 +89,11 @@ GelBaseInfo* gel_base_info_new(GIBaseInfo *info)
         {
             g_registered_type_info_get_g_type(info);
 
-            gel_base_info_insert_multiple(self,
+            gel_typeinfo_insert_multiple(self,
                 g_object_info_get_n_methods,
                 g_object_info_get_method);
 
-            gel_base_info_insert_multiple(self,
+            gel_typeinfo_insert_multiple(self,
                 g_object_info_get_n_constants,
                 g_object_info_get_constant);
 
@@ -104,11 +104,11 @@ GelBaseInfo* gel_base_info_new(GIBaseInfo *info)
         {
             g_registered_type_info_get_g_type(info);
 
-            gel_base_info_insert_multiple(self,
+            gel_typeinfo_insert_multiple(self,
                 g_struct_info_get_n_methods,
                 g_struct_info_get_method);
 
-            gel_base_info_insert_multiple(self,
+            gel_typeinfo_insert_multiple(self,
                 g_struct_info_get_n_fields,
                 g_struct_info_get_field);
 
@@ -120,7 +120,7 @@ GelBaseInfo* gel_base_info_new(GIBaseInfo *info)
         {
             g_registered_type_info_get_g_type(info);
 
-            gel_base_info_insert_multiple(self,
+            gel_typeinfo_insert_multiple(self,
                 g_enum_info_get_n_values,
                 g_enum_info_get_value);
 
@@ -131,11 +131,11 @@ GelBaseInfo* gel_base_info_new(GIBaseInfo *info)
         {
             g_registered_type_info_get_g_type(info);
 
-            gel_base_info_insert_multiple(self,
+            gel_typeinfo_insert_multiple(self,
                 g_union_info_get_n_methods,
                 g_union_info_get_method);
 
-            gel_base_info_insert_multiple(self,
+            gel_typeinfo_insert_multiple(self,
                 g_union_info_get_n_fields,
                 g_union_info_get_field);
 
@@ -150,7 +150,7 @@ GelBaseInfo* gel_base_info_new(GIBaseInfo *info)
 }
 
 
-GelBaseInfo* gel_base_info_ref(GelBaseInfo *self)
+GelTypeinfo* gel_typeinfo_ref(GelTypeinfo *self)
 {
     g_return_val_if_fail(self != NULL, NULL);
 
@@ -159,7 +159,7 @@ GelBaseInfo* gel_base_info_ref(GelBaseInfo *self)
 }
 
 
-void gel_base_info_unref(GelBaseInfo *self)
+void gel_typeinfo_unref(GelTypeinfo *self)
 {
     g_return_if_fail(self != NULL);
 
@@ -167,12 +167,12 @@ void gel_base_info_unref(GelBaseInfo *self)
     {
         g_hash_table_unref(self->infos);
         g_base_info_unref(self->info);
-        g_slice_free(GelBaseInfo, self);
+        g_slice_free(GelTypeinfo, self);
     }
 }
 
 
-const gchar* gel_base_info_get_name(const GelBaseInfo *self)
+const gchar* gel_typeinfo_get_name(const GelTypeinfo *self)
 {
     g_return_val_if_fail(self != NULL, NULL);
 
@@ -180,7 +180,7 @@ const gchar* gel_base_info_get_name(const GelBaseInfo *self)
 }
 
 
-GIBaseInfo* gel_base_info_get_info(const GelBaseInfo *self)
+GIBaseInfo* gel_typeinfo_get_info(const GelTypeinfo *self)
 {
     g_return_val_if_fail(self != NULL, NULL);
 
@@ -188,11 +188,11 @@ GIBaseInfo* gel_base_info_get_info(const GelBaseInfo *self)
 }
 
 
-const GelBaseInfo* gel_base_info_lookup(const GelBaseInfo *self,
-                                        const gchar *name)
+const GelTypeinfo* gel_typeinfo_lookup(const GelTypeinfo *self,
+                                       const gchar *name)
 {
     g_return_val_if_fail(self != NULL, NULL);
 
-    return (GelBaseInfo *)g_hash_table_lookup(self->infos, name);
+    return (GelTypeinfo *)g_hash_table_lookup(self->infos, name);
 }
 

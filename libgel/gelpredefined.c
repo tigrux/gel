@@ -1364,16 +1364,16 @@ void dot_(GClosure *self, GValue *return_value,
     n_values--;
 
     const GelTypelib *ns = NULL;
-    const GelBaseInfo *info = NULL;
+    const GelTypeinfo *info = NULL;
 
     GType type = GEL_VALUE_TYPE(value);
     if(type == GEL_TYPE_TYPELIB)
         ns = (GelTypelib*)g_value_get_boxed(value);
     else
-    if(type == GEL_TYPE_BASE_INFO)
-        info = (GelBaseInfo*)g_value_get_boxed(value);
+    if(type == GEL_TYPE_TYPEINFO)
+        info = (GelTypeinfo*)g_value_get_boxed(value);
     else
-        g_warning("%s: Expected typelib or baseinfo", __FUNCTION__);
+        g_warning("%s: Expected typelib or typeinfo", __FUNCTION__);
 
     if(GEL_IS_VALUE(&tmp_value))
         g_value_unset(&tmp_value);
@@ -1407,7 +1407,7 @@ void dot_(GClosure *self, GValue *return_value,
                 info = gel_typelib_lookup(ns, name);
         }
         else
-            info = gel_base_info_lookup(info, name);
+            info = gel_typeinfo_lookup(info, name);
 
         if(info == NULL)
         {
@@ -1421,7 +1421,7 @@ void dot_(GClosure *self, GValue *return_value,
 
     if(info != NULL)
     {
-        g_value_init(return_value, GEL_TYPE_BASE_INFO);
+        g_value_init(return_value, GEL_TYPE_TYPEINFO);
         g_value_set_boxed(return_value, info);
     }
 }

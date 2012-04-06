@@ -16,7 +16,7 @@ libgel_la_SOURCES = \
 	gelvalue.c \
 	gelsymbol.c \
 	gelvariable.c \
-	gelbaseinfo.c \
+	geltypeinfo.c \
 	geltypelib.c
 
 
@@ -35,6 +35,6 @@ noinst_HEADERS = \
 	gelsymbol.h \
 	geldebug.h \
 	gelvariable.h \
-	gelbaseinfo.h \
+	geltypeinfo.h \
 	geltypelib.h
 
