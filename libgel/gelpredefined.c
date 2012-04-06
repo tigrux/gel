@@ -120,7 +120,7 @@ void define_(GClosure *self, GValue *return_value,
         g_warning("%s: Expected a symbol or array of symbols", __FUNCTION__);
     else
         if(defined)
-            g_warning("%s: Symbol '%s' already exists", __FUNCTION__, name);
+            gel_warning_symbol_exists(__FUNCTION__, name);
         else
             if(value != NULL)
             {
