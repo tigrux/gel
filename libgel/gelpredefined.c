@@ -1325,6 +1325,12 @@ void require_(GClosure *self, GValue *return_value,
             "sS", &n_values, &values, &namespace_, &version))
         return;
 
+    if(gel_context_get_variable(context, namespace_) != NULL)
+    {
+        gel_warning_symbol_exists(__FUNCTION__, namespace_);
+        return;
+    }
+
     gboolean result = FALSE;
     if(g_irepository_require(NULL, namespace_, version, 0, NULL) != NULL)
     {
