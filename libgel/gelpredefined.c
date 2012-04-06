@@ -1346,6 +1346,91 @@ void require_(GClosure *self, GValue *return_value,
 
 
 static
+void dot_(GClosure *self, GValue *return_value,
+              guint n_values, const GValue *values, GelContext *context)
+{
+    guint n_args = 2;
+    if(n_values < n_args)
+    {
+        gel_warning_needs_at_least_n_arguments(__FUNCTION__, n_args);
+        return;
+    }
+
+    GValue tmp_value = {0};
+    const GValue *value =
+        gel_context_eval_into_value(context, values + 0, &tmp_value);
+
+    values++;
+    n_values--;
+
+    const GelNamespace *ns = NULL;
+    const GelBaseInfo *info = NULL;
+
+    GType type = GEL_VALUE_TYPE(value);
+    if(type == GEL_TYPE_NAMESPACE)
+        ns = (GelNamespace*)g_value_get_boxed(value);
+    else
+    if(type == GEL_TYPE_BASE_INFO)
+        info = (GelBaseInfo*)g_value_get_boxed(value);
+    else
+        g_warning("%s: Expected namespace or base info", __FUNCTION__);
+
+    if(GEL_IS_VALUE(&tmp_value))
+        g_value_unset(&tmp_value);
+
+    if(info == NULL && ns == NULL)
+        return;
+
+    while(n_values > 0)
+    {
+        const gchar *name = NULL;
+        value = values + 0;
+        type = GEL_VALUE_TYPE(value);
+        if(type == GEL_TYPE_SYMBOL)
+        {
+            GelSymbol *symbol = (GelSymbol*)gel_value_get_boxed(value);
+            name = gel_symbol_get_name(symbol);
+        }
+        else
+        if(type == G_TYPE_STRING)
+            name = gel_value_get_string(value);
+
+        if(name == NULL)
+        {
+            g_warning("%s: Expected symbol or string", __FUNCTION__);
+            return;
+        }
+
+        if(info == NULL)
+        {
+            if(ns != NULL)
+                info = gel_namespace_lookup(ns, name);
+        }
+        else
+        if(ns == NULL)
+            info = gel_base_info_lookup(info, name);
+        else
+            info = gel_base_info_lookup(info, name);
+
+        if(info == NULL)
+        {
+            g_warning("%s: Could not resolve '%s'", __FUNCTION__, name);
+            break;
+        }
+
+        values++;
+        n_values--;    
+    }
+
+    if(info != NULL)
+    {
+        g_value_init(return_value, GEL_TYPE_BASE_INFO);
+        g_value_set_boxed(return_value, info);
+    }
+}
+
+
+static
 void object_new(GClosure *self, GValue *return_value,
                 guint n_values, const GValue *values, GelContext *context)
 {
@@ -1548,6 +1633,7 @@ GHashTable* gel_make_default_symbols(void)
 
         /* introspection */
         CLOSURE(require),
+        CLOSURE_NAME(".", dot_),
 
         /* objects */
         CLOSURE_NAME("object-new", object_new),
