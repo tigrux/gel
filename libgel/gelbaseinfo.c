@@ -1,7 +1,6 @@
 #include <gelbaseinfo.h>
 
 
-
 static
 void gel_base_info_to_string_transform(const GValue *source, GValue *dest)
 {
@@ -13,7 +12,6 @@ void gel_base_info_to_string_transform(const GValue *source, GValue *dest)
     gchar *buffer = g_strdup_printf("<GelBaseInfo %s %s>", type, name);
     g_value_take_string(dest, buffer);
 }
-
 
 
 GType gel_base_info_get_type(void)
