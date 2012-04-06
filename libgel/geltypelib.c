@@ -33,7 +33,7 @@ GType gel_typelib_get_type(void)
 
 struct _GelTypelib
 {
-    gchar *name;
+    GITypelib *typelib;
     GHashTable *infos;
     volatile gint ref_count;
 };
@@ -42,7 +42,9 @@ struct _GelTypelib
 GelTypelib* gel_typelib_new(const gchar *ns, const gchar *version)
 {
     GelTypelib *self = NULL;
-    if(g_irepository_require(NULL, ns, version, 0, NULL) != NULL)
+
+    GITypelib *typelib = g_irepository_require(NULL, ns, version, 0, NULL);
+    if(typelib != NULL)
     {
         GHashTable *infos = g_hash_table_new_full(
             g_str_hash, g_str_equal,
@@ -59,7 +61,7 @@ GelTypelib* gel_typelib_new(const gchar *ns, const gchar *version)
 
         self = g_slice_new0(GelTypelib);
         self->ref_count = 1;
-        self->name = g_strdup(ns);
+        self->typelib = typelib;
         self->infos = infos;
     }
 
@@ -82,7 +84,6 @@ void gel_typelib_unref(GelTypelib *self)
 
     if(g_atomic_int_dec_and_test(&self->ref_count))
     {
-        g_free(self->name);
         g_hash_table_unref(self->infos);
         g_slice_free(GelTypelib, self);
     }
@@ -93,7 +94,7 @@ const gchar* gel_typelib_get_name(const GelTypelib *self)
 {
     g_return_val_if_fail(self != NULL, NULL);
 
-    return self->name;
+    return g_typelib_get_namespace(self->typelib);
 }
 
 
