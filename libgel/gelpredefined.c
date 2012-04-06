@@ -5,7 +5,7 @@
 #include <gelvalueprivate.h>
 #include <gelsymbol.h>
 #include <gelclosure.h>
-#include <gelbaseinfo.h>
+#include <gelnamespace.h>
 
 
 static
@@ -1331,38 +1331,15 @@ void require_(GClosure *self, GValue *return_value,
         return;
     }
 
-    gboolean result = FALSE;
-    if(g_irepository_require(NULL, namespace_, version, 0, NULL) != NULL)
+    GelNamespace *ns = gel_namespace_new(namespace_, version);
+    if(ns != NULL)
     {
-        GHashTable *infos = g_hash_table_new_full(
-            (GHashFunc)gel_value_hash, (GEqualFunc)gel_values_eq,
-            (GDestroyNotify)gel_value_free, (GDestroyNotify)gel_value_free);
-
-        guint n = g_irepository_get_n_infos(NULL, namespace_);
-        guint i;
-        for(i = 0; i < n; i++)
-        {
-            GIBaseInfo *info = g_irepository_get_info(NULL, namespace_, i);
-            if(g_base_info_get_type(info) == GI_INFO_TYPE_OBJECT)
-                g_registered_type_info_get_g_type(info);
-
-            GValue *key = gel_value_new_of_type(G_TYPE_STRING);
-            g_value_set_string(key, g_base_info_get_name(info));
-
-            GValue *value = gel_value_new_from_boxed(
-                    GEL_TYPE_BASE_INFO, gel_base_info_new(info));
-
-            g_hash_table_insert(infos, key, value);
-        }
-
-        GValue *repository_value =
-            gel_value_new_from_boxed(G_TYPE_HASH_TABLE, infos);
-        gel_context_insert(context, namespace_, repository_value);
-        result = TRUE;
-    }
+        GValue *value = gel_value_new_from_boxed(GEL_TYPE_NAMESPACE, ns);
+        gel_context_insert(context, namespace_, value);
+    }    
 
     g_value_init(return_value, G_TYPE_BOOLEAN);
-    gel_value_set_boolean(return_value, result);
+    gel_value_set_boolean(return_value, ns != NULL);
 
     gel_value_list_free(list);
 }
