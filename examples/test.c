@@ -2,8 +2,45 @@
 #include <gel.h>
 
 
+void demo_quit(GClosure *closure, GValue *return_value,
+               guint n_param_values, GValue *param_values,
+               GelContext *invocation_context, gpointer user_data);
+
+void demo_run(void);
+
 GelContext *context;
 GValueArray *array;
+
+
+int main(int argc, char *argv[])
+{
+    gtk_init(&argc, &argv);
+
+    if(argc != 2)
+    {
+        g_printerr("%s requires an argument\n", argv[0]);
+        return 1;
+    }
+
+    array = gel_parse_file(argv[1], NULL);
+    if(array == NULL)
+    {
+        g_print("Could not parse file '%s'\n", argv[1]);
+        return 1;
+    }
+
+    context = gel_context_new();
+    gel_context_insert_function(context,
+        "quit", demo_quit, NULL);
+    gel_context_insert_object(context,
+        "label", (GObject*)gtk_label_new("Added from C"));
+
+    gtk_init_add((GtkFunction)demo_run, NULL);
+    gtk_main();
+
+    gel_context_free(context);
+    return 0;
+}
 
 
 void demo_quit(GClosure *closure, GValue *return_value,
@@ -42,36 +79,5 @@ void demo_run(void)
         }
     }
     g_value_array_free(array);
-}
-
-
-int main(int argc, char *argv[])
-{
-    gtk_init(&argc, &argv);
-
-    if(argc != 2)
-    {
-        g_printerr("%s requires an argument\n", argv[0]);
-        return 1;
-    }
-
-    array = gel_parse_file(argv[1], NULL);
-    if(array == NULL)
-    {
-        g_print("Could not parse file '%s'\n", argv[1]);
-        return 1;
-    }
-
-    context = gel_context_new();
-    gel_context_insert_function(context,
-        "quit", demo_quit, NULL);
-    gel_context_insert_object(context,
-        "label", (GObject*)gtk_label_new("Added from C"));
-
-    gtk_init_add((GtkFunction)demo_run, NULL);
-    gtk_main();
-
-    gel_context_free(context);
-    return 0;
 }
 
