@@ -100,7 +100,6 @@ GelTypeinfo* gel_typeinfo_new(GIBaseInfo *info)
     switch(g_base_info_get_type(info))
     {
         case GI_INFO_TYPE_INTERFACE:
-        {
             gel_typeinfo_insert_multiple(self,
                 g_interface_info_get_n_methods,
                 g_interface_info_get_method);
@@ -108,12 +107,9 @@ GelTypeinfo* gel_typeinfo_new(GIBaseInfo *info)
             gel_typeinfo_insert_multiple(self,
                 g_interface_info_get_n_constants,
                 g_interface_info_get_constant);
-
             break;
-        }
 
         case GI_INFO_TYPE_OBJECT:
-        {
             gel_typeinfo_insert_multiple(self,
                 g_object_info_get_n_methods,
                 g_object_info_get_method);
@@ -121,45 +117,26 @@ GelTypeinfo* gel_typeinfo_new(GIBaseInfo *info)
             gel_typeinfo_insert_multiple(self,
                 g_object_info_get_n_constants,
                 g_object_info_get_constant);
-
             break;
-        }
 
         case GI_INFO_TYPE_STRUCT:
-        {
             gel_typeinfo_insert_multiple(self,
                 g_struct_info_get_n_methods,
                 g_struct_info_get_method);
-
-            gel_typeinfo_insert_multiple(self,
-                g_struct_info_get_n_fields,
-                g_struct_info_get_field);
-
             break;
-        }
 
         case GI_INFO_TYPE_FLAGS:
         case GI_INFO_TYPE_ENUM:
-        {
             gel_typeinfo_insert_multiple(self,
                 g_enum_info_get_n_values,
                 g_enum_info_get_value);
-
             break;
-        }
 
         case GI_INFO_TYPE_UNION:
-        {
             gel_typeinfo_insert_multiple(self,
                 g_union_info_get_n_methods,
                 g_union_info_get_method);
-
-            gel_typeinfo_insert_multiple(self,
-                g_union_info_get_n_fields,
-                g_union_info_get_field);
-
             break;
-        }
 
         default:
             break;
