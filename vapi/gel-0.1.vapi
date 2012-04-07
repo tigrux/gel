@@ -4,7 +4,7 @@ namespace Gel {
     [CCode (instance_pos = -1)]
     public delegate void Function(GLib.Closure closure, out GLib.Value return_value, [CCode (array_length_pos = 2.9, array_length_type = "guint")] GLib.Value[] param_values, Gel.Context? invocation_context);
 
-    [CCode (type_id = "GEL_CONTEXT_TYPE")]
+    [CCode (type_id = "GEL_TYPE_CONTEXT")]
     [Compact]
     public class Context {
         public Context();
