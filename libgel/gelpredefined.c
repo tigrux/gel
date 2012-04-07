@@ -1363,22 +1363,31 @@ void dot_(GClosure *self, GValue *return_value,
     values++;
     n_values--;
 
-    const GelTypelib *ns = NULL;
-    const GelTypeinfo *info = NULL;
+    const GelTypelib *typelib = NULL;
+    const GelTypeinfo *typeinfo = NULL;
 
     GType type = GEL_VALUE_TYPE(value);
     if(type == GEL_TYPE_TYPELIB)
-        ns = (GelTypelib*)g_value_get_boxed(value);
+        typelib = (GelTypelib*)g_value_get_boxed(value);
     else
     if(type == GEL_TYPE_TYPEINFO)
-        info = (GelTypeinfo*)g_value_get_boxed(value);
+        typeinfo = (GelTypeinfo*)g_value_get_boxed(value);
     else
-        g_warning("%s: Expected typelib or typeinfo", __FUNCTION__);
+    if(G_TYPE_IS_OBJECT(type))
+    {
+        typeinfo = gel_typeinfo_from_gtype(type);
+        if(typeinfo == NULL)
+            g_warning("%s: %s is not a registed type",
+                __FUNCTION__, g_type_name(type));
+    }
+    else
+        g_warning("%s: Expected typelib, typeinfo or registered type",
+            __FUNCTION__);
 
     if(GEL_IS_VALUE(&tmp_value))
         g_value_unset(&tmp_value);
 
-    if(info == NULL && ns == NULL)
+    if(typeinfo == NULL && typelib == NULL)
         return;
 
     while(n_values > 0)
@@ -1386,6 +1395,7 @@ void dot_(GClosure *self, GValue *return_value,
         const gchar *name = NULL;
         value = values + 0;
         type = GEL_VALUE_TYPE(value);
+
         if(type == GEL_TYPE_SYMBOL)
         {
             GelSymbol *symbol = (GelSymbol*)gel_value_get_boxed(value);
@@ -1395,34 +1405,31 @@ void dot_(GClosure *self, GValue *return_value,
         if(type == G_TYPE_STRING)
             name = gel_value_get_string(value);
 
-        if(name == NULL)
+        if(name != NULL)
         {
-            g_warning("%s: Expected symbol or string", __FUNCTION__);
-            return;
-        }
+            if(typeinfo != NULL)
+                typeinfo = gel_typeinfo_lookup(typeinfo, name);
+            else
+            if(typelib != NULL)
+                typeinfo = gel_typelib_lookup(typelib, name);
 
-        if(info == NULL)
-        {
-            if(ns != NULL)
-                info = gel_typelib_lookup(ns, name);
+            if(typeinfo == NULL)
+            {
+                g_warning("%s: Could not resolve '%s'", __FUNCTION__, name);
+                break;
+            }
         }
         else
-            info = gel_typeinfo_lookup(info, name);
-
-        if(info == NULL)
-        {
-            g_warning("%s: Could not resolve '%s'", __FUNCTION__, name);
-            break;
-        }
+            g_warning("%s: Expected symbol or string", __FUNCTION__);
 
         values++;
         n_values--;    
     }
 
-    if(info != NULL)
+    if(typeinfo != NULL)
     {
         g_value_init(return_value, GEL_TYPE_TYPEINFO);
-        g_value_set_boxed(return_value, info);
+        g_value_set_boxed(return_value, typeinfo);
     }
 }
 
