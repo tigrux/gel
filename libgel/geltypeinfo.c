@@ -4,6 +4,7 @@
 struct _GelTypeinfo
 {
     GIBaseInfo *info;
+    GelTypeinfo *container;
     GHashTable *infos;
     volatile gint ref_count;
 };
@@ -50,10 +51,11 @@ void gel_typeinfo_insert_multiple(GelTypeinfo *self,
     guint i;
     for(i = 0; i < n; i++)
     {
-        GIBaseInfo *node_info = get_node(self->info, i);
-        g_hash_table_insert(self->infos,
-            (void*)g_base_info_get_name(node_info),
-            gel_typeinfo_new(node_info));
+        GIBaseInfo *info = get_node(self->info, i);
+        const gchar *name = g_base_info_get_name(info);
+        GelTypeinfo *node = gel_typeinfo_new(info);
+        node->container = self;
+        g_hash_table_insert(self->infos, (void* )name, node);
     }
 }
 
