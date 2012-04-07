@@ -1,6 +1,10 @@
 #include <geltypeinfo.h>
 
 
+static
+GHashTable *gel_typeinfo_gtypes = NULL;
+
+
 struct _GelTypeinfo
 {
     GIBaseInfo *info;
@@ -43,9 +47,8 @@ GType gel_typeinfo_get_type(void)
 
 static
 void gel_typeinfo_insert_multiple(GelTypeinfo *self,
-                               gint (*get_n_nodes)(GIBaseInfo *info),
-                               GIBaseInfo* (*get_node)(GIBaseInfo *info, gint n)
-)
+                              gint (*get_n_nodes)(GIBaseInfo *info),
+                              GIBaseInfo* (*get_node)(GIBaseInfo *info, gint n))
 {
     guint n = get_n_nodes(self->info);
     guint i;
@@ -60,6 +63,28 @@ void gel_typeinfo_insert_multiple(GelTypeinfo *self,
 }
 
 
+static
+void gel_typeinfo_register(GelTypeinfo *self)
+{
+    if(gel_typeinfo_gtypes == NULL)
+        gel_typeinfo_gtypes = g_hash_table_new(g_direct_hash, g_direct_equal);
+    GType type = g_registered_type_info_get_g_type(self->info);
+    g_hash_table_insert(gel_typeinfo_gtypes, GINT_TO_POINTER(type), self);
+}
+
+
+GelTypeinfo* gel_typeinfo_from_gtype(GType type)
+{
+    GelTypeinfo *info = NULL;
+    if(gel_typeinfo_gtypes != NULL)
+    {
+        info = (GelTypeinfo *)g_hash_table_lookup(
+                    gel_typeinfo_gtypes, GINT_TO_POINTER(type));
+    }
+    return info;
+}
+
+
 GelTypeinfo* gel_typeinfo_new(GIBaseInfo *info)
 {
     GelTypeinfo *self = g_slice_new0(GelTypeinfo);
@@ -69,12 +94,13 @@ GelTypeinfo* gel_typeinfo_new(GIBaseInfo *info)
         g_str_hash, g_str_equal,
         NULL, (GDestroyNotify)gel_typeinfo_unref);
 
+    if(GI_IS_REGISTERED_TYPE_INFO(info))
+        gel_typeinfo_register(self);
+
     switch(g_base_info_get_type(info))
     {
         case GI_INFO_TYPE_INTERFACE:
         {
-            g_registered_type_info_get_g_type(info);
-
             gel_typeinfo_insert_multiple(self,
                 g_interface_info_get_n_methods,
                 g_interface_info_get_method);
@@ -88,8 +114,6 @@ GelTypeinfo* gel_typeinfo_new(GIBaseInfo *info)
 
         case GI_INFO_TYPE_OBJECT:
         {
-            g_registered_type_info_get_g_type(info);
-
             gel_typeinfo_insert_multiple(self,
                 g_object_info_get_n_methods,
                 g_object_info_get_method);
@@ -103,8 +127,6 @@ GelTypeinfo* gel_typeinfo_new(GIBaseInfo *info)
 
         case GI_INFO_TYPE_STRUCT:
         {
-            g_registered_type_info_get_g_type(info);
-
             gel_typeinfo_insert_multiple(self,
                 g_struct_info_get_n_methods,
                 g_struct_info_get_method);
@@ -119,8 +141,6 @@ GelTypeinfo* gel_typeinfo_new(GIBaseInfo *info)
         case GI_INFO_TYPE_FLAGS:
         case GI_INFO_TYPE_ENUM:
         {
-            g_registered_type_info_get_g_type(info);
-
             gel_typeinfo_insert_multiple(self,
                 g_enum_info_get_n_values,
                 g_enum_info_get_value);
@@ -130,8 +150,6 @@ GelTypeinfo* gel_typeinfo_new(GIBaseInfo *info)
 
         case GI_INFO_TYPE_UNION:
         {
-            g_registered_type_info_get_g_type(info);
-
             gel_typeinfo_insert_multiple(self,
                 g_union_info_get_n_methods,
                 g_union_info_get_method);
