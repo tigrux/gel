@@ -207,14 +207,15 @@ const GValue* gel_context_eval_param_into_value(GelContext *self,
 {
     const GValue *result_value =
         gel_context_eval_into_value(self, value, out_value);
-    if(GEL_VALUE_HOLDS(result_value, GEL_TYPE_SYMBOL))
+    if(GEL_VALUE_HOLDS(result_value, GEL_TYPE_VARIABLE))
     {
-        const GelSymbol *symbol = (GelSymbol*)g_value_get_boxed(result_value);
-        if(symbol != NULL)
+        const GelVariable *variable =
+            (GelVariable *)g_value_get_boxed(result_value);
+        if(variable != NULL)
         {
-            const GValue *symbol_value = gel_symbol_get_value(symbol);
-            if(symbol_value != NULL)
-                result_value = symbol_value;
+            const GValue *value = gel_variable_get_value(variable);
+            if(value != NULL)
+                result_value = value;
         }
     }
     return result_value;

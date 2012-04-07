@@ -306,10 +306,8 @@ void get_(GClosure *self, GValue *return_value,
         GelVariable *variable = gel_context_lookup_variable(context, name);
         if(variable != NULL)
         {
-            GelSymbol *symbol =
-                gel_symbol_new(name, gel_variable_ref(variable));
-            g_value_init(return_value, GEL_TYPE_SYMBOL);
-            g_value_take_boxed(return_value, symbol);
+            g_value_init(return_value, GEL_TYPE_VARIABLE);
+            g_value_set_boxed(return_value, variable);
         }
     }
     gel_value_list_free(list);
