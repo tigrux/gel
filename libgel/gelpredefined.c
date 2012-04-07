@@ -1433,8 +1433,8 @@ void dot_(GClosure *self, GValue *return_value,
 
 
 static
-void object_new(GClosure *self, GValue *return_value,
-                guint n_values, const GValue *values, GelContext *context)
+void object_new_(GClosure *self, GValue *return_value,
+                 guint n_values, const GValue *values, GelContext *context)
 {
     const gchar *type_name = NULL;
     GList *list = NULL;
@@ -1464,8 +1464,8 @@ void object_new(GClosure *self, GValue *return_value,
 
 
 static
-void object_get(GClosure *self, GValue *return_value,
-                guint n_values, const GValue *values, GelContext *context)
+void object_get_(GClosure *self, GValue *return_value,
+                 guint n_values, const GValue *values, GelContext *context)
 {
     GObject *object = NULL;
     const gchar *prop_name = NULL;
@@ -1493,8 +1493,8 @@ void object_get(GClosure *self, GValue *return_value,
 
 
 static
-void object_set(GClosure *self, GValue *return_value,
-                guint n_values, const GValue *values, GelContext *context)
+void object_set_(GClosure *self, GValue *return_value,
+                 guint n_values, const GValue *values, GelContext *context)
 {
     GObject *object = NULL;
     gchar *prop_name = NULL;
@@ -1532,8 +1532,8 @@ void object_set(GClosure *self, GValue *return_value,
 
 
 static
-void object_connect(GClosure *self, GValue *return_value,
-                    guint n_values, const GValue *values, GelContext *context)
+void object_connect_(GClosure *self, GValue *return_value,
+                     guint n_values, const GValue *values, GelContext *context)
 {
     GObject *object = NULL;
     gchar *signal = NULL;
@@ -1558,7 +1558,7 @@ void object_connect(GClosure *self, GValue *return_value,
 }
 
 
-#define CLOSURE_NAME(N, S) {N, (GClosureMarshal)S}
+#define CLOSURE_NAME(N, S) {N, (GClosureMarshal)S##_}
 #define CLOSURE(S) {#S, (GClosureMarshal)S##_}
 
 
@@ -1576,8 +1576,8 @@ GHashTable* gel_make_default_symbols(void)
         CLOSURE(begin),
 
         /* imperative */
-        CLOSURE_NAME("set!", set_),
-        CLOSURE_NAME("get&", get_),
+        CLOSURE_NAME("set!", set),
+        CLOSURE_NAME("get&", get),
 
         /* conditional */
         CLOSURE(if),
@@ -1593,29 +1593,29 @@ GHashTable* gel_make_default_symbols(void)
         CLOSURE(print),
 
         /* arithmetic */
-        CLOSURE_NAME("+", add_),
-        CLOSURE_NAME("-", sub_),
-        CLOSURE_NAME("*", mul_),
-        CLOSURE_NAME("/", div_),
-        CLOSURE_NAME("%", mod_),
+        CLOSURE_NAME("+", add),
+        CLOSURE_NAME("-", sub),
+        CLOSURE_NAME("*", mul),
+        CLOSURE_NAME("/", div),
+        CLOSURE_NAME("%", mod),
 
         /* logic */
         CLOSURE(and),
         CLOSURE(or),
-        CLOSURE_NAME(">", gt_),
-        CLOSURE_NAME(">=", ge_),
-        CLOSURE_NAME("=", eq_),
-        CLOSURE_NAME("<", lt_),
-        CLOSURE_NAME("<=", le_),
-        CLOSURE_NAME("!=", ne_),
+        CLOSURE_NAME(">", gt),
+        CLOSURE_NAME(">=", ge),
+        CLOSURE_NAME("=", eq),
+        CLOSURE_NAME("<", lt),
+        CLOSURE_NAME("<=", le),
+        CLOSURE_NAME("!=", ne),
 
         /* array */
         CLOSURE(array),
-        CLOSURE_NAME("array-append!", array_append_),
-        CLOSURE_NAME("array-get", array_get_),
-        CLOSURE_NAME("array-set!", array_set_),
-        CLOSURE_NAME("array-remove!", array_remove_),
-        CLOSURE_NAME("array-size", array_size_),
+        CLOSURE_NAME("array-append!", array_append),
+        CLOSURE_NAME("array-get", array_get),
+        CLOSURE_NAME("array-set!", array_set),
+        CLOSURE_NAME("array-remove!", array_remove),
+        CLOSURE_NAME("array-size", array_size),
 
         /* array management */
         CLOSURE(range),
@@ -1627,15 +1627,15 @@ GHashTable* gel_make_default_symbols(void)
 
         /* hash */
         CLOSURE(hash),
-        CLOSURE_NAME("hash-get", hash_get_),
-        CLOSURE_NAME("hash-set!", hash_set_),
-        CLOSURE_NAME("hash-remove!", hash_remove_),
-        CLOSURE_NAME("hash-size", hash_size_),
-        CLOSURE_NAME("hash-keys", hash_keys_),
+        CLOSURE_NAME("hash-get", hash_get),
+        CLOSURE_NAME("hash-set!", hash_set),
+        CLOSURE_NAME("hash-remove!", hash_remove),
+        CLOSURE_NAME("hash-size", hash_size),
+        CLOSURE_NAME("hash-keys", hash_keys),
 
         /* introspection */
         CLOSURE(require),
-        CLOSURE_NAME(".", dot_),
+        CLOSURE_NAME(".", dot),
 
         /* objects */
         CLOSURE_NAME("object-new", object_new),
