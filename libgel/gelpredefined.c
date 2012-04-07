@@ -17,7 +17,7 @@ GClosure* new_closure(GelContext *context, const gchar *name,
     gchar *invalid_arg_name = NULL;
 
     guint i;
-    for(i = 0; i < n_vars; i++)
+    for(i = 0; i < n_vars && invalid_arg_name != NULL; i++)
     {
         const GValue *value = var_values + i;
         if(GEL_VALUE_HOLDS(value, GEL_TYPE_SYMBOL))
@@ -26,10 +26,7 @@ GClosure* new_closure(GelContext *context, const gchar *name,
             vars[i] = g_strdup(gel_symbol_get_name(symbol));
         }
         else
-        {
             invalid_arg_name = gel_value_to_string(value);
-            break;
-        }
     }
 
     GClosure *self;
@@ -75,7 +72,6 @@ void define_(GClosure *self, GValue *return_value,
     GClosure *closure = NULL;
 
     GType type = GEL_VALUE_TYPE(values + 0);
-
     if(type == GEL_TYPE_SYMBOL)
     {
         GValue *r_value = NULL;
@@ -119,15 +115,15 @@ void define_(GClosure *self, GValue *return_value,
     if(type == G_TYPE_INVALID)
         g_warning("%s: Expected a symbol or array of symbols", __FUNCTION__);
     else
-        if(defined)
-            gel_warning_symbol_exists(__FUNCTION__, name);
-        else
-            if(value != NULL)
-            {
-                gel_context_insert(context, name, value);
-                if(closure != NULL)
-                    gel_closure_bind(closure);
-            }
+    if(defined)
+        gel_warning_symbol_exists(__FUNCTION__, name);
+    else
+    if(value != NULL)
+    {
+        gel_context_insert(context, name, value);
+        if(closure != NULL)
+            gel_closure_bind(closure);
+    }
 
     gel_value_list_free(list);
 }
@@ -404,7 +400,7 @@ void cond_(GClosure *self, GValue *return_value,
 
 static
 void case_(GClosure *self, GValue *return_value,
-            guint n_values, const GValue *values, GelContext *context)
+           guint n_values, const GValue *values, GelContext *context)
 {
 
     guint n_args = 2;
@@ -496,6 +492,7 @@ void while_(GClosure *self, GValue *return_value,
         GValue tmp_value = {0};
         const GValue *cond_value =
             gel_context_eval_into_value(context, values + 0, &tmp_value);
+
         if(gel_value_to_boolean(cond_value))
         {
             run = TRUE;
@@ -507,6 +504,7 @@ void while_(GClosure *self, GValue *return_value,
             if(run == FALSE)
                 gel_value_copy(cond_value, return_value);
         }
+
         if(GEL_IS_VALUE(&tmp_value))
             g_value_unset(&tmp_value);
     }
