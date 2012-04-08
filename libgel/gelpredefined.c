@@ -1355,30 +1355,30 @@ void dot_(GClosure *self, GValue *return_value,
     n_values--;
 
     const GelTypelib *typelib = NULL;
-    const GelTypeinfo *typeinfo = NULL;
+    const GelTypeInfo *type_info = NULL;
 
     GType type = GEL_VALUE_TYPE(value);
     if(type == GEL_TYPE_TYPELIB)
         typelib = (GelTypelib*)g_value_get_boxed(value);
     else
     if(type == GEL_TYPE_TYPEINFO)
-        typeinfo = (GelTypeinfo*)g_value_get_boxed(value);
+        type_info = (GelTypeInfo*)g_value_get_boxed(value);
     else
     if(G_TYPE_IS_OBJECT(type))
     {
-        typeinfo = gel_typeinfo_from_gtype(type);
-        if(typeinfo == NULL)
+        type_info = gel_type_info_from_gtype(type);
+        if(type_info == NULL)
             g_warning("%s: %s is not a registed type",
                 __FUNCTION__, g_type_name(type));
     }
     else
-        g_warning("%s: Expected typelib, typeinfo or registered type",
+        g_warning("%s: Expected typelib, type info or registered type",
             __FUNCTION__);
 
     if(GEL_IS_VALUE(&tmp_value))
         g_value_unset(&tmp_value);
 
-    if(typeinfo == NULL && typelib == NULL)
+    if(type_info == NULL && typelib == NULL)
         return;
 
     while(n_values > 0)
@@ -1398,13 +1398,13 @@ void dot_(GClosure *self, GValue *return_value,
 
         if(name != NULL)
         {
-            if(typeinfo != NULL)
-                typeinfo = gel_typeinfo_lookup(typeinfo, name);
+            if(type_info != NULL)
+                type_info = gel_type_info_lookup(type_info, name);
             else
             if(typelib != NULL)
-                typeinfo = gel_typelib_lookup(typelib, name);
+                type_info = gel_typelib_lookup(typelib, name);
 
-            if(typeinfo == NULL)
+            if(type_info == NULL)
             {
                 g_warning("%s: Could not resolve '%s'", __FUNCTION__, name);
                 break;
@@ -1417,10 +1417,10 @@ void dot_(GClosure *self, GValue *return_value,
         n_values--;    
     }
 
-    if(typeinfo != NULL)
+    if(type_info != NULL)
     {
         g_value_init(return_value, GEL_TYPE_TYPEINFO);
-        g_value_set_boxed(return_value, typeinfo);
+        g_value_set_boxed(return_value, type_info);
     }
 }
 

@@ -48,7 +48,7 @@ GelTypelib* gel_typelib_new(const gchar *ns, const gchar *version)
     {
         GHashTable *infos = g_hash_table_new_full(
             g_str_hash, g_str_equal,
-            NULL, (GDestroyNotify)gel_typeinfo_unref);
+            NULL, (GDestroyNotify)gel_type_info_unref);
 
         guint n = g_irepository_get_n_infos(NULL, ns);
         guint i;
@@ -56,7 +56,7 @@ GelTypelib* gel_typelib_new(const gchar *ns, const gchar *version)
         {
             GIBaseInfo *info = g_irepository_get_info(NULL, ns, i);
             g_hash_table_insert(infos,
-                (void*)g_base_info_get_name(info), gel_typeinfo_new(info));
+                (void*)g_base_info_get_name(info), gel_type_info_new(info));
         }
 
         self = g_slice_new0(GelTypelib);
@@ -98,11 +98,11 @@ const gchar* gel_typelib_get_name(const GelTypelib *self)
 }
 
 
-const GelTypeinfo* gel_typelib_lookup(const GelTypelib *self,
+const GelTypeInfo* gel_typelib_lookup(const GelTypelib *self,
                                       const gchar *name)
 {
     g_return_val_if_fail(self != NULL, NULL);
 
-    return (GelTypeinfo *)g_hash_table_lookup(self->infos, name);
+    return (GelTypeInfo *)g_hash_table_lookup(self->infos, name);
 }
 
