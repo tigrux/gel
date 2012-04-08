@@ -1202,9 +1202,10 @@ void hash_(GClosure *self, GValue *return_value,
     {
         GValue *key = NULL;
         GValue *value = NULL;
-        gel_context_eval_params(context, __FUNCTION__, &list,
-                "(VV)*", &n_values, &values, &key, &value);
-        g_hash_table_insert(hash, gel_value_dup(key), gel_value_dup(value));
+        if(gel_context_eval_params(context, __FUNCTION__, &list,
+                "(VV)*", &n_values, &values, &key, &value))
+            g_hash_table_insert(hash,
+                gel_value_dup(key), gel_value_dup(value));
     }
 
     g_value_init(return_value, G_TYPE_HASH_TABLE);
