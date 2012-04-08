@@ -18,11 +18,38 @@ static
 void gel_typeinfo_to_string_transform(const GValue *source, GValue *dest)
 {
     GelTypeinfo *info = (GelTypeinfo *)g_value_get_boxed(source);
+    GIBaseInfo *base_info = info->info;
 
-    const gchar *type = g_info_type_to_string(g_base_info_get_type(info->info));
-    const gchar *name = g_base_info_get_name(info->info);
-    gchar *buffer = g_strdup_printf("<GelTypeinfo %s %s>", type, name);
-    g_value_take_string(dest, buffer);
+    const gchar *info_namespace = g_base_info_get_namespace(base_info);
+    const gchar *type = g_info_type_to_string(g_base_info_get_type(base_info));
+
+    guint n_names = 1;
+    GList *name_list = NULL;
+    while(info != NULL)
+    {
+        const gchar *name = g_base_info_get_name(info->info);
+        name_list = g_list_prepend(name_list, (void *)name);
+        info = info->container;
+        n_names++;
+    }
+    name_list = g_list_prepend(name_list, (void *)info_namespace);
+
+    gchar **name_array = g_new0(gchar*, n_names+1);
+    GList *name_iter = name_list;
+    guint i = 0;
+    while(i < n_names)
+    {
+        name_array[i] = (gchar*)(name_iter->data);
+        name_iter = g_list_next(name_iter);
+        i++;
+    }
+    g_list_free(name_list);
+    gchar *name = g_strjoinv(".", name_array);
+    g_free(name_array);
+
+    g_value_take_string(dest,
+        g_strdup_printf("<GelTypeinfo %s %s>", type, name));
+    g_free(name);
 }
 
 
