@@ -55,7 +55,7 @@ gboolean gel_context_eval_param(GelContext *self, const gchar *func,
             value = gel_value_new();
             result_value =
                 gel_context_eval_param_into_value(self, *values, value);
-            if(GEL_IS_VALUE(result_value))
+            if(!G_VALUE_HOLDS(result_value, GEL_TYPE_SYMBOL))
             {
                 const GValue **v = va_arg(args, const GValue **);
                 *v = result_value;
