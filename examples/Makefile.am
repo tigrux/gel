@@ -5,6 +5,6 @@ test_CFLAGS = $(GTK_CFLAGS) $(GI_CFLAGS) -I$(top_srcdir)/libgel
 test_LDFLAGS = $(GTK_LIBS) $(GI_LIBS)
 test_LDADD = $(top_srcdir)/libgel/libgel.la
 
-gel_SOURCES = test.c
+test_SOURCES = test.c
 
 EXTRA_DIST = test.vala test.gel test2.gel test3.gel test4.gel test5.gel
