@@ -5,8 +5,8 @@
 #include <geltypeinfo.h>
 
 typedef struct _GelTypelib GelTypelib;
-
 GType gel_typelib_get_type(void) G_GNUC_CONST;
+
 GelTypelib* gel_typelib_new(const gchar *ns, const gchar *version);
 GelTypelib* gel_typelib_ref(GelTypelib *self);
 void gel_typelib_unref(GelTypelib *self);

@@ -203,7 +203,8 @@ gboolean gel_context_eval(GelContext *self, const GValue *value, GValue *dest)
 
 
 const GValue* gel_context_eval_param_into_value(GelContext *self,
-                                     const GValue *value, GValue *out_value)
+                                                const GValue *value,
+                                                GValue *out_value)
 {
     const GValue *result_value =
         gel_context_eval_into_value(self, value, out_value);
@@ -236,7 +237,8 @@ const GValue* gel_context_eval_param_into_value(GelContext *self,
  * Returns: A #GValue with the result
  */
 const GValue* gel_context_eval_into_value(GelContext *self,
-                                     const GValue *value, GValue *out_value)
+                                          const GValue *value,
+                                          GValue *out_value)
 {
     g_return_val_if_fail(self != NULL, NULL);
     g_return_val_if_fail(value != NULL, NULL);
@@ -312,7 +314,7 @@ GList* gel_context_get_variables(const GelContext *self)
 
 
 GelVariable* gel_context_get_variable(const GelContext *self,
-                                            const gchar *name)
+                                      const gchar *name)
 {
     return g_hash_table_lookup(self->variables, name);
 }

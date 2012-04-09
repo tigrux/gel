@@ -20,49 +20,49 @@ struct _GelTypeInfo
 static
 const gchar* g_info_type_to_string (GIInfoType type)
 {
-  switch (type)
+    switch (type)
     {
-    case GI_INFO_TYPE_INVALID:
-      return "invalid";
-    case GI_INFO_TYPE_FUNCTION:
-      return "function";
-    case GI_INFO_TYPE_CALLBACK:
-      return "callback";
-    case GI_INFO_TYPE_STRUCT:
-      return "struct";
-    case GI_INFO_TYPE_BOXED:
-      return "boxed";
-    case GI_INFO_TYPE_ENUM:
-      return "enum";
-    case GI_INFO_TYPE_FLAGS:
-      return "flags";
-    case GI_INFO_TYPE_OBJECT:
-      return "object";
-    case GI_INFO_TYPE_INTERFACE:
-      return "interface";
-    case GI_INFO_TYPE_CONSTANT:
-      return "constant";
-    case GI_INFO_TYPE_UNION:
-      return "union";
-    case GI_INFO_TYPE_VALUE:
-      return "value";
-    case GI_INFO_TYPE_SIGNAL:
-      return "signal";
-    case GI_INFO_TYPE_VFUNC:
-      return "vfunc";
-    case GI_INFO_TYPE_PROPERTY:
-      return "property";
-    case GI_INFO_TYPE_FIELD:
-      return "field";
-    case GI_INFO_TYPE_ARG:
-      return "arg";
-    case GI_INFO_TYPE_TYPE:
-      return "type";
-    case GI_INFO_TYPE_UNRESOLVED:
-      return "unresolved";
-    default:
-      return "unknown";
-  }
+        case GI_INFO_TYPE_INVALID:
+            return "invalid";
+        case GI_INFO_TYPE_FUNCTION:
+            return "function";
+        case GI_INFO_TYPE_CALLBACK:
+            return "callback";
+        case GI_INFO_TYPE_STRUCT:
+            return "struct";
+        case GI_INFO_TYPE_BOXED:
+            return "boxed";
+        case GI_INFO_TYPE_ENUM:
+            return "enum";
+        case GI_INFO_TYPE_FLAGS:
+            return "flags";
+        case GI_INFO_TYPE_OBJECT:
+            return "object";
+        case GI_INFO_TYPE_INTERFACE:
+            return "interface";
+        case GI_INFO_TYPE_CONSTANT:
+            return "constant";
+        case GI_INFO_TYPE_UNION:
+            return "union";
+        case GI_INFO_TYPE_VALUE:
+            return "value";
+        case GI_INFO_TYPE_SIGNAL:
+            return "signal";
+        case GI_INFO_TYPE_VFUNC:
+            return "vfunc";
+        case GI_INFO_TYPE_PROPERTY:
+            return "property";
+        case GI_INFO_TYPE_FIELD:
+            return "field";
+        case GI_INFO_TYPE_ARG:
+            return "arg";
+        case GI_INFO_TYPE_TYPE:
+            return "type";
+        case GI_INFO_TYPE_UNRESOLVED:
+            return "unresolved";
+        default:
+            return "unknown";
+    }
 }
 
 #endif
@@ -128,8 +128,9 @@ GType gel_type_info_get_type(void)
 
 static
 void gel_type_info_insert_multiple(GelTypeInfo *self,
-                              gint (*get_n_nodes)(GIBaseInfo *info),
-                              GIBaseInfo* (*get_node)(GIBaseInfo *info, gint n))
+                                   gint (*get_n_nodes)(GIBaseInfo *info),
+                                   GIBaseInfo* (*get_node)(GIBaseInfo *info,
+                                                           gint n))
 {
     guint n = get_n_nodes(self->info);
     guint i;
@@ -258,7 +259,7 @@ const gchar* gel_type_info_get_name(const GelTypeInfo *self)
 
 
 const GelTypeInfo* gel_type_info_lookup(const GelTypeInfo *self,
-                                       const gchar *name)
+                                        const gchar *name)
 {
     g_return_val_if_fail(self != NULL, NULL);
 

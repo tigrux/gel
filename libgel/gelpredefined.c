@@ -157,7 +157,7 @@ void lambda_(GClosure *self, GValue *return_value,
 
 static
 void let_(GClosure *self, GValue *return_value,
-            guint n_values, const GValue *values, GelContext *context)
+          guint n_values, const GValue *values, GelContext *context)
 {
     guint n_args = 2;
     if(n_values < n_args)

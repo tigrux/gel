@@ -5,7 +5,6 @@
 #include <gelvariable.h>
 
 typedef struct _GelSymbol GelSymbol;
-
 GType gel_symbol_get_type(void) G_GNUC_CONST;
 
 GelSymbol* gel_symbol_new(const gchar *name, GelVariable *variable);

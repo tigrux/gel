@@ -4,6 +4,7 @@
 #include <glib-object.h>
 
 typedef struct _GelContext GelContext;
+GType gel_context_get_type(void) G_GNUC_CONST;
 
 /**
  * GelFunction:
@@ -26,7 +27,6 @@ GelContext* gel_context_new(void);
 GelContext* gel_context_new_with_outer(GelContext *outer);
 GelContext* gel_context_dup(const GelContext *self);
 void gel_context_free(GelContext *self);
-GType gel_context_get_type(void) G_GNUC_CONST;
 
 GValue* gel_context_lookup(const GelContext *self, const gchar *name);
 GelContext* gel_context_get_outer(const GelContext *self);
@@ -42,7 +42,8 @@ gboolean gel_context_remove(GelContext *self, const gchar *name);
 gboolean gel_context_eval(GelContext *self,
                           const GValue *value, GValue *dest);
 const GValue* gel_context_eval_into_value(GelContext *self,
-                                     const GValue *value, GValue *out_value);
+                                          const GValue *value,
+                                          GValue *out_value);
 gboolean gel_context_eval_params(GelContext *self, const gchar *func,
                                  GList **list, const gchar *format,
                                  guint *n_values, const GValue **values, ...);
