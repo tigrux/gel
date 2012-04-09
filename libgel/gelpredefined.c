@@ -1368,8 +1368,7 @@ void dot_(GClosure *self, GValue *return_value,
     {
         type_info = gel_type_info_from_gtype(type);
         if(type_info == NULL)
-            g_warning("%s: %s is not a registed type",
-                __FUNCTION__, g_type_name(type));
+            gel_warning_type_name_invalid(__FUNCTION__, g_type_name(type));
     }
     else
         g_warning("%s: Expected typelib, type info or registered type",
