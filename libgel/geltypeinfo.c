@@ -189,6 +189,10 @@ GelTypeInfo* gel_type_info_new(GIBaseInfo *info)
             gel_type_info_insert_multiple(self,
                 g_interface_info_get_n_constants,
                 g_interface_info_get_constant);
+
+            gel_type_info_insert_multiple(self,
+                g_interface_info_get_n_properties,
+                g_interface_info_get_property);
             break;
 
         case GI_INFO_TYPE_OBJECT:
@@ -199,6 +203,10 @@ GelTypeInfo* gel_type_info_new(GIBaseInfo *info)
             gel_type_info_insert_multiple(self,
                 g_object_info_get_n_constants,
                 g_object_info_get_constant);
+
+            gel_type_info_insert_multiple(self,
+                g_object_info_get_n_properties,
+                g_object_info_get_property);
             break;
 
         case GI_INFO_TYPE_STRUCT:
