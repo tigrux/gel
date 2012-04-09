@@ -81,10 +81,11 @@ void define_(GClosure *self, GValue *return_value,
         if(gel_context_eval_params(context, __FUNCTION__, &list,
                 "sV", &n_values, &values, &name, &r_value))
         {
-            if(gel_context_get_variable(context, name) == NULL)
-                value = gel_value_dup(r_value);
-            else
+            if(gel_context_get_variable(context, name) != NULL)
                 defined = TRUE;
+            else
+            if(GEL_IS_VALUE(r_value))
+                value = gel_value_dup(r_value); 
         }
     }
     else
@@ -100,16 +101,16 @@ void define_(GClosure *self, GValue *return_value,
                     "s*", &array_n_values, &array_values, &name))
                 type = G_TYPE_INVALID;
             else
-            if(gel_context_lookup(context, name) == NULL)
+            if(gel_context_lookup(context, name) != NULL)
+                defined = FALSE;
+            else
             {
                 closure = new_closure(context, name,
-                        array_n_values, array_values, n_values, values);
+                                array_n_values, array_values, n_values, values);
                 if(closure != NULL)
                     value =
                         gel_value_new_from_boxed(G_TYPE_CLOSURE, closure);
             }
-            else
-                defined = FALSE;
         }
         else
             type = G_TYPE_INVALID;
