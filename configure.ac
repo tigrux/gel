@@ -33,5 +33,10 @@ AC_CONFIG_FILES([
 	docs/reference/gel/Makefile
 	])
 
+AC_SEARCH_LIBS(g_info_type_to_string,
+    girepository-1.0,
+    AC_DEFINE(HAVE_G_INFO_TYPE_TO_STRING, 1, "Define to 1 if you have g_info_type_to_string")
+)
+
 AC_OUTPUT
 
