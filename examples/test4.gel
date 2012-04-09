@@ -29,13 +29,13 @@
     )
 
     (lambda ()
-        (define calculating #t)
+        (define calculating true)
         (while calculating
             (if (none-prime can-divide-candidate)
                 (begin
                     (array-append! primes candidate)
                     (define calculated-prime candidate)
-                    (set! calculating #f)
+                    (set! calculating false)
                 )
             )
             (set! candidate (+ candidate 1))

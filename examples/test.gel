@@ -4,14 +4,14 @@
 (object-set window "title" "Hello world")
 (object-set window "default-width" 320)
 (object-set window "default-height" 120)
-; the function 'quit' was added in the code of the example interpreter
+# the function 'quit' was added in the code of the example interpreter
 (object-connect window "hide" quit)
 
 (define box (object-new "GtkVBox"))
 (object-set window "child" box)
 (object-set box "border-width" 12)
 
-; the symbol 'label' was added in the code of the example interpreter
+# the symbol 'label' was added in the code of the example interpreter
 (object-set box "child" label)
 
 (define button (object-new "GtkButton"))
@@ -32,9 +32,9 @@
     )
 )
 
-(object-set label "visible" #t)
-(object-set button "visible" #t)
-(object-set entry "visible" #t)
-(object-set box "visible" #t)
-(object-set window "visible" #t)
+(object-set label "visible" true)
+(object-set button "visible" true)
+(object-set entry "visible" true)
+(object-set box "visible" true)
+(object-set window "visible" true)
 
