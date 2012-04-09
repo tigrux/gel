@@ -33,7 +33,7 @@ GType gel_typelib_get_type(void)
 
 struct _GelTypelib
 {
-    GITypelib *typelib;
+    GTypelib *typelib;
     GHashTable *infos;
     volatile gint ref_count;
 };
@@ -43,7 +43,7 @@ GelTypelib* gel_typelib_new(const gchar *ns, const gchar *version)
 {
     GelTypelib *self = NULL;
 
-    GITypelib *typelib = g_irepository_require(NULL, ns, version, 0, NULL);
+    GTypelib *typelib = g_irepository_require(NULL, ns, version, 0, NULL);
     if(typelib != NULL)
     {
         GHashTable *infos = g_hash_table_new_full(
