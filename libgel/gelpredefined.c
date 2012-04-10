@@ -1559,7 +1559,7 @@ GHashTable* gel_make_default_symbols(void)
     {
         /* binding */
         CLOSURE(define),
-        CLOSURE(lambda),
+        CLOSURE_NAME("=>", lambda),
         CLOSURE(let),
 
         /* block */

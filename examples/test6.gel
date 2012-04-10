@@ -23,7 +23,7 @@
 
 (define (hash-values h)
     (map
-        (lambda (k)
+        (=> (k)
             (hash-get h k)
         )
         (hash-keys h)

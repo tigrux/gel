@@ -28,7 +28,7 @@
         (= (% candidate i) 0)
     )
 
-    (lambda ()
+    (=> ()
         (define calculating TRUE)
         (while calculating
             (if (none-prime can-divide-candidate)

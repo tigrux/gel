@@ -32,7 +32,7 @@
 
 
 (define (multiply-by factor)
-    (lambda (n) (* n factor) )
+    (=> (n) (* n factor) )
 )
 
 (define A (range 1 4))

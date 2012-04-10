@@ -4,7 +4,7 @@
 )
 
 (define (index ls value)
-    (find ls (lambda (i) (= i value)))
+    (find ls (=> (i) (= i value)))
 )
 
 (define (primes-lesser-than top)
