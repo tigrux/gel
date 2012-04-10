@@ -1,16 +1,16 @@
 
-(define (none-of ls predicate)
+(def (none-of ls predicate)
     (= (find ls predicate) -1)
 )
 
-(define (index ls value)
+(def (index ls value)
     (find ls (=> (i) (= i value)))
 )
 
-(define (primes-lesser-than top)
-    (define primes (array 2))
-    (define n 3)
-    (define (can-divide-n i)
+(def (primes-lesser-than top)
+    (def primes (array 2))
+    (def n 3)
+    (def (can-divide-n i)
         (= (% n i) 0)
     )
     (while (< n top)
@@ -22,7 +22,7 @@
     primes
 )
 
-(define primes (primes-lesser-than 100))
+(def primes (primes-lesser-than 100))
 
 (for iter primes
     (print "Primes(" (index primes iter) ") = " iter)
@@ -33,18 +33,18 @@
 (print "The last prime is " (array-get primes -1))
 
 
-(define (factorial n)
+(def (factorial n)
     (if (<= n 0)
         1
         (* n (factorial (- n 1)))
     )
 )
 
-(define n 10)
+(def n 10)
 (print "Factorial of " n " is " (factorial n))
 (print n " is " (if (= (% n 2) 0) "even" "odd"))
 
-(define (fibonacci n)
+(def (fibonacci n)
     (cond
         ((= n 0)
             0

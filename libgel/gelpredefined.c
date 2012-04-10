@@ -58,7 +58,7 @@ GClosure* new_closure(GelContext *context, const gchar *name,
 
 
 static
-void define_(GClosure *self, GValue *return_value,
+void def_(GClosure *self, GValue *return_value,
              guint n_values, const GValue *values, GelContext *context)
 {
     guint n_args = 2;
@@ -1558,7 +1558,7 @@ GHashTable* gel_make_default_symbols(void)
     struct {const gchar *name; GClosureMarshal marshal;} *c, closures[] =
     {
         /* binding */
-        CLOSURE(define),
+        CLOSURE(def),
         CLOSURE_NAME("=>", lambda),
         CLOSURE(let),
 

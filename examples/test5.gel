@@ -1,7 +1,7 @@
 
-(define colors (array "red" "green" "blue"))
+(def colors (array "red" "green" "blue"))
 
-(define (palette)
+(def (palette)
     (get& colors)
 )
 
@@ -11,10 +11,10 @@
 (array-set! (palette) 3 "black")
 (print colors)
 
-(define message "hello")
+(def message "hello")
 
-(define (salutation)
-    (define message "hallo")
+(def (salutation)
+    (def message "hallo")
     (print message)
 )
 
