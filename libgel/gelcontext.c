@@ -21,6 +21,14 @@
  */
 
 
+struct _GelContext
+{
+    GHashTable *variables;
+    GelContext *outer;
+    gboolean running;
+};
+
+
 GType gel_context_get_type(void)
 {
     static volatile gsize once = 0;
@@ -34,14 +42,6 @@ GType gel_context_get_type(void)
     }
     return type;
 }
-
-
-struct _GelContext
-{
-    GHashTable *variables;
-    GelContext *outer;
-    gboolean running;
-};
 
 
 #if GEL_CONTEXT_USE_POOL

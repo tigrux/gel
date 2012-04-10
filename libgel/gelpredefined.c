@@ -59,7 +59,7 @@ GClosure* new_closure(GelContext *context, const gchar *name,
 
 static
 void def_(GClosure *self, GValue *return_value,
-             guint n_values, const GValue *values, GelContext *context)
+          guint n_values, const GValue *values, GelContext *context)
 {
     guint n_args = 2;
     if(n_values < n_args)

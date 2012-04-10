@@ -2,10 +2,6 @@
 #include <geltypeinfo.h>
 
 
-static
-GHashTable *gel_type_info_gtypes = NULL;
-
-
 struct _GelTypeInfo
 {
     GIBaseInfo *info;
@@ -144,6 +140,10 @@ void gel_type_info_insert_multiple(GelTypeInfo *self,
         g_hash_table_insert(self->infos, name, node);
     }
 }
+
+
+static
+GHashTable *gel_type_info_gtypes = NULL;
 
 
 static

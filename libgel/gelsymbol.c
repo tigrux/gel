@@ -1,6 +1,13 @@
 #include <gelsymbol.h>
 
 
+struct _GelSymbol
+{
+    gchar *name;
+    GelVariable *variable;
+};
+
+
 GType gel_symbol_get_type(void)
 {
     static volatile gsize once = 0;
@@ -13,13 +20,6 @@ GType gel_symbol_get_type(void)
     }
     return type;
 }
-
-
-struct _GelSymbol
-{
-    gchar *name;
-    GelVariable *variable;
-};
 
 
 GelSymbol* gel_symbol_new(const gchar *name, GelVariable *variable)
