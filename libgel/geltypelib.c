@@ -47,15 +47,16 @@ GelTypelib* gel_typelib_new(const gchar *ns, const gchar *version)
     {
         GHashTable *infos = g_hash_table_new_full(
             g_str_hash, g_str_equal,
-            NULL, (GDestroyNotify)gel_type_info_unref);
+            (GDestroyNotify)g_free, (GDestroyNotify)gel_type_info_unref);
 
         guint n = g_irepository_get_n_infos(NULL, ns);
         guint i;
         for(i = 0; i < n; i++)
         {
             GIBaseInfo *info = g_irepository_get_info(NULL, ns, i);
-            g_hash_table_insert(infos,
-                (void*)g_base_info_get_name(info), gel_type_info_new(info));
+            const gchar *base_info_name = g_base_info_get_name(info);
+            gchar *name = g_strdelimit(g_strdup(base_info_name), "_", '-');
+            g_hash_table_insert(infos, name, gel_type_info_new(info));
         }
 
         self = g_slice_new0(GelTypelib);

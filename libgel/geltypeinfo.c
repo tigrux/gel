@@ -137,10 +137,11 @@ void gel_type_info_insert_multiple(GelTypeInfo *self,
     for(i = 0; i < n; i++)
     {
         GIBaseInfo *info = get_node(self->info, i);
-        const gchar *name = g_base_info_get_name(info);
+        const gchar *base_info_name = g_base_info_get_name(info);
+        gchar *name = g_strdelimit(g_strdup(base_info_name), "_", '-');
         GelTypeInfo *node = gel_type_info_new(info);
         node->container = self;
-        g_hash_table_insert(self->infos, (void* )name, node);
+        g_hash_table_insert(self->infos, name, node);
     }
 }
 
@@ -174,7 +175,7 @@ GelTypeInfo* gel_type_info_new(GIBaseInfo *info)
     self->info = info;
     self->infos = g_hash_table_new_full(
         g_str_hash, g_str_equal,
-        NULL, (GDestroyNotify)gel_type_info_unref);
+        (GDestroyNotify)g_free, (GDestroyNotify)gel_type_info_unref);
 
     if(GI_IS_REGISTERED_TYPE_INFO(info))
         gel_type_info_register(self);
