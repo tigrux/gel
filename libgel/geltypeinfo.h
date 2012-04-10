@@ -10,7 +10,6 @@ GelTypeInfo* gel_type_info_new(GIBaseInfo *info);
 GelTypeInfo* gel_type_info_ref(GelTypeInfo *self);
 void gel_type_info_unref(GelTypeInfo *self);
 
-const gchar* gel_type_info_get_name(const GelTypeInfo *self);
 const GelTypeInfo* gel_type_info_lookup(const GelTypeInfo *self,
                                         const gchar *name);
 

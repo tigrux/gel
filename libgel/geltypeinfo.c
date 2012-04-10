@@ -258,14 +258,6 @@ void gel_type_info_unref(GelTypeInfo *self)
 }
 
 
-const gchar* gel_type_info_get_name(const GelTypeInfo *self)
-{
-    g_return_val_if_fail(self != NULL, NULL);
-
-    return g_base_info_get_name(self->info);
-}
-
-
 const GelTypeInfo* gel_type_info_lookup(const GelTypeInfo *self,
                                         const gchar *name)
 {

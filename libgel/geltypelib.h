@@ -11,7 +11,6 @@ GelTypelib* gel_typelib_new(const gchar *ns, const gchar *version);
 GelTypelib* gel_typelib_ref(GelTypelib *self);
 void gel_typelib_unref(GelTypelib *self);
 
-const gchar* gel_typelib_get_name(const GelTypelib *self);
 const GelTypeInfo* gel_typelib_lookup(const GelTypelib *self,
                                       const gchar *name);
 

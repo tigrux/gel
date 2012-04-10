@@ -1,12 +1,19 @@
 #include <geltypelib.h>
 
 
+struct _GelTypelib
+{
+    GTypelib *typelib;
+    GHashTable *infos;
+    volatile gint ref_count;
+};
+
+
 static
 void gel_typelib_to_string_transform(const GValue *source, GValue *dest)
 {
-    GelTypelib *gel_ns = (GelTypelib *)g_value_get_boxed(source);
-
-    const gchar *name = gel_typelib_get_name(gel_ns);
+    GelTypelib *self = (GelTypelib *)g_value_get_boxed(source);
+    const gchar *name = g_typelib_get_namespace(self->typelib);
     gchar *buffer = g_strdup_printf("<GelTypelib %s>", name);
     g_value_take_string(dest, buffer);
 }
@@ -29,14 +36,6 @@ GType gel_typelib_get_type(void)
     }
     return type;
 }
-
-
-struct _GelTypelib
-{
-    GTypelib *typelib;
-    GHashTable *infos;
-    volatile gint ref_count;
-};
 
 
 GelTypelib* gel_typelib_new(const gchar *ns, const gchar *version)
@@ -87,14 +86,6 @@ void gel_typelib_unref(GelTypelib *self)
         g_hash_table_unref(self->infos);
         g_slice_free(GelTypelib, self);
     }
-}
-
-
-const gchar* gel_typelib_get_name(const GelTypelib *self)
-{
-    g_return_val_if_fail(self != NULL, NULL);
-
-    return g_typelib_get_namespace(self->typelib);
 }
 
 
