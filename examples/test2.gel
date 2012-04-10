@@ -65,5 +65,27 @@
 )
 
 
+(def (how-many-days-have? month)
+    (case month
+        (("January" "March" "May" "July" "August" "October" "December")
+            31
+        )
+        (("March" "Abril" "June" "September" "November")
+            30
+        )
+        (("February")
+            28
+        )
+        (else
+            "No such month"
+        )
+    )
+)
+
+(def month-I-was-born "December")
+
+(print month-I-was-born " has " (how-many-days-have? month-I-was-born) " days")
+
+
 (quit)
 
