@@ -1,4 +1,4 @@
-AC_INIT([gel], [0.3], [tigrux@gmail.com], [gel])
+AC_INIT([gel], [0.4], [tigrux@gmail.com], [gel])
 AC_CONFIG_SRCDIR([Makefile.am])
 AC_CONFIG_HEADERS(config.h)
 AM_INIT_AUTOMAKE([foreign])
