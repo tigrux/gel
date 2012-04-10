@@ -111,7 +111,7 @@ gboolean gel_closure_has_argument(const GelClosure *self, const gchar *name)
 
 
 static
-void gel_closure_bind_array(GelClosure *self, GValueArray *array)
+void gel_closure_bind_symbols_of_array(GelClosure *self, GValueArray *array)
 {
     guint array_n_values = array->n_values;
     GValue *array_values = array->values;
@@ -122,7 +122,7 @@ void gel_closure_bind_array(GelClosure *self, GValueArray *array)
         const GValue *value = array_values + i;
         GType type = GEL_VALUE_TYPE(value);
         if(type == G_TYPE_VALUE_ARRAY)
-            gel_closure_bind_array(self,
+            gel_closure_bind_symbols_of_array(self,
                 (GValueArray*)gel_value_get_boxed(value));
         else
         if(type == GEL_TYPE_SYMBOL)
@@ -142,10 +142,10 @@ void gel_closure_bind_array(GelClosure *self, GValueArray *array)
 }
 
 
-void gel_closure_bind(GClosure *closure)
+void gel_closure_close_over(GClosure *closure)
 {
     GelClosure *self = (GelClosure *)closure;
-    gel_closure_bind_array(self, self->code);
+    gel_closure_bind_symbols_of_array(self, self->code);
 }
 
 

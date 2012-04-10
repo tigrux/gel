@@ -126,7 +126,7 @@ void define_(GClosure *self, GValue *return_value,
     {
         gel_context_insert(context, name, value);
         if(closure != NULL)
-            gel_closure_bind(closure);
+            gel_closure_close_over(closure);
     }
 
     gel_value_list_free(list);
@@ -147,7 +147,7 @@ void lambda_(GClosure *self, GValue *return_value,
                 array->n_values, array->values, n_values, values);
         if(closure != NULL)
         {
-            gel_closure_bind(closure);
+            gel_closure_close_over(closure);
             g_value_init(return_value, G_TYPE_CLOSURE);
             g_value_take_boxed(return_value, closure);
         }
@@ -215,7 +215,7 @@ void let_(GClosure *self, GValue *return_value,
                     GValue *value =
                         gel_value_new_from_boxed(G_TYPE_CLOSURE, closure);
                     gel_context_insert(let_context, name, value);
-                    gel_closure_bind(closure);
+                    gel_closure_close_over(closure);
                 }
             }
 
