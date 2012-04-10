@@ -125,7 +125,7 @@ GValueArray* gel_parse_scanner(GScanner *scanner, gint level,
             
             if(!is_number)
             {
-                GValue *symbol = gel_value_lookup_predefined(name);
+                const GValue *symbol = gel_value_lookup_predefined(name);
                 if(symbol != NULL)
                     g_value_array_append(array, symbol);
                 else

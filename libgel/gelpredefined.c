@@ -1668,7 +1668,7 @@ GHashTable* gel_make_default_symbols(void)
  *
  * Returns: The #GValue that correspond to @name
  */
-GValue *gel_value_lookup_predefined(const gchar *name)
+const GValue *gel_value_lookup_predefined(const gchar *name)
 {
     static GHashTable *symbols = NULL;
     static volatile gsize once = 0;
