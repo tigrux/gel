@@ -32,9 +32,9 @@
     )
 )
 
-(object-set label "visible" true)
-(object-set button "visible" true)
-(object-set entry "visible" true)
-(object-set box "visible" true)
-(object-set window "visible" true)
+(object-set label "visible" TRUE)
+(object-set button "visible" TRUE)
+(object-set entry "visible" TRUE)
+(object-set box "visible" TRUE)
+(object-set window "visible" TRUE)
 
