@@ -1557,12 +1557,12 @@ GHashTable* gel_make_default_symbols(void)
 {
     struct {const gchar *name; GClosureMarshal marshal;} *c, closures[] =
     {
-        /* definitions */
+        /* binding */
         CLOSURE(define),
         CLOSURE(lambda),
-
-        /* blocks */
         CLOSURE(let),
+
+        /* block */
         CLOSURE(begin),
 
         /* imperative */
@@ -1607,7 +1607,7 @@ GHashTable* gel_make_default_symbols(void)
         CLOSURE_NAME("array-remove!", array_remove),
         CLOSURE_NAME("array-size", array_size),
 
-        /* array management */
+        /* functional */
         CLOSURE(range),
         CLOSURE(find),
         CLOSURE(filter),
@@ -1627,7 +1627,7 @@ GHashTable* gel_make_default_symbols(void)
         CLOSURE(require),
         CLOSURE_NAME(".", dot),
 
-        /* objects */
+        /* object */
         CLOSURE_NAME("object-new", object_new),
         CLOSURE_NAME("object-get", object_get),
         CLOSURE_NAME("object-set", object_set),
