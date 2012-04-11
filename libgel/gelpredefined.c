@@ -1313,25 +1313,26 @@ void require_(GClosure *self, GValue *return_value,
     const gchar *namespace_ = NULL;
     const gchar *version = NULL;
     GList *list = NULL;
+    GelTypelib *ns = NULL;
 
     if(gel_context_eval_params(context, __FUNCTION__, &list,
         "sS", &n_values, &values, &namespace_, &version))
     {
         if(gel_context_get_variable(context, namespace_) == NULL)
         {
-            GelTypelib *ns = gel_typelib_new(namespace_, version);
+            ns = gel_typelib_new(namespace_, version);
             if(ns != NULL)
             {
                 GValue *value = gel_value_new_from_boxed(GEL_TYPE_TYPELIB, ns);
                 gel_context_insert(context, namespace_, value);
             }    
-
-            g_value_init(return_value, G_TYPE_BOOLEAN);
-            gel_value_set_boolean(return_value, ns != NULL);
         }
         else
             gel_warning_symbol_exists(__FUNCTION__, namespace_);
     }
+
+    g_value_init(return_value, G_TYPE_BOOLEAN);
+    gel_value_set_boolean(return_value, ns != NULL);
 
     gel_value_list_free(list);
 }
