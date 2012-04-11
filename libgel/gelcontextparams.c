@@ -26,7 +26,7 @@ GNode *gel_params_format_to_node(const gchar *format, guint *pos)
         if(format[*pos] == ')')
             break;
         else
-            g_node_append_data(root, GINT_TO_POINTER(format[*pos]));
+            g_node_append_data(root, GINT_TO_POINTER((gint)format[*pos]));
         (*pos)++;
     }
     return root;
