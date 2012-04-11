@@ -129,6 +129,8 @@ void def_(GClosure *self, GValue *return_value,
             gel_closure_close_over(closure);
     }
 
+    g_value_init(return_value, G_TYPE_BOOLEAN);
+    gel_value_set_boolean(return_value, value != NULL);
     gel_value_list_free(list);
 }
 
