@@ -486,29 +486,26 @@ void while_(GClosure *self, GValue *return_value,
         return;
     }
 
-    gboolean run = FALSE;
+    gboolean cond_is_true = FALSE;
     GelContext *loop_context = gel_context_new_with_outer(context);
     while(gel_context_get_running(loop_context))
     {
         GValue tmp_value = {0};
         const GValue *cond_value =
-            gel_context_eval_into_value(context, values + 0, &tmp_value);
+            gel_context_eval_into_value(loop_context, values + 0, &tmp_value);
 
-        if(gel_value_to_boolean(cond_value))
-        {
-            run = TRUE;
-            begin_(self, return_value, n_values-1, values+1, context);
-        }
+        cond_is_true = gel_value_to_boolean(cond_value);
+        if(cond_is_true)
+            begin_(self, return_value, n_values-1, values+1, loop_context);
         else
-        {
             gel_context_set_running(loop_context, FALSE);
-            if(run == FALSE)
-                gel_value_copy(cond_value, return_value);
-        }
 
         if(GEL_IS_VALUE(&tmp_value))
             g_value_unset(&tmp_value);
     }
+
+    g_value_init(return_value, G_TYPE_BOOLEAN);
+    gel_value_set_boolean(return_value, !cond_is_true);
     gel_context_free(loop_context);
 }
 
