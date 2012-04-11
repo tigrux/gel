@@ -7,7 +7,7 @@
 #include <gelvalueprivate.h>
 #include <gelsymbol.h>
 
-#define NODE_DATA(node) (GPOINTER_TO_INT((node)->data))
+#define g_node_get_data(node) (GPOINTER_TO_INT((node)->data))
 
 
 static
@@ -217,7 +217,7 @@ gboolean gel_context_eval_params_va(GelContext *self, const gchar *func,
     gboolean exact = TRUE;
 
     GNode *last_child = g_node_last_child(format_node);
-    if(NODE_DATA(last_child) == '*')
+    if(g_node_get_data(last_child) == '*')
     {
         exact = FALSE;
         g_node_destroy(last_child);
@@ -248,7 +248,7 @@ gboolean gel_context_eval_params_va(GelContext *self, const gchar *func,
     {
         if(G_NODE_IS_LEAF(node))
         {
-            gchar format = NODE_DATA(node);
+            gchar format = g_node_get_data(node);
             parsed = gel_context_eval_param(self,
                 func, list, format, n_values, values, args);
         }
