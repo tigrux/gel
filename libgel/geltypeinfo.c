@@ -168,6 +168,19 @@ GelTypeInfo* gel_type_info_from_gtype(GType type)
 }
 
 
+#ifndef GI_IS_REGISTERED_TYPE_INFO
+#define GI_IS_REGISTERED_TYPE_INFO(info) \
+    ((g_base_info_get_type((GIBaseInfo*)info) == GI_INFO_TYPE_BOXED) || \
+     (g_base_info_get_type((GIBaseInfo*)info) == GI_INFO_TYPE_ENUM) || \
+     (g_base_info_get_type((GIBaseInfo*)info) == GI_INFO_TYPE_FLAGS) ||	\
+     (g_base_info_get_type((GIBaseInfo*)info) == GI_INFO_TYPE_INTERFACE) || \
+     (g_base_info_get_type((GIBaseInfo*)info) == GI_INFO_TYPE_OBJECT) || \
+     (g_base_info_get_type((GIBaseInfo*)info) == GI_INFO_TYPE_STRUCT) || \
+     (g_base_info_get_type((GIBaseInfo*)info) == GI_INFO_TYPE_UNION) || \
+     (g_base_info_get_type((GIBaseInfo*)info) == GI_INFO_TYPE_BOXED))
+#endif
+
+
 GelTypeInfo* gel_type_info_new(GIBaseInfo *info)
 {
     GelTypeInfo *self = g_slice_new0(GelTypeInfo);
