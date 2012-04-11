@@ -23,7 +23,7 @@
 
 (def (hash-values h)
     (map
-        (=> (k)
+        (closure (k)
             (hash-get h k)
         )
         (hash-keys h)

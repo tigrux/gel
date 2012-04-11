@@ -24,7 +24,7 @@
 (def counter 0)
 
 (object-connect button "clicked"
-    (=> (widget)
+    (closure (widget)
         (print "Previous label " (object-get widget "label"))
         (object-set widget "label" "Thanks!")
         (set! counter (+ counter 1))

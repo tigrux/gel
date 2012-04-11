@@ -134,8 +134,8 @@ void def_(GClosure *self, GValue *return_value,
 
 
 static
-void lambda_(GClosure *self, GValue *return_value,
-             guint n_values, const GValue *values, GelContext *context)
+void closure_(GClosure *self, GValue *return_value,
+              guint n_values, const GValue *values, GelContext *context)
 {
     GValueArray *array;
     GList *list = NULL;
@@ -1559,7 +1559,7 @@ GHashTable* gel_make_default_symbols(void)
     {
         /* binding */
         CLOSURE(def),
-        CLOSURE_NAME("=>", lambda),
+        CLOSURE(closure),
         CLOSURE(let),
 
         /* block */

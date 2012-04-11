@@ -4,7 +4,7 @@
 )
 
 (def (index ls value)
-    (find ls (=> (i) (= i value)))
+    (find ls (closure (i) (= i value)))
 )
 
 (def (primes-lesser-than top)

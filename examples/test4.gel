@@ -28,7 +28,7 @@
         (= (% candidate i) 0)
     )
 
-    (=> ()
+    (closure ()
         (def calculating TRUE)
         (while calculating
             (if (none-prime can-divide-candidate)
