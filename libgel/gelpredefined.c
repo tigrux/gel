@@ -517,6 +517,7 @@ void for_(GClosure *self, GValue *return_value,
     const gchar *name;
     GValueArray *array;
     GList *list = NULL;
+    gboolean result = FALSE;
 
     if(gel_context_eval_params(context, __FUNCTION__, &list,
             "sA*", &n_values, &values, &name, &array))
@@ -535,8 +536,13 @@ void for_(GClosure *self, GValue *return_value,
             begin_(self, return_value, n_values, values, loop_context);
             g_value_unset(value);
         }
+        if(i == last)
+            result = TRUE;  
         gel_context_free(loop_context);
     }
+
+    g_value_init(return_value, G_TYPE_BOOLEAN);
+    gel_value_set_boolean(return_value, result);
 
     gel_value_list_free(list);
 }
