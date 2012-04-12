@@ -17,6 +17,9 @@
     ((**((gpointer **)(*(args))++)) = (gpointer)(value))
 
 
+#define gel_ref_arg_type(args, type) \
+    (**((type **)(*(args))++))
+
 static
 GNode *gel_params_format_to_node(const gchar *format, guint *pos, guint *count)
 {
@@ -147,7 +150,8 @@ gboolean gel_context_eval_param(GelContext *self, const gchar *func,
             result_value =
                 gel_context_eval_param_into_value(self, *values, value);
             if(GEL_VALUE_HOLDS(result_value, G_TYPE_LONG))
-                **((glong **)(*(args))++) = gel_value_get_long(result_value);
+                gel_ref_arg_type(args, glong) =
+                    gel_value_get_long(result_value);
             else
             {
                 gel_warning_value_not_of_type(func,
@@ -160,7 +164,8 @@ gboolean gel_context_eval_param(GelContext *self, const gchar *func,
             result_value =
                 gel_context_eval_param_into_value(self, *values, value);
             if(GEL_VALUE_HOLDS(result_value, G_TYPE_DOUBLE))
-                **((gdouble **)(*(args))++) = gel_value_get_double(result_value);
+                gel_ref_arg_type(args, gdouble) =
+                    gel_value_get_double(result_value);
             else
             {
                 gel_warning_value_not_of_type(func,
