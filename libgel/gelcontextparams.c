@@ -7,8 +7,15 @@
 #include <gelvalueprivate.h>
 #include <gelsymbol.h>
 
-#define g_node_get_int(node) (GPOINTER_TO_INT((node)->data))
-#define g_node_add_int(node, data) g_node_append_data(node, GINT_TO_POINTER(data))
+#define g_node_get_int(node) \
+    (GPOINTER_TO_INT((node)->data))
+
+#define g_node_add_int(node, data) \
+    g_node_append_data(node, GINT_TO_POINTER(data))
+
+#define gel_set_arg(args, value) \
+    ((**((gpointer **)(*(args))++)) = (gpointer)(value))
+
 
 static
 GNode *gel_params_format_to_node(const gchar *format, guint *pos, guint *count)
@@ -59,20 +66,14 @@ gboolean gel_context_eval_param(GelContext *self, const gchar *func,
     switch(format)
     {
         case 'v':
-            {
-                const GValue ***v = (const GValue ***)(*args)++;
-                **v = *values;
-            }
+            gel_set_arg(args, *values);
             break;
         case 'V':
             value = gel_value_new();
             result_value =
                 gel_context_eval_param_into_value(self, *values, value);
             if(!G_VALUE_HOLDS(result_value, GEL_TYPE_SYMBOL))
-            {
-                const GValue ***v = (const GValue ***)(*args)++;
-                **v = result_value;
-            }
+                gel_set_arg(args, result_value);
             else
             {
                 g_warning("%s: Not a GValue", func);
@@ -81,10 +82,7 @@ gboolean gel_context_eval_param(GelContext *self, const gchar *func,
             break;
         case 'a':
             if(GEL_VALUE_HOLDS(*values, G_TYPE_VALUE_ARRAY))
-            {
-                GValueArray ***a = (GValueArray ***)(*args)++;
-                **a = (GValueArray*)gel_value_get_boxed(*values);
-            }
+                gel_set_arg(args, gel_value_get_boxed(*values));
             else
             {
                 gel_warning_value_not_of_type(func,
@@ -97,10 +95,7 @@ gboolean gel_context_eval_param(GelContext *self, const gchar *func,
             result_value =
                 gel_context_eval_param_into_value(self, *values, value);
             if(GEL_VALUE_HOLDS(result_value, G_TYPE_VALUE_ARRAY))
-            {
-                GValueArray ***a = (GValueArray ***)(*args)++;
-                **a = (GValueArray*)gel_value_get_boxed(result_value);
-            }
+                gel_set_arg(args, gel_value_get_boxed(result_value));
             else
             {
                 gel_warning_value_not_of_type(func,
@@ -113,10 +108,7 @@ gboolean gel_context_eval_param(GelContext *self, const gchar *func,
             result_value =
                 gel_context_eval_param_into_value(self, *values, value);
             if(GEL_VALUE_HOLDS(result_value, G_TYPE_HASH_TABLE))
-            {
-                GHashTable ***a = (GHashTable ***)(*args)++;
-                **a = (GHashTable*)gel_value_get_boxed(result_value);
-            }
+                gel_set_arg(args, gel_value_get_boxed(result_value));
             else
             {
                 gel_warning_value_not_of_type(func,
@@ -127,10 +119,8 @@ gboolean gel_context_eval_param(GelContext *self, const gchar *func,
         case 's':
             if(GEL_VALUE_HOLDS(*values, GEL_TYPE_SYMBOL))
             {
-                const gchar ***s = (const gchar ***)(*args)++;
-                GelSymbol *symbol =
-                    (GelSymbol*)gel_value_get_boxed(*values);
-                **s = gel_symbol_get_name(symbol);
+                GelSymbol *symbol = (GelSymbol*)gel_value_get_boxed(*values);
+                gel_set_arg(args, gel_symbol_get_name(symbol));
             }
             else
             {
@@ -144,10 +134,7 @@ gboolean gel_context_eval_param(GelContext *self, const gchar *func,
             result_value =
                 gel_context_eval_param_into_value(self, *values, value);
             if(GEL_VALUE_HOLDS(result_value, G_TYPE_STRING))
-            {
-                const gchar ***s = (const gchar ***)(*args)++;
-                **s = g_value_get_string(result_value);
-            }
+                gel_set_arg(args, g_value_get_string(result_value));
             else
             {
                 gel_warning_value_not_of_type(func,
@@ -160,10 +147,7 @@ gboolean gel_context_eval_param(GelContext *self, const gchar *func,
             result_value =
                 gel_context_eval_param_into_value(self, *values, value);
             if(GEL_VALUE_HOLDS(result_value, G_TYPE_LONG))
-            {
-                glong **i = (glong **)(*args)++;
-                **i = gel_value_get_long(result_value);
-            }
+                gel_set_arg(args, gel_value_get_long(result_value));
             else
             {
                 gel_warning_value_not_of_type(func,
@@ -176,10 +160,7 @@ gboolean gel_context_eval_param(GelContext *self, const gchar *func,
             result_value =
                 gel_context_eval_param_into_value(self, *values, value);
             if(GEL_VALUE_HOLDS(result_value, G_TYPE_OBJECT))
-            {
-                GObject ***obj = (GObject ***)(*args)++;
-                **obj = (GObject*)g_value_get_object(result_value);
-            }
+                gel_set_arg(args, g_value_get_object(result_value));
             else
             {
                 gel_warning_value_not_of_type(func,
@@ -192,10 +173,7 @@ gboolean gel_context_eval_param(GelContext *self, const gchar *func,
             result_value =
                 gel_context_eval_param_into_value(self, *values, value);
             if(GEL_VALUE_HOLDS(result_value, G_TYPE_CLOSURE))
-            {
-                GClosure ***closure = (GClosure ***)(*args)++;
-                **closure = (GClosure*)gel_value_get_boxed(result_value);
-            }
+                gel_set_arg(args, gel_value_get_boxed(result_value));
             else
             {
                 gel_warning_value_not_of_type(func,
@@ -377,7 +355,6 @@ gboolean gel_context_eval_params(GelContext *self, const gchar *func,
     gpointer *args_iter = args;
     gboolean parsed = gel_context_eval_params_args(self,
         func, list, format_node, n_values, values, &args_iter);
-
 
     g_free(args);
     g_node_destroy(format_node);
