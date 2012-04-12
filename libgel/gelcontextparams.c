@@ -147,7 +147,7 @@ gboolean gel_context_eval_param(GelContext *self, const gchar *func,
             result_value =
                 gel_context_eval_param_into_value(self, *values, value);
             if(GEL_VALUE_HOLDS(result_value, G_TYPE_LONG))
-                gel_set_arg(args, gel_value_get_long(result_value));
+                **((glong **)(*(args))++) = gel_value_get_long(result_value);
             else
             {
                 gel_warning_value_not_of_type(func,
