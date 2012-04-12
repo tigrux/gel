@@ -74,7 +74,7 @@ void demo_run(void)
         {
             value_string = gel_value_to_string(&result_value);
             g_value_unset(&result_value);
-            g_print("= %s\n\n", value_string);
+            g_print("= %s\n", value_string);
             g_free(value_string);
         }
     }

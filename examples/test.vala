@@ -20,7 +20,7 @@ class Demo : Object {
 
             GLib.Value result_value;
             if(context.eval(iter_value, out result_value))
-                print("= %s\n\n", Gel.Value.to_string(result_value));
+                print("= %s\n", Gel.Value.to_string(result_value));
         }
         return true;
     }
