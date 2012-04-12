@@ -155,6 +155,19 @@ gboolean gel_context_eval_param(GelContext *self, const gchar *func,
                 parsed = FALSE;
             }
             break;
+        case 'F':
+            value = gel_value_new();
+            result_value =
+                gel_context_eval_param_into_value(self, *values, value);
+            if(GEL_VALUE_HOLDS(result_value, G_TYPE_DOUBLE))
+                **((gdouble **)(*(args))++) = gel_value_get_double(result_value);
+            else
+            {
+                gel_warning_value_not_of_type(func,
+                    result_value, G_TYPE_LONG);
+                parsed = FALSE;
+            }
+            break;
         case 'O':
             value = gel_value_new();
             result_value =
@@ -316,6 +329,9 @@ gboolean gel_context_eval_params_args(GelContext *self, const gchar *func,
  *   </para></listitem>
  *   <listitem><para>
  *     I: evaluate and get an integer (#glong).
+ *   </para></listitem>
+ *   <listitem><para>
+ *     F: evaluate and get a float (#gdouble).
  *   </para></listitem>
  *   <listitem><para>
  *     O: evaluate and get an object (#GObject *).
