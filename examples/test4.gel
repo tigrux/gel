@@ -29,13 +29,12 @@
     )
 
     (closure ()
-        (def calculating TRUE)
-        (while calculating
+        (def calculated-prime 0)
+        (while (= calculated-prime 0)
             (if (none-prime can-divide-candidate)
                 (begin
                     (array-append! primes candidate)
-                    (def calculated-prime candidate)
-                    (set! calculating FALSE)
+                    (set! calculated-prime candidate)
                 )
             )
             (set! candidate (+ candidate 1))
