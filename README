@@ -1,11 +1,11 @@
-The Glib-Embedded-Language (or just Gel) is a dynamic language
-completely written in GObject and C, but inspired in scheme and python.
+The Glib-Extension-Language (or just Gel) is a dynamic language
+completely written in GLib and C, but inspired in Scheme and Python.
 
-It is very easy to use, since everything is an array, number or symbol.
+It is very easy to use, since everything is an literal, symbol or symbol.
 
-The Code is very small, just 8 modules.
+The Code is very small, just 3 public modules, and a few more of support.
 
-What makes gel different is that everything is implemented in glib:
+What makes Gel different is that everything is implemented in GLib:
 - Symbols are GValues.
 - Functions are GClosures.
 - Arrays are GValueArray.
@@ -14,17 +14,12 @@ What makes gel different is that everything is implemented in glib:
 - Symbols are resolved using GHashTables.
 - Arithmetic and logic are exposed as functions that take GValues.
 
-However, the syntax is not a direct copy of scheme or lisp:
-- Built-in functions allow an intuitive python-like style, with functions like:
-  and, or, any, all, len, for, while, if, cond, case, new, filter, map, sort.
-- Can use +, *, <, >= instead of add, mul, lt, ge.
-
-Bindings for Vala are provided (see examples/gel.vala)
-Support for gobject-introspection will be optional and available soon.
+Bindings for Vala are provided (see examples/test.vala)
+Support for gobject-introspection is currently in early stage.
 
 However, the project is not mature yet, so speed or elegance is not a
 priority yet. The current goal is to prevent memory leaks and provide
-an API comfortable to use from both C and Gel.
+an API comfortable to use from both C, Vala and Gel.
 
 A few examples are available in examples/
 
