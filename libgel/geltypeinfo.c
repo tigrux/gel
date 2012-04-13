@@ -14,7 +14,7 @@ struct _GelTypeInfo
 #ifndef HAVE_G_INFO_TYPE_TO_STRING
 
 static
-const gchar* g_info_type_to_string (GIInfoType type)
+const gchar* g_info_type_to_string(GIInfoType type)
 {
     switch (type)
     {
