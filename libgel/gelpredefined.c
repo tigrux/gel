@@ -16,8 +16,7 @@ GClosure* new_closure(GelContext *context, const gchar *name,
     gchar **vars = (gchar**)g_new0(gchar*, n_vars + 1);
     gchar *invalid_arg_name = NULL;
 
-    guint i;
-    for(i = 0; i < n_vars; i++)
+    for(guint i = 0; i < n_vars; i++)
     {
         const GValue *value = var_values + i;
         if(GEL_VALUE_HOLDS(value, GEL_TYPE_SYMBOL))
@@ -36,7 +35,7 @@ GClosure* new_closure(GelContext *context, const gchar *name,
     if(invalid_arg_name == NULL)
     {
         GValueArray *code = g_value_array_new(n_values);
-        for(i = 0; i < n_values; i++)
+        for(guint i = 0; i < n_values; i++)
             g_value_array_append(code, values + i);
         self = gel_closure_new(name, vars, code, context);
         g_closure_ref(self);
@@ -46,7 +45,7 @@ GClosure* new_closure(GelContext *context, const gchar *name,
     {
         gel_warning_invalid_argument_name(__FUNCTION__, invalid_arg_name);
         g_free(invalid_arg_name);
-        for(i = 0; i < n_vars; i++)
+        for(guint i = 0; i < n_vars; i++)
             if(vars[i] != NULL)
                 g_free(vars[i]);
         g_free(vars);
@@ -188,8 +187,8 @@ void let_(GClosure *self, GValue *return_value,
         guint n_vars =  bindings_n_values;
         gchar **var_names = g_new0(gchar *, n_vars+1);
         GValue **var_values = g_new(GValue *, n_vars);
-        guint i;
-        for(i = 0; i < n_vars; i++)
+
+        for(guint i = 0; i < n_vars; i++)
         {
             gchar *var_name = NULL;
             GValue *var_value = NULL;
@@ -221,8 +220,7 @@ void let_(GClosure *self, GValue *return_value,
                 }
             }
 
-            guint i;
-            for(i = 0; i < n_vars; i++)
+            for(guint i = 0; i < n_vars; i++)
             {
                 gel_context_insert(let_context,
                     var_names[i], gel_value_dup(var_values[i]));
@@ -249,8 +247,7 @@ void begin_(GClosure *self, GValue *return_value,
     }
 
     guint last = n_values-1;
-    guint i;
-    for(i = 0; i <= last && gel_context_get_running(context); i++)
+    for(guint i = 0; i <= last && gel_context_get_running(context); i++)
     {
         GValue tmp_value = {0};
         const GValue *value =
@@ -552,8 +549,7 @@ static
 void break_(GClosure *self, GValue *return_value,
             guint n_values, const GValue *values, GelContext *context)
 {
-    GelContext *i;
-    for(i = context; i != NULL; i = gel_context_get_outer(i))
+    for(GelContext *i = context; i != NULL; i = gel_context_get_outer(i))
         if(gel_context_get_running(i))
         {
             gel_context_set_running(i, FALSE);
@@ -574,8 +570,7 @@ void print_(GClosure *self, GValue *return_value,
     }
 
     guint last = n_values - 1;
-    guint i;
-    for(i = 0; i <= last; i++)
+    for(guint i = 0; i <= last; i++)
     {
         GValue tmp_value = {0};
         const GValue *value =
@@ -620,8 +615,7 @@ void arithmetic(GClosure *self, GValue *return_value,
     if(GEL_IS_VALUE(&tmp2))
         g_value_unset(&tmp2);
 
-    guint i;
-    for(i = 2; i < n_values && running; i++)
+    for(guint i = 2; i < n_values && running; i++)
     {
         GValue *v1;
 
@@ -701,8 +695,7 @@ void logic(GClosure *self, GValue *return_value,
     gboolean result = TRUE;
     guint last = n_values - 1;
 
-    guint i;
-    for(i = 0; i < last && result; i++)
+    for(guint i = 0; i < last && result; i++)
     {
         GValue tmp1 = {0};
         GValue tmp2 = {0};
@@ -735,8 +728,7 @@ void and_(GClosure *self, GValue *return_value,
 
     gboolean result = TRUE;
     guint last = n_values - 1;
-    guint i;
-    for(i = 0; i <= last && result == TRUE; i++)
+    for(guint i = 0; i <= last && result == TRUE; i++)
     {
         GValue tmp_value = {0};
         const GValue *value =
@@ -763,8 +755,7 @@ void or_(GClosure *self, GValue *return_value,
 
     guint last =  n_values - 1;
     gboolean result = FALSE;
-    guint i;
-    for(i = 0; i <= last && result == FALSE; i++)
+    for(guint i = 0; i <= last && result == FALSE; i++)
     {
         GValue tmp_value = {0};
         const GValue *value =
@@ -831,8 +822,7 @@ void array_(GClosure *self, GValue *return_value,
             guint n_values, const GValue *values, GelContext *context)
 {
     GValueArray *array = g_value_array_new(n_values);
-    guint i;
-    for(i = 0; i < n_values; i++)
+    for(guint i = 0; i < n_values; i++)
     {
         GValue tmp_value = {0};
         const GValue *value =
@@ -856,9 +846,7 @@ void array_append_(GClosure *self, GValue *return_value,
 
     if(gel_context_eval_params(context, __FUNCTION__, &list,
             "A*", &n_values, &values, &array))
-    {
-        guint i;
-        for(i = 0; i < n_values; i++)
+        for(guint i = 0; i < n_values; i++)
         {
             GValue tmp = {0};
             const GValue *value =
@@ -867,7 +855,6 @@ void array_append_(GClosure *self, GValue *return_value,
             if(GEL_IS_VALUE(&tmp))
                 g_value_unset(&tmp);
         }
-    }
 
     gel_value_list_free(list);
 }
@@ -984,15 +971,14 @@ void range_(GClosure *self, GValue *return_value,
         GValue value = {0};
         g_value_init(&value, G_TYPE_LONG);
 
-        glong i;
         if(last > first)
-            for(i = first; i <= last; i++)
+            for(glong i = first; i <= last; i++)
             {
                 gel_value_set_long(&value, i);
                 g_value_array_append(array, &value);
             }
         else
-            for(i = first; i >= last; i--)
+            for(glong i = first; i >= last; i--)
             {
                 gel_value_set_long(&value, i);
                 g_value_array_append(array, &value);
@@ -1020,8 +1006,7 @@ void find_(GClosure *self, GValue *return_value,
     {
         const GValue *array_values = array->values;
         glong result = -1;
-        guint i;
-        for(i = 0; i < array->n_values && result == -1; i++)
+        for(guint i = 0; i < array->n_values && result == -1; i++)
         {
             GValue value = {0};
             g_closure_invoke(closure, &value, 1, array_values + i, context);
@@ -1049,8 +1034,7 @@ void filter_(GClosure *self, GValue *return_value,
             "CA", &n_values, &values, &closure, &array))
     {
         GValueArray *result_array = g_value_array_new(array->n_values);
-        guint i;
-        for(i = 0; i < array->n_values; i++)
+        for(guint i = 0; i < array->n_values; i++)
         {
             GValue tmp_value = {0};
             g_closure_invoke(closure, &tmp_value, 1, array->values + i, context);
@@ -1090,8 +1074,8 @@ void zip_(GClosure *self, GValue *return_value,
 
     guint n_arrays = n_values;
     GValueArray **arrays = g_new0(GValueArray*, n_values);
-
     guint i;
+
     for(i = 0; i < n_arrays; i++)
         if(!gel_context_eval_params(context, __FUNCTION__, &list,
                 "A*", &n_values, &values, arrays + i))
@@ -1149,8 +1133,7 @@ void map_(GClosure *self, GValue *return_value,
         result_array->n_values = array_n_values;
         GValue *result_array_values = result_array->values;
 
-        guint i;
-        for(i = 0; i < array_n_values; i++)
+        for(guint i = 0; i < array_n_values; i++)
             g_closure_invoke(closure,
                 result_array_values + i, 1, array_values + i, context);
 
@@ -1299,8 +1282,8 @@ void hash_keys_(GClosure *self, GValue *return_value,
         guint size = g_hash_table_size(hash);
         GValueArray *array = g_value_array_new(size);
         GList *keys = g_hash_table_get_keys(hash);
-        GList *iter;
-        for(iter = keys; iter != NULL; iter = g_list_next(iter))
+
+        for(GList *iter = keys; iter != NULL; iter = g_list_next(iter))
             g_value_array_append(array, (GValue*)iter->data);
         g_value_init(return_value, G_TYPE_VALUE_ARRAY);
         g_value_take_boxed(return_value, array);

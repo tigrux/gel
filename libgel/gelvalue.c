@@ -153,8 +153,7 @@ gchar* gel_value_to_string(const GValue *value)
         {
             guint last = n_values - 1;
             const GValue *array_values = array->values;
-            guint i;
-            for(i = 0; i <= last; i++)
+            for(guint i = 0; i <= last; i++)
             {
                 gchar *s = gel_value_to_string(array_values + i);
                 g_string_append(buffer, s);
@@ -390,12 +389,11 @@ gboolean gel_values_simple_add(const GValue *v1, const GValue *v2,
                 GValueArray *array = g_value_array_new(n1_values + n2_values);
 
                 const GValue *a1_values = a1->values;
-                guint i;
-                for(i = 0; i < n1_values; i++)
+                for(guint i = 0; i < n1_values; i++)
                     g_value_array_append(array, a1_values + i);
 
                 const GValue *a2_values = a2->values;
-                for(i = 0; i < n2_values; i++)
+                for(guint i = 0; i < n2_values; i++)
                     g_value_array_append(array, a2_values + i);
                 g_value_take_boxed(dest_value, array);
                 return TRUE;
@@ -743,6 +741,7 @@ gint gel_values_cmp(const GValue *v1, const GValue *v2)
 
                 GValue *a1_values = a1->values;
                 GValue *a2_values = a2->values;
+
                 guint i;
                 for(i = 0; i < n_values; i++)
                 {

@@ -362,8 +362,7 @@ gboolean gel_context_eval_params(GelContext *self, const gchar *func,
 
     va_list args_va;
     va_start(args_va, values);
-    guint i;
-    for(i = 0; i < n_args; i++)
+    for(guint i = 0; i < n_args; i++)
         args[i] = va_arg(args_va, gpointer);
     va_end(args_va);
 

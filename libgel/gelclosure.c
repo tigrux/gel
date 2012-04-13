@@ -55,8 +55,7 @@ void gel_closure_marshal(GelClosure *closure, GValue *return_value,
     GelContext *context = gel_context_new_with_outer(outer);
 
     gchar **closure_args = closure->args;
-    guint i;
-    for(i = 0; i < n_args; i++)
+    for(guint i = 0; i < n_args; i++)
     {
         GValue *value = gel_value_new();
         gel_context_eval(invocation_context, values + i, value);
@@ -68,7 +67,7 @@ void gel_closure_marshal(GelClosure *closure, GValue *return_value,
     {
         guint last = closure_code_n_values - 1;
         const GValue *closure_code_values = closure->code->values;
-        for(i = 0; i <= last; i++)
+        for(guint i = 0; i <= last; i++)
         {
             GValue tmp_value = {0};
             const GValue *value = gel_context_eval_into_value(context,
@@ -116,8 +115,7 @@ void gel_closure_bind_symbols_of_array(GelClosure *self, GValueArray *array)
     guint array_n_values = array->n_values;
     GValue *array_values = array->values;
 
-    guint i;
-    for(i = 0; i < array_n_values; i++)
+    for(guint i = 0; i < array_n_values; i++)
     {
         const GValue *value = array_values + i;
         GType type = GEL_VALUE_TYPE(value);
@@ -181,8 +179,7 @@ GClosure* gel_closure_new(const gchar *name, gchar **args, GValueArray *code,
         new_context, (GClosureNotify)gel_closure_finalize);
 
     GHashTable *args_hash = g_hash_table_new(g_str_hash, g_str_equal);
-    guint i;
-    for(i = 0; args[i] != NULL; i++)
+    for(guint i = 0; args[i] != NULL; i++)
         g_hash_table_insert(args_hash, args[i], args);
 
     GelClosure *self = (GelClosure*)closure;

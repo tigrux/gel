@@ -129,8 +129,7 @@ void gel_type_info_insert_multiple(GelTypeInfo *self,
                                                            gint n))
 {
     guint n = get_n_nodes(self->info);
-    guint i;
-    for(i = 0; i < n; i++)
+    for(guint i = 0; i < n; i++)
     {
         GIBaseInfo *info = get_node(self->info, i);
         const gchar *base_info_name = g_base_info_get_name(info);

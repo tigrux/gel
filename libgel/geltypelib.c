@@ -50,8 +50,7 @@ GelTypelib* gel_typelib_new(const gchar *ns, const gchar *version)
             (GDestroyNotify)g_free, (GDestroyNotify)gel_type_info_unref);
 
         guint n = g_irepository_get_n_infos(NULL, ns);
-        guint i;
-        for(i = 0; i < n; i++)
+        for(guint i = 0; i < n; i++)
         {
             GIBaseInfo *info = g_irepository_get_info(NULL, ns, i);
             const gchar *base_info_name = g_base_info_get_name(info);
