@@ -86,12 +86,10 @@ void gel_type_info_to_string_transform(const GValue *source, GValue *dest)
 
     gchar **name_array = g_new0(gchar*, n_names+1);
     GList *name_iter = name_list;
-    guint i = 0;
-    while(i < n_names)
+    for(guint i = 0; i < n_names; i++)
     {
         name_array[i] = (gchar*)(name_iter->data);
         name_iter = g_list_next(name_iter);
-        i++;
     }
     g_list_free(name_list);
     gchar *name = g_strjoinv(".", name_array);
