@@ -18,6 +18,7 @@ GType gel_symbol_get_type(void)
             (GBoxedCopyFunc)gel_symbol_dup, (GBoxedFreeFunc)gel_symbol_free);
         g_once_init_leave(&once, 1);
     }
+
     return type;
 }
 

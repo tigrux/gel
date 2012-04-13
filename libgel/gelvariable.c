@@ -13,6 +13,7 @@ GType gel_variable_get_type(void)
                 (GBoxedFreeFunc)gel_variable_unref);
         g_once_init_leave(&once, 1);
     }
+
     return type;
 }
 

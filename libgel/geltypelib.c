@@ -34,6 +34,7 @@ GType gel_typelib_get_type(void)
 
         g_once_init_leave(&once, 1);
     }
+
     return type;
 }
 

@@ -40,6 +40,7 @@ GNode *gel_params_format_to_node(const gchar *format, guint *pos, guint *count)
         }
         (*pos)++;
     }
+
     return root;
 }
 
@@ -202,6 +203,7 @@ gboolean gel_context_eval_param(GelContext *self, const gchar *func,
         else
             gel_value_free(value);
     }
+
     return parsed;
 }
 
@@ -286,6 +288,7 @@ gboolean gel_context_eval_params_args(GelContext *self, const gchar *func,
         *n_values = o_n_values;
         *values = o_values;
     }
+
     return parsed;
 }
 

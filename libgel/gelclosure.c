@@ -228,6 +228,7 @@ GClosure* gel_closure_new_native(const gchar *name, GClosureMarshal marshal)
     self->native_marshal = marshal;
     g_closure_set_marshal(closure, (GClosureMarshal)gel_native_closure_marshal);
     g_closure_add_finalize_notifier(closure, dup_name, (GClosureNotify)g_free);
+
     return closure;
 }
 
@@ -250,6 +251,7 @@ const gchar* gel_closure_get_name(const GClosure *closure)
         name = ((GelClosure*)closure)->name;
     else
         name = NULL;
+
     return name;
 }
 

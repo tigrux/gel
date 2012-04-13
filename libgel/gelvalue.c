@@ -34,6 +34,7 @@ GValue *gel_value_dup(const GValue *value)
 
     GValue *dup_value = gel_value_new_of_type(GEL_VALUE_TYPE(value));
     gel_value_copy(value, dup_value);
+
     return dup_value;
 }
 
@@ -290,6 +291,7 @@ gboolean gel_value_to_boolean(const GValue *value)
             }
             g_warning("Could not convert %s to gboolean", g_type_name(type));
     }
+
     return result;
 }
 
@@ -398,8 +400,8 @@ gboolean gel_values_simple_add(const GValue *v1, const GValue *v2,
                 g_value_take_boxed(dest_value, array);
                 return TRUE;
             }
+            return FALSE;
     }
-    return FALSE;
 }
 
 
@@ -423,8 +425,9 @@ gboolean gel_values_simple_sub(const GValue *v1, const GValue *v2,
                 gel_value_get_double(v1)
                 - gel_value_get_double(v2));
             return TRUE;
+        default:
+            return FALSE;
     }
-    return FALSE;
 }
 
 
@@ -448,8 +451,9 @@ gboolean gel_values_simple_mul(const GValue *v1, const GValue *v2,
                 gel_value_get_double(v1)
                 * gel_value_get_double(v2));
             return TRUE;
+        default:
+            return FALSE;
     }
-    return FALSE;
 }
 
 
@@ -473,8 +477,9 @@ gboolean gel_values_simple_div(const GValue *v1, const GValue *v2,
                 gel_value_get_double(v1)
                 / gel_value_get_double(v2));
             return TRUE;
+        default:
+            return FALSE;
     }
-    return FALSE;
 }
 
 
@@ -498,8 +503,9 @@ gboolean gel_values_simple_mod(const GValue *v1, const GValue *v2,
                 (long)gel_value_get_double(v1)
                 % (long)gel_value_get_double(v2));
             return TRUE;
+        default:
+            return FALSE;
     }
-    return FALSE;
 }
 
 
@@ -665,6 +671,7 @@ gboolean gel_values_arithmetic(const GValue *v1, const GValue *v2,
         g_value_unset(&tmp1);
     if(GEL_IS_VALUE(&tmp2))
         g_value_unset(&tmp2);
+
     return result;
 }
 
@@ -758,6 +765,7 @@ gint gel_values_cmp(const GValue *v1, const GValue *v2)
         g_value_unset(&tmp1);
     if(GEL_IS_VALUE(&tmp2))
         g_value_unset(&tmp2);
+
     return result;
 }
 
@@ -784,6 +792,7 @@ gboolean gel_values_logic(const GValue *v1, const GValue *v2,
         g_value_unset(&tmp1);
     if(GEL_IS_VALUE(&tmp2))
         g_value_unset(&tmp2);
+
     return result;
 }
 

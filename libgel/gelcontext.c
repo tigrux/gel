@@ -40,6 +40,7 @@ GType gel_context_get_type(void)
                 (GBoxedFreeFunc)gel_context_free);
         g_once_init_leave(&once, 1);
     }
+
     return type;
 }
 
@@ -50,6 +51,7 @@ static GList *contexts_POOL;
 G_LOCK_DEFINE_STATIC(contexts);
 #endif
 
+
 static
 GelContext* gel_context_alloc(void)
 {
@@ -58,6 +60,7 @@ GelContext* gel_context_alloc(void)
         g_str_hash, g_str_equal,
         (GDestroyNotify)g_free, (GDestroyNotify)gel_variable_unref);
     self->outer = NULL;
+
     return self;
 }
 
@@ -219,6 +222,7 @@ const GValue* gel_context_eval_param_into_value(GelContext *self,
                 result_value = value;
         }
     }
+
     return result_value;
 }
 
@@ -333,6 +337,7 @@ GelVariable* gel_context_lookup_variable(const GelContext *self,
         variable = gel_context_get_variable(context, name);
         context = gel_context_get_outer(context);
     }
+
     return variable;
 }
 

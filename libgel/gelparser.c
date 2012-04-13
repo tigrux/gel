@@ -165,6 +165,7 @@ GValueArray* gel_parse_file(const gchar *file, GError **error)
 
     GValueArray *array = gel_parse_text(content, content_len);
     g_free(content);
+
     return array;
 }
 

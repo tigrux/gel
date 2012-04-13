@@ -116,6 +116,7 @@ GType gel_type_info_get_type(void)
 
         g_once_init_leave(&once, 1);
     }
+
     return type;
 }
 
