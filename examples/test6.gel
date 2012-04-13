@@ -33,4 +33,31 @@
 (hash-values fundamentals)
 
 
+(def romans
+    (hash
+        (1000 "M")
+        (900 "MC")
+        (500 "D")
+        (400 "DC")
+        (100 "C")
+        (90 "CX")
+        (50 "L")
+        (40 "LX")
+        (10 "X")
+        (9 "XI")
+        (5 "V")
+        (4 "IV")
+        (1 "I")
+    )
+)
+
+(hash-keys romans)
+
+(map
+    (closure (i) (hash-get romans i))
+    (array 1000 900 50 10 10 5 1 1)
+)
+
+
 (quit)
+

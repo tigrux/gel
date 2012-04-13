@@ -1151,24 +1151,14 @@ gel_value_hash(const GValue *value)
     GType type = GEL_VALUE_TYPE(value);
     switch(type)
     {
-        case G_TYPE_LONG:
-        {
-            gint i = (gint)gel_value_get_long(value);
-            return g_int_hash(&i);
-        }
-        case G_TYPE_DOUBLE:
-        {
-            gdouble d = gel_value_get_double(value);
-            return g_double_hash(&d);
-        }
+
         case G_TYPE_STRING:
         {
             gchar *s = gel_value_get_string(value);
             return g_str_hash(s);
         }
         default:
-            g_warn_if_reached();
-            return g_direct_hash(value);
+            return value->data[0].v_uint;
     }
 }
 
