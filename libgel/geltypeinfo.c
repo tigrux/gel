@@ -302,9 +302,17 @@ gboolean gel_type_info_eval_into_value(const GelTypeInfo *self,
         {
             GType enum_type =
                 g_registered_type_info_get_g_type(self->container->info);
-            g_value_init(return_value, enum_type);
-            g_value_set_enum(return_value, g_value_info_get_value(info));
-
+            glong enum_value = g_value_info_get_value(info);
+            if(G_TYPE_IS_ENUM(enum_type))
+            {
+                g_value_init(return_value, enum_type);
+                g_value_set_enum(return_value, enum_value);
+            }
+            else
+            {
+                g_value_init(return_value, G_TYPE_LONG);
+                gel_value_set_long(return_value, enum_value);
+            }
             return TRUE;
         }
         case GI_INFO_TYPE_PROPERTY:
