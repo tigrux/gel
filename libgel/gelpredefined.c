@@ -1361,8 +1361,7 @@ void dot_(GClosure *self, GValue *return_value,
             instance = (const GObject *)gel_value_get_object(value);
     }
     else
-        g_warning("%s: Expected typelib, type or instance",
-            __FUNCTION__);
+        g_warning("%s: Expected typelib, type or instance", __FUNCTION__);
 
     if(GEL_IS_VALUE(&tmp_value))
         g_value_unset(&tmp_value);
@@ -1415,29 +1414,47 @@ static
 void object_new_(GClosure *self, GValue *return_value,
                  guint n_values, const GValue *values, GelContext *context)
 {
-    const gchar *type_name = NULL;
-    GList *list = NULL;
-
-    if(gel_context_eval_params(context, __FUNCTION__, &list,
-            "S", &n_values, &values, &type_name))
+    guint n_args = 1;
+    if(n_values != n_args)
     {
-        GType type = g_type_from_name(type_name);
-        if(type != G_TYPE_INVALID)
-        {
-            g_value_init(return_value, type);
-            if(G_TYPE_IS_INSTANTIATABLE(type))
-            {
-                GObject *new_object = (GObject*)g_object_new(type, NULL);
-                if(G_IS_INITIALLY_UNOWNED(new_object))
-                    g_object_ref_sink(new_object);
-                gel_value_take_boxed(return_value, new_object);
-            }
-        }
-        else
-            gel_warning_type_name_invalid(__FUNCTION__, type_name);
+        gel_warning_needs_n_arguments(__FUNCTION__, n_args);
+        return;
     }
 
-    gel_value_list_free(list);
+    GValue tmp_value = {0};
+    const GValue *value =
+        gel_context_eval_into_value(context, values + 0, &tmp_value);
+
+    GType type = G_TYPE_INVALID;
+
+    GType value_type = GEL_VALUE_TYPE(value);
+    if(value_type == G_TYPE_STRING)
+    {
+        const gchar *type_name = gel_value_get_string(value);
+        type = g_type_from_name(type_name);
+        if(type == G_TYPE_INVALID)
+            gel_warning_type_name_invalid(__FUNCTION__, type_name);
+    }
+    else
+    if(value_type == G_TYPE_GTYPE)
+        type = g_value_get_gtype(&tmp_value);
+    else
+        g_warning("%s: Expected typename or type", __FUNCTION__);
+
+    if(type != G_TYPE_INVALID)
+    {
+        g_value_init(return_value, type);
+        if(G_TYPE_IS_INSTANTIATABLE(type))
+        {
+            GObject *new_object = (GObject*)g_object_new(type, NULL);
+            if(G_IS_INITIALLY_UNOWNED(new_object))
+                g_object_ref_sink(new_object);
+            gel_value_take_boxed(return_value, new_object);
+        }
+    }
+
+    if(GEL_IS_VALUE(&tmp_value))
+        g_value_unset(&tmp_value);
 }
 
 
