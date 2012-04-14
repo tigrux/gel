@@ -299,9 +299,14 @@ gboolean gel_type_info_eval_into_value(const GelTypeInfo *self,
     switch(g_base_info_get_type(info))
     {
         case GI_INFO_TYPE_VALUE:
-            g_value_init(return_value, G_TYPE_LONG);
-            gel_value_set_long(return_value, g_value_info_get_value(info));
+        {
+            GType enum_type =
+                g_registered_type_info_get_g_type(self->container->info);
+            g_value_init(return_value, enum_type);
+            g_value_set_enum(return_value, g_value_info_get_value(info));
+
             return TRUE;
+        }
         case GI_INFO_TYPE_PROPERTY:
             if(object != NULL)
             {
