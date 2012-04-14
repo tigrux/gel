@@ -13,7 +13,6 @@ struct _GelTypeInfo
 
 
 #ifndef HAVE_G_INFO_TYPE_TO_STRING
-
 static
 const gchar* g_info_type_to_string(GIInfoType type)
 {
@@ -61,7 +60,6 @@ const gchar* g_info_type_to_string(GIInfoType type)
             return "unknown";
     }
 }
-
 #endif
 
 
@@ -280,8 +278,8 @@ const GelTypeInfo* gel_type_info_lookup(const GelTypeInfo *self,
 }
 
 
-gboolean gel_argument_to_value(const GIArgument *arg, GITypeTag arg_tag,
-                           GValue *value)
+gboolean gel_argument_to_value(const GArgument *arg, GITypeTag arg_tag,
+                               GValue *value)
 {
     switch(arg_tag)
     {
@@ -365,11 +363,13 @@ gboolean gel_type_info_eval_into_value(const GelTypeInfo *self,
         {
             GITypeInfo *arg_info = g_constant_info_get_type(info);
             GITypeTag arg_tag = g_type_info_get_tag(arg_info);
-            GIArgument argument = {0};
+            GArgument argument = {0};
             g_constant_info_get_value(info, &argument);
             gboolean converted =
                 gel_argument_to_value(&argument, arg_tag, return_value);
+#if HAVE_G_CONSTANT_INFO_FREE_VALUE
             g_constant_info_free_value(info, &argument);
+#endif
             g_base_info_unref(arg_info);
             if(converted)
                 return TRUE;

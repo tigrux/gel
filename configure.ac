@@ -35,7 +35,14 @@ AC_CONFIG_FILES([
 
 AC_SEARCH_LIBS(g_info_type_to_string,
     girepository-1.0,
-    AC_DEFINE(HAVE_G_INFO_TYPE_TO_STRING, 1, "Define to 1 if you have g_info_type_to_string")
+    AC_DEFINE(HAVE_G_INFO_TYPE_TO_STRING, 1,
+              Define to 1 if you have g_info_type_to_string)
+)
+
+AC_SEARCH_LIBS(g_constant_info_free_value,
+    girepository-1.0,
+    AC_DEFINE(HAVE_G_CONSTANT_INFO_FREE_VALUE, 1,
+              Define to 1 if you have g_constant_info_free_value)
 )
 
 AC_OUTPUT
