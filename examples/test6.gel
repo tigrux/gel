@@ -59,5 +59,29 @@
 )
 
 
+(def (Cyborg)
+    (def self (object-new "GHashTable"))
+    (set! self
+        (hash
+            ("name" "Terminator")
+            ("greet"
+                (closure (name-of-person)
+                    (print "Hello " name-of-person)
+                    (print "My name is " (hash-get self "name"))
+                )
+            )
+        )
+    )
+    self
+)
+
+(def instance (Cyborg))
+
+( (hash-get instance "greet") "John Connor")
+
+(quit)
+
+
+
 (quit)
 
