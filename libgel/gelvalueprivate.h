@@ -10,6 +10,7 @@
 #define gel_value_get_pointer(v) ((v)->data[0].v_pointer)
 #define gel_value_peek_pointer(v) ((v)->data[0].v_pointer)
 #define gel_value_get_string(v) ((gchar*)(v)->data[0].v_pointer)
+#define gel_value_get_object(v) ((gpointer)(v)->data[0].v_pointer)
 
 #define gel_value_set_boolean(v, a) ((v)->data[0].v_int = (a) != FALSE)
 #define gel_value_set_long(v, a) ((v)->data[0].v_long = (glong)(a))
