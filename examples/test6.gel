@@ -36,15 +36,15 @@
 (def romans
     (hash
         (1000 "M")
-        (900 "MC")
+        (900 "CM")
         (500 "D")
-        (400 "DC")
+        (400 "CD")
         (100 "C")
-        (90 "CX")
+        (90 "XC")
         (50 "L")
-        (40 "LX")
+        (40 "XL")
         (10 "X")
-        (9 "XI")
+        (9 "XX")
         (5 "V")
         (4 "IV")
         (1 "I")
@@ -53,9 +53,11 @@
 
 (hash-keys romans)
 
-(map
-    (closure (i) (hash-get romans i))
-    (array 1000 900 50 10 10 5 1 1)
+(apply +
+    (map
+        (closure (i) (hash-get romans i))
+        (array 1000 900 50 10 10 5 1 1)
+    )
 )
 
 
