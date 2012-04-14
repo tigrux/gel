@@ -1463,22 +1463,22 @@ void object_get_(GClosure *self, GValue *return_value,
                  guint n_values, const GValue *values, GelContext *context)
 {
     GObject *object = NULL;
-    const gchar *prop_name = NULL;
+    const gchar *name = NULL;
     GList *list = NULL;
 
     if(gel_context_eval_params(context, __FUNCTION__, &list,
-            "OS", &n_values, &values, &object, &prop_name))
+            "OS", &n_values, &values, &object, &name))
         if(G_IS_OBJECT(object))
         {
-            GParamSpec *prop_spec = g_object_class_find_property(
-                    G_OBJECT_GET_CLASS(object), prop_name);
-            if(prop_spec != NULL)
+            GObjectClass *gclass = G_OBJECT_GET_CLASS(object);
+            GParamSpec *spec = g_object_class_find_property(gclass, name);
+            if(spec != NULL)
             {
-                g_value_init(return_value, prop_spec->value_type);
-                g_object_get_property(object, prop_name, return_value);
+                g_value_init(return_value, spec->value_type);
+                g_object_get_property(object, name, return_value);
             }
             else
-                gel_warning_no_such_property(__FUNCTION__, prop_name);
+                gel_warning_no_such_property(__FUNCTION__, name);
         }
 
     gel_value_list_free(list);
@@ -1490,32 +1490,32 @@ void object_set_(GClosure *self, GValue *return_value,
                  guint n_values, const GValue *values, GelContext *context)
 {
     GObject *object = NULL;
-    gchar *prop_name = NULL;
+    gchar *name = NULL;
     GValue *value = NULL;
     GList *list = NULL;
 
     if(gel_context_eval_params(context, __FUNCTION__, &list,
-            "OSV", &n_values, &values, &object, &prop_name, &value))
+            "OSV", &n_values, &values, &object, &name, &value))
         if(G_IS_OBJECT(object))
         {
-            GParamSpec *prop_spec = g_object_class_find_property(
-                    G_OBJECT_GET_CLASS(object), prop_name);
-            if(prop_spec != NULL)
+            GObjectClass *gclass = G_OBJECT_GET_CLASS(object);
+            GParamSpec *spec = g_object_class_find_property(gclass, name);
+            if(spec != NULL)
             {
                 GValue result_value = {0};
-                g_value_init(&result_value, prop_spec->value_type);
+                g_value_init(&result_value, spec->value_type);
 
                 if(g_value_transform(value, &result_value))
                 {
-                    g_object_set_property(object, prop_name, &result_value);
+                    g_object_set_property(object, name, &result_value);
                     g_value_unset(&result_value);
                 }
                 else
                     gel_warning_invalid_value_for_property(__FUNCTION__,
-                        value, prop_spec);
+                        value, spec);
             }
             else
-                gel_warning_no_such_property(__FUNCTION__, prop_name);
+                gel_warning_no_such_property(__FUNCTION__, name);
         }
 
     gel_value_list_free(list);
