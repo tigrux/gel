@@ -1,5 +1,6 @@
 #include <config.h>
 #include <geltypeinfo.h>
+#include <gelvalueprivate.h>
 
 
 struct _GelTypeInfo
@@ -285,9 +286,17 @@ gboolean gel_type_info_eval_into_value(const GelTypeInfo *self,
 {
     g_return_val_if_fail(self != NULL, FALSE);
 
-    g_value_init(return_value, GEL_TYPE_TYPEINFO);
-    g_value_set_boxed(return_value, self);
-
-    return FALSE;
+    GIBaseInfo *info = self->info;
+    switch(g_base_info_get_type(info))
+    {
+        case GI_INFO_TYPE_VALUE:
+            g_value_init(return_value, G_TYPE_LONG);
+            gel_value_set_long(return_value, g_value_info_get_value(info));
+            return TRUE;
+        default:
+            g_value_init(return_value, GEL_TYPE_TYPEINFO);
+            g_value_set_boxed(return_value, self);
+            return FALSE;
+    }
 }
 
