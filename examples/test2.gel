@@ -1,20 +1,15 @@
 
-(def (none-of ls predicate)
-    (= (find ls predicate) -1)
-)
-
-(def (index ls value)
-    (find ls (closure (i) (= i value)))
-)
-
 (def (primes-lesser-than top)
     (def primes (array 2))
     (def n 3)
     (def (can-divide-n i)
         (= (% n i) 0)
     )
+    (def (none-prime predicate)
+        (= (find primes predicate) -1)
+    )
     (while (< n top)
-        (if (none-of primes can-divide-n )
+        (if (none-prime can-divide-n )
             (array-append! primes n)
         )
         (set! n (+ n 2))
@@ -24,8 +19,13 @@
 
 (def primes (primes-lesser-than 100))
 
+(def (index-of value values)
+    (def (equal-to-value i) (= i value))
+    (find values equal-to-value)
+)
+
 (for iter primes
-    (print "Primes(" (index primes iter) ") = " iter)
+    (print "Primes(" (index-of iter primes) ") = " iter)
 )
 
 
