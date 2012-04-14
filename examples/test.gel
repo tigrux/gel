@@ -1,31 +1,35 @@
 (require Gtk "2.0")
 
-(def window (object-new "GtkWindow"))
+(def (object-add parent child)
+    (object-set parent "child" child)
+)
+
+(def window (object-new (. Gtk Window)))
 (object-set window "title" "Hello world")
 (object-set window "default-width" 320)
 (object-set window "default-height" 120)
 # the function 'quit' was added in the code of the example interpreter
 (object-connect window "hide" quit)
 
-(def box (object-new "GtkVBox"))
-(object-set window "child" box)
+(def box (object-new (. Gtk VBox)))
+(object-add window box)
 (object-set box "border-width" 12)
 
 # the symbol 'label' was added in the code of the example interpreter
-(object-set box "child" label)
+(object-add box label)
 
-(def button (object-new "GtkButton"))
-(object-set box "child" button)
+(def button (object-new (. Gtk Button)))
+(object-add box button)
 (object-set button "label" "Click me!")
 
-(def entry (object-new "GtkEntry"))
-(object-set box "child" entry)
+(def entry (object-new (. Gtk Entry)))
+(object-add box entry)
 
 (def counter 0)
 
 (object-connect button "clicked"
     (closure (widget)
-        (print "Previous label " (object-get widget "label"))
+        (print "Previous label " (. widget "label"))
         (object-set widget "label" "Thanks!")
         (set! counter (+ counter 1))
         (object-set entry "text" counter)
