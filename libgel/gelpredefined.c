@@ -1416,17 +1416,16 @@ void object_new_(GClosure *self, GValue *return_value,
     {
         GType type = g_type_from_name(type_name);
         if(type != G_TYPE_INVALID)
+        {
+            g_value_init(return_value, type);
             if(G_TYPE_IS_INSTANTIATABLE(type))
             {
                 GObject *new_object = (GObject*)g_object_new(type, NULL);
                 if(G_IS_INITIALLY_UNOWNED(new_object))
                     g_object_ref_sink(new_object);
-
-                g_value_init(return_value, type);
                 g_value_take_object(return_value, new_object);
             }
-            else
-                gel_warning_type_not_instantiatable(__FUNCTION__, type);
+        }
         else
             gel_warning_type_name_invalid(__FUNCTION__, type_name);
     }
