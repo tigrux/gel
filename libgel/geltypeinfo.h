@@ -15,5 +15,9 @@ const GelTypeInfo* gel_type_info_lookup(const GelTypeInfo *self,
 
 GelTypeInfo* gel_type_info_from_gtype(GType type);
 
+gboolean gel_type_info_eval_into_value(const GelTypeInfo *self,
+                                       const GObject *instance,
+                                       GValue *return_value);
+
 #endif
 

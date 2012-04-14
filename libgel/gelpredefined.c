@@ -1336,6 +1336,7 @@ void dot_(GClosure *self, GValue *return_value,
 
     const GelTypelib *typelib = NULL;
     const GelTypeInfo *type_info = NULL;
+    const GObject *instance = NULL;
 
     GType type = GEL_VALUE_TYPE(value);
     if(type == GEL_TYPE_TYPELIB)
@@ -1349,6 +1350,8 @@ void dot_(GClosure *self, GValue *return_value,
         type_info = gel_type_info_from_gtype(type);
         if(type_info == NULL)
             gel_warning_type_name_invalid(__FUNCTION__, g_type_name(type));
+        else
+            instance = (const GObject *)gel_value_get_object(value);
     }
     else
         g_warning("%s: Expected typelib, type info or registered type",
@@ -1397,10 +1400,7 @@ void dot_(GClosure *self, GValue *return_value,
     }
 
     if(type_info != NULL)
-    {
-        g_value_init(return_value, GEL_TYPE_TYPEINFO);
-        g_value_set_boxed(return_value, type_info);
-    }
+        gel_type_info_eval_into_value(type_info, instance, return_value);
 }
 
 

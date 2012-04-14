@@ -278,3 +278,16 @@ const GelTypeInfo* gel_type_info_lookup(const GelTypeInfo *self,
     return (GelTypeInfo *)g_hash_table_lookup(self->infos, name);
 }
 
+
+gboolean gel_type_info_eval_into_value(const GelTypeInfo *self,
+                                       const GObject *instance,
+                                       GValue *return_value)
+{
+    g_return_val_if_fail(self != NULL, FALSE);
+
+    g_value_init(return_value, GEL_TYPE_TYPEINFO);
+    g_value_set_boxed(return_value, self);
+
+    return FALSE;
+}
+
