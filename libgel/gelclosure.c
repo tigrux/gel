@@ -126,12 +126,12 @@ void gel_closure_bind_symbols_of_array(GelClosure *self, GValueArray *array)
         if(type == GEL_TYPE_SYMBOL)
         {
             GelSymbol *symbol = (GelSymbol*)gel_value_get_boxed(value);
-            const gchar *symbol_name = gel_symbol_get_name(symbol);
+            const gchar *name = gel_symbol_get_name(symbol);
             const GelContext *context = gel_closure_get_context(self);
-            if(!gel_closure_has_argument(self, symbol_name))
+            if(!gel_closure_has_argument(self, name))
             {
                 GelVariable *variable =
-                    gel_context_lookup_variable(context, symbol_name);
+                    gel_context_lookup_variable(context, name);
                 if(variable != NULL)
                     gel_symbol_set_variable(symbol, variable);
             }
