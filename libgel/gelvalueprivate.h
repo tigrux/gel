@@ -15,8 +15,11 @@
 #define gel_value_set_boolean(v, a) ((v)->data[0].v_int = (a) != FALSE)
 #define gel_value_set_long(v, a) ((v)->data[0].v_long = (glong)(a))
 #define gel_value_set_uint(v, a) ((v)->data[0].v_uint = (guint)(a))
-#define gel_value_set_pointer(v, a) ((v)->data[0].v_pointer = (gpointer)(a))
 #define gel_value_set_double(v, a) ((v)->data[0].v_double = (gdouble)(a))
+#define gel_value_set_pointer(v, a) ((v)->data[0].v_pointer = (gpointer)(a))
+#define gel_value_take_boxed(v, a) ((v)->data[0].v_pointer = (gpointer)(a))
+#define gel_value_take_object(v, a) ((v)->data[0].v_pointer = (gpointer)(a))
+
 
 #define GEL_VALUE_HOLDS(v, t) ((v)->g_type == (t) || g_type_is_a((v)->g_type, (t)))
 #define GEL_VALUE_TYPE(v) ((v)->g_type)

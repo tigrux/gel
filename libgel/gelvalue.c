@@ -22,7 +22,7 @@
 GValue* gel_value_new_from_boxed(GType type, gpointer boxed)
 {
     GValue *value = gel_value_new_of_type(type);
-    g_value_take_boxed(value, boxed);
+    gel_value_take_boxed(value, boxed);
     return value;
 }
 
@@ -397,7 +397,7 @@ gboolean gel_values_simple_add(const GValue *v1, const GValue *v2,
                 const GValue *a2_values = a2->values;
                 for(guint i = 0; i < n2_values; i++)
                     g_value_array_append(array, a2_values + i);
-                g_value_take_boxed(dest_value, array);
+                gel_value_take_boxed(dest_value, array);
                 return TRUE;
             }
             return FALSE;

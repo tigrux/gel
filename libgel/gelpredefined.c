@@ -150,7 +150,7 @@ void closure_(GClosure *self, GValue *return_value,
         {
             gel_closure_close_over(closure);
             g_value_init(return_value, G_TYPE_CLOSURE);
-            g_value_take_boxed(return_value, closure);
+            gel_value_take_boxed(return_value, closure);
         }
     }
     gel_value_list_free(list);
@@ -833,7 +833,7 @@ void array_(GClosure *self, GValue *return_value,
     }
 
     g_value_init(return_value, G_TYPE_VALUE_ARRAY);
-    g_value_take_boxed(return_value, array);
+    gel_value_take_boxed(return_value, array);
 }
 
 
@@ -986,7 +986,7 @@ void range_(GClosure *self, GValue *return_value,
 
         g_value_unset(&value);
         g_value_init(return_value, G_TYPE_VALUE_ARRAY);
-        g_value_take_boxed(return_value, array);
+        gel_value_take_boxed(return_value, array);
     }
 
     gel_value_list_free(list);
@@ -1044,7 +1044,7 @@ void filter_(GClosure *self, GValue *return_value,
         }
 
         g_value_init(return_value, G_TYPE_VALUE_ARRAY);
-        g_value_take_boxed(return_value, result_array);
+        gel_value_take_boxed(return_value, result_array);
     }
     gel_value_list_free(list);
 }
@@ -1102,10 +1102,10 @@ void zip_(GClosure *self, GValue *return_value,
             for(j = 0; j < n_arrays; j++)
                 g_value_array_append(array, arrays[j]->values + i);
             g_value_init(result_array_values + i, G_TYPE_VALUE_ARRAY);
-            g_value_take_boxed(result_array_values + i, array);
+            gel_value_take_boxed(result_array_values + i, array);
         }
         g_value_init(return_value, G_TYPE_VALUE_ARRAY);
-        g_value_take_boxed(return_value, result_array);
+        gel_value_take_boxed(return_value, result_array);
     }
     else
         g_warning("%s: Argument %u is not an array", __FUNCTION__, i);
@@ -1138,7 +1138,7 @@ void map_(GClosure *self, GValue *return_value,
                 result_array_values + i, 1, array_values + i, context);
 
         g_value_init(return_value, G_TYPE_VALUE_ARRAY);
-        g_value_take_boxed(return_value, result_array);
+        gel_value_take_boxed(return_value, result_array);
     }
 
     gel_value_list_free(list);
@@ -1183,7 +1183,7 @@ void hash_(GClosure *self, GValue *return_value,
     }
 
     g_value_init(return_value, G_TYPE_HASH_TABLE);
-    g_value_take_boxed(return_value, hash);
+    gel_value_take_boxed(return_value, hash);
     gel_value_list_free(list);
 }
 
@@ -1276,7 +1276,7 @@ void hash_keys_(GClosure *self, GValue *return_value,
         for(GList *iter = keys; iter != NULL; iter = g_list_next(iter))
             g_value_array_append(array, (GValue*)iter->data);
         g_value_init(return_value, G_TYPE_VALUE_ARRAY);
-        g_value_take_boxed(return_value, array);
+        gel_value_take_boxed(return_value, array);
         g_list_free(keys);
     }
 
@@ -1423,7 +1423,7 @@ void object_new_(GClosure *self, GValue *return_value,
                 GObject *new_object = (GObject*)g_object_new(type, NULL);
                 if(G_IS_INITIALLY_UNOWNED(new_object))
                     g_object_ref_sink(new_object);
-                g_value_take_object(return_value, new_object);
+                gel_value_take_boxed(return_value, new_object);
             }
         }
         else

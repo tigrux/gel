@@ -419,7 +419,7 @@ void gel_context_insert_object(GelContext *self, const gchar *name,
     GValue *value = gel_value_new_of_type(G_OBJECT_TYPE(object));
     if(G_IS_INITIALLY_UNOWNED(object))
         g_object_ref_sink(object);
-    g_value_take_object(value, object);
+    gel_value_take_object(value, object);
     gel_context_insert(self, name, value);
 }
 
@@ -445,7 +445,7 @@ void gel_context_insert_function(GelContext *self, const gchar *name,
     GClosure *closure = gel_closure_new_native(
             g_strdup(name), (GClosureMarshal)function);
     closure->data = user_data;
-    g_value_take_boxed(value, closure);
+    gel_value_take_boxed(value, closure);
     gel_context_insert(self, name, value);
 }
 

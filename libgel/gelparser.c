@@ -4,6 +4,7 @@
 #include <gelparser.h>
 #include <gelsymbol.h>
 #include <gelvalue.h>
+#include <gelvalueprivate.h>
 
 #define ARRAY_N_PREALLOCATED 8
 
@@ -64,7 +65,7 @@ GValueArray* gel_parse_scanner(GScanner *scanner, gint level,
             case G_TOKEN_LEFT_PAREN:
                 g_scanner_get_next_token(scanner);
                 g_value_init(&value, G_TYPE_VALUE_ARRAY);
-                g_value_take_boxed(&value,gel_parse_scanner(scanner, level+1,
+                gel_value_take_boxed(&value,gel_parse_scanner(scanner, level+1,
                     scanner->line, scanner->position));
                 break;
             case G_TOKEN_RIGHT_PAREN:
@@ -131,7 +132,7 @@ GValueArray* gel_parse_scanner(GScanner *scanner, gint level,
                 else
                 {
                     g_value_init(&value, GEL_TYPE_SYMBOL);
-                    g_value_take_boxed(&value, gel_symbol_new(name, NULL));
+                    gel_value_take_boxed(&value, gel_symbol_new(name, NULL));
                 }
             }
         }
