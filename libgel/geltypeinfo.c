@@ -281,7 +281,7 @@ const GelTypeInfo* gel_type_info_lookup(const GelTypeInfo *self,
 
 
 gboolean gel_type_info_eval_into_value(const GelTypeInfo *self,
-                                       const GObject *instance,
+                                       GObject *object,
                                        GValue *return_value)
 {
     g_return_val_if_fail(self != NULL, FALSE);
@@ -302,10 +302,25 @@ gboolean gel_type_info_eval_into_value(const GelTypeInfo *self,
             g_value_init(return_value, G_TYPE_LONG);
             gel_value_set_long(return_value, g_value_info_get_value(info));
             return TRUE;
+        case GI_INFO_TYPE_PROPERTY:
+            if(object != NULL)
+            {
+                const gchar *name = g_base_info_get_name(info);
+                GObjectClass *gclass = G_OBJECT_GET_CLASS(object);
+                GParamSpec *spec = g_object_class_find_property(gclass, name);
+                if(spec != NULL)
+                {
+                    g_value_init(return_value, spec->value_type);
+                    g_object_get_property(object, name, return_value);
+                    return TRUE;
+                }
+            }
         default:
-            g_value_init(return_value, GEL_TYPE_TYPEINFO);
-            g_value_set_boxed(return_value, self);
-            return FALSE;
+            break;
     }
+
+    g_value_init(return_value, GEL_TYPE_TYPEINFO);
+    g_value_set_boxed(return_value, self);
+    return FALSE;
 }
 
