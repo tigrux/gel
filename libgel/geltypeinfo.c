@@ -287,6 +287,15 @@ gboolean gel_type_info_eval_into_value(const GelTypeInfo *self,
     g_return_val_if_fail(self != NULL, FALSE);
 
     GIBaseInfo *info = self->info;
+
+    if(GI_IS_REGISTERED_TYPE_INFO(info))
+    {
+        g_value_init(return_value, G_TYPE_GTYPE);
+        GType type = g_registered_type_info_get_g_type(info);
+        g_value_set_gtype(return_value, type);
+        return TRUE;
+    }
+
     switch(g_base_info_get_type(info))
     {
         case GI_INFO_TYPE_VALUE:
