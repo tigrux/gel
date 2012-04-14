@@ -257,14 +257,11 @@ const GValue* gel_context_eval_into_value(GelContext *self,
         const gchar *name = gel_symbol_get_name(symbol);
 
         const GelVariable *variable = gel_context_get_variable(self, name);
-        if(variable != NULL)
-            result = gel_variable_get_value(variable);
-        else
-        {
-            const GelContext *outer = gel_context_get_outer(self);
-            if(outer != NULL)
-                result = gel_context_lookup(outer, name);
-        }
+        result = (variable != NULL) ?
+            gel_variable_get_value(variable) : gel_symbol_get_value(symbol);
+
+        if(result == NULL)
+            result = gel_context_lookup(self, name);
 
         if(result == NULL)
             gel_warning_unknown_symbol(__FUNCTION__, name);
