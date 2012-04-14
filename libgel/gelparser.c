@@ -34,8 +34,7 @@ const gchar *scanner_errors[] = {
 
 
 static
-GValueArray* gel_parse_scanner(GScanner *scanner, gint level,
-                               guint line, guint pos)
+GValueArray* gel_parse_scanner(GScanner *scanner, guint line, guint pos)
 {
     GValueArray *array = g_value_array_new(ARRAY_N_PREALLOCATED);
 
@@ -65,7 +64,7 @@ GValueArray* gel_parse_scanner(GScanner *scanner, gint level,
             case G_TOKEN_LEFT_PAREN:
                 g_scanner_get_next_token(scanner);
                 g_value_init(&value, G_TYPE_VALUE_ARRAY);
-                gel_value_take_boxed(&value,gel_parse_scanner(scanner, level+1,
+                gel_value_take_boxed(&value,gel_parse_scanner(scanner,
                     scanner->line, scanner->position));
                 break;
             case G_TOKEN_RIGHT_PAREN:
@@ -73,7 +72,7 @@ GValueArray* gel_parse_scanner(GScanner *scanner, gint level,
                 parsing = FALSE;
                 break;
             case G_TOKEN_EOF:
-                if(level != 0)
+                if(line != 0)
                     g_error("'(' opened at line %u, char %u was not closed",
                         line, pos);
                 parsing = FALSE;
@@ -197,7 +196,7 @@ GValueArray* gel_parse_text(const gchar *text, guint text_len)
     scanner->config->scan_identifier_1char = TRUE;
     g_scanner_input_text(scanner, text, text_len);
 
-    GValueArray *array = gel_parse_scanner(scanner, 0, 0, 0);
+    GValueArray *array = gel_parse_scanner(scanner, 0, 0);
     g_scanner_destroy(scanner);
 
     return array;
