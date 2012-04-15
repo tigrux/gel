@@ -417,6 +417,15 @@ gboolean gel_type_info_property_to_value(const GelTypeInfo *self,
 }
 
 
+static
+gboolean gel_type_info_function_to_value(const GelTypeInfo *self,
+                                         GObject *object, GValue *return_value)
+{
+    //gboolean is_method = (self->container != NULL);
+    return FALSE;
+}
+
+
 gboolean gel_type_info_to_value(const GelTypeInfo *self,
                                 GObject *object, GValue *return_value)
 {
@@ -435,6 +444,11 @@ gboolean gel_type_info_to_value(const GelTypeInfo *self,
         case GI_INFO_TYPE_PROPERTY:
             if(object != NULL)
                 if(gel_type_info_property_to_value(self, object, return_value))
+                    return TRUE;
+            break;
+        case GI_INFO_TYPE_FUNCTION:
+            if(object != NULL)
+                if(gel_type_info_function_to_value(self, object, return_value))
                     return TRUE;
             break;
         default:
