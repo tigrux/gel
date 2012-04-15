@@ -1,0 +1,17 @@
+
+(macro (when cond . body)
+    (if cond
+        (begin body)
+    )
+)
+
+(macro (unless cond . body)
+    (if (not cond)
+        (begin body)
+    )
+)
+
+(macro (send instance (method . args))
+    ((. instance method) args)
+)
+
