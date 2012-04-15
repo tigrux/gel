@@ -46,9 +46,12 @@ GNode *gel_params_format_to_node(const gchar *format, guint *pos, guint *count)
 
 
 static
-GNode *gel_params_parse_format(const gchar *format, guint *count)
+GNode* gel_params_parse_format(const gchar *format, guint *count)
 {
+    g_return_val_if_fail(count != NULL, NULL);
+
     guint pos = 0;
+    *count = 0;
     return gel_params_format_to_node(format, &pos, count);
 }
 
@@ -358,8 +361,7 @@ gboolean gel_context_eval_params(GelContext *self, const gchar *func,
                                  GList **list, const gchar *format,
                                  guint *n_values, const GValue **values, ...)
 {
-
-    guint n_args = 0;
+    guint n_args;
     GNode *format_node = gel_params_parse_format(format, &n_args);
     gpointer *args = g_new0(gpointer, n_args);
 
