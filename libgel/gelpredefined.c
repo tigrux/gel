@@ -1408,7 +1408,7 @@ void dot_(GClosure *self, GValue *return_value,
     }
 
     if(type_info != NULL)
-        gel_type_info_eval_into_value(type_info, object, return_value);
+        gel_type_info_to_value(type_info, object, return_value);
 }
 
 

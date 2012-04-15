@@ -417,8 +417,8 @@ gboolean gel_type_info_property_to_value(const GelTypeInfo *self,
 }
 
 
-gboolean gel_type_info_eval_into_value(const GelTypeInfo *self,
-                                       GObject *object, GValue *return_value)
+gboolean gel_type_info_to_value(const GelTypeInfo *self,
+                                GObject *object, GValue *return_value)
 {
     g_return_val_if_fail(self != NULL, FALSE);
 
