@@ -367,9 +367,9 @@ gboolean gel_type_info_eval_into_value(const GelTypeInfo *self,
             g_constant_info_get_value(info, &argument);
             gboolean converted =
                 gel_argument_to_value(&argument, arg_tag, return_value);
-#if HAVE_G_CONSTANT_INFO_FREE_VALUE
+            #if HAVE_G_CONSTANT_INFO_FREE_VALUE
             g_constant_info_free_value(info, &argument);
-#endif
+            #endif
             g_base_info_unref(arg_info);
             if(converted)
                 return TRUE;
