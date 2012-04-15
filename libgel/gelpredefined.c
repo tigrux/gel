@@ -180,7 +180,7 @@ void let_(GClosure *self, GValue *return_value,
 
     GValueArray *bindings = NULL;
     if(gel_context_eval_params(context, __FUNCTION__,
-            &n_values, &values, &list, "a*", &n_values, &values, &bindings))
+            &n_values, &values, &list, "a*", &bindings))
     {
         guint bindings_n_values = bindings->n_values;
         const GValue *bindings_values = bindings->values;
