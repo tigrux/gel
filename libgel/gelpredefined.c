@@ -90,14 +90,14 @@ void def_(GClosure *self, GValue *return_value,
     else
     if(type == G_TYPE_VALUE_ARRAY)
     {
-        GValueArray *array = NULL;
+        GValueArray *vars = NULL;
         if(gel_context_eval_params(context, __FUNCTION__, &n_values, &values, 
-                &list, "a*", &array))
+                &list, "a*", &vars))
         {
-            guint array_n_values = array->n_values;
-            const GValue *array_values = array->values;
+            guint n_vars = vars->n_values;
+            const GValue *var_values = vars->values;
             if(!gel_context_eval_params(context, __FUNCTION__,
-                    &array_n_values, &array_values, &list, "s*", &name))
+                    &n_vars, &var_values, &list, "s*", &name))
                 type = G_TYPE_INVALID;
             else
             if(gel_context_lookup(context, name) != NULL)
@@ -105,7 +105,7 @@ void def_(GClosure *self, GValue *return_value,
             else
             {
                 closure = new_closure(context, name,
-                                array_n_values, array_values, n_values, values);
+                                n_vars, var_values, n_values, values);
                 if(closure != NULL)
                     value =
                         gel_value_new_from_boxed(G_TYPE_CLOSURE, closure);
