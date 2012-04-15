@@ -356,7 +356,7 @@ void cond_(GClosure *self, GValue *return_value,
             if(type == GEL_TYPE_SYMBOL)
             {
                 GelSymbol *symbol =
-                    (GelSymbol*)g_value_get_boxed(array_values + 0);
+                    (GelSymbol*)gel_value_get_boxed(array_values + 0);
                 array_n_values--;
                 array_values++;
                 const gchar *name = gel_symbol_get_name(symbol);
@@ -1342,14 +1342,14 @@ void dot_(GClosure *self, GValue *return_value,
 
     GType type = GEL_VALUE_TYPE(value);
     if(type == GEL_TYPE_TYPELIB)
-        typelib = (GelTypelib*)g_value_get_boxed(value);
+        typelib = (GelTypelib*)gel_value_get_boxed(value);
     else
     if(type == GEL_TYPE_TYPEINFO)
-        type_info = (GelTypeInfo*)g_value_get_boxed(value);
+        type_info = (GelTypeInfo*)gel_value_get_boxed(value);
     else
     if(type == G_TYPE_GTYPE)
     {
-        type_info = gel_type_info_from_gtype(g_value_get_gtype(value));
+        type_info = gel_type_info_from_gtype(gel_value_get_gtype(value));
         if(type_info == NULL)
             gel_warning_type_name_invalid(__FUNCTION__, g_type_name(type));
     }
@@ -1439,7 +1439,7 @@ void object_new_(GClosure *self, GValue *return_value,
     }
     else
     if(value_type == G_TYPE_GTYPE)
-        type = g_value_get_gtype(&tmp_value);
+        type = gel_value_get_gtype(&tmp_value);
     else
         g_warning("%s: Expected typename or type", __FUNCTION__);
 

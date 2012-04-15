@@ -66,7 +66,7 @@ const gchar* g_info_type_to_string(GIInfoType type)
 static
 void gel_type_info_to_string_transform(const GValue *source, GValue *dest)
 {
-    GelTypeInfo *info = (GelTypeInfo *)g_value_get_boxed(source);
+    GelTypeInfo *info = (GelTypeInfo *)gel_value_get_boxed(source);
     GIBaseInfo *base_info = info->info;
 
     const gchar *info_namespace = g_base_info_get_namespace(base_info);
@@ -286,51 +286,51 @@ gboolean gel_argument_to_value(const GArgument *arg, GITypeTag arg_tag,
     {
         case GI_TYPE_TAG_BOOLEAN:
             g_value_init(value, G_TYPE_BOOLEAN);
-            g_value_set_boolean(value, arg->v_boolean);
+            gel_value_set_boolean(value, arg->v_boolean);
             return TRUE;
         case GI_TYPE_TAG_INT8:
             g_value_init(value, G_TYPE_LONG);
-            g_value_set_long(value, arg->v_int8);
+            gel_value_set_long(value, arg->v_int8);
             return TRUE;
         case GI_TYPE_TAG_UINT8:
             g_value_init(value, G_TYPE_LONG);
-            g_value_set_long(value, arg->v_uint8);
+            gel_value_set_long(value, arg->v_uint8);
             return TRUE;
         case GI_TYPE_TAG_INT16:
             g_value_init(value, G_TYPE_LONG);
-            g_value_set_long(value, arg->v_int16);
+            gel_value_set_long(value, arg->v_int16);
             return TRUE;
         case GI_TYPE_TAG_UINT16:
             g_value_init(value, G_TYPE_LONG);
-            g_value_set_long(value, arg->v_uint16);
+            gel_value_set_long(value, arg->v_uint16);
             return TRUE;
         case GI_TYPE_TAG_INT32:
             g_value_init(value, G_TYPE_LONG);
-            g_value_set_long(value, arg->v_int32);
+            gel_value_set_long(value, arg->v_int32);
             return TRUE;
         case GI_TYPE_TAG_UINT32:
             g_value_init(value, G_TYPE_LONG);
-            g_value_set_long(value, arg->v_uint32);
+            gel_value_set_long(value, arg->v_uint32);
             return TRUE;
         case GI_TYPE_TAG_INT64:
             g_value_init(value, G_TYPE_INT64);
-            g_value_set_int64(value, arg->v_int64);
+            gel_value_set_int64(value, arg->v_int64);
             return TRUE;
         case GI_TYPE_TAG_UINT64:
             g_value_init(value, G_TYPE_UINT64);
-            g_value_set_uint64(value, arg->v_uint64);
+            gel_value_set_uint64(value, arg->v_uint64);
             return TRUE;
         case GI_TYPE_TAG_FLOAT:
             g_value_init(value, G_TYPE_DOUBLE);
-            g_value_set_double(value, arg->v_float);
+            gel_value_set_double(value, arg->v_float);
             return TRUE;
         case GI_TYPE_TAG_DOUBLE:
             g_value_init(value, G_TYPE_DOUBLE);
-            g_value_set_double(value, arg->v_double);
+            gel_value_set_double(value, arg->v_double);
             return TRUE;
         case GI_TYPE_TAG_GTYPE:
             g_value_init(value, G_TYPE_GTYPE);
-            g_value_set_gtype(value, arg->v_uint32);
+            gel_value_set_gtype(value, arg->v_uint32);
             return TRUE;
         case GI_TYPE_TAG_UTF8:
             g_value_init(value, G_TYPE_STRING);
@@ -388,7 +388,7 @@ gboolean gel_type_info_enum_to_value(const GelTypeInfo *self,
     if(G_TYPE_IS_ENUM(enum_type))
     {
         g_value_init(return_value, enum_type);
-        g_value_set_enum(return_value, enum_value);
+        gel_value_set_enum(return_value, enum_value);
     }
     else
     {

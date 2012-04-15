@@ -9,7 +9,9 @@
 #include <gelvariable.h>
 #include <gelclosure.h>
 
+#ifndef GEL_CONTEXT_USE_POOL
 #define GEL_CONTEXT_USE_POOL 1
+#endif
 
 /**
  * SECTION:gelcontext
@@ -214,7 +216,7 @@ const GValue* gel_context_eval_param_into_value(GelContext *self,
     if(GEL_VALUE_HOLDS(result_value, GEL_TYPE_VARIABLE))
     {
         const GelVariable *variable =
-            (GelVariable *)g_value_get_boxed(result_value);
+            (GelVariable *)gel_value_get_boxed(result_value);
         if(variable != NULL)
         {
             const GValue *value = gel_variable_get_value(variable);

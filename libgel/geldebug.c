@@ -56,7 +56,7 @@ void gel_warning_invalid_value_for_property(const gchar *func,
 {
     gchar *value_string = gel_value_to_string(value);
     g_print("%s: '%s' of type '%s' is invalid for property '%s' of type '%s'",
-        func, value_string, G_VALUE_TYPE_NAME(value),
+        func, value_string, GEL_VALUE_TYPE_NAME(value),
         pspec->name, g_type_name(pspec->value_type));
     g_free(value_string);
 }

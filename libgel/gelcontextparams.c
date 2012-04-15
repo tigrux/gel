@@ -74,7 +74,7 @@ gboolean gel_context_eval_param(GelContext *self, const gchar *func,
             value = gel_value_new();
             result =
                 gel_context_eval_param_into_value(self, *values, value);
-            if(!G_VALUE_HOLDS(result, GEL_TYPE_SYMBOL))
+            if(!GEL_VALUE_HOLDS(result, GEL_TYPE_SYMBOL))
                 gel_args_pop(args, const GValue *) = result;
             else
             {
@@ -136,7 +136,7 @@ gboolean gel_context_eval_param(GelContext *self, const gchar *func,
             result =
                 gel_context_eval_param_into_value(self, *values, value);
             if(GEL_VALUE_HOLDS(result, G_TYPE_STRING))
-                gel_args_pop(args, const gchar *) = g_value_get_string(result);
+                gel_args_pop(args, const gchar *) = gel_value_get_string(result);
             else
             {
                 gel_warning_value_not_of_type(func,
@@ -175,7 +175,7 @@ gboolean gel_context_eval_param(GelContext *self, const gchar *func,
             result =
                 gel_context_eval_param_into_value(self, *values, value);
             if(GEL_VALUE_HOLDS(result, G_TYPE_OBJECT))
-                gel_args_pop(args, gpointer) = g_value_get_object(result);
+                gel_args_pop(args, gpointer) = gel_value_get_object(result);
             else
             {
                 gel_warning_value_not_of_type(func,

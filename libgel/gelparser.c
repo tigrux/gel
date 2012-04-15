@@ -54,12 +54,12 @@ GValueArray* gel_parse_scanner(GScanner *scanner, guint line, guint pos)
             case G_TOKEN_FLOAT:
                 g_scanner_get_next_token(scanner);
                 g_value_init(&value, G_TYPE_DOUBLE);
-                g_value_set_double(&value, scanner->value.v_float);
+                gel_value_set_double(&value, scanner->value.v_float);
                 break;
             case G_TOKEN_INT:
                 g_scanner_get_next_token(scanner);
                 g_value_init(&value, G_TYPE_LONG);
-                g_value_set_long(&value, scanner->value.v_int);
+                gel_value_set_long(&value, scanner->value.v_int);
                 break;
             case G_TOKEN_LEFT_PAREN:
                 g_scanner_get_next_token(scanner);
@@ -109,12 +109,12 @@ GValueArray* gel_parse_scanner(GScanner *scanner, guint line, guint pos)
                 {
                     case G_TOKEN_FLOAT:
                         g_value_init(&value, G_TYPE_DOUBLE);
-                        g_value_set_double(&value, -num_scanner->value.v_float);
+                        gel_value_set_double(&value, -num_scanner->value.v_float);
                         is_number = TRUE;
                         break;
                     case G_TOKEN_INT:
                         g_value_init(&value, G_TYPE_LONG);
-                        g_value_set_long(&value, -num_scanner->value.v_int);
+                        gel_value_set_long(&value, -num_scanner->value.v_int);
                         is_number = TRUE;
                         break;
                     default:
