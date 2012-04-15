@@ -1153,12 +1153,8 @@ gel_value_hash(const GValue *value)
     GType type = GEL_VALUE_TYPE(value);
     switch(type)
     {
-
         case G_TYPE_STRING:
-        {
-            const gchar *s = gel_value_get_string(value);
-            return g_str_hash(s);
-        }
+            return g_str_hash(gel_value_get_string(value));
         default:
             return value->data[0].v_uint;
     }
