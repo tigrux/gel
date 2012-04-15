@@ -77,8 +77,8 @@ void def_(GClosure *self, GValue *return_value,
     if(type == GEL_TYPE_SYMBOL)
     {
         GValue *r_value = NULL;
-        if(gel_context_eval_params(context, __FUNCTION__, &list,
-                "sV", &n_values, &values, &name, &r_value))
+        if(gel_context_eval_params(context, __FUNCTION__,
+                &n_values, &values, &list, "sV", &name, &r_value))
         {
             if(gel_context_get_variable(context, name) != NULL)
                 defined = TRUE;
@@ -91,13 +91,13 @@ void def_(GClosure *self, GValue *return_value,
     if(type == G_TYPE_VALUE_ARRAY)
     {
         GValueArray *array = NULL;
-        if(gel_context_eval_params(context, __FUNCTION__, &list,
-                "a*", &n_values, &values, &array))
+        if(gel_context_eval_params(context, __FUNCTION__, &n_values, &values, 
+                &list, "a*", &array))
         {
             guint array_n_values = array->n_values;
             const GValue *array_values = array->values;
-            if(!gel_context_eval_params(context, __FUNCTION__, &list,
-                    "s*", &array_n_values, &array_values, &name))
+            if(!gel_context_eval_params(context, __FUNCTION__,
+                    &array_n_values, &array_values, &list, "s*", &name))
                 type = G_TYPE_INVALID;
             else
             if(gel_context_lookup(context, name) != NULL)
@@ -141,8 +141,8 @@ void closure_(GClosure *self, GValue *return_value,
     GValueArray *array;
     GList *list = NULL;
 
-    if(gel_context_eval_params(context, __FUNCTION__, &list,
-            "a*", &n_values, &values, &array))
+    if(gel_context_eval_params(context, __FUNCTION__,
+            &n_values, &values, &list, "a*", &array))
     {
         GClosure *closure = new_closure(context, "lambda",
                 array->n_values, array->values, n_values, values);
@@ -175,12 +175,12 @@ void let_(GClosure *self, GValue *return_value,
     GType type = GEL_VALUE_TYPE(values + 0);
 
     if(type == GEL_TYPE_SYMBOL)
-        gel_context_eval_params(context, __FUNCTION__, &list,
-             "s*", &n_values, &values, &name);
+        gel_context_eval_params(context, __FUNCTION__,
+            &n_values, &values, &list, "s*", &name);
 
     GValueArray *bindings = NULL;
-    if(gel_context_eval_params(context, __FUNCTION__, &list,
-           "a*", &n_values, &values, &bindings))
+    if(gel_context_eval_params(context, __FUNCTION__,
+            &n_values, &values, &list, "a*", &n_values, &values, &bindings))
     {
         guint bindings_n_values = bindings->n_values;
         const GValue *bindings_values = bindings->values;
@@ -192,17 +192,17 @@ void let_(GClosure *self, GValue *return_value,
         {
             gchar *var_name = NULL;
             GValue *var_value = NULL;
-            if(gel_context_eval_params(context, __FUNCTION__, &list,
-                "(sV)", &bindings_n_values, &bindings_values,
-                &var_name, &var_value))
+            if(gel_context_eval_params(context, __FUNCTION__,
+                    &bindings_n_values, &bindings_values,
+                    &list, "(sV)", &var_name, &var_value))
             {
                 var_names[i] = g_strdup(var_name);
                 var_values[i] = var_value;
             }
         }
 
-        if(gel_context_eval_params(context, __FUNCTION__, &list,
-            "v", &n_values, &values, &body))
+        if(gel_context_eval_params(context, __FUNCTION__,
+                &n_values, &values, &list, "v", &body))
         {
             GelContext *let_context = gel_context_new_with_outer(context);
             if(name != NULL)
@@ -268,8 +268,8 @@ void set_(GClosure *self, GValue *return_value,
     GValue *value = NULL;
     GList *list = NULL;
 
-     if(gel_context_eval_params(context, __FUNCTION__, &list,
-            "sV", &n_values, &values, &symbol, &value))
+     if(gel_context_eval_params(context, __FUNCTION__,
+            &n_values, &values, &list, "sV", &symbol, &value))
     {
         GValue *symbol_value = gel_context_lookup(context, symbol);
         if(symbol_value != NULL)
@@ -295,8 +295,8 @@ void get_(GClosure *self, GValue *return_value,
 
     GList *list = NULL;
     gchar *name;
-    if(gel_context_eval_params(context, __FUNCTION__, &list,
-            "s", &n_values, &values, &name))
+    if(gel_context_eval_params(context, __FUNCTION__,
+            &n_values, &values, &list, "s", &name))
     {
         GelVariable *variable = gel_context_lookup_variable(context, name);
         if(variable != NULL)
@@ -345,8 +345,8 @@ void cond_(GClosure *self, GValue *return_value,
     while(n_values > 0 && running)
     {
         GValueArray *array = NULL;
-        if(gel_context_eval_params(context, __FUNCTION__, &list,
-                "a*", &n_values, &values, &array))
+        if(gel_context_eval_params(context, __FUNCTION__,
+                &n_values, &values,&list, "a*", &array))
         {
             guint array_n_values = array->n_values;
             GValue *array_values = array->values;
@@ -371,8 +371,9 @@ void cond_(GClosure *self, GValue *return_value,
             {
                 const GValue *array_values = array->values;
                 guint array_n_values = array->n_values;
-                if(gel_context_eval_params(context, __FUNCTION__, &list,
-                        "V*", &array_n_values, &array_values, &cond_value))
+                if(gel_context_eval_params(context, __FUNCTION__,
+                        &array_n_values, &array_values, &list,
+                        "V*", &cond_value))
                     predicate_is_true = gel_value_to_boolean(cond_value);
                 else
                     running = FALSE;
@@ -413,13 +414,13 @@ void case_(GClosure *self, GValue *return_value,
     gboolean running = TRUE;
 
     GValue *probe_value = NULL;
-    if(gel_context_eval_params(context, __FUNCTION__, &list,
-            "V*", &n_values, &values, &probe_value))
+    if(gel_context_eval_params(context, __FUNCTION__,
+            &n_values, &values, &list, "V*", &probe_value))
         while(n_values > 0 && running)
         {
             GValueArray *cases = NULL;
-            if(gel_context_eval_params(context, __FUNCTION__, &list,
-                    "a*", &n_values, &values, &cases))
+            if(gel_context_eval_params(context, __FUNCTION__,
+                    &n_values, &values, &list, "a*", &cases))
             {
                 guint cases_n_values = cases->n_values;
                 const GValue *cases_values = cases->values;
@@ -442,8 +443,9 @@ void case_(GClosure *self, GValue *return_value,
                                 __FUNCTION__, name);
                     }
                     else
-                    if(gel_context_eval_params(context, __FUNCTION__, &list,
-                        "a*", &cases_n_values, &cases_values, &tests))
+                    if(gel_context_eval_params(context, __FUNCTION__,
+                            &cases_n_values, &cases_values, &list,
+                            "a*", &tests))
                     {
                         guint tests_n_values = tests->n_values;
                         const GValue *tests_values = tests->values;
@@ -451,8 +453,8 @@ void case_(GClosure *self, GValue *return_value,
                         {
                             GValue *test_value = 0;
                             if(gel_context_eval_params(context, __FUNCTION__,
-                                &list, "v*", &tests_n_values, &tests_values,
-                                &test_value))
+                                    &tests_n_values, &tests_values, &list,
+                                    "v*", &test_value))
                                 if(gel_values_eq(probe_value, test_value))
                                     are_equals = TRUE;
                         }
@@ -516,8 +518,8 @@ void for_(GClosure *self, GValue *return_value,
     GList *list = NULL;
     gboolean result = FALSE;
 
-    if(gel_context_eval_params(context, __FUNCTION__, &list,
-            "sA*", &n_values, &values, &name, &array))
+    if(gel_context_eval_params(context, __FUNCTION__,
+            &n_values, &values,&list, "sA*", &name, &array))
     {
         guint last = array->n_values;
         const GValue *array_values = array->values;
@@ -844,8 +846,8 @@ void array_append_(GClosure *self, GValue *return_value,
     GList *list = NULL;
     GValueArray *array = NULL;
 
-    if(gel_context_eval_params(context, __FUNCTION__, &list,
-            "A*", &n_values, &values, &array))
+    if(gel_context_eval_params(context, __FUNCTION__,
+            &n_values, &values, &list, "A*", &array))
         for(guint i = 0; i < n_values; i++)
         {
             GValue tmp = {0};
@@ -868,8 +870,8 @@ void array_get_(GClosure *self, GValue *return_value,
     GValueArray *array = NULL;
     glong index = 0;
 
-    if(gel_context_eval_params(context, __FUNCTION__, &list,
-            "AI", &n_values, &values, &array, &index))
+    if(gel_context_eval_params(context, __FUNCTION__,
+            &n_values, &values, &list, "AI", &array, &index)) 
     {
         guint array_n_values = array->n_values;
         if(index < 0)
@@ -897,8 +899,8 @@ void array_set_(GClosure *self, GValue *return_value,
     glong index = 0;
     GValue *value = NULL;
 
-    if(gel_context_eval_params(context, __FUNCTION__, &list,
-            "AIV", &n_values, &values, &array, &index, &value))
+    if(gel_context_eval_params(context, __FUNCTION__,
+            &n_values, &values, &list, "AIV", &array, &index, &value))
     {
         guint array_n_values = array->n_values;
         if(index < 0)
@@ -922,8 +924,8 @@ void array_remove_(GClosure *self, GValue *return_value,
     GValueArray *array = NULL;
     glong index = 0;
 
-    if(gel_context_eval_params(context, __FUNCTION__, &list,
-            "AI", &n_values, &values, &array, &index))
+    if(gel_context_eval_params(context, __FUNCTION__,
+            &n_values, &values,&list, "AI", &array, &index))
     {
         guint array_n_values = array->n_values;
         if(index < 0)
@@ -946,8 +948,8 @@ void array_size_(GClosure *self, GValue *return_value,
     GList *list = NULL;
     GValueArray *array = NULL;
 
-    if(gel_context_eval_params(context, __FUNCTION__, &list,
-            "A", &n_values, &values, &array))
+    if(gel_context_eval_params(context, __FUNCTION__,
+            &n_values, &values, &list, "A", &array))
     {
         g_value_init(return_value, G_TYPE_UINT);
         gel_value_set_uint(return_value, array->n_values);
@@ -964,8 +966,8 @@ void range_(GClosure *self, GValue *return_value,
     glong first = 0;
     glong last = 0;
 
-    if(gel_context_eval_params(context, __FUNCTION__, &list,
-            "II", &n_values, &values, &first, &last))
+    if(gel_context_eval_params(context, __FUNCTION__,
+            &n_values, &values, &list, "II", &first, &last))
     {
         GValueArray *array = g_value_array_new(ABS(last-first) + 1);
         GValue value = {0};
@@ -1001,8 +1003,8 @@ void find_(GClosure *self, GValue *return_value,
     GValueArray *array = NULL;
     GClosure *closure = NULL;
 
-    if(gel_context_eval_params(context, __FUNCTION__, &list,
-            "AC", &n_values, &values, &array, &closure))
+    if(gel_context_eval_params(context, __FUNCTION__,
+            &n_values, &values, &list, "AC", &array, &closure))
     {
         const GValue *array_values = array->values;
         glong result = -1;
@@ -1030,8 +1032,8 @@ void filter_(GClosure *self, GValue *return_value,
     GClosure *closure = NULL;
     GValueArray *array = NULL;
 
-    if(gel_context_eval_params(context, __FUNCTION__, &list,
-            "CA", &n_values, &values, &closure, &array))
+    if(gel_context_eval_params(context, __FUNCTION__,
+            &n_values, &values, &list, "CA", &closure, &array))
     {
         GValueArray *result_array = g_value_array_new(array->n_values);
         for(guint i = 0; i < array->n_values; i++)
@@ -1058,8 +1060,8 @@ void apply_(GClosure *self, GValue *return_value,
     GClosure *closure = NULL;
     GValueArray *array = NULL;
 
-    if(gel_context_eval_params(context, __FUNCTION__, &list,
-            "CA", &n_values, &values, &closure, &array))
+    if(gel_context_eval_params(context, __FUNCTION__,
+            &n_values, &values, &list, "CA", &closure, &array))
         g_closure_invoke(closure, return_value,
             array->n_values, array->values, context);
     gel_value_list_free(list);
@@ -1077,8 +1079,8 @@ void zip_(GClosure *self, GValue *return_value,
     guint i;
 
     for(i = 0; i < n_arrays; i++)
-        if(!gel_context_eval_params(context, __FUNCTION__, &list,
-                "A*", &n_values, &values, arrays + i))
+        if(!gel_context_eval_params(context, __FUNCTION__,
+                &n_values, &values, &list, "A*", arrays + i))
             break;
 
     if(i == n_arrays)
@@ -1123,8 +1125,8 @@ void map_(GClosure *self, GValue *return_value,
     GClosure *closure = NULL;
     GValueArray *array = NULL;
 
-    if(gel_context_eval_params(context, __FUNCTION__, &list,
-            "CA", &n_values, &values, &closure, &array))
+    if(gel_context_eval_params(context, __FUNCTION__,
+            &n_values, &values, &list, "CA", &closure, &array))
     {
         const GValue *array_values = array->values;
         const guint array_n_values = array->n_values;
@@ -1176,8 +1178,8 @@ void hash_(GClosure *self, GValue *return_value,
     {
         GValue *key = NULL;
         GValue *value = NULL;
-        if(gel_context_eval_params(context, __FUNCTION__, &list,
-                "(VV)*", &n_values, &values, &key, &value))
+        if(gel_context_eval_params(context, __FUNCTION__,
+                &n_values, &values, &list, "(VV)*", &key, &value))
             g_hash_table_insert(hash,
                 gel_value_dup(key), gel_value_dup(value));
     }
@@ -1195,8 +1197,8 @@ void hash_get_(GClosure *self, GValue *return_value,
     GList *list = NULL;
     GHashTable *hash = NULL;
     GValue *key = NULL;
-    if(gel_context_eval_params(context, __FUNCTION__, &list,
-            "HV", &n_values, &values, &hash, &key))
+    if(gel_context_eval_params(context, __FUNCTION__,
+            &n_values, &values, &list, "HV", &hash, &key))
     {
         GValue *value = g_hash_table_lookup(hash, key);
         if(value != NULL)
@@ -1216,8 +1218,8 @@ void hash_set_(GClosure *self, GValue *return_value,
     GValue *key = NULL;
     GValue *value = NULL;
 
-    if(gel_context_eval_params(context, __FUNCTION__, &list,
-            "HVV", &n_values, &values, &hash, &key, &value))
+    if(gel_context_eval_params(context, __FUNCTION__,
+            &n_values, &values, &list, "HVV", &hash, &key, &value))
         g_hash_table_insert(hash, gel_value_dup(key), gel_value_dup(value));
 
     gel_value_list_free(list);
@@ -1232,8 +1234,8 @@ void hash_remove_(GClosure *self, GValue *return_value,
     GHashTable *hash = NULL;
     GValue *key = NULL;
 
-    if(gel_context_eval_params(context, __FUNCTION__, &list,
-            "HV", &n_values, &values, &hash, &key))
+    if(gel_context_eval_params(context, __FUNCTION__,
+            &n_values, &values, &list, "HV", &hash, &key))
         g_hash_table_remove(hash, key);
 
     gel_value_list_free(list);
@@ -1247,8 +1249,8 @@ void hash_size_(GClosure *self, GValue *return_value,
     GList *list = NULL;
     GHashTable *hash = NULL;
 
-    if(gel_context_eval_params(context, __FUNCTION__, &list,
-            "H", &n_values, &values, &hash))
+    if(gel_context_eval_params(context, __FUNCTION__,
+            &n_values, &values, &list, "H", &hash))
     {
         g_value_init(return_value, G_TYPE_UINT);
         guint result = g_hash_table_size(hash);
@@ -1266,8 +1268,8 @@ void hash_keys_(GClosure *self, GValue *return_value,
     GList *list = NULL;
     GHashTable *hash = NULL;
 
-    if(gel_context_eval_params(context, __FUNCTION__, &list,
-            "H", &n_values, &values, &hash))
+    if(gel_context_eval_params(context, __FUNCTION__,
+            &n_values, &values, &list, "H", &hash))
     {
         guint size = g_hash_table_size(hash);
         GValueArray *array = g_value_array_new(size);
@@ -1293,8 +1295,8 @@ void require_(GClosure *self, GValue *return_value,
     GList *list = NULL;
     GelTypelib *ns = NULL;
 
-    if(gel_context_eval_params(context, __FUNCTION__, &list,
-        "sS", &n_values, &values, &namespace_, &version))
+    if(gel_context_eval_params(context, __FUNCTION__,
+            &n_values, &values, &list, "sS", &namespace_, &version))
     {
         if(gel_context_get_variable(context, namespace_) == NULL)
         {
@@ -1466,8 +1468,8 @@ void object_get_(GClosure *self, GValue *return_value,
     const gchar *name = NULL;
     GList *list = NULL;
 
-    if(gel_context_eval_params(context, __FUNCTION__, &list,
-            "OS", &n_values, &values, &object, &name))
+    if(gel_context_eval_params(context, __FUNCTION__,
+            &n_values, &values, &list, "OS", &object, &name))
         if(G_IS_OBJECT(object))
         {
             GObjectClass *gclass = G_OBJECT_GET_CLASS(object);
@@ -1494,8 +1496,8 @@ void object_set_(GClosure *self, GValue *return_value,
     GValue *value = NULL;
     GList *list = NULL;
 
-    if(gel_context_eval_params(context, __FUNCTION__, &list,
-            "OSV", &n_values, &values, &object, &name, &value))
+    if(gel_context_eval_params(context, __FUNCTION__,
+            &n_values, &values, &list, "OSV", &object, &name, &value))
         if(G_IS_OBJECT(object))
         {
             GObjectClass *gclass = G_OBJECT_GET_CLASS(object);
@@ -1531,8 +1533,8 @@ void object_connect_(GClosure *self, GValue *return_value,
     GClosure *callback = NULL;
     GList *list = NULL;
 
-    if(gel_context_eval_params(context, __FUNCTION__, &list,
-            "OSC", &n_values, &values, &object, &signal, &callback))
+    if(gel_context_eval_params(context, __FUNCTION__,
+            &n_values, &values, &list, "OSC", &object, &signal, &callback))
     {
         if(G_IS_OBJECT(object))
         {

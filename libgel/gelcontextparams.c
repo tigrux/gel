@@ -58,9 +58,8 @@ GNode* gel_params_parse_format(const gchar *format, guint *count)
 
 static
 gboolean gel_context_eval_param(GelContext *self, const gchar *func,
-                                GList **list, gchar format,
                                 guint *n_values, const GValue **values,
-                                gpointer **args)
+                                GList **list, gchar format, gpointer **args)
 {
     GValue *value = NULL;
     const GValue *result = NULL;
@@ -213,8 +212,8 @@ gboolean gel_context_eval_param(GelContext *self, const gchar *func,
 
 static
 gboolean gel_context_eval_params_args(GelContext *self, const gchar *func,
-                                      GList **list, GNode *format_node,
                                       guint *n_values, const GValue **values,
+                                      GList **list, GNode *format_node,
                                       gpointer **args)
 
 {
@@ -258,7 +257,7 @@ gboolean gel_context_eval_params_args(GelContext *self, const gchar *func,
         {
             gchar format = g_node_get_int(node);
             parsed = gel_context_eval_param(self,
-                func, list, format, n_values, values, args);
+                func, n_values, values, list, format, args);
         }
         else
             if(GEL_VALUE_HOLDS(*values, G_TYPE_VALUE_ARRAY))
@@ -268,7 +267,7 @@ gboolean gel_context_eval_params_args(GelContext *self, const gchar *func,
                 guint n_values = array->n_values;
                 const GValue *values = array->values;
                 gel_context_eval_params_args(self,
-                    func, list, node, &n_values, &values, args);
+                    func, &n_values, &values, list, node,  args);
             }
             else
             {
@@ -357,23 +356,23 @@ gboolean gel_context_eval_params_args(GelContext *self, const gchar *func,
  * 
  * Returns: #TRUE on sucess, #FALSE otherwise.
  */
-gboolean gel_context_eval_params(GelContext *self, const gchar *func,
-                                 GList **list, const gchar *format,
-                                 guint *n_values, const GValue **values, ...)
+gboolean gel_context_eval_params(GelContext *self,const gchar *func,
+                                 guint *n_values, const GValue **values,
+                                 GList **list, const gchar *format, ...)
 {
     guint n_args;
     GNode *format_node = gel_params_parse_format(format, &n_args);
     gpointer *args = g_new0(gpointer, n_args);
 
     va_list args_va;
-    va_start(args_va, values);
+    va_start(args_va, format);
     for(guint i = 0; i < n_args; i++)
         args[i] = va_arg(args_va, gpointer);
     va_end(args_va);
 
     gpointer *args_iter = args;
     gboolean parsed = gel_context_eval_params_args(self,
-        func, list, format_node, n_values, values, &args_iter);
+        func, n_values, values, list, format_node, &args_iter);
 
     g_free(args);
     g_node_destroy(format_node);

@@ -45,8 +45,8 @@ const GValue* gel_context_eval_into_value(GelContext *self,
                                           const GValue *value,
                                           GValue *out_value);
 gboolean gel_context_eval_params(GelContext *self, const gchar *func,
-                                 GList **list, const gchar *format,
-                                 guint *n_values, const GValue **values, ...);
+                                 guint *n_values, const GValue **values,
+                                 GList **list, const gchar *format, ...);
 
 gboolean gel_context_get_running(const GelContext *self);
 void gel_context_set_running(GelContext *self, gboolean running);
