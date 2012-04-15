@@ -278,6 +278,7 @@ const GelTypeInfo* gel_type_info_lookup(const GelTypeInfo *self,
 }
 
 
+static
 gboolean gel_argument_to_value(const GArgument *arg, GITypeTag arg_tag,
                                GValue *value)
 {
@@ -341,14 +342,11 @@ gboolean gel_argument_to_value(const GArgument *arg, GITypeTag arg_tag,
 }
 
 
-gboolean gel_type_info_eval_into_value(const GelTypeInfo *self,
-                                       GObject *object,
-                                       GValue *return_value)
+static
+gboolean gel_type_info_registered_type_to_value(const GelTypeInfo *self,
+                                                GValue *return_value)
 {
-    g_return_val_if_fail(self != NULL, FALSE);
-
     GIBaseInfo *info = self->info;
-
     if(GI_IS_REGISTERED_TYPE_INFO(info))
     {
         g_value_init(return_value, G_TYPE_GTYPE);
@@ -356,57 +354,92 @@ gboolean gel_type_info_eval_into_value(const GelTypeInfo *self,
         g_value_set_gtype(return_value, type);
         return TRUE;
     }
+    return FALSE;
+}
 
-    switch(g_base_info_get_type(info))
+
+static
+gboolean gel_type_info_constant_to_value(const GelTypeInfo *self,
+                                         GValue *return_value)
+{
+    GIBaseInfo *info = self->info;
+    GITypeInfo *arg_info = g_constant_info_get_type(info);
+    GITypeTag arg_tag = g_type_info_get_tag(arg_info);
+    GArgument argument = {0};
+    g_constant_info_get_value(info, &argument);
+    gboolean converted =
+        gel_argument_to_value(&argument, arg_tag, return_value);
+    #if HAVE_G_CONSTANT_INFO_FREE_VALUE
+    g_constant_info_free_value(info, &argument);
+    #endif
+    g_base_info_unref(arg_info);
+    return converted;
+}
+
+
+static
+gboolean gel_type_info_enum_to_value(const GelTypeInfo *self,
+                                     GValue *return_value)
+{
+    GType enum_type =
+        g_registered_type_info_get_g_type(self->container->info);
+    GIBaseInfo *info = self->info;
+    glong enum_value = g_value_info_get_value(info);
+    if(G_TYPE_IS_ENUM(enum_type))
+    {
+        g_value_init(return_value, enum_type);
+        g_value_set_enum(return_value, enum_value);
+    }
+    else
+    {
+        g_value_init(return_value, G_TYPE_LONG);
+        gel_value_set_long(return_value, enum_value);
+    }
+    return TRUE;
+}
+
+
+static
+gboolean gel_type_info_property_to_value(const GelTypeInfo *self,
+                                         GObject *object, GValue *return_value)
+{
+    GIBaseInfo *info = self->info;
+    const gchar *name = g_base_info_get_name(info);
+    GObjectClass *gclass = G_OBJECT_GET_CLASS(object);
+    GParamSpec *spec = g_object_class_find_property(gclass, name);
+    if(spec != NULL)
+    {
+        g_value_init(return_value, spec->value_type);
+        g_object_get_property(object, name, return_value);
+        return TRUE;
+    }
+    return FALSE;
+}
+
+
+gboolean gel_type_info_eval_into_value(const GelTypeInfo *self,
+                                       GObject *object, GValue *return_value)
+{
+    g_return_val_if_fail(self != NULL, FALSE);
+
+    switch(g_base_info_get_type(self->info))
     {
         case GI_INFO_TYPE_CONSTANT:
-        {
-            GITypeInfo *arg_info = g_constant_info_get_type(info);
-            GITypeTag arg_tag = g_type_info_get_tag(arg_info);
-            GArgument argument = {0};
-            g_constant_info_get_value(info, &argument);
-            gboolean converted =
-                gel_argument_to_value(&argument, arg_tag, return_value);
-            #if HAVE_G_CONSTANT_INFO_FREE_VALUE
-            g_constant_info_free_value(info, &argument);
-            #endif
-            g_base_info_unref(arg_info);
-            if(converted)
+            if(gel_type_info_constant_to_value(self, return_value))
                 return TRUE;
             break;
-        }
         case GI_INFO_TYPE_VALUE:
-        {
-            GType enum_type =
-                g_registered_type_info_get_g_type(self->container->info);
-            glong enum_value = g_value_info_get_value(info);
-            if(G_TYPE_IS_ENUM(enum_type))
-            {
-                g_value_init(return_value, enum_type);
-                g_value_set_enum(return_value, enum_value);
-            }
-            else
-            {
-                g_value_init(return_value, G_TYPE_LONG);
-                gel_value_set_long(return_value, enum_value);
-            }
-            return TRUE;
-        }
+            if(gel_type_info_enum_to_value(self, return_value))
+                return TRUE;
+            break;
         case GI_INFO_TYPE_PROPERTY:
             if(object != NULL)
-            {
-                const gchar *name = g_base_info_get_name(info);
-                GObjectClass *gclass = G_OBJECT_GET_CLASS(object);
-                GParamSpec *spec = g_object_class_find_property(gclass, name);
-                if(spec != NULL)
-                {
-                    g_value_init(return_value, spec->value_type);
-                    g_object_get_property(object, name, return_value);
+                if(gel_type_info_property_to_value(self, object, return_value))
                     return TRUE;
-                }
-            }
             break;
         default:
+            if(gel_type_info_registered_type_to_value(self, return_value))
+                return TRUE;
             break;
     }
 
