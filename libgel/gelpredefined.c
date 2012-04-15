@@ -1156,7 +1156,7 @@ gel_value_hash(const GValue *value)
 
         case G_TYPE_STRING:
         {
-            gchar *s = gel_value_get_string(value);
+            const gchar *s = gel_value_get_string(value);
             return g_str_hash(s);
         }
         default:
