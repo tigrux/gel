@@ -10,6 +10,14 @@ if ! which autoreconf > /dev/null; then
     MISSING="$MISSING autoconf"
 fi
 
+if ! which automake > /dev/null; then
+    MISSING="$MISSING automake"
+fi
+
+if ! which libtool > /dev/null; then
+    MISSING="$MISSING libtool"
+fi
+
 if which pkg-config > /dev/null; then
     if ! pkg-config --exists gobject-introspection-1.0; then
         MISSING="$MISSING libgirepository1.0-dev"
