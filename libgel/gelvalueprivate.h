@@ -11,6 +11,7 @@
 
 #define gel_value_get_boolean(v) ((v)->data[0].v_int != FALSE)
 #define gel_value_get_long(v) ((v)->data[0].v_long)
+#define gel_value_get_int64(v) ((v)->data[0].v_int64)
 #define gel_value_get_double(v) ((v)->data[0].v_double)
 #define gel_value_get_gtype(v) ((GType)(v)->data[0].v_pointer)
 #define gel_value_get_boxed(v) ((v)->data[0].v_pointer)
@@ -38,6 +39,7 @@
 
 #define gel_value_get_boolean g_value_get_boolean
 #define gel_value_get_long g_value_get_long
+#define gel_value_get_int64 g_value_get_int64
 #define gel_value_get_double g_value_get_double
 #define gel_value_get_gtype g_value_get_gtype
 #define gel_value_get_boxed g_value_get_boxed

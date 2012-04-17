@@ -58,8 +58,8 @@ GValueArray* gel_parse_scanner(GScanner *scanner, guint line, guint pos)
                 break;
             case G_TOKEN_INT:
                 g_scanner_get_next_token(scanner);
-                g_value_init(&value, G_TYPE_LONG);
-                gel_value_set_long(&value, scanner->value.v_int);
+                g_value_init(&value, G_TYPE_INT64);
+                gel_value_set_int64(&value, scanner->value.v_int);
                 break;
             case G_TOKEN_LEFT_PAREN:
                 g_scanner_get_next_token(scanner);
@@ -113,8 +113,8 @@ GValueArray* gel_parse_scanner(GScanner *scanner, guint line, guint pos)
                         is_number = TRUE;
                         break;
                     case G_TOKEN_INT:
-                        g_value_init(&value, G_TYPE_LONG);
-                        gel_value_set_long(&value, -num_scanner->value.v_int);
+                        g_value_init(&value, G_TYPE_INT64);
+                        gel_value_set_int64(&value, -num_scanner->value.v_int);
                         is_number = TRUE;
                         break;
                     default:
@@ -177,7 +177,7 @@ GValueArray* gel_parse_file(const gchar *file, GError **error)
  *
  * Uses a #GScanner to parse @content, operators are replaced with their
  * corresponding functions (add for +, mul for *, etc). Characters [ ] are
- * used to build array literals. Integers are considered #glong literals,
+ * used to build array literals. Integers are considered #gint64 literals,
  * strings are #gchararray literals and floats are #gdouble literals.
  *
  * #gel_context_eval_value considers array literals as closure's invokes.

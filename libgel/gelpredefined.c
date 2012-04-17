@@ -868,7 +868,7 @@ void array_get_(GClosure *self, GValue *return_value,
 {
     GList *list = NULL;
     GValueArray *array = NULL;
-    glong index = 0;
+    gint64 index = 0;
 
     if(gel_context_eval_params(context, __FUNCTION__,
             &n_values, &values, &list, "AI", &array, &index)) 
@@ -896,7 +896,7 @@ void array_set_(GClosure *self, GValue *return_value,
 {
     GList *list = NULL;
     GValueArray *array = NULL;
-    glong index = 0;
+    gint64 index = 0;
     GValue *value = NULL;
 
     if(gel_context_eval_params(context, __FUNCTION__,
@@ -922,7 +922,7 @@ void array_remove_(GClosure *self, GValue *return_value,
 {
     GList *list = NULL;
     GValueArray *array = NULL;
-    glong index = 0;
+    gint64 index = 0;
 
     if(gel_context_eval_params(context, __FUNCTION__,
             &n_values, &values,&list, "AI", &array, &index))
@@ -951,8 +951,8 @@ void array_size_(GClosure *self, GValue *return_value,
     if(gel_context_eval_params(context, __FUNCTION__,
             &n_values, &values, &list, "A", &array))
     {
-        g_value_init(return_value, G_TYPE_UINT);
-        gel_value_set_uint(return_value, array->n_values);
+        g_value_init(return_value, G_TYPE_INT64);
+        gel_value_set_int64(return_value, array->n_values);
     }
     gel_value_list_free(list);
 }
@@ -963,26 +963,26 @@ void range_(GClosure *self, GValue *return_value,
             guint n_values, const GValue *values, GelContext *context)
 {
     GList *list = NULL;
-    glong first = 0;
-    glong last = 0;
+    gint64 first = 0;
+    gint64 last = 0;
 
     if(gel_context_eval_params(context, __FUNCTION__,
             &n_values, &values, &list, "II", &first, &last))
     {
         GValueArray *array = g_value_array_new(ABS(last-first) + 1);
         GValue value = {0};
-        g_value_init(&value, G_TYPE_LONG);
+        g_value_init(&value, G_TYPE_INT64);
 
         if(last > first)
-            for(glong i = first; i <= last; i++)
+            for(gint64 i = first; i <= last; i++)
             {
-                gel_value_set_long(&value, i);
+                gel_value_set_int64(&value, i);
                 g_value_array_append(array, &value);
             }
         else
-            for(glong i = first; i >= last; i--)
+            for(gint64 i = first; i >= last; i--)
             {
-                gel_value_set_long(&value, i);
+                gel_value_set_int64(&value, i);
                 g_value_array_append(array, &value);
             }
 
@@ -1007,7 +1007,7 @@ void find_(GClosure *self, GValue *return_value,
             &n_values, &values, &list, "AC", &array, &closure))
     {
         const GValue *array_values = array->values;
-        glong result = -1;
+        gint64 result = -1;
         for(guint i = 0; i < array->n_values && result == -1; i++)
         {
             GValue value = {0};
@@ -1017,8 +1017,8 @@ void find_(GClosure *self, GValue *return_value,
             g_value_unset(&value);
         }
 
-        g_value_init(return_value, G_TYPE_LONG);
-        gel_value_set_long(return_value, result);
+        g_value_init(return_value, G_TYPE_INT64);
+        gel_value_set_int64(return_value, result);
     }
     gel_value_list_free(list);
 }
@@ -1248,9 +1248,9 @@ void hash_size_(GClosure *self, GValue *return_value,
     if(gel_context_eval_params(context, __FUNCTION__,
             &n_values, &values, &list, "H", &hash))
     {
-        g_value_init(return_value, G_TYPE_UINT);
+        g_value_init(return_value, G_TYPE_INT64);
         guint result = g_hash_table_size(hash);
-        gel_value_set_uint(return_value, result);
+        gel_value_set_int64(return_value, result);
     }
 
     gel_value_list_free(list);
@@ -1534,8 +1534,8 @@ void object_connect_(GClosure *self, GValue *return_value,
     {
         if(G_IS_OBJECT(object))
         {
-            g_value_init(return_value, G_TYPE_UINT);
-            gel_value_set_uint(return_value,
+            g_value_init(return_value, G_TYPE_INT64);
+            gel_value_set_int64(return_value,
                 g_signal_connect_closure(object,
                     signal, g_closure_ref(callback), FALSE));
         }

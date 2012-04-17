@@ -71,9 +71,9 @@ gboolean gel_value_copy(const GValue *src_value, GValue *dest_value)
                 gel_value_set_boolean(dest_value,
                     gel_value_get_boolean(src_value));
                 break;
-            case G_TYPE_LONG:
-                gel_value_set_long(dest_value,
-                    gel_value_get_long(src_value));
+            case G_TYPE_INT64:
+                gel_value_set_int64(dest_value,
+                    gel_value_get_int64(src_value));
                 break;
             case G_TYPE_POINTER:
                 gel_value_set_pointer(dest_value,
@@ -271,8 +271,8 @@ gboolean gel_value_to_boolean(const GValue *value)
         case G_TYPE_BOOLEAN:
             result = (gel_value_get_boolean(value) != FALSE);
             break;
-        case G_TYPE_LONG:
-            result = (gel_value_get_long(value) != 0);
+        case G_TYPE_INT64:
+            result = (gel_value_get_int64(value) != 0);
             break;
         case G_TYPE_DOUBLE:
             result = (gel_value_get_double(value) != 0.0);
@@ -304,11 +304,13 @@ GType gel_value_simple_type(const GValue *value)
     GType type = GEL_VALUE_TYPE(value);
     switch(type)
     {
+        case G_TYPE_INT:
         case G_TYPE_UINT:
         case G_TYPE_ULONG:
-        case G_TYPE_INT:
         case G_TYPE_LONG:
-            return G_TYPE_LONG;
+        case G_TYPE_INT64:
+        case G_TYPE_UINT64:
+            return G_TYPE_INT64;
         case G_TYPE_FLOAT:
         case G_TYPE_DOUBLE:
             return G_TYPE_DOUBLE;
@@ -319,7 +321,7 @@ GType gel_value_simple_type(const GValue *value)
         default:
             if(GEL_VALUE_HOLDS(value, G_TYPE_ENUM)
                || GEL_VALUE_HOLDS(value, G_TYPE_FLAGS))
-                return G_TYPE_LONG;
+                return G_TYPE_INT64;
             if(GEL_VALUE_HOLDS(value, G_TYPE_VALUE_ARRAY))
                 return G_TYPE_VALUE_ARRAY;
             if(g_value_fits_pointer(value))
@@ -342,10 +344,10 @@ GType gel_values_simple_type(const GValue *v1, const GValue *v2)
     if(l_type == G_TYPE_INVALID || r_type == G_TYPE_INVALID)
         return G_TYPE_INVALID;
 
-    if(l_type == G_TYPE_DOUBLE && r_type == G_TYPE_LONG)
+    if(l_type == G_TYPE_DOUBLE && r_type == G_TYPE_INT64)
         return G_TYPE_DOUBLE;
 
-    if(r_type == G_TYPE_DOUBLE && l_type == G_TYPE_LONG)
+    if(r_type == G_TYPE_DOUBLE && l_type == G_TYPE_INT64)
         return G_TYPE_DOUBLE;
 
     return G_TYPE_INVALID;
@@ -363,10 +365,10 @@ gboolean gel_values_simple_add(const GValue *v1, const GValue *v2,
     GType type = GEL_VALUE_TYPE(dest_value);
     switch(type)
     {
-        case G_TYPE_LONG:
-            gel_value_set_long(dest_value,
-                gel_value_get_long(v1)
-                + gel_value_get_long(v2));
+        case G_TYPE_INT64:
+            gel_value_set_int64(dest_value,
+                gel_value_get_int64(v1)
+                + gel_value_get_int64(v2));
             return TRUE;
         case G_TYPE_DOUBLE:
             gel_value_set_double(dest_value,
@@ -415,10 +417,10 @@ gboolean gel_values_simple_sub(const GValue *v1, const GValue *v2,
 
     switch(GEL_VALUE_TYPE(dest_value))
     {
-        case G_TYPE_LONG:
-            gel_value_set_long(dest_value,
-                gel_value_get_long(v1)
-                - gel_value_get_long(v2));
+        case G_TYPE_INT64:
+            gel_value_set_int64(dest_value,
+                gel_value_get_int64(v1)
+                - gel_value_get_int64(v2));
             return TRUE;
         case G_TYPE_DOUBLE:
             gel_value_set_double(dest_value,
@@ -441,10 +443,10 @@ gboolean gel_values_simple_mul(const GValue *v1, const GValue *v2,
 
     switch(GEL_VALUE_TYPE(dest_value))
     {
-        case G_TYPE_LONG:
-            gel_value_set_long(dest_value,
-                gel_value_get_long(v1)
-                * gel_value_get_long(v2));
+        case G_TYPE_INT64:
+            gel_value_set_int64(dest_value,
+                gel_value_get_int64(v1)
+                * gel_value_get_int64(v2));
             return TRUE;
         case G_TYPE_DOUBLE:
             gel_value_set_double(dest_value,
@@ -467,10 +469,10 @@ gboolean gel_values_simple_div(const GValue *v1, const GValue *v2,
 
     switch(GEL_VALUE_TYPE(dest_value))
     {
-        case G_TYPE_LONG:
-            gel_value_set_long(dest_value,
-                gel_value_get_long(v1)
-                / gel_value_get_long(v2));
+        case G_TYPE_INT64:
+            gel_value_set_int64(dest_value,
+                gel_value_get_int64(v1)
+                / gel_value_get_int64(v2));
             return TRUE;
         case G_TYPE_DOUBLE:
             gel_value_set_double(dest_value,
@@ -493,15 +495,15 @@ gboolean gel_values_simple_mod(const GValue *v1, const GValue *v2,
 
     switch(GEL_VALUE_TYPE(dest_value))
     {
-        case G_TYPE_LONG:
-            gel_value_set_long(dest_value,
-                gel_value_get_long(v1)
-                % gel_value_get_long(v2));
+        case G_TYPE_INT64:
+            gel_value_set_int64(dest_value,
+                gel_value_get_int64(v1)
+                % gel_value_get_int64(v2));
             return TRUE;
         case G_TYPE_DOUBLE:
             gel_value_set_double(dest_value,
-                (long)gel_value_get_double(v1)
-                % (long)gel_value_get_double(v2));
+                (gint64)gel_value_get_double(v1)
+                % (gint64)gel_value_get_double(v2));
             return TRUE;
         default:
             return FALSE;
@@ -561,7 +563,7 @@ gboolean gel_values_can_cmp(const GValue *v1, const GValue *v2)
     GType type = gel_values_simple_type(v1, v2);
     switch(type)
     {
-        case G_TYPE_LONG:
+        case G_TYPE_INT64:
         case G_TYPE_DOUBLE:
         case G_TYPE_STRING:
         case G_TYPE_POINTER:
@@ -702,10 +704,10 @@ gint gel_values_cmp(const GValue *v1, const GValue *v2)
     gboolean result = -1;
     switch(simple_type)
     {
-        case G_TYPE_LONG:
+        case G_TYPE_INT64:
         {
-            glong i1 = gel_value_get_long(vv1);
-            glong i2 = gel_value_get_long(vv2);
+            gint64 i1 = gel_value_get_int64(vv1);
+            gint64 i2 = gel_value_get_int64(vv2);
             result = i1 > i2 ? 1 : i1 < i2 ? -1 : 0;
             break;
         }

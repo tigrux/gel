@@ -148,12 +148,12 @@ gboolean gel_context_eval_param(GelContext *self, const gchar *func,
             value = gel_value_new();
             result =
                 gel_context_eval_param_into_value(self, *values, value);
-            if(GEL_VALUE_HOLDS(result, G_TYPE_LONG))
-                gel_args_pop(args, glong) = gel_value_get_long(result);
+            if(GEL_VALUE_HOLDS(result, G_TYPE_INT64))
+                gel_args_pop(args, gint64) = gel_value_get_int64(result);
             else
             {
                 gel_warning_value_not_of_type(func,
-                    result, G_TYPE_LONG);
+                    result, G_TYPE_INT64);
                 parsed = FALSE;
             }
             break;
@@ -166,7 +166,7 @@ gboolean gel_context_eval_param(GelContext *self, const gchar *func,
             else
             {
                 gel_warning_value_not_of_type(func,
-                    result, G_TYPE_LONG);
+                    result, G_TYPE_DOUBLE);
                 parsed = FALSE;
             }
             break;
@@ -332,7 +332,7 @@ gboolean gel_context_eval_params_args(GelContext *self, const gchar *func,
  *     S: evaluate and get a string (#gchararray).
  *   </para></listitem>
  *   <listitem><para>
- *     I: evaluate and get an integer (#glong).
+ *     I: evaluate and get an integer (#gint64).
  *   </para></listitem>
  *   <listitem><para>
  *     F: evaluate and get a float (#gdouble).
