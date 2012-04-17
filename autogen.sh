@@ -10,14 +10,25 @@ if ! which autoreconf > /dev/null; then
     MISSING="$MISSING autoconf"
 fi
 
-if ! pkg-config --exists gobject-introspection-1.0; then
-    MISSING="$MISSING libgirepository1.0-dev"
+if ! which automake > /dev/null; then
+    MISSING="$MISSING automake"
 fi
 
-if ! pkg-config --exists gtk+-2.0; then
-    MISSING="$MISSING libgtk2.0-dev"
+if ! which libtool > /dev/null; then
+    MISSING="$MISSING libtool"
 fi
 
+if which pkg-config > /dev/null; then
+    if ! pkg-config --exists gobject-introspection-1.0; then
+        MISSING="$MISSING libgirepository1.0-dev"
+    fi
+
+    if ! pkg-config --exists gtk+-2.0; then
+        MISSING="$MISSING libgtk2.0-dev"
+    fi
+else
+    MISSING="$MISSING pkg-config"
+fi
 
 if test -n "$MISSING"; then
     echo "Some required packages are missing"
@@ -31,6 +42,6 @@ gtkdocize
 autoreconf -i
 
 if test -f configure; then
-    ./configure --enable-gtk-doc $@
+    ./configure --enable-gtk-doc $@ && echo "Now type 'make' to compile"
 fi
 
