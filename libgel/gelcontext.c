@@ -283,7 +283,8 @@ const GValue* gel_context_eval_into_value(GelContext *self,
 
             if(GEL_VALUE_HOLDS(first_value, G_TYPE_CLOSURE))
             {
-                g_closure_invoke((GClosure*)gel_value_get_boxed(first_value),
+                GClosure *closure = (GClosure*)gel_value_get_boxed(first_value);
+                g_closure_invoke(closure,
                     out_value, array_n_values - 1 , array_values + 1, self);
                 result = out_value;
             }
