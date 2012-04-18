@@ -120,8 +120,10 @@ void gel_closure_bind_symbols_of_array(GelClosure *self, GValueArray *array)
         const GValue *value = array_values + i;
         GType type = GEL_VALUE_TYPE(value);
         if(type == G_TYPE_VALUE_ARRAY)
-            gel_closure_bind_symbols_of_array(self,
-                (GValueArray*)gel_value_get_boxed(value));
+        {
+            GValueArray *array = (GValueArray*)gel_value_get_boxed(value);
+            gel_closure_bind_symbols_of_array(self, array);
+        }
         else
         if(type == GEL_TYPE_SYMBOL)
         {
