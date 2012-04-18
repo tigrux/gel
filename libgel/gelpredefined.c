@@ -513,27 +513,27 @@ static
 void for_(GClosure *self, GValue *return_value,
           guint n_values, const GValue *values, GelContext *context)
 {
-    const gchar *name;
+    const gchar *iter_name;
     GValueArray *array;
     GList *list = NULL;
     gboolean result = FALSE;
 
     if(gel_context_eval_params(context, __FUNCTION__,
-            &n_values, &values,&list, "sA*", &name, &array))
+            &n_values, &values,&list, "sA*", &iter_name, &array))
     {
         guint last = array->n_values;
         const GValue *array_values = array->values;
 
         GelContext *loop_context = gel_context_new_with_outer(context);
-        GValue *value = gel_value_new();
-        gel_context_insert(loop_context, name, value);
+        GValue *iter_value = gel_value_new();
+        gel_context_insert(loop_context, iter_name, iter_value);
 
         guint i;
         for(i = 0; i < last && gel_context_get_running(loop_context); i++)
         {
-            gel_value_copy(array_values + i, value);
+            gel_value_copy(array_values + i, iter_value);
             begin_(self, return_value, n_values, values, loop_context);
-            g_value_unset(value);
+            g_value_unset(iter_value);
         }
         if(i == last)
             result = TRUE;  
