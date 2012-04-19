@@ -160,82 +160,6 @@ void closure_(GClosure *self, GValue *return_value,
 
 
 static
-void let_(GClosure *self, GValue *return_value,
-          guint n_values, const GValue *values, GelContext *context)
-{
-    guint n_args = 2;
-    if(n_values < n_args)
-    {
-        gel_warning_needs_at_least_n_arguments(__FUNCTION__, n_args);
-        return;
-    }
-
-    GList *tmp_list = NULL;
-    gchar *name = NULL;
-    GValue *body = NULL;
-    
-    GType type = GEL_VALUE_TYPE(values + 0);
-
-    if(type == GEL_TYPE_SYMBOL)
-        gel_context_eval_params(context, __FUNCTION__,
-            &n_values, &values, &tmp_list, "s*", &name);
-
-    GValueArray *bindings = NULL;
-    if(gel_context_eval_params(context, __FUNCTION__,
-            &n_values, &values, &tmp_list, "a*", &bindings))
-    {
-        guint bindings_n_values = bindings->n_values;
-        const GValue *bindings_values = bindings->values;
-        guint n_vars =  bindings_n_values;
-        gchar **var_names = g_new0(gchar *, n_vars+1);
-        GValue **var_values = g_new(GValue *, n_vars);
-
-        for(guint i = 0; i < n_vars; i++)
-        {
-            gchar *var_name = NULL;
-            GValue *var_value = NULL;
-            if(gel_context_eval_params(context, __FUNCTION__,
-                    &bindings_n_values, &bindings_values,
-                    &tmp_list, "(sV)", &var_name, &var_value))
-            {
-                var_names[i] = g_strdup(var_name);
-                var_values[i] = var_value;
-            }
-        }
-
-        if(gel_context_eval_params(context, __FUNCTION__,
-                &n_values, &values, &tmp_list, "v", &body))
-        {
-            GelContext *let_context = gel_context_new_with_outer(context);
-            if(name != NULL)
-            {
-                GValueArray *code = g_value_array_new(1);
-                g_value_array_append(code, body);
-                GClosure *closure =
-                    gel_closure_new(name, var_names, code, let_context);
-                if(closure != NULL)
-                {
-                    GValue *value =
-                        gel_value_new_from_boxed(G_TYPE_CLOSURE, closure);
-                    gel_context_insert(let_context, name, value);
-                    gel_closure_close_over(closure);
-                }
-            }
-
-            for(guint i = 0; i < n_vars; i++)
-                gel_context_insert(let_context,
-                    var_names[i], gel_value_dup(var_values[i]));
-
-            gel_context_eval_into_value(let_context, body, return_value);
-            g_free(var_values);
-            gel_context_free(let_context);
-        }
-    }
-    gel_value_list_free(tmp_list);
-}
-
-
-static
 void begin_(GClosure *self, GValue *return_value,
             guint n_values, const GValue *values, GelContext *context)
 {
@@ -1562,7 +1486,6 @@ GHashTable* gel_make_default_symbols(void)
         /* binding */
         CLOSURE(def),
         CLOSURE(closure),
-        CLOSURE(let),
 
         /* block */
         CLOSURE(begin),

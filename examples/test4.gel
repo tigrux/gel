@@ -1,21 +1,4 @@
 
-(def (draw-polygon circumference vertices)
-    (def side (/ circumference vertices))
-    (def angle (/ 360 vertices))
-    (let iterate ( (i 0) )
-        (if (< i vertices)
-            (begin
-                (print "move " side)
-                (print "turn " angle)
-                (iterate (+ i 1))
-            )
-        )
-    )
-)
-
-(draw-polygon 300 3)
-
-
 (def (generate-primes)
     (def primes (array))
     (def candidate 2)
