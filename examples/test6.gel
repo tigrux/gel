@@ -61,25 +61,31 @@
 )
 
 
-(def (Cyborg)
+(def (Person name age)
     (def self (object-new "GHashTable"))
     (set! self
         (hash
-            ("name" "Terminator")
+            ("name" name)
+            ("age" age)
             ("greet"
                 (closure (name-of-person)
                     (print "Hello " name-of-person)
                     (print "My name is " (hash-get self "name"))
+                    (print "I am " (hash-get self "age") " years old")
                 )
             )
         )
     )
-    self
+    (closure (s)
+        (hash-get self s)
+    )
 )
 
-(def terminator (Cyborg))
+(def mary (Person "Mary" 35))
 
-( (hash-get terminator "greet") "John Connor")
+(mary "name")
+(mary "age")
+( (mary "greet") "Hanna")
 
 (quit)
 
