@@ -1,6 +1,7 @@
 #include <config.h>
 #include <geltypeinfo.h>
 #include <gelvalueprivate.h>
+#include <gelclosureprivate.h>
 
 
 struct _GelTypeInfo
@@ -67,33 +68,9 @@ static
 void gel_type_info_to_string_transform(const GValue *source, GValue *dest)
 {
     GelTypeInfo *info = (GelTypeInfo *)gel_value_get_boxed(source);
-    GIBaseInfo *base_info = info->info;
-
-    const gchar *info_namespace = g_base_info_get_namespace(base_info);
-    const gchar *type = g_info_type_to_string(g_base_info_get_type(base_info));
-
-    guint n_names = 1;
-    GList *name_list = NULL;
-    while(info != NULL)
-    {
-        const gchar *name = g_base_info_get_name(info->info);
-        name_list = g_list_prepend(name_list, (void *)name);
-        info = info->container;
-        n_names++;
-    }
-    name_list = g_list_prepend(name_list, (void *)info_namespace);
-
-    gchar **name_array = g_new0(gchar*, n_names+1);
-    GList *name_iter = name_list;
-    for(guint i = 0; i < n_names; i++)
-    {
-        name_array[i] = (gchar*)(name_iter->data);
-        name_iter = g_list_next(name_iter);
-    }
-    g_list_free(name_list);
-    gchar *name = g_strjoinv(".", name_array);
-    g_free(name_array);
-
+    gchar *name = gel_type_info_to_string(info);
+    const gchar *type =
+        g_info_type_to_string(g_base_info_get_type(info->info));
     g_value_take_string(dest,
         g_strdup_printf("<GelTypeInfo %s %s>", type, name));
     g_free(name);
@@ -278,6 +255,37 @@ const GelTypeInfo* gel_type_info_lookup(const GelTypeInfo *self,
 }
 
 
+gchar* gel_type_info_to_string(const GelTypeInfo *self)
+{
+    GIBaseInfo *base_info = self->info;
+
+    const gchar *info_namespace = g_base_info_get_namespace(base_info);
+
+    guint n_names = 1;
+    GList *name_list = NULL;
+    const GelTypeInfo *info = self;
+    while(info != NULL)
+    {
+        const gchar *name = g_base_info_get_name(base_info);
+        name_list = g_list_prepend(name_list, (void *)name);
+        info = info->container;
+        n_names++;
+    }
+    name_list = g_list_prepend(name_list, (void *)info_namespace);
+
+    gchar **name_array = g_new0(gchar*, n_names+1);
+    GList *name_iter = name_list;
+    for(guint i = 0; i < n_names; i++)
+    {
+        name_array[i] = (gchar*)(name_iter->data);
+        name_iter = g_list_next(name_iter);
+    }
+    g_list_free(name_list);
+    gchar *name = g_strjoinv(".", name_array);
+    g_free(name_array);
+    return name;
+}
+
 static
 gboolean gel_argument_to_value(const GArgument *arg, GITypeTag arg_tag,
                                GValue *value)
@@ -417,11 +425,34 @@ gboolean gel_type_info_property_to_value(const GelTypeInfo *self,
 }
 
 
+void gel_type_info_closure_marshal(GClosure *closure, GValue *return_value,
+                                   guint n_values, const GValue *values,
+                                   GelContext *context)
+{
+    GelTypeInfo *info = (GelTypeInfo *)closure->data;
+    GIBaseInfo *base_info = info->info;
+
+    guint n = g_callable_info_get_n_args(base_info);
+    for(guint i = 0; i < n; i++)
+    {
+        GIArgInfo *arg_info = g_callable_info_get_arg(base_info, i);
+        GITypeInfo *arg_type = g_arg_info_get_type(arg_info);
+        // TODO
+        g_base_info_unref(arg_type);
+        g_base_info_unref(arg_info);
+    }
+}
+
+
 static
 gboolean gel_type_info_function_to_value(const GelTypeInfo *self,
                                          GObject *object, GValue *return_value)
 {
-    return FALSE;
+    GClosure *closure = gel_closure_new_introspection(self);
+
+    g_value_init(return_value, G_TYPE_CLOSURE);
+    g_value_take_boxed(return_value, closure);
+    return TRUE;
 }
 
 
@@ -446,9 +477,8 @@ gboolean gel_type_info_to_value(const GelTypeInfo *self,
                     return TRUE;
             break;
         case GI_INFO_TYPE_FUNCTION:
-            if(object != NULL)
-                if(gel_type_info_function_to_value(self, object, return_value))
-                    return TRUE;
+            if(gel_type_info_function_to_value(self, object, return_value))
+                return TRUE;
             break;
         default:
             if(gel_type_info_registered_type_to_value(self, return_value))

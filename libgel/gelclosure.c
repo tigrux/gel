@@ -4,7 +4,7 @@
 #include <gelvalue.h>
 #include <gelvalueprivate.h>
 #include <gelsymbol.h>
-
+#include <geltypeinfo.h>
 
 /**
  * SECTION:gelclosure
@@ -30,16 +30,6 @@ struct _GelClosure
     gchar **args;
     GHashTable *args_hash;
     GValueArray *code;
-};
-
-
-typedef struct _GelNativeClosure GelNativeClosure;
-
-struct _GelNativeClosure
-{
-    GClosure closure;
-    gchar *name;
-    GClosureMarshal native_marshal;
 };
 
 
@@ -84,15 +74,15 @@ void gel_closure_marshal(GelClosure *closure, GValue *return_value,
 
 
 static
-void gel_closure_finalize(GelContext *self, GelClosure *closure)
+void gel_closure_finalize(GelContext *context, GelClosure *self)
 {
-    g_return_if_fail(self != NULL);
+    g_return_if_fail(context != NULL);
 
-    g_free(closure->name);
-    g_strfreev(closure->args);
-    g_hash_table_unref(closure->args_hash);
-    g_value_array_free(closure->code);
-    gel_context_free(self);
+    g_free(self->name);
+    g_strfreev(self->args);
+    g_hash_table_unref(self->args_hash);
+    g_value_array_free(self->code);
+    gel_context_free(context);
 }
 
 
@@ -194,6 +184,16 @@ GClosure* gel_closure_new(const gchar *name, gchar **args, GValueArray *code,
 }
 
 
+typedef struct _GelNativeClosure GelNativeClosure;
+
+struct _GelNativeClosure
+{
+    GClosure closure;
+    gchar *name;
+    GClosureMarshal native_marshal;
+};
+
+
 static
 void gel_native_closure_marshal(GClosure *closure, GValue *return_value,
                                 guint n_values, const GValue *values,
@@ -225,12 +225,44 @@ GClosure* gel_closure_new_native(const gchar *name, GClosureMarshal marshal)
 
     GClosure *closure = g_closure_new_simple(sizeof (GelNativeClosure), NULL);
     GelNativeClosure *self = (GelNativeClosure*)closure;
+
     gchar *dup_name = g_strdup(name);
     self->name = dup_name;
     self->native_marshal = marshal;
     g_closure_set_marshal(closure, (GClosureMarshal)gel_native_closure_marshal);
     g_closure_add_finalize_notifier(closure, dup_name, (GClosureNotify)g_free);
 
+    return closure;
+}
+
+
+typedef struct _GelIntrospectionClosure GelIntrospectionClosure;
+
+struct _GelIntrospectionClosure
+{
+    GClosure closure;
+    gchar *name;
+};
+
+
+static
+void gel_introspection_closure_finalize(GelTypeInfo *info, GelClosure *self)
+{
+    g_free(self->name);
+}
+
+
+GClosure* gel_closure_new_introspection(const GelTypeInfo *info)
+{
+    GClosure *closure =
+        g_closure_new_simple(sizeof (GelIntrospectionClosure), (void*)info);
+    g_closure_set_marshal(closure,
+        (GClosureMarshal)gel_type_info_closure_marshal);
+    g_closure_add_finalize_notifier(closure, 
+        (void*)info, (GClosureNotify)gel_introspection_closure_finalize);
+
+    GelIntrospectionClosure *self = (GelIntrospectionClosure*)closure;
+    self->name = gel_type_info_to_string(info);
     return closure;
 }
 
@@ -246,11 +278,14 @@ GClosure* gel_closure_new_native(const gchar *name, GClosureMarshal marshal)
 const gchar* gel_closure_get_name(const GClosure *closure)
 {
     const gchar *name;
+    if(closure->marshal == (GClosureMarshal)gel_closure_marshal)
+        name = ((GelClosure*)closure)->name;
+    else
     if(closure->marshal == (GClosureMarshal)gel_native_closure_marshal)
         name = ((GelNativeClosure*)closure)->name;
     else
-    if(closure->marshal == (GClosureMarshal)gel_closure_marshal)
-        name = ((GelClosure*)closure)->name;
+    if(closure->marshal == (GClosureMarshal)gel_type_info_closure_marshal)
+        name = ((GelIntrospectionClosure*)closure)->name;
     else
         name = NULL;
 
