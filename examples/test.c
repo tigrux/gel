@@ -1,20 +1,21 @@
-#include <gtk/gtk.h>
 #include <gel.h>
 
 
-void demo_quit(GClosure *closure, GValue *return_value,
-               guint n_param_values, GValue *param_values,
-               GelContext *invocation_context, gpointer user_data);
+void get_label_from_c(GClosure *closure, GValue *return_value,
+                      guint n_param_values, GValue *param_values,
+                      GelContext *invocation_context, gpointer user_data)
+{
+    GType label_type = g_type_from_name("GtkLabel");
+    g_value_init(return_value, label_type);
 
-void demo_run(void);
-
-GelContext *context;
-GValueArray *array;
+    GObject *label = g_object_new(label_type, "label", (gchar*)user_data, NULL);
+    g_value_take_object(return_value, label);
+}
 
 
 int main(int argc, char *argv[])
 {
-    gtk_init(&argc, &argv);
+    g_type_init();
 
     if(argc != 2)
     {
@@ -22,49 +23,26 @@ int main(int argc, char *argv[])
         return 1;
     }
 
-    array = gel_parse_file(argv[1], NULL);
+    GValueArray *array = gel_parse_file(argv[1], NULL);
     if(array == NULL)
     {
         g_print("Could not parse file '%s'\n", argv[1]);
         return 1;
     }
 
-    context = gel_context_new();
+    GelContext *context = gel_context_new();
+
     gel_context_insert_function(context,
-        "quit", demo_quit, NULL);
-    gel_context_insert_object(context,
-        "label", (GObject*)gtk_label_new("Added from C"));
+        "get-label-from-c", get_label_from_c, "Added from C");
 
-    gtk_init_add((GtkFunction)demo_run, NULL);
-    gtk_main();
+    GValue *window_title_value = g_new0(GValue, 1);
+    g_value_init(window_title_value, G_TYPE_STRING);
+    g_value_set_string(window_title_value, "Hello Gtk from Gel");
+    gel_context_insert(context, "window-title", window_title_value);
 
-    gel_context_free(context);
-    return 0;
-}
-
-
-void demo_quit(GClosure *closure, GValue *return_value,
-               guint n_param_values, GValue *param_values,
-               GelContext *invocation_context, gpointer user_data)
-{
-    if(return_value != NULL)
+    for(guint i = 0; i < array->n_values; i++)
     {
-        g_value_init(return_value, G_TYPE_STRING);
-        g_value_set_static_string(return_value, "Bye!");
-    }
-    gtk_main_quit();
-}
-
-
-void demo_run(void)
-{
-    guint n_values = array->n_values;
-    const GValue *array_values = array->values;
-
-    guint i;
-    for(i = 0; i < n_values; i++)
-    {
-        const GValue *iter_value = array_values + i;
+        GValue *iter_value = array->values + i;
         gchar *value_string = gel_value_to_string(iter_value);
         g_print("\n%s ?\n", value_string);
         g_free(value_string);
@@ -78,6 +56,9 @@ void demo_run(void)
             g_free(value_string);
         }
     }
+
     g_value_array_free(array);
+    gel_context_free(context);
+    return 0;
 }
 
