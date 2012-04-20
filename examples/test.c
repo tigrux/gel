@@ -1,5 +1,5 @@
 /*
-    An example interpreter that uses the API provided by gelb (libgel).
+    An example interpreter that uses the API provided by Gel (libgel).
     The goal is to show how simple is to use libgel
     to provide scripting to any program based on glib.
     It's still work in progress.
@@ -44,7 +44,7 @@ int main(int argc, char *argv[])
         return 1;
     }
 
-    // instantiate a context to be used to evaluate
+    // instantiate a context to be used to evaluate the parsed values
     GelContext *context = gel_context_new();
 
     // insert a function to make it available in the script
