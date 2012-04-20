@@ -94,9 +94,3 @@
 ( (mary "set") "age" 37)
 (mary "age")
 
-(quit)
-
-
-
-(quit)
-

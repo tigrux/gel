@@ -86,6 +86,3 @@
 
 (print month-I-was-born " has " (how-many-days-have? month-I-was-born) " days")
 
-
-(quit)
-

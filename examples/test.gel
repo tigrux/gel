@@ -1,21 +1,32 @@
+
 (require Gtk "2.0")
+
+( (. Gtk init) )
 
 (def (object-add parent child)
     (object-set parent "child" child)
 )
 
 (def window (object-new (. Gtk Window)))
-(object-set window "title" "Hello world")
+
+# window-title was defined in the interpreter
+(object-set window "title" window-title)
+
 (object-set window "default-width" 320)
 (object-set window "default-height" 120)
-# the function 'quit' was added in the code of the example interpreter
-(object-connect window "hide" quit)
+
+(object-connect window "hide"
+    (closure (widget)
+        ( (. Gtk main-quit) )
+    )
+)
 
 (def box (object-new (. Gtk VBox)))
 (object-add window box)
 (object-set box "border-width" 12)
 
-# the symbol 'label' was added in the code of the example interpreter
+# get-label-from-c was defined in the interpreter
+(def label (get-label-from-c))
 (object-add box label)
 
 (def button (object-new (. Gtk Button)))
@@ -41,4 +52,6 @@
 (object-set entry "visible" TRUE)
 (object-set box "visible" TRUE)
 (object-set window "visible" TRUE)
+
+( (. Gtk main) )
 

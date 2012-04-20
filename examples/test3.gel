@@ -45,6 +45,3 @@
 
 (map sum-of (zip A B C))
 
-
-(quit)
-

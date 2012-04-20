@@ -32,6 +32,3 @@
     (print "Primes(" i ") = " (next-prime))
 )
 
-
-(quit)
-
