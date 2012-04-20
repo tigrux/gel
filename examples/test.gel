@@ -9,8 +9,8 @@
 
 (def window (object-new (. Gtk Window)))
 
-# window-title was defined in the interpreter
-(object-set window "title" window-title)
+# the variable 'title' was defined in the interpreter
+(object-set window "title" title)
 
 (object-set window "default-width" 320)
 (object-set window "default-height" 120)
