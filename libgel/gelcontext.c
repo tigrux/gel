@@ -320,7 +320,9 @@ GList* gel_context_get_variables(const GelContext *self)
 GelVariable* gel_context_get_variable(const GelContext *self,
                                       const gchar *name)
 {
-    return g_hash_table_lookup(self->variables, name);
+    GelVariable *variable = NULL;
+    variable = g_hash_table_lookup(self->variables, name);
+    return variable;
 }
 
 
