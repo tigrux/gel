@@ -115,7 +115,7 @@ GelContext* gel_context_new_with_outer(GelContext *outer)
 #else
     self = gel_context_alloc();
 #endif
-    self->outer = outer;
+    gel_context_set_outer(self, outer);
     self->running = TRUE;
 
     return self;
@@ -500,7 +500,7 @@ void gel_context_set_outer(GelContext *self, GelContext *context)
  * A #GelContext is considered as running when it is
  * currently evaluating a loop (for, while).
  *
- * Returns: #TRUE if #self is running, #FALSE otherwise
+ * Returns: #TRUE if @self is running, #FALSE otherwise
  */
 gboolean gel_context_get_running(const GelContext *self)
 {
