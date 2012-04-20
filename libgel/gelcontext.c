@@ -71,7 +71,6 @@ static
 void gel_context_dispose(GelContext *self)
 {
     g_hash_table_unref(self->variables);
-    memset(self, 0, sizeof(GelContext));
     g_slice_free(GelContext, self);
 }
 
