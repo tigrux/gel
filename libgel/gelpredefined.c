@@ -774,12 +774,12 @@ void array_append_(GClosure *self, GValue *return_value,
             &n_values, &values, &tmp_list, "A*", &array))
         for(guint i = 0; i < n_values; i++)
         {
-            GValue tmp = {0};
+            GValue tmp_value = {0};
             const GValue *value =
-                gel_context_eval_into_value(context,values + i, &tmp);
+                gel_context_eval_into_value(context,values + i, &tmp_value);
             g_value_array_append(array, value);
-            if(GEL_IS_VALUE(&tmp))
-                g_value_unset(&tmp);
+            if(GEL_IS_VALUE(&tmp_value))
+                g_value_unset(&tmp_value);
         }
 
     gel_value_list_free(tmp_list);
@@ -1107,6 +1107,31 @@ void hash_(GClosure *self, GValue *return_value,
 
     g_value_init(return_value, G_TYPE_HASH_TABLE);
     gel_value_take_boxed(return_value, hash);
+    gel_value_list_free(tmp_list);
+}
+
+
+static
+void hash_append_(GClosure *self, GValue *return_value,
+                  guint n_values, const GValue *values, GelContext *context)
+{
+    GList *tmp_list = NULL;
+    GHashTable *hash = NULL;
+
+    if(gel_context_eval_params(context, __FUNCTION__,
+            &n_values, &values, &tmp_list, "H*", &hash))
+        while(n_values > 0)
+        {
+            GValue *key = NULL;
+            GValue *value = NULL;
+            if(gel_context_eval_params(context, __FUNCTION__,
+                    &n_values, &values, &tmp_list, "(VV)*", &key, &value))
+                g_hash_table_insert(hash,
+                    gel_value_dup(key), gel_value_dup(value));
+            else
+                break;
+        }
+
     gel_value_list_free(tmp_list);
 }
 
@@ -1542,6 +1567,7 @@ GHashTable* gel_make_default_symbols(void)
 
         /* hash */
         CLOSURE(hash),
+        CLOSURE_NAME("hash-append!", hash_append),
         CLOSURE_NAME("hash-get", hash_get),
         CLOSURE_NAME("hash-set!", hash_set),
         CLOSURE_NAME("hash-remove!", hash_remove),

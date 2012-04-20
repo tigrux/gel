@@ -62,17 +62,15 @@
 
 
 (def (Person name age)
-    (def self (object-new "GHashTable"))
-    (set! self
-        (hash
-            ("name" name)
-            ("age" age)
-            ("greet"
-                (closure (name-of-person)
-                    (print "Hello " name-of-person)
-                    (print "My name is " (hash-get self "name"))
-                    (print "I am " (hash-get self "age") " years old")
-                )
+    (def self (hash))
+    (hash-append! self
+        ("name" name)
+        ("age" age)
+        ("greet"
+            (closure (name-of-person)
+                (print "Hello " name-of-person)
+                (print "My name is " (hash-get self "name"))
+                (print "I am " (hash-get self "age") " years old")
             )
         )
     )
