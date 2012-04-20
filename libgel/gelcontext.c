@@ -28,6 +28,7 @@ struct _GelContext
     GHashTable *variables;
     GelContext *outer;
     gboolean running;
+    guint level;
 };
 
 
@@ -331,10 +332,12 @@ GelVariable* gel_context_lookup_variable(const GelContext *self,
 
     GelVariable *variable = NULL;
     const GelContext *context = self;
-    while(context != NULL && variable == NULL)
+    guint level = 0;
+    while(context != NULL && variable == NULL && level <= self->level)
     {
         variable = gel_context_get_variable(context, name);
         context = gel_context_get_outer(context);
+        level++;
     }
 
     return variable;
@@ -489,6 +492,8 @@ void gel_context_set_outer(GelContext *self, GelContext *context)
 {
     g_return_if_fail(self != NULL);
     self->outer = context;
+    if(context != NULL)
+        self->level = context->level + 1;
 }
 
 
