@@ -8,7 +8,7 @@
 #include <gel.h>
 
 
-// this function will be made available to the scripts
+// this function will be made available to the script
 void get_label_from_c(GClosure *closure, GValue *return_value,
                       guint n_param_values, GValue *param_values,
                       GelContext *invocation_context, gpointer user_data)
@@ -44,21 +44,21 @@ int main(int argc, char *argv[])
         return 1;
     }
 
-    // intantiate a context to be used to evaluate
+    // instantiate a context to be used to evaluate
     GelContext *context = gel_context_new();
 
-    // insert a function to make it available in the scripts
+    // insert a function to make it available in the script
     gel_context_insert_function(context,
-        "get-label-from-c", get_label_from_c, "Label made in C");
+        "get-label-from-native", get_label_from_c, "Label made in C");
 
-    // insert a value of type string to make it available in the scripts
+    // insert a string to make it available to the script
     GValue *title_value = g_new0(GValue, 1);
     g_value_init(title_value, G_TYPE_STRING);
     g_value_set_string(title_value, "Hello Gtk from Gel");
     gel_context_insert(context,
         "title", title_value);
 
-    // for each value obtained during the parsing...
+    // for each value obtained during the parsing:
     for(guint i = 0; i < array->n_values; i++)
     {
         // print a representation of the value to be evaluated
@@ -68,10 +68,10 @@ int main(int argc, char *argv[])
         g_free(value_string);
 
         GValue result_value = {0};
-        // if the evaluation yields a value...
+        // if the evaluation yields a value ...
         if(gel_context_eval(context, iter_value, &result_value))
         {
-            // print the value obtained from the evaluation
+            // ... then print the value obtained from the evaluation
             value_string = gel_value_to_string(&result_value);
             g_value_unset(&result_value);
             g_print("= %s\n", value_string);

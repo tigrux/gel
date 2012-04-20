@@ -25,8 +25,8 @@
 (object-add window box)
 (object-set box "border-width" 12)
 
-# get-label-from-c was defined in the interpreter
-(def label (get-label-from-c))
+# get-label-from-native was defined in the interpreter
+(def label (get-label-from-native))
 (object-add box label)
 
 (def button (object-new (. Gtk Button)))
