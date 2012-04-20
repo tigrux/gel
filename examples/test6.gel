@@ -51,8 +51,6 @@
     )
 )
 
-(hash-keys romans)
-
 (apply +
     (map
         (closure (i) (hash-get romans i))
@@ -68,9 +66,18 @@
         ("age" age)
         ("greet"
             (closure (name-of-person)
-                (print "Hello " name-of-person)
-                (print "My name is " (hash-get self "name"))
-                (print "I am " (hash-get self "age") " years old")
+                (print "Nice to meet you " name-of-person)
+                (print "I am " (hash-get self "name"))
+            )
+        )
+        ("set"
+            (closure (attr value)
+                (case attr
+                    ( ("age")
+                        (print "Now I am " value " years old")
+                        (hash-set! self "age" value)
+                    )
+                )
             )
         )
     )
@@ -79,11 +86,13 @@
     )
 )
 
-(def mary (Person "Mary" 35))
+(def mary (Person "Maria Romanov" 35))
 
-(mary "name")
-(mary "age")
+(print "My name is " (mary "name") " and I'm " (mary "age"))
 ( (mary "greet") "Hanna")
+
+( (mary "set") "age" 37)
+(mary "age")
 
 (quit)
 
