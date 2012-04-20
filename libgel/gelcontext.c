@@ -61,7 +61,6 @@ GelContext* gel_context_alloc(void)
     self->variables = g_hash_table_new_full(
         g_str_hash, g_str_equal,
         (GDestroyNotify)g_free, (GDestroyNotify)gel_variable_unref);
-    self->outer = NULL;
 
     return self;
 }
