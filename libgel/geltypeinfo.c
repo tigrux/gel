@@ -432,15 +432,63 @@ void gel_type_info_closure_marshal(GClosure *closure, GValue *return_value,
     GelTypeInfo *info = (GelTypeInfo *)closure->data;
     GIBaseInfo *base_info = info->info;
 
-    guint n = g_callable_info_get_n_args(base_info);
-    for(guint i = 0; i < n; i++)
+    guint n_args = g_callable_info_get_n_args(base_info);
+    GIArgInfo **infos = g_new0(GIArgInfo *, n_args);
+    GITypeInfo **types = g_new0(GITypeInfo *, n_args);
+    gboolean *are_indirect = g_new0(gboolean, n_args);
+    GArgument *inputs = g_new0(GArgument, n_args);
+    GArgument *outputs = g_new0(GArgument, n_args);
+    
+    guint n_inputs = 0;
+    guint n_outputs = 0;
+
+    for(guint i = 0; i < n_args; i++)
     {
-        GIArgInfo *arg_info = g_callable_info_get_arg(base_info, i);
-        GITypeInfo *arg_type = g_arg_info_get_type(arg_info);
-        // TODO
-        g_base_info_unref(arg_type);
-        g_base_info_unref(arg_info);
+        GIArgInfo *info = g_callable_info_get_arg(base_info, i);
+        GITypeInfo *type = g_arg_info_get_type(info);
+        if(g_type_info_get_tag(type) == GI_TYPE_TAG_ARRAY)
+        {
+            gint length_index = g_type_info_get_array_length(type);
+            if(length_index != -1)
+                are_indirect[length_index] = TRUE;
+        }
+        infos[i] = info;
+        types[i] = type;
     }
+
+    for(guint i = 0; i < n_args; i++)
+    {
+        GIDirection dir = g_arg_info_get_direction(infos[i]);
+        if(dir == GI_DIRECTION_IN)
+            n_inputs++;
+        else
+        if(dir == GI_DIRECTION_OUT)
+            n_outputs++;
+        else
+        {
+            n_inputs++;
+            n_outputs++;
+        }
+        // TODO
+    }
+
+    GArgument return_arg = {0};
+    g_function_info_invoke(base_info,
+        inputs, n_inputs,
+        outputs, n_outputs,
+        &return_arg,
+        FALSE);
+
+    for(guint i = 0; i < n_args; i++)
+    {
+        g_base_info_unref(types[i]);
+        g_base_info_unref(infos[i]);
+    }
+    g_free(outputs);
+    g_free(inputs);
+    g_free(are_indirect);
+    g_free(types);
+    g_free(infos);
 }
 
 
