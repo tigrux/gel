@@ -77,6 +77,9 @@
                         (print "Now I am " value " years old")
                         (hash-set! self "age" value)
                     )
+                    (else
+                        (print "I don't think you can change my " attr)
+                    )
                 )
             )
         )
@@ -93,4 +96,6 @@
 
 ( (mary "set") "age" 37)
 (mary "age")
+
+( (mary "set") "name" "Boris")
 
