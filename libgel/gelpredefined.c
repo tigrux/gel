@@ -1235,16 +1235,15 @@ void require_(GClosure *self, GValue *return_value,
               guint n_values, const GValue *values, GelContext *context)
 {
     const gchar *namespace_ = NULL;
-    const gchar *version = NULL;
     GList *tmp_list = NULL;
     GelTypelib *ns = NULL;
 
     if(gel_context_eval_params(context, __FUNCTION__,
-            &n_values, &values, &tmp_list, "sS", &namespace_, &version))
+            &n_values, &values, &tmp_list, "s", &namespace_))
     {
         if(gel_context_get_variable(context, namespace_) == NULL)
         {
-            ns = gel_typelib_new(namespace_, version);
+            ns = gel_typelib_new(namespace_, NULL);
             if(ns != NULL)
             {
                 GValue *value = gel_value_new_from_boxed(GEL_TYPE_TYPELIB, ns);

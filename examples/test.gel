@@ -1,5 +1,5 @@
 
-(require Gtk "2.0")
+(require Gtk)
 
 ( (. Gtk init) )
 
