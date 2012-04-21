@@ -334,12 +334,12 @@ GelVariable* gel_context_lookup_variable(const GelContext *self,
     GelVariable *variable = NULL;
     const GelContext *context = self;
     guint level = 0;
-    do
+    while(context != NULL && variable == NULL && level <= self->level)
     {
         variable = gel_context_get_variable(context, name);
         context = gel_context_get_outer(context);
         level++;
-    } while(context != NULL && variable == NULL && level < self->level);
+    }
 
     return variable;
 }
