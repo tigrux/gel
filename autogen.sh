@@ -22,10 +22,6 @@ if which pkg-config > /dev/null; then
     if ! pkg-config --exists gobject-introspection-1.0; then
         MISSING="$MISSING libgirepository1.0-dev"
     fi
-
-    if ! pkg-config --exists gtk+-2.0; then
-        MISSING="$MISSING libgtk2.0-dev"
-    fi
 else
     MISSING="$MISSING pkg-config"
 fi
