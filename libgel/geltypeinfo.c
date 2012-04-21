@@ -425,26 +425,37 @@ gboolean gel_type_info_property_to_value(const GelTypeInfo *self,
 }
 
 
-void gel_type_info_closure_marshal(GClosure *closure, GValue *return_value,
+void gel_type_info_closure_marshal(GClosure *gclosure,
+                                   GValue *return_value,
                                    guint n_values, const GValue *values,
                                    GelContext *context)
 {
-    GelTypeInfo *info = (GelTypeInfo *)closure->data;
-    GIBaseInfo *base_info = info->info;
+    GelIntrospectionClosure *closure = (GelIntrospectionClosure *)gclosure;
+    const GelTypeInfo *info = gel_introspection_closure_get_info(closure);
+    GObject *object = gel_introspection_closure_get_object(closure);
+    GIBaseInfo *function_info = info->info;
 
-    guint n_args = g_callable_info_get_n_args(base_info);
+    guint n_args = g_callable_info_get_n_args(function_info);
     GIArgInfo **infos = g_new0(GIArgInfo *, n_args);
     GITypeInfo **types = g_new0(GITypeInfo *, n_args);
     gboolean *are_indirect = g_new0(gboolean, n_args);
-    GArgument *inputs = g_new0(GArgument, n_args);
+    GArgument *inputs = g_new0(GArgument, n_args + 1);
     GArgument *outputs = g_new0(GArgument, n_args);
     
     guint n_inputs = 0;
     guint n_outputs = 0;
+    guint first_input = 0;
+
+    if(g_function_info_get_flags(function_info) & GI_FUNCTION_IS_METHOD)
+    {
+        inputs[0].v_pointer = object;
+        first_input++;
+        n_inputs++;
+    }
 
     for(guint i = 0; i < n_args; i++)
     {
-        GIArgInfo *info = g_callable_info_get_arg(base_info, i);
+        GIArgInfo *info = g_callable_info_get_arg(function_info, i);
         GITypeInfo *type = g_arg_info_get_type(info);
         if(g_type_info_get_tag(type) == GI_TYPE_TAG_ARRAY)
         {
@@ -473,7 +484,7 @@ void gel_type_info_closure_marshal(GClosure *closure, GValue *return_value,
     }
 
     GArgument return_arg = {0};
-    g_function_info_invoke(base_info,
+    g_function_info_invoke(function_info,
         inputs, n_inputs,
         outputs, n_outputs,
         &return_arg,
@@ -496,7 +507,7 @@ static
 gboolean gel_type_info_function_to_value(const GelTypeInfo *self,
                                          GObject *object, GValue *return_value)
 {
-    GClosure *closure = gel_closure_new_introspection(self);
+    GClosure *closure = gel_closure_new_introspection(self, object);
 
     g_value_init(return_value, G_TYPE_CLOSURE);
     g_value_take_boxed(return_value, closure);

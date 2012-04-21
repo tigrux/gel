@@ -242,28 +242,47 @@ struct _GelIntrospectionClosure
 {
     GClosure closure;
     gchar *name;
+    const GelTypeInfo *info;
 };
 
 
 static
-void gel_introspection_closure_finalize(GelTypeInfo *info, GelClosure *self)
+void gel_introspection_closure_finalize(GObject *object, GelClosure *self)
 {
+    g_object_unref(object);
     g_free(self->name);
 }
 
 
-GClosure* gel_closure_new_introspection(const GelTypeInfo *info)
+GClosure* gel_closure_new_introspection(const GelTypeInfo *info,
+                                        GObject *object)
 {
+    g_object_ref(object);
     GClosure *closure =
-        g_closure_new_simple(sizeof (GelIntrospectionClosure), (void*)info);
+        g_closure_new_simple(sizeof (GelIntrospectionClosure), object);
+
     g_closure_set_marshal(closure,
         (GClosureMarshal)gel_type_info_closure_marshal);
-    g_closure_add_finalize_notifier(closure, 
-        (void*)info, (GClosureNotify)gel_introspection_closure_finalize);
+
+    g_closure_add_finalize_notifier(closure, object,
+        (GClosureNotify)gel_introspection_closure_finalize);
 
     GelIntrospectionClosure *self = (GelIntrospectionClosure*)closure;
     self->name = gel_type_info_to_string(info);
+    self->info = info;
     return closure;
+}
+
+
+const GelTypeInfo* gel_introspection_closure_get_info(GelIntrospectionClosure *self)
+{
+    return self->info;
+}
+
+
+GObject* gel_introspection_closure_get_object(GelIntrospectionClosure *self)
+{
+    return ((GClosure*)self)->data;
 }
 
 
