@@ -15,7 +15,7 @@
         (def calculated-prime 0)
         (while (= calculated-prime 0)
             (if (none-prime can-divide-candidate)
-                (begin
+                (do
                     (array-append! primes candidate)
                     (set! calculated-prime candidate)
                 )

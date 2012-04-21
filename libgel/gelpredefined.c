@@ -158,8 +158,8 @@ void closure_(GClosure *self, GValue *return_value,
 
 
 static
-void begin_(GClosure *self, GValue *return_value,
-            guint n_values, const GValue *values, GelContext *context)
+void do_(GClosure *self, GValue *return_value,
+         guint n_values, const GValue *values, GelContext *context)
 {
     guint n_args = 1;
     if(n_values < n_args)
@@ -304,7 +304,7 @@ void cond_(GClosure *self, GValue *return_value,
             if(running && predicate_is_true)
             {
                 if(array_n_values > 0)
-                    begin_(self, return_value,
+                    do_(self, return_value,
                         array_n_values, array_values, context);
                 else
                     if(cond_value != NULL)
@@ -384,7 +384,7 @@ void case_(GClosure *self, GValue *return_value,
 
                     if(are_equals)
                     {
-                        begin_(self, return_value,
+                        do_(self, return_value,
                             cases_n_values, cases_values, context);
                         running = FALSE;
                     }
@@ -417,7 +417,7 @@ void while_(GClosure *self, GValue *return_value,
 
         cond_is_true = gel_value_to_boolean(cond_value);
         if(cond_is_true)
-            begin_(self, return_value, n_values-1, values+1, loop_context);
+            do_(self, return_value, n_values-1, values+1, loop_context);
         else
             gel_context_set_running(loop_context, FALSE);
 
@@ -454,7 +454,7 @@ void for_(GClosure *self, GValue *return_value,
         for(i = 0; i < last && gel_context_get_running(loop_context); i++)
         {
             gel_value_copy(array_values + i, iter_value);
-            begin_(self, return_value, n_values, values, loop_context);
+            do_(self, return_value, n_values, values, loop_context);
             g_value_unset(iter_value);
         }
         if(i == last)
@@ -1511,7 +1511,7 @@ GHashTable* gel_make_default_symbols(void)
         CLOSURE(closure),
 
         /* block */
-        CLOSURE(begin),
+        CLOSURE(do),
 
         /* imperative */
         CLOSURE_NAME("set!", set),
