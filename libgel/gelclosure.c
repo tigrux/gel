@@ -238,8 +238,6 @@ GClosure* gel_closure_new_native(const gchar *name, GClosureMarshal marshal)
 }
 
 
-typedef struct _GelIntrospectionClosure GelIntrospectionClosure;
-
 struct _GelIntrospectionClosure
 {
     GClosure closure;
