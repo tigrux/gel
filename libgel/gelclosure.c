@@ -26,6 +26,7 @@
 struct _GelClosure
 {
     GClosure closure;
+    GelContext *context;
     gchar *name;
     gchar **args;
     GHashTable *args_hash;
@@ -74,21 +75,19 @@ void gel_closure_marshal(GelClosure *closure, GValue *return_value,
 
 
 static
-void gel_closure_finalize(GelContext *context, GelClosure *self)
+void gel_closure_finalize(void *data, GelClosure *self)
 {
-    g_return_if_fail(context != NULL);
-
     g_free(self->name);
     g_strfreev(self->args);
     g_hash_table_unref(self->args_hash);
     g_value_array_free(self->code);
-    gel_context_free(context);
+    gel_context_free(self->context);
 }
 
 
 GelContext* gel_closure_get_context(GelClosure *self)
 {
-    return (GelContext*)self->closure.data;
+    return self->context;
 }
 
 
@@ -146,8 +145,8 @@ void gel_closure_close_over(GClosure *closure)
  * @code: #GValueArray with the code of the closure.
  * @context: #GelContext where to define a #GClosure.
  *
- * Creates a new #GClosure where @context is used as the data of the new
- * closure, @name will be the name of the closure,
+ * Creates a new #GClosure written in Gel
+ * @name will be the name of the closure,
  * @args contains the names of the arguments of the closure, and
  * @code contains the values that the closure shall evaluate when invoked.
  *
@@ -163,22 +162,25 @@ GClosure* gel_closure_new(const gchar *name, gchar **args, GValueArray *code,
     g_return_val_if_fail(args != NULL, NULL);
     g_return_val_if_fail(code != NULL, NULL);
 
-    GelContext *new_context = gel_context_dup(context);
-    gel_context_set_outer(new_context, context);
-    GClosure *closure = g_closure_new_simple(sizeof(GelClosure), new_context);
+
+    GClosure *closure = g_closure_new_simple(sizeof(GelClosure), NULL);
     g_closure_set_marshal(closure, (GClosureMarshal)gel_closure_marshal);
-    g_closure_add_finalize_notifier(closure, 
-        new_context, (GClosureNotify)gel_closure_finalize);
+    g_closure_add_finalize_notifier(closure,
+        NULL, (GClosureNotify)gel_closure_finalize);
 
     GHashTable *args_hash = g_hash_table_new(g_str_hash, g_str_equal);
     for(guint i = 0; args[i] != NULL; i++)
         g_hash_table_insert(args_hash, args[i], args);
+
+    GelContext *closure_context = gel_context_dup(context);
+    gel_context_set_outer(closure_context, context);
 
     GelClosure *self = (GelClosure*)closure;
     self->args_hash = args_hash;
     self->name = g_strdup(name);
     self->args = args;
     self->code = code;
+    self->context = closure_context;
 
     return closure;
 }
@@ -243,13 +245,16 @@ struct _GelIntrospectionClosure
     GClosure closure;
     gchar *name;
     const GelTypeInfo *info;
+    GObject *object;
 };
 
 
 static
-void gel_introspection_closure_finalize(GObject *object, GelClosure *self)
+void gel_introspection_closure_finalize(void *data,
+                                        GelIntrospectionClosure *self)
 {
-    g_object_unref(object);
+    if(self->object != NULL)
+        g_object_unref(self->object);
     g_free(self->name);
 }
 
@@ -257,9 +262,8 @@ void gel_introspection_closure_finalize(GObject *object, GelClosure *self)
 GClosure* gel_closure_new_introspection(const GelTypeInfo *info,
                                         GObject *object)
 {
-    g_object_ref(object);
     GClosure *closure =
-        g_closure_new_simple(sizeof (GelIntrospectionClosure), object);
+        g_closure_new_simple(sizeof (GelIntrospectionClosure), NULL);
 
     g_closure_set_marshal(closure,
         (GClosureMarshal)gel_type_info_closure_marshal);
@@ -270,6 +274,10 @@ GClosure* gel_closure_new_introspection(const GelTypeInfo *info,
     GelIntrospectionClosure *self = (GelIntrospectionClosure*)closure;
     self->name = gel_type_info_to_string(info);
     self->info = info;
+    if(object != NULL)
+        self->object = g_object_ref(object);
+    else
+        self->object = NULL;
     return closure;
 }
 
@@ -282,7 +290,7 @@ const GelTypeInfo* gel_introspection_closure_get_info(GelIntrospectionClosure *s
 
 GObject* gel_introspection_closure_get_object(GelIntrospectionClosure *self)
 {
-    return ((GClosure*)self)->data;
+    return self->object;
 }
 
 
