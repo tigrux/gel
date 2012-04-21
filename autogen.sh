@@ -2,20 +2,20 @@
 
 MISSING=""
 
-if ! which gtkdocize > /dev/null; then
-    MISSING="$MISSING gtk-doc-tools"
+if ! which automake > /dev/null; then
+    MISSING="$MISSING automake"
 fi
 
 if ! which autoreconf > /dev/null; then
     MISSING="$MISSING autoconf"
 fi
 
-if ! which automake > /dev/null; then
-    MISSING="$MISSING automake"
-fi
-
 if ! which libtool > /dev/null; then
     MISSING="$MISSING libtool"
+fi
+
+if ! which gtkdocize > /dev/null; then
+    MISSING="$MISSING gtk-doc-tools"
 fi
 
 if which pkg-config > /dev/null; then
