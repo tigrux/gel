@@ -6,15 +6,16 @@
 */
 
 int main(string[] args) {
+
     if(args.length != 2) {
         printerr("%s requires an argument\n", args[0]);
         return 1;
     }
 
-    ValueArray array;
+    ValueArray parsed_array;
     try {
-        // parsing a file produces an array of values
-        array = Gel.parse_file(args[1]);
+        // parsing a file returns an array of values
+        parsed_array = Gel.parse_file(args[1]);
     }
     catch {
         print("Could not parse file '%s'\n", args[1]);
@@ -36,7 +37,7 @@ int main(string[] args) {
     context.insert("title", "Hello Gtk from Gel");
 
     // for each value obtained during the parsing:
-    foreach(Value iter_value in array.values) {
+    foreach(Value iter_value in parsed_array.values) {
         // print a representation of the value to be evaluated
         print("\n%s ?\n", Gel.Value.to_string(iter_value));
 
