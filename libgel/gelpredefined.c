@@ -205,7 +205,7 @@ void set_(GClosure *self, GValue *return_value,
 
 
 static
-void get_(GClosure *self, GValue *return_value,
+void var_(GClosure *self, GValue *return_value,
           guint n_values, const GValue *values, GelContext *context)
 {
     guint n_args = 1;
@@ -1515,7 +1515,7 @@ GHashTable* gel_make_default_symbols(void)
 
         /* imperative */
         CLOSURE_NAME("set!", set),
-        CLOSURE_NAME("get&", get),
+        CLOSURE_NAME("var", var),
 
         /* conditional */
         CLOSURE(if),

@@ -2,7 +2,7 @@
 (def colors (array "red" "green" "blue"))
 
 (def (palette)
-    (get& colors)
+    (var colors)
 )
 
 (array-append! (palette) "white")
