@@ -54,12 +54,12 @@ GValueArray* gel_parse_scanner(GScanner *scanner, guint line, guint pos)
             case G_TOKEN_FLOAT:
                 g_scanner_get_next_token(scanner);
                 g_value_init(&value, G_TYPE_DOUBLE);
-                gel_value_set_double(&value, scanner->value.v_float);
+                gel_value_set_double(&value, (gdouble)scanner->value.v_float);
                 break;
             case G_TOKEN_INT:
                 g_scanner_get_next_token(scanner);
                 g_value_init(&value, G_TYPE_INT64);
-                gel_value_set_int64(&value, scanner->value.v_int);
+                gel_value_set_int64(&value, (gint64)scanner->value.v_int64);
                 break;
             case G_TOKEN_LEFT_PAREN:
                 g_scanner_get_next_token(scanner);
@@ -101,6 +101,7 @@ GValueArray* gel_parse_scanner(GScanner *scanner, guint line, guint pos)
             if(name[0] == '-' && len > 1)
             {
                 GScanner *num_scanner = g_scanner_new(NULL);
+                num_scanner->config->store_int64 = TRUE;
                 g_scanner_input_text(num_scanner, name+1, len-1);
                 guint num_token = g_scanner_get_next_token(num_scanner);
                 if(g_scanner_peek_next_token(num_scanner) != G_TOKEN_EOF)
@@ -109,12 +110,14 @@ GValueArray* gel_parse_scanner(GScanner *scanner, guint line, guint pos)
                 {
                     case G_TOKEN_FLOAT:
                         g_value_init(&value, G_TYPE_DOUBLE);
-                        gel_value_set_double(&value, -num_scanner->value.v_float);
+                        gel_value_set_double(&value,
+                            -(gdouble)num_scanner->value.v_float);
                         is_number = TRUE;
                         break;
                     case G_TOKEN_INT:
                         g_value_init(&value, G_TYPE_INT64);
-                        gel_value_set_int64(&value, -num_scanner->value.v_int);
+                        gel_value_set_int64(&value,
+                            -(gint64)num_scanner->value.v_int64);
                         is_number = TRUE;
                         break;
                     default:
@@ -187,13 +190,16 @@ GValueArray* gel_parse_file(const gchar *file, GError **error)
 GValueArray* gel_parse_text(const gchar *text, guint text_len)
 {
     GScanner *scanner = g_scanner_new(NULL);
+    GScannerConfig *config = scanner->config;
 
-    scanner->config->cset_identifier_first =
+    config->cset_identifier_first =
         (gchar*)G_CSET_a_2_z G_CSET_A_2_Z "=_+-*/%!&<>.";
-    scanner->config->cset_identifier_nth =
+    config->cset_identifier_nth =
         (gchar*)G_CSET_a_2_z G_CSET_A_2_Z "=_+-*/%!&<>.?" G_CSET_DIGITS;
-    scanner->config->cpair_comment_single = "#\n";
-    scanner->config->scan_identifier_1char = TRUE;
+    config->cpair_comment_single = "#\n";
+    config->scan_identifier_1char = TRUE;
+    config->store_int64 = TRUE;
+
     g_scanner_input_text(scanner, text, text_len);
 
     GValueArray *array = gel_parse_scanner(scanner, 0, 0);
