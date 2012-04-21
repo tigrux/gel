@@ -1,35 +1,54 @@
 #!/bin/sh
 
-MISSING=""
+MISSING="no"
+DEB_MISSING=""
+RPM_MISSING=""
 
-if ! which automake > /dev/null; then
-    MISSING="$MISSING automake"
+if ! which automake > /dev/null 2>&1; then
+    DEB_MISSING="$DEB_MISSING automake"
+    RPM_MISSING="$RPM_MISSING automake"
+    MISSING="yes"
 fi
 
-if ! which autoreconf > /dev/null; then
-    MISSING="$MISSING autoconf"
+if ! which autoreconf > /dev/null 2>&1; then
+    DEB_MISSING="$DEB_MISSING autoconf"
+    RPM_MISSING="$RPM_MISSING autoconf"
+    MISSING="yes"
 fi
 
-if ! which libtool > /dev/null; then
-    MISSING="$MISSING libtool"
+if ! which libtool > /dev/null 2>&1; then
+    DEB_MISSING="$DEB_MISSING libtool"
+    RPM_MISSING="$RPM_MISSING libtool"
+    MISSING="yes"
 fi
 
-if ! which gtkdocize > /dev/null; then
-    MISSING="$MISSING gtk-doc-tools"
+if ! which gtkdocize > /dev/null 2>&1; then
+    DEB_MISSING="$DEB_MISSING gtk-doc-tools"
+    RPM_MISSING="$RPM_MISSING gtk-doc"
+    MISSING="yes"
 fi
 
-if which pkg-config > /dev/null; then
+if which pkg-config > /dev/null 2>&1; then
     if ! pkg-config --exists gobject-introspection-1.0; then
-        MISSING="$MISSING libgirepository1.0-dev"
+        DEB_MISSING="$DEB_MISSING libgirepository1.0-dev"
+        RPM_MISSING="$RPM_MISSING gobject-introspection-devel"
+        MISSING="yes"
     fi
 else
-    MISSING="$MISSING pkg-config"
+    DEB_MISSING="$DEB_MISSING pkg-config"
+    RPM_MISSING="$RPM_MISSING pkg-config"
+    MISSING="yes"
 fi
 
-if test -n "$MISSING"; then
+if test "$MISSING" = "yes"; then
     echo "Some required packages are missing"
-    echo "If you are using debian or ubuntu, install them with:"
-    echo "sudo apt-get install $MISSING"
+    if which yum > /dev/null 2>&1; then
+        echo "If you are using redhat or fedora, install them with:"
+        echo "sudo yum install$RPM_MISSING"
+    elif which apt-get > /dev/null 2>&1; then
+        echo "If you are using debian or ubuntu, install them with:"
+        echo "sudo apt-get install$DEB_MISSING"
+    fi
     exit 1
 fi
 
