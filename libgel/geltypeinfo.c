@@ -264,6 +264,7 @@ gchar* gel_type_info_to_string(const GelTypeInfo *self)
     guint n_names = 1;
     GList *name_list = NULL;
     const GelTypeInfo *info = self;
+
     while(info != NULL)
     {
         const gchar *name = g_base_info_get_name(base_info);
@@ -273,18 +274,21 @@ gchar* gel_type_info_to_string(const GelTypeInfo *self)
     }
     name_list = g_list_prepend(name_list, (void *)info_namespace);
 
-    gchar **name_array = g_new0(gchar*, n_names+1);
+    gchar **name_array = g_new0(gchar *, n_names + 1);
     GList *name_iter = name_list;
+
     for(guint i = 0; i < n_names; i++)
     {
-        name_array[i] = (gchar*)(name_iter->data);
+        name_array[i] = (gchar*)name_iter->data;
         name_iter = g_list_next(name_iter);
     }
+
     g_list_free(name_list);
     gchar *name = g_strjoinv(".", name_array);
     g_free(name_array);
     return name;
 }
+
 
 static
 gboolean gel_argument_to_value(const GArgument *arg, GITypeTag arg_tag,
