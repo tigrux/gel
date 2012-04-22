@@ -494,6 +494,10 @@ void gel_type_info_closure_marshal(GClosure *gclosure,
         &return_arg,
         FALSE);
 
+    GITypeInfo *return_type = g_callable_info_get_return_type(function_info);
+    GITypeTag return_tag = g_type_info_get_tag(return_type);
+    gel_argument_to_value(&return_arg, return_tag, return_value);
+
     for(guint i = 0; i < n_args; i++)
     {
         g_base_info_unref(types[i]);
