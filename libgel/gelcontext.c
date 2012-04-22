@@ -105,7 +105,7 @@ GelContext* gel_context_new_with_outer(GelContext *outer)
     G_LOCK(contexts);
     if(contexts_POOL != NULL)
     {
-        self = (GelContext*)contexts_POOL->data;
+        self = contexts_POOL->data;
         contexts_POOL = g_list_delete_link(contexts_POOL, contexts_POOL);
     }
     else
@@ -140,7 +140,7 @@ GelContext* gel_context_dup(const GelContext *self)
 
     GelContext *context = gel_context_new_with_outer(self->outer);
     g_hash_table_iter_init(&iter, self->variables);
-    while(g_hash_table_iter_next(&iter, (gpointer*)&name, (gpointer*)&variable))
+    while(g_hash_table_iter_next(&iter, (void **)&name, (void **)&variable))
         gel_context_insert_variable(context, name, variable);
 
     return context;
@@ -214,8 +214,7 @@ const GValue* gel_context_eval_param_into_value(GelContext *self,
         gel_context_eval_into_value(self, value, out_value);
     if(GEL_VALUE_HOLDS(result_value, GEL_TYPE_VARIABLE))
     {
-        const GelVariable *variable =
-            (GelVariable *)gel_value_get_boxed(result_value);
+        const GelVariable *variable = gel_value_get_boxed(result_value);
         if(variable != NULL)
         {
             const GValue *value = gel_variable_get_value(variable);
@@ -254,7 +253,7 @@ const GValue* gel_context_eval_into_value(GelContext *self,
 
     if(type == GEL_TYPE_SYMBOL)
     {
-        const GelSymbol *symbol = (GelSymbol*)gel_value_get_boxed(value);
+        const GelSymbol *symbol = gel_value_get_boxed(value);
         const gchar *name = gel_symbol_get_name(symbol);
 
         const GelVariable *variable = gel_context_get_variable(self, name);
@@ -270,7 +269,7 @@ const GValue* gel_context_eval_into_value(GelContext *self,
     else
     if(type == G_TYPE_VALUE_ARRAY)
     {
-        GValueArray *array = (GValueArray*)gel_value_get_boxed(value);
+        GValueArray *array = gel_value_get_boxed(value);
         const guint array_n_values = array->n_values;
         if(array_n_values > 0)
         {
@@ -282,7 +281,7 @@ const GValue* gel_context_eval_into_value(GelContext *self,
 
             if(GEL_VALUE_HOLDS(first_value, G_TYPE_CLOSURE))
             {
-                GClosure *closure = (GClosure*)gel_value_get_boxed(first_value);
+                GClosure *closure = gel_value_get_boxed(first_value);
                 g_closure_invoke(closure,
                     out_value, array_n_values - 1 , array_values + 1, self);
                 result = out_value;
@@ -441,7 +440,7 @@ void gel_context_insert_object(GelContext *self, const gchar *name,
  * @self evaluates a call to a function named @name.
  */
 void gel_context_insert_function(GelContext *self, const gchar *name,
-                                 GelFunction function, gpointer user_data)
+                                 GelFunction function, void *user_data)
 {
     g_return_if_fail(self != NULL);
     g_return_if_fail(name != NULL);

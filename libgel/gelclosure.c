@@ -110,13 +110,13 @@ void gel_closure_bind_symbols_of_array(GelClosure *self, GValueArray *array)
         GType type = GEL_VALUE_TYPE(value);
         if(type == G_TYPE_VALUE_ARRAY)
         {
-            GValueArray *array = (GValueArray*)gel_value_get_boxed(value);
+            GValueArray *array = gel_value_get_boxed(value);
             gel_closure_bind_symbols_of_array(self, array);
         }
         else
         if(type == GEL_TYPE_SYMBOL)
         {
-            GelSymbol *symbol = (GelSymbol*)gel_value_get_boxed(value);
+            GelSymbol *symbol = gel_value_get_boxed(value);
             const gchar *name = gel_symbol_get_name(symbol);
             const GelContext *context = gel_closure_get_context(self);
             if(!gel_closure_has_argument(self, name))

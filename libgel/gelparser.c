@@ -193,9 +193,9 @@ GValueArray* gel_parse_text(const gchar *text, guint text_len)
     GScannerConfig *config = scanner->config;
 
     config->cset_identifier_first =
-        (gchar*)G_CSET_a_2_z G_CSET_A_2_Z "=_+-*/%!&<>.";
+        G_CSET_a_2_z G_CSET_A_2_Z "=_+-*/%!&<>.";
     config->cset_identifier_nth =
-        (gchar*)G_CSET_a_2_z G_CSET_A_2_Z "=_+-*/%!&<>.?" G_CSET_DIGITS;
+        G_CSET_a_2_z G_CSET_A_2_Z "=_+-*/%!&<>.?" G_CSET_DIGITS;
     config->cpair_comment_single = "#\n";
     config->scan_identifier_1char = TRUE;
     config->store_int64 = TRUE;

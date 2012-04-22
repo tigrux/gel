@@ -12,7 +12,7 @@ struct _GelTypelib
 static
 void gel_typelib_to_string_transform(const GValue *source, GValue *dest)
 {
-    GelTypelib *self = (GelTypelib *)g_value_get_boxed(source);
+    GelTypelib *self = g_value_get_boxed(source);
     const gchar *name = g_typelib_get_namespace(self->typelib);
     gchar *buffer = g_strdup_printf("<GelTypelib %s>", name);
     g_value_take_string(dest, buffer);
@@ -95,6 +95,6 @@ const GelTypeInfo* gel_typelib_lookup(const GelTypelib *self,
 {
     g_return_val_if_fail(self != NULL, NULL);
 
-    return (GelTypeInfo *)g_hash_table_lookup(self->infos, name);
+    return g_hash_table_lookup(self->infos, name);
 }
 

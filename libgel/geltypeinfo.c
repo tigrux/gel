@@ -67,7 +67,7 @@ const gchar* g_info_type_to_string(GIInfoType type)
 static
 void gel_type_info_to_string_transform(const GValue *source, GValue *dest)
 {
-    GelTypeInfo *info = (GelTypeInfo *)gel_value_get_boxed(source);
+    GelTypeInfo *info = gel_value_get_boxed(source);
     gchar *name = gel_type_info_to_string(info);
     const gchar *type =
         g_info_type_to_string(g_base_info_get_type(info->info));
@@ -134,10 +134,8 @@ GelTypeInfo* gel_type_info_from_gtype(GType type)
 {
     GelTypeInfo *info = NULL;
     if(gel_type_info_gtypes != NULL)
-    {
-        info = (GelTypeInfo *)g_hash_table_lookup(
-                    gel_type_info_gtypes, GINT_TO_POINTER(type));
-    }
+        info = g_hash_table_lookup(gel_type_info_gtypes, GINT_TO_POINTER(type));
+
     return info;
 }
 
@@ -251,7 +249,7 @@ const GelTypeInfo* gel_type_info_lookup(const GelTypeInfo *self,
 {
     g_return_val_if_fail(self != NULL, NULL);
 
-    return (GelTypeInfo *)g_hash_table_lookup(self->infos, name);
+    return g_hash_table_lookup(self->infos, name);
 }
 
 
@@ -279,7 +277,7 @@ gchar* gel_type_info_to_string(const GelTypeInfo *self)
 
     for(guint i = 0; i < n_names; i++)
     {
-        name_array[i] = (gchar*)name_iter->data;
+        name_array[i] = name_iter->data;
         name_iter = g_list_next(name_iter);
     }
 

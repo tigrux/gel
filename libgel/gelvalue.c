@@ -19,7 +19,7 @@
  */
 
 
-GValue* gel_value_new_from_boxed(GType type, gpointer boxed)
+GValue* gel_value_new_from_boxed(GType type, void *boxed)
 {
     GValue *value = gel_value_new_of_type(type);
     gel_value_take_boxed(value, boxed);
@@ -147,7 +147,7 @@ gchar* gel_value_to_string(const GValue *value)
     else
     if(GEL_VALUE_HOLDS(value, G_TYPE_VALUE_ARRAY))
     {
-        const GValueArray *array = (GValueArray*)gel_value_get_boxed(value);
+        const GValueArray *array = gel_value_get_boxed(value);
         GString *buffer = g_string_new("(");
         const guint n_values = array->n_values;
         if(n_values > 0)
@@ -169,7 +169,7 @@ gchar* gel_value_to_string(const GValue *value)
     else
     if(GEL_VALUE_HOLDS(value, G_TYPE_HASH_TABLE))
     {
-        GHashTable *hash = (GHashTable*)gel_value_get_boxed(value);
+        GHashTable *hash = gel_value_get_boxed(value);
         GString *buffer = g_string_new("(");
         guint n_values = g_hash_table_size(hash);
         if(n_values > 0)
@@ -181,7 +181,8 @@ gchar* gel_value_to_string(const GValue *value)
             guint i = 0;
 
             g_hash_table_iter_init(&iter, hash);
-            while(g_hash_table_iter_next(&iter, (void*)&key, (void*)&value))
+            while(g_hash_table_iter_next(&iter,
+                    (void *)&key, (void *)&value))
             {
                 gchar *ks = gel_value_to_string(key);
                 gchar *vs = gel_value_to_string(value);
@@ -199,7 +200,7 @@ gchar* gel_value_to_string(const GValue *value)
     else
     if(GEL_VALUE_HOLDS(value, GEL_TYPE_SYMBOL))
     {
-        const GelSymbol *symbol = (GelSymbol*)gel_value_get_boxed(value);
+        const GelSymbol *symbol = gel_value_get_boxed(value);
         const GValue *symbol_value = gel_symbol_get_value(symbol);
         if(symbol_value != NULL)
             result = gel_value_to_string(symbol_value);
@@ -209,7 +210,7 @@ gchar* gel_value_to_string(const GValue *value)
     else
     if(GEL_VALUE_HOLDS(value, G_TYPE_CLOSURE))
     {
-        const GClosure *closure = (GClosure*)gel_value_get_boxed(value);
+        const GClosure *closure = gel_value_get_boxed(value);
         const gchar *name = gel_closure_get_name(closure);
         if(name != NULL)
             result = g_strdup(name);
@@ -280,7 +281,7 @@ gboolean gel_value_to_boolean(const GValue *value)
         default:
             if(type == G_TYPE_ARRAY)
             {
-                GValueArray *array = (GValueArray*)gel_value_get_boxed(value);
+                GValueArray *array = gel_value_get_boxed(value);
                 result = (array != NULL && array->n_values != 0);
                 break;
             }
@@ -385,8 +386,8 @@ gboolean gel_values_simple_add(const GValue *v1, const GValue *v2,
         default:
             if(type == G_TYPE_VALUE_ARRAY)
             {
-                GValueArray *a1 = (GValueArray*)gel_value_get_boxed(v1);
-                GValueArray *a2 = (GValueArray*)gel_value_get_boxed(v2);
+                GValueArray *a1 = gel_value_get_boxed(v1);
+                GValueArray *a2 = gel_value_get_boxed(v2);
                 guint n1_values = a1->n_values;
                 guint n2_values = a2->n_values;
 
@@ -734,16 +735,16 @@ gint gel_values_cmp(const GValue *v1, const GValue *v2)
         case G_TYPE_POINTER:
         {
             
-            gpointer p1 = gel_value_peek_pointer(vv1);
-            gpointer p2 = gel_value_peek_pointer(vv2);
+            void *p1 = gel_value_peek_pointer(vv1);
+            void *p2 = gel_value_peek_pointer(vv2);
             result = p1 > p2 ? 1 : p1 < p2 ? -1 : 0;
             break;
         }
         default:
             if(simple_type == G_TYPE_VALUE_ARRAY)
             {
-                GValueArray *a1 = (GValueArray*)gel_value_get_boxed(vv1);
-                GValueArray *a2 = (GValueArray*)gel_value_get_boxed(vv2);
+                GValueArray *a1 = gel_value_get_boxed(vv1);
+                GValueArray *a2 = gel_value_get_boxed(vv2);
                 guint a1_n = a1->n_values;
                 guint a2_n = a2->n_values;
                 guint n_values = MIN(a1_n, a2_n);

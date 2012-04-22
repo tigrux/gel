@@ -59,7 +59,7 @@ GNode* gel_params_parse_format(const gchar *format, guint *count)
 static
 gboolean gel_context_eval_param(GelContext *self, const gchar *func,
                                 guint *n_values, const GValue **values,
-                                GList **list, gchar format, gpointer **args)
+                                GList **list, gchar format, void ***args)
 {
     GValue *value = NULL;
     const GValue *result = NULL;
@@ -84,7 +84,7 @@ gboolean gel_context_eval_param(GelContext *self, const gchar *func,
             break;
         case 'a':
             if(GEL_VALUE_HOLDS(*values, G_TYPE_VALUE_ARRAY))
-                gel_args_pop(args, gpointer) = gel_value_get_boxed(*values);
+                gel_args_pop(args, void *) = gel_value_get_boxed(*values);
             else
             {
                 gel_warning_value_not_of_type(func,
@@ -97,7 +97,7 @@ gboolean gel_context_eval_param(GelContext *self, const gchar *func,
             result =
                 gel_context_eval_param_into_value(self, *values, value);
             if(GEL_VALUE_HOLDS(result, G_TYPE_VALUE_ARRAY))
-                gel_args_pop(args, gpointer) = gel_value_get_boxed(result);
+                gel_args_pop(args, void *) = gel_value_get_boxed(result);
             else
             {
                 gel_warning_value_not_of_type(func,
@@ -110,7 +110,7 @@ gboolean gel_context_eval_param(GelContext *self, const gchar *func,
             result =
                 gel_context_eval_param_into_value(self, *values, value);
             if(GEL_VALUE_HOLDS(result, G_TYPE_HASH_TABLE))
-                gel_args_pop(args, gpointer) = gel_value_get_boxed(result);
+                gel_args_pop(args, void *) = gel_value_get_boxed(result);
             else
             {
                 gel_warning_value_not_of_type(func,
@@ -121,7 +121,7 @@ gboolean gel_context_eval_param(GelContext *self, const gchar *func,
         case 's':
             if(GEL_VALUE_HOLDS(*values, GEL_TYPE_SYMBOL))
             {
-                GelSymbol *symbol = (GelSymbol*)gel_value_get_boxed(*values);
+                GelSymbol *symbol = gel_value_get_boxed(*values);
                 gel_args_pop(args, const gchar *) = gel_symbol_get_name(symbol);
             }
             else
@@ -175,7 +175,7 @@ gboolean gel_context_eval_param(GelContext *self, const gchar *func,
             result =
                 gel_context_eval_param_into_value(self, *values, value);
             if(GEL_VALUE_HOLDS(result, G_TYPE_OBJECT))
-                gel_args_pop(args, gpointer) = gel_value_get_object(result);
+                gel_args_pop(args, void *) = gel_value_get_object(result);
             else
             {
                 gel_warning_value_not_of_type(func,
@@ -188,7 +188,7 @@ gboolean gel_context_eval_param(GelContext *self, const gchar *func,
             result =
                 gel_context_eval_param_into_value(self, *values, value);
             if(GEL_VALUE_HOLDS(result, G_TYPE_CLOSURE))
-                gel_args_pop(args, gpointer) = gel_value_get_boxed(result);
+                gel_args_pop(args, void *) = gel_value_get_boxed(result);
             else
             {
                 gel_warning_value_not_of_type(func,
@@ -214,7 +214,7 @@ static
 gboolean gel_context_eval_params_args(GelContext *self, const gchar *func,
                                       guint *n_values, const GValue **values,
                                       GList **list, GNode *format_node,
-                                      gpointer **args)
+                                      void ***args)
 
 {
     g_return_val_if_fail(self != NULL, FALSE);
@@ -262,8 +262,7 @@ gboolean gel_context_eval_params_args(GelContext *self, const gchar *func,
         else
             if(GEL_VALUE_HOLDS(*values, G_TYPE_VALUE_ARRAY))
             {
-                GValueArray *array =
-                    (GValueArray*)gel_value_get_boxed(*values);
+                GValueArray *array = gel_value_get_boxed(*values);
                 guint n_values = array->n_values;
                 const GValue *values = array->values;
                 gel_context_eval_params_args(self,
@@ -362,15 +361,15 @@ gboolean gel_context_eval_params(GelContext *self,const gchar *func,
 {
     guint n_args;
     GNode *format_node = gel_params_parse_format(format, &n_args);
-    gpointer *args = g_new0(gpointer, n_args);
+    void **args = g_new0(void *, n_args);
 
     va_list args_va;
     va_start(args_va, format);
     for(guint i = 0; i < n_args; i++)
-        args[i] = va_arg(args_va, gpointer);
+        args[i] = va_arg(args_va, void *);
     va_end(args_va);
 
-    gpointer *args_iter = args;
+    void **args_iter = args;
     gboolean parsed = gel_context_eval_params_args(self,
         func, n_values, values, list, format_node, &args_iter);
 

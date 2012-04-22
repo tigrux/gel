@@ -13,7 +13,7 @@ GClosure* new_closure(GelContext *context, const gchar *name,
                       guint n_vars, const GValue *var_values,
                       guint n_values, const GValue *values)
 {
-    gchar **vars = (gchar**)g_new0(gchar*, n_vars + 1);
+    gchar **vars = g_new0(gchar*, n_vars + 1);
     gchar *invalid_arg_name = NULL;
 
     for(guint i = 0; i < n_vars; i++)
@@ -21,7 +21,7 @@ GClosure* new_closure(GelContext *context, const gchar *name,
         const GValue *value = var_values + i;
         if(GEL_VALUE_HOLDS(value, GEL_TYPE_SYMBOL))
         {
-            GelSymbol *symbol = (GelSymbol*)gel_value_get_boxed(value);
+            GelSymbol *symbol = gel_value_get_boxed(value);
             vars[i] = g_strdup(gel_symbol_get_name(symbol));
         }
         else
@@ -277,8 +277,7 @@ void cond_(GClosure *self, GValue *return_value,
             GType type = GEL_VALUE_TYPE(array_values + 0);
             if(type == GEL_TYPE_SYMBOL)
             {
-                GelSymbol *symbol =
-                    (GelSymbol*)gel_value_get_boxed(array_values + 0);
+                GelSymbol *symbol = gel_value_get_boxed(array_values + 0);
                 array_n_values--;
                 array_values++;
                 const gchar *name = gel_symbol_get_name(symbol);
@@ -354,7 +353,7 @@ void case_(GClosure *self, GValue *return_value,
                     if(type == GEL_TYPE_SYMBOL)
                     {
                         GelSymbol *symbol =
-                            (GelSymbol*)gel_value_get_boxed(cases_values + 0);
+                            gel_value_get_boxed(cases_values + 0);
                         cases_n_values--;
                         cases_values++;
                         const gchar *name = gel_symbol_get_name(symbol);
@@ -1220,7 +1219,7 @@ void hash_keys_(GClosure *self, GValue *return_value,
         GList *keys = g_hash_table_get_keys(hash);
 
         for(GList *iter = keys; iter != NULL; iter = g_list_next(iter))
-            g_value_array_append(array, (GValue*)iter->data);
+            g_value_array_append(array, iter->data);
         g_value_init(return_value, G_TYPE_VALUE_ARRAY);
         gel_value_take_boxed(return_value, array);
         g_list_free(keys);
@@ -1285,10 +1284,10 @@ void dot_(GClosure *self, GValue *return_value,
 
     GType type = GEL_VALUE_TYPE(value);
     if(type == GEL_TYPE_TYPELIB)
-        typelib = (GelTypelib*)gel_value_get_boxed(value);
+        typelib = gel_value_get_boxed(value);
     else
     if(type == GEL_TYPE_TYPEINFO)
-        type_info = (GelTypeInfo*)gel_value_get_boxed(value);
+        type_info = gel_value_get_boxed(value);
     else
     if(type == G_TYPE_GTYPE)
     {
@@ -1303,7 +1302,7 @@ void dot_(GClosure *self, GValue *return_value,
         if(type_info == NULL)
             gel_warning_type_name_invalid(__FUNCTION__, g_type_name(type));
         else
-            object = (GObject *)gel_value_get_object(value);
+            object = gel_value_get_object(value);
     }
     else
         g_warning("%s: Expected typelib, type or object", __FUNCTION__);
@@ -1322,7 +1321,7 @@ void dot_(GClosure *self, GValue *return_value,
 
         if(type == GEL_TYPE_SYMBOL)
         {
-            GelSymbol *symbol = (GelSymbol*)gel_value_get_boxed(value);
+            GelSymbol *symbol = gel_value_get_boxed(value);
             name = gel_symbol_get_name(symbol);
         }
         else
@@ -1391,7 +1390,7 @@ void object_new_(GClosure *self, GValue *return_value,
         g_value_init(return_value, type);
         if(G_TYPE_IS_INSTANTIATABLE(type))
         {
-            GObject *new_object = (GObject*)g_object_new(type, NULL);
+            GObject *new_object = g_object_new(type, NULL);
             if(G_IS_INITIALLY_UNOWNED(new_object))
                 g_object_ref_sink(new_object);
             gel_value_take_boxed(return_value, new_object);
@@ -1625,6 +1624,6 @@ const GValue *gel_value_lookup_predefined(const gchar *name)
         symbols = gel_make_default_symbols();
         g_once_init_leave(&once, 1);
     }
-    return (GValue*)g_hash_table_lookup(symbols, name);
+    return g_hash_table_lookup(symbols, name);
 }
 
