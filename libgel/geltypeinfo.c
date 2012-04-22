@@ -267,7 +267,7 @@ gchar* gel_type_info_to_string(const GelTypeInfo *self)
 
     while(info != NULL)
     {
-        const gchar *name = g_base_info_get_name(base_info);
+        const gchar *name = g_base_info_get_name(info->info);
         name_list = g_list_prepend(name_list, (void *)name);
         info = info->container;
         n_names++;
