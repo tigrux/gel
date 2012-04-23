@@ -248,8 +248,29 @@ const GelTypeInfo* gel_type_info_lookup(const GelTypeInfo *self,
                                         const gchar *name)
 {
     g_return_val_if_fail(self != NULL, NULL);
+    const GelTypeInfo *info = NULL;
+    while(self != NULL)
+    {
+        info = g_hash_table_lookup(self->infos, name);
+        if(info != NULL)
+            break;
+            
+        GIBaseInfo *base_info = self->info;
+        if(GI_IS_OBJECT_INFO(base_info))
+        {
+            GIObjectInfo *parent_info = g_object_info_get_parent(base_info);
+            if(parent_info == NULL)
+                break;
 
-    return g_hash_table_lookup(self->infos, name);
+            GType parent_type = g_registered_type_info_get_g_type(parent_info);
+            self = gel_type_info_from_gtype(parent_type);
+            g_base_info_unref(parent_info);
+        }
+        else
+            break;
+    }
+
+    return info;
 }
 
 
