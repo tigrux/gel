@@ -152,6 +152,11 @@ GelTypeInfo* gel_type_info_from_gtype(GType type)
      (g_base_info_get_type((GIBaseInfo*)info) == GI_INFO_TYPE_BOXED))
 #endif
 
+#ifndef GI_IS_OBJECT_INFO
+#define GI_IS_OBJECT_INFO(info) \
+     (g_base_info_get_type((GIBaseInfo*)info) == GI_INFO_TYPE_OBJECT)
+#endif
+
 
 GelTypeInfo* gel_type_info_new(GIBaseInfo *info)
 {
