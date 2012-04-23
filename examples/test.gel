@@ -3,7 +3,7 @@
 
 ( (. Gtk init) )
 
-(def (object-add parent child)
+(defn object-add (parent child)
     (object-set parent "child" child)
 )
 
@@ -16,7 +16,7 @@
 (object-set window "default-height" 120)
 
 (object-connect window "hide"
-    (closure (widget)
+    (fn (widget)
         ( (. Gtk main-quit) )
     )
 )
@@ -39,7 +39,7 @@
 (def counter 0)
 
 (object-connect button "clicked"
-    (closure (widget)
+    (fn (widget)
         (object-set widget "label" "Thanks!")
         (set! counter (+ counter 1))
         (object-set entry "text" counter)

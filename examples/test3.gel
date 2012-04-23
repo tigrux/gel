@@ -7,14 +7,14 @@
 (apply and S)
 
 
-(def (negative-of n)
+(defn negative-of (n)
     (- 0 n)
 )
 
 (map negative-of S)
 
 
-(def (is-positive n)
+(defn is-positive (n)
     (> n 0)
 )
 
@@ -24,22 +24,22 @@
 (def values (array 4.5 2))
 (def operators (array + - * /))
 
-(def (apply-oper oper)
+(defn apply-oper (oper)
     (apply oper values)
 )
 
 (map apply-oper operators)
 
 
-(def (multiply-by factor)
-    (closure (n) (* n factor) )
+(defn multiply-by (factor)
+    (fn (n) (* n factor) )
 )
 
 (def A (range 1 4))
 (def B (map (multiply-by 10) A))
 (def C (map (multiply-by 10) B))
 
-(def (sum-of values)
+(defn sum-of (values)
     (apply + values)
 )
 

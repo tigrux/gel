@@ -21,7 +21,7 @@
 
 (hash-keys fundamentals)
 
-(def (hash-values h)
+(defn hash-values (h)
     (map
         (closure (k)
             (hash-get h k)
@@ -59,19 +59,19 @@
 )
 
 
-(def (Person name age)
+(defn Person (name age)
     (def self (hash))
     (hash-append! self
         ("name" name)
         ("age" age)
         ("greet"
-            (closure (name-of-person)
+            (fn (name-of-person)
                 (print "Nice to meet you " name-of-person)
                 (print "I am " (hash-get self "name"))
             )
         )
         ("set"
-            (closure (attr value)
+            (fn (attr value)
                 (case attr
                     ( ("age")
                         (print "Now I am " value " years old")
@@ -84,7 +84,7 @@
             )
         )
     )
-    (closure (s)
+    (fn (s)
         (hash-get self s)
     )
 )
