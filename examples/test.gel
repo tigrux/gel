@@ -47,11 +47,7 @@
     )
 )
 
-(object-set label "visible" TRUE)
-(object-set button "visible" TRUE)
-(object-set entry "visible" TRUE)
-(object-set box "visible" TRUE)
-(object-set window "visible" TRUE)
+((. window "show-all"))
 
 ( (. Gtk main) )
 
