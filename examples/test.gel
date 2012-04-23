@@ -47,7 +47,7 @@
     )
 )
 
-((. window "show-all"))
+( (. window show-all) )
 
 ( (. Gtk main) )
 
