@@ -145,7 +145,7 @@ void do_(GClosure *self, GValue *return_value,
     }
 
     guint last = n_values-1;
-    for(guint i = 0; i <= last && gel_context_get_running(context); i++)
+    for(guint i = 0; i <= last; i++)
     {
         GValue tmp_value = {0};
         const GValue *value =
@@ -384,7 +384,9 @@ void while_(GClosure *self, GValue *return_value,
 
     gboolean cond_is_true = FALSE;
     GelContext *loop_context = gel_context_new_with_outer(context);
-    while(gel_context_get_running(loop_context))
+    gboolean running = TRUE;
+
+    while(running)
     {
         GValue tmp_value = {0};
         const GValue *cond_value =
@@ -394,7 +396,7 @@ void while_(GClosure *self, GValue *return_value,
         if(cond_is_true)
             do_(self, return_value, n_values-1, values+1, loop_context);
         else
-            gel_context_set_running(loop_context, FALSE);
+            running = FALSE;
 
         if(GEL_IS_VALUE(&tmp_value))
             g_value_unset(&tmp_value);
@@ -426,7 +428,7 @@ void for_(GClosure *self, GValue *return_value,
         gel_context_insert(loop_context, iter_name, iter_value);
 
         guint i;
-        for(i = 0; i < last && gel_context_get_running(loop_context); i++)
+        for(i = 0; i < last; i++)
         {
             gel_value_copy(array_values + i, iter_value);
             do_(self, return_value, n_values, values, loop_context);

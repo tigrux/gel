@@ -27,7 +27,6 @@ struct _GelContext
 {
     GHashTable *variables;
     GelContext *outer;
-    gboolean running;
     guint level;
 };
 
@@ -116,7 +115,6 @@ GelContext* gel_context_new_with_outer(GelContext *outer)
     self = gel_context_alloc();
 #endif
     gel_context_set_outer(self, outer);
-    self->running = TRUE;
 
     return self;
 }
@@ -496,36 +494,4 @@ void gel_context_set_outer(GelContext *self, GelContext *context)
         self->level = context->level + 1;
 }
 
-
-/**
- * gel_context_get_running:
- * @self: #GelContext to check if it is running or not
- *
- * Checks if @self is running.
- * A #GelContext is considered as running when it is
- * currently evaluating a loop (for, while).
- *
- * Returns: #TRUE if @self is running, #FALSE otherwise
- */
-gboolean gel_context_get_running(const GelContext *self)
-{
-    g_return_val_if_fail(self != NULL, FALSE);
-    return self->running;
-}
-
-
-/**
- * gel_context_set_running:
- * @self: #GelContext whose running state will be set
- * @running: #TRUE to set the context as running
- *
- * Set @self's running state as @running
- * If @running is #FALSE then current execution loop (for, while) is stopped.
- * It is used internally by the function break.
- */
-void gel_context_set_running(GelContext *self, gboolean running)
-{
-    g_return_if_fail(self != NULL);
-    self->running = running;
-}
 

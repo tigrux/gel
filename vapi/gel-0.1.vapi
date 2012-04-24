@@ -12,7 +12,6 @@ namespace Gel {
         public unowned GLib.Value lookup(string name);
         public unowned Context outer {get;}
         public GLib.List<unowned string> variables {get;}
-        public bool running {get; set;}
         public void insert(string name, owned GLib.Value value);
         public void insert_object(string name, owned GLib.Object object);
         public void insert_function(string name, Gel.Function function);
