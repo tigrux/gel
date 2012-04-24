@@ -445,19 +445,6 @@ void for_(GClosure *self, GValue *return_value,
 
 
 static
-void break_(GClosure *self, GValue *return_value,
-            guint n_values, const GValue *values, GelContext *context)
-{
-    for(GelContext *i = context; i != NULL; i = gel_context_get_outer(i))
-        if(gel_context_get_running(i))
-        {
-            gel_context_set_running(i, FALSE);
-            break;
-        }
-}
-
-
-static
 void print_(GClosure *self, GValue *return_value,
             guint n_values, const GValue *values, GelContext *context)
 {
@@ -1500,7 +1487,6 @@ GHashTable* gel_make_default_symbols(void)
         /* loop */
         CLOSURE(while),
         CLOSURE(for),
-        CLOSURE(break),
 
         /* output */
         CLOSURE(print),
