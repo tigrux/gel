@@ -269,7 +269,6 @@ const GelTypeInfo* gel_type_info_lookup(const GelTypeInfo *self,
             GIObjectInfo *parent_info = g_object_info_get_parent(base_info);
             if(parent_info == NULL)
                 break;
-
             GType parent_type = g_registered_type_info_get_g_type(parent_info);
             container_info = gel_type_info_from_gtype(parent_type);
             g_base_info_unref(parent_info);
@@ -469,7 +468,7 @@ void gel_type_info_closure_marshal(GClosure *gclosure,
     guint n_args = g_callable_info_get_n_args(function_info);
     GIArgInfo **infos = g_new0(GIArgInfo *, n_args);
     GITypeInfo **types = g_new0(GITypeInfo *, n_args);
-    gboolean *are_indirect = g_new0(gboolean, n_args);
+    gboolean *indirect_args = g_new0(gboolean, n_args);
     GArgument *inputs = g_new0(GArgument, n_args + 1);
     GArgument *outputs = g_new0(GArgument, n_args);
     
@@ -488,11 +487,33 @@ void gel_type_info_closure_marshal(GClosure *gclosure,
     {
         GIArgInfo *info = g_callable_info_get_arg(function_info, i);
         GITypeInfo *type = g_arg_info_get_type(info);
-        if(g_type_info_get_tag(type) == GI_TYPE_TAG_ARRAY)
+        switch(g_type_info_get_tag(type))
         {
-            gint length_index = g_type_info_get_array_length(type);
-            if(length_index != -1)
-                are_indirect[length_index] = TRUE;
+            case GI_TYPE_TAG_ARRAY:
+            {
+                gint length_index = g_type_info_get_array_length(type);
+                if(length_index != -1)
+                    indirect_args[length_index] = TRUE;
+                break;
+            }
+            case GI_TYPE_TAG_INTERFACE:
+            {
+                GIBaseInfo *interface_info = g_type_info_get_interface(info);
+                GIInfoType interface_type = g_base_info_get_type(interface_info);
+                switch(interface_type)
+                {
+                    case GI_INFO_TYPE_CALLBACK:
+                        indirect_args[g_arg_info_get_closure(info)] = TRUE;
+                        indirect_args[g_arg_info_get_destroy(info)] = TRUE;
+                        break;
+                    default:
+                        break;
+                }
+                g_base_info_unref(interface_info);
+                break;
+            }
+            default:
+                break;
         }
         infos[i] = info;
         types[i] = type;
@@ -532,7 +553,7 @@ void gel_type_info_closure_marshal(GClosure *gclosure,
     }
     g_free(outputs);
     g_free(inputs);
-    g_free(are_indirect);
+    g_free(indirect_args);
     g_free(types);
     g_free(infos);
 }
