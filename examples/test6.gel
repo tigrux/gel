@@ -1,9 +1,9 @@
 
 (def fundamentals
     (hash
-        ("e" 2.718281828459045)
-        ("pi" 3.141592653589793)
-        ("c" 299792458)
+        "e" 2.718281828459045
+        "pi" 3.141592653589793
+        "c" 299792458
     )
 )
 
@@ -35,19 +35,19 @@
 
 (def romans
     (hash
-        (1000 "M")
-        (900 "CM")
-        (500 "D")
-        (400 "CD")
-        (100 "C")
-        (90 "XC")
-        (50 "L")
-        (40 "XL")
-        (10 "X")
-        (9 "IX")
-        (5 "V")
-        (4 "IV")
-        (1 "I")
+        1000 "M"
+        900 "CM"
+        500 "D"
+        400 "CD"
+        100 "C"
+        90 "XC"
+        50 "L"
+        40 "XL"
+        10 "X"
+        9 "IX"
+        5 "V"
+        4 "IV"
+        1 "I"
     )
 )
 
@@ -62,27 +62,25 @@
 (defn Person (name age)
     (def self (hash))
     (hash-append! self
-        ("name" name)
-        ("age" age)
-        ("greet"
+        "name" name
+        "age" age
+        "greet" 
             (fn (name-of-person)
                 (print "Nice to meet you " name-of-person)
                 (print "I am " (hash-get self "name"))
             )
-        )
-        ("set"
+        "set"
             (fn (attr value)
                 (case attr
-                    ( ("age")
-                        (print "Now I am " value " years old")
-                        (hash-set! self "age" value)
-                    )
-                    (else
+                    ("age")
+                        (do
+                            (hash-set! self "age" value)
+                            (print "Now I am " value " years old")
+                        )
+                    #else
                         (print "I don't think you can change my " attr)
-                    )
                 )
             )
-        )
     )
     (fn (s)
         (hash-get self s)

@@ -1001,7 +1001,7 @@ void hash_(GClosure *self, GValue *return_value,
         GValue *key = NULL;
         GValue *value = NULL;
         if(gel_context_eval_params(context, __FUNCTION__,
-                &n_values, &values, &tmp_list, "(VV)*", &key, &value))
+                &n_values, &values, &tmp_list, "VV*", &key, &value))
             g_hash_table_insert(hash,
                 gel_value_dup(key), gel_value_dup(value));
     }
@@ -1026,7 +1026,7 @@ void hash_append_(GClosure *self, GValue *return_value,
             GValue *key = NULL;
             GValue *value = NULL;
             if(gel_context_eval_params(context, __FUNCTION__,
-                    &n_values, &values, &tmp_list, "(VV)*", &key, &value))
+                    &n_values, &values, &tmp_list, "VV*", &key, &value))
                 g_hash_table_insert(hash,
                     gel_value_dup(key), gel_value_dup(value));
             else
