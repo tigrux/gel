@@ -48,17 +48,14 @@
 
 (defn fibonacci (n)
     (cond
-        ((= n 0)
+        (= n 0)
             0
-        )
-        ((= n 1)
+        (= n 1)
             1
-        )
-        (else
+        #else
             (+ (fibonacci (- n 1))
                (fibonacci (- n 2))
             )
-        )
     )
 )
 
@@ -75,7 +72,8 @@
             30
         ("February")
             28
-        "No such month"
+        #else
+            "No such month"
     )
 )
 

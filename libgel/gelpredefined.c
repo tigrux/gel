@@ -237,59 +237,30 @@ static
 void cond_(GClosure *self, GValue *return_value,
            guint n_values, const GValue *values, GelContext *context)
 {
+    guint n_args = 2;
+    if(n_values < n_args)
+    {
+        gel_warning_needs_at_least_n_arguments(__FUNCTION__, n_args);
+        return;
+    }
+
     GList *tmp_list = NULL;
 
-    gboolean running = TRUE;
-    while(n_values > 0 && running)
-    {
-        GValueArray *array = NULL;
-        if(gel_context_eval_params(context, __FUNCTION__,
-                &n_values, &values,&tmp_list, "a*", &array))
-        {
-            guint array_n_values = array->n_values;
-            GValue *array_values = array->values;
-            gboolean predicate_is_true = FALSE;
-
-            GType type = GEL_VALUE_TYPE(array_values + 0);
-            if(type == GEL_TYPE_SYMBOL)
-            {
-                GelSymbol *symbol = gel_value_get_boxed(array_values + 0);
-                array_n_values--;
-                array_values++;
-                const gchar *name = gel_symbol_get_name(symbol);
-                if(g_strcmp0(name, "else") == 0)
-                    predicate_is_true = TRUE;
-                else
-                    gel_warning_invalid_argument_name(__FUNCTION__, name);
-            }
-
-            GValue *cond_value = NULL;
-            if(!predicate_is_true)
-            {
-                const GValue *array_values = array->values;
-                guint array_n_values = array->n_values;
-                if(gel_context_eval_params(context, __FUNCTION__,
-                        &array_n_values, &array_values, &tmp_list,
-                        "V*", &cond_value))
-                    predicate_is_true = gel_value_to_boolean(cond_value);
-                else
-                    running = FALSE;
-            }
-
-            if(running && predicate_is_true)
-            {
-                if(array_n_values > 0)
-                    do_(self, return_value,
-                        array_n_values, array_values, context);
-                else
-                    if(cond_value != NULL)
-                        gel_value_copy(cond_value, return_value);
-                running = FALSE;
-            }
-        }
+    while(n_values > 0)
+        if(n_values == 1)
+            do_(self, return_value, n_values--, values++, context);
         else
-            running = FALSE;
-    }
+        {
+            GValue *test_value = NULL;
+            GValue *value = NULL;
+            if(gel_context_eval_params(context, __FUNCTION__,
+                &n_values, &values, &tmp_list, "Vv*", &test_value, &value))
+                if(gel_value_to_boolean(test_value))
+                {
+                    do_(self, return_value, 1, value, context);
+                    n_values = 0;
+                }
+        }
 
     gel_value_list_free(tmp_list);
 }
@@ -299,7 +270,6 @@ static
 void case_(GClosure *self, GValue *return_value,
            guint n_values, const GValue *values, GelContext *context)
 {
-
     guint n_args = 2;
     if(n_values < n_args)
     {
