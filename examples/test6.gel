@@ -53,7 +53,9 @@
 
 (apply +
     (map
-        (fn (i) (hash-get romans i))
+        (fn (i)
+            (hash-get romans i)
+        )
         (array 1000 900 50 10 10 5 1 1)
     )
 )
@@ -64,7 +66,7 @@
     (hash-append! self
         "name" name
         "age" age
-        "greet" 
+        "greet"
             (fn (name-of-person)
                 (print "Nice to meet you " name-of-person)
                 (print "I am " (hash-get self "name"))
