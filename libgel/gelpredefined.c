@@ -212,21 +212,38 @@ static
 void set_(GClosure *self, GValue *return_value,
           guint n_values, const GValue *values, GelContext *context)
 {
-    const gchar *symbol = NULL;
-    GValue *value = NULL;
-    GList *tmp_list = NULL;
 
-     if(gel_context_eval_params(context, __FUNCTION__,
-            &n_values, &values, &tmp_list, "sV", &symbol, &value))
+    guint n_args = 2;
+    if(n_values != n_args)
     {
-        GValue *symbol_value = gel_context_lookup(context, symbol);
-        if(symbol_value != NULL)
-            gel_value_copy(value, symbol_value);
-        else
-            gel_warning_unknown_symbol(__FUNCTION__, symbol);
+        gel_warning_needs_n_arguments(__FUNCTION__, n_args);
+        return;
     }
 
-    gel_value_list_free(tmp_list);
+    GValue *dest_value = NULL;
+    GValue tmp_value = {0};
+
+    GType type = GEL_VALUE_TYPE(values + 0);
+    if(type == GEL_TYPE_SYMBOL)
+    {
+        GelSymbol *symbol = gel_value_get_boxed(values + 0);
+        dest_value = gel_symbol_get_value(symbol);
+    }
+
+    gboolean copied = FALSE;
+    if(dest_value != NULL)
+    {
+        const GValue *src_value =
+            gel_context_eval_param_into_value(context, values + 1, &tmp_value);
+        if(src_value != NULL)
+            copied = gel_value_copy(src_value, dest_value);
+    }
+
+    if(!copied)
+        g_warning("%s: Expected symbol or variable", __FUNCTION__);
+
+    if(GEL_IS_VALUE(&tmp_value))
+        g_value_unset(&tmp_value);
 }
 
 
@@ -241,19 +258,23 @@ void var_(GClosure *self, GValue *return_value,
         return;
     }
 
-    GList *tmp_list = NULL;
-    gchar *name;
-    if(gel_context_eval_params(context, __FUNCTION__,
-            &n_values, &values, &tmp_list, "s", &name))
+    if(GEL_VALUE_HOLDS(values, GEL_TYPE_SYMBOL))
     {
-        GelVariable *variable = gel_context_lookup_variable(context, name);
+        GelSymbol *symbol = gel_value_get_boxed(values);
+        GelVariable *variable = gel_symbol_get_variable(symbol);
         if(variable != NULL)
         {
             g_value_init(return_value, GEL_TYPE_VARIABLE);
             g_value_set_boxed(return_value, variable);
         }
+        else
+        {
+            const gchar *name = gel_symbol_get_name(symbol);
+            gel_warning_unknown_symbol(__FUNCTION__, name);
+        }
     }
-    gel_value_list_free(tmp_list);
+    else
+        gel_warning_value_not_of_type(__FUNCTION__, values, GEL_TYPE_SYMBOL);
 }
 
 
