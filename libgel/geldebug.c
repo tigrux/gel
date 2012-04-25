@@ -85,3 +85,9 @@ void gel_warning_symbol_exists(const gchar *func, const gchar *name)
     g_warning("%s: Symbol '%s' already exists", func, name);
 }
 
+
+void gel_warning_expected(const gchar *func, const gchar *s)
+{
+    g_warning("%s: Expected %s", func, s);
+}
+

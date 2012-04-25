@@ -251,7 +251,7 @@ void set_(GClosure *self, GValue *return_value,
     }
 
     if(!copied)
-        g_warning("%s: Expected symbol or variable", __FUNCTION__);
+        gel_warning_expected(__FUNCTION__, "symbol or variable");
 
     if(GEL_IS_VALUE(&tmp1_value))
         g_value_unset(&tmp1_value);
@@ -1294,7 +1294,7 @@ void dot_(GClosure *self, GValue *return_value,
             object = gel_value_get_object(value);
     }
     else
-        g_warning("%s: Expected typelib, type or object", __FUNCTION__);
+        gel_warning_expected(__FUNCTION__, "typelib, type or object");
 
     if(GEL_IS_VALUE(&tmp_value))
         g_value_unset(&tmp_value);
@@ -1332,7 +1332,7 @@ void dot_(GClosure *self, GValue *return_value,
             }
         }
         else
-            g_warning("%s: Expected symbol or string", __FUNCTION__);
+            gel_warning_expected(__FUNCTION__, "symbol or string");
 
         values++;
         n_values--;    
@@ -1372,7 +1372,7 @@ void object_new_(GClosure *self, GValue *return_value,
     if(value_type == G_TYPE_GTYPE)
         type = gel_value_get_gtype(&tmp_value);
     else
-        g_warning("%s: Expected typename or type", __FUNCTION__);
+        gel_warning_expected(__FUNCTION__, "typename or type");
 
     if(type != G_TYPE_INVALID)
     {
