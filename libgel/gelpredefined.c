@@ -1081,15 +1081,18 @@ void hash_(GClosure *self, GValue *return_value,
             (GHashFunc)gel_value_hash, (GEqualFunc)gel_values_eq,
             (GDestroyNotify)gel_value_free, (GDestroyNotify)gel_value_free);
 
-    while(n_values > 0)
-    {
-        GValue *key = NULL;
-        GValue *value = NULL;
-        if(gel_context_eval_params(context, __FUNCTION__,
-                &n_values, &values, &tmp_list, "VV*", &key, &value))
-            g_hash_table_insert(hash,
-                gel_value_dup(key), gel_value_dup(value));
-    }
+    if(n_values % 2 == 0)
+        while(n_values > 0)
+        {
+            GValue *key = NULL;
+            GValue *value = NULL;
+            if(gel_context_eval_params(context, __FUNCTION__,
+                    &n_values, &values, &tmp_list, "VV*", &key, &value))
+                g_hash_table_insert(hash,
+                    gel_value_dup(key), gel_value_dup(value));
+        }
+    else
+        g_warning("%s: arguments must be pairs", __FUNCTION__);
 
     g_value_init(return_value, G_TYPE_HASH_TABLE);
     gel_value_take_boxed(return_value, hash);
@@ -1106,17 +1109,23 @@ void hash_append_(GClosure *self, GValue *return_value,
 
     if(gel_context_eval_params(context, __FUNCTION__,
             &n_values, &values, &tmp_list, "H*", &hash))
-        while(n_values > 0)
-        {
-            GValue *key = NULL;
-            GValue *value = NULL;
-            if(gel_context_eval_params(context, __FUNCTION__,
-                    &n_values, &values, &tmp_list, "VV*", &key, &value))
-                g_hash_table_insert(hash,
-                    gel_value_dup(key), gel_value_dup(value));
-            else
-                break;
-        }
+    {
+        if(n_values % 2 == 0)
+            while(n_values > 0)
+            {
+                GValue *key = NULL;
+                GValue *value = NULL;
+                if(gel_context_eval_params(context, __FUNCTION__,
+                        &n_values, &values, &tmp_list, "VV*", &key, &value))
+                    g_hash_table_insert(hash,
+                        gel_value_dup(key), gel_value_dup(value));
+                else
+                    break;
+            }
+        else
+            g_warning("%s: arguments must be pairs", __FUNCTION__);
+    }
+
 
     gel_value_list_free(tmp_list);
 }
