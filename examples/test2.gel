@@ -33,12 +33,12 @@
 )
 
 (for iter primes
-    (print "Primes(" (index-of iter primes) ") = " iter)
+    (print "Primes(" (index-of iter primes) ") =" iter)
 )
 
 
-(print "The first prime is " (array-get primes 0))
-(print "The last prime is " (array-get primes -1))
+(print "The first prime is" (array-get primes 0))
+(print "The last prime is" (array-get primes -1))
 
 
 (defn factorial (n)
@@ -49,8 +49,8 @@
 )
 
 (def n 10)
-(print "Factorial of " n " is " (factorial n))
-(print n " is " (if (= (% n 2) 0) "even" "odd"))
+(print "Factorial of" n "is" (factorial n))
+(print n "is" (if (= (% n 2) 0) "even" "odd"))
 
 (defn fibonacci (n)
     (cond
@@ -66,7 +66,7 @@
 )
 
 (for i (range 10 0)
-    (print "Fibonacci(" i ") = " (fibonacci i))
+    (print "Fibonacci(" i ") =" (fibonacci i))
 )
 
 
@@ -85,5 +85,5 @@
 
 (def month-I-was-born "December")
 
-(print month-I-was-born " has " (how-many-days-have? month-I-was-born) " days")
+(print month-I-was-born "has" (how-many-days-have? month-I-was-born) "days")
 

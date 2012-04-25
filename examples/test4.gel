@@ -29,6 +29,6 @@
 (def next-prime (generate-primes))
 
 (for i (range 1 12)
-    (print "Primes(" i ") = " (next-prime))
+    (print "Primes(" i ") =" (next-prime))
 )
 

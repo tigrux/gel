@@ -490,7 +490,7 @@ void print_(GClosure *self, GValue *return_value,
         if(GEL_IS_VALUE(value))
         {
             gchar *value_string = gel_value_to_string(value);
-            g_print("%s", value_string);
+            g_print("%s%s", value_string, i == last ? "" : " ");
             g_free(value_string);
         }
         if(GEL_IS_VALUE(&tmp_value))
