@@ -308,61 +308,30 @@ void case_(GClosure *self, GValue *return_value,
     }
 
     GList *tmp_list = NULL;
-    gboolean running = TRUE;
-
     GValue *probe_value = NULL;
+
     if(gel_context_eval_params(context, __FUNCTION__,
             &n_values, &values, &tmp_list, "V*", &probe_value))
-        while(n_values > 0 && running)
+        while(n_values > 0)
         {
-            GValueArray *cases = NULL;
-            if(gel_context_eval_params(context, __FUNCTION__,
-                    &n_values, &values, &tmp_list, "a*", &cases))
+            if(n_values == 1)
+                do_(self, return_value, n_values--, values++, context);
+            else
             {
-                guint cases_n_values = cases->n_values;
-                const GValue *cases_values = cases->values;
-                if(cases_n_values > 0 && running)
+                GValueArray *tests = NULL;
+                GValue *value = NULL;
+                if(gel_context_eval_params(context, __FUNCTION__,
+                    &n_values, &values, &tmp_list, "av*", &tests, &value))
                 {
-                    gboolean are_equals = FALSE;
-                    GValueArray *tests = NULL;
-                    GType type = GEL_VALUE_TYPE(cases_values + 0);
-                    if(type == GEL_TYPE_SYMBOL)
-                    {
-                        GelSymbol *symbol =
-                            gel_value_get_boxed(cases_values + 0);
-                        cases_n_values--;
-                        cases_values++;
-                        const gchar *name = gel_symbol_get_name(symbol);
-                        if(g_strcmp0(name, "else") == 0)
-                            are_equals = TRUE;
-                        else
-                            gel_warning_invalid_argument_name(
-                                __FUNCTION__, name);
-                    }
-                    else
-                    if(gel_context_eval_params(context, __FUNCTION__,
-                            &cases_n_values, &cases_values, &tmp_list,
-                            "a*", &tests))
-                    {
-                        guint tests_n_values = tests->n_values;
-                        const GValue *tests_values = tests->values;
-                        while(tests_n_values > 0 && running)
+                    const GValue *test_values = tests->values;
+                    guint test_n_values = tests->n_values;
+                    for(guint i = 0; i < test_n_values; i++)
+                        if(gel_values_eq(test_values + i, probe_value))
                         {
-                            GValue *test_value = 0;
-                            if(gel_context_eval_params(context, __FUNCTION__,
-                                    &tests_n_values, &tests_values, &tmp_list,
-                                    "v*", &test_value))
-                                if(gel_values_eq(probe_value, test_value))
-                                    are_equals = TRUE;
+                            do_(self, return_value, 1, value, context);
+                            n_values = 0;
+                            break;
                         }
-                    }
-
-                    if(are_equals)
-                    {
-                        do_(self, return_value,
-                            cases_n_values, cases_values, context);
-                        running = FALSE;
-                    }
                 }
             }
         }

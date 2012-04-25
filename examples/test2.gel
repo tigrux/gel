@@ -69,18 +69,13 @@
 
 (defn how-many-days-have? (month)
     (case month
-        (("January" "March" "May" "July" "August" "October" "December")
+        ("January" "March" "May" "July" "August" "October" "December")
             31
-        )
-        (("March" "Abril" "June" "September" "November")
+        ("March" "Abril" "June" "September" "November")
             30
-        )
-        (("February")
+        ("February")
             28
-        )
-        (else
-            "No such month"
-        )
+        "No such month"
     )
 )
 
