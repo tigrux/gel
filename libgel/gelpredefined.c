@@ -159,6 +159,56 @@ void do_(GClosure *self, GValue *return_value,
 
 
 static
+void let_(GClosure *self, GValue *return_value,
+          guint n_values, const GValue *values, GelContext *context)
+{
+    guint n_args = 2;
+    if(n_values < n_args)
+    {
+        gel_warning_needs_at_least_n_arguments(__FUNCTION__, n_args);
+        return;
+    }
+
+    GList *tmp_list = NULL;
+    GValueArray *bindings = NULL;
+
+    if(gel_context_eval_params(context, __FUNCTION__,
+            &n_values, &values, &tmp_list, "a*", &bindings))
+    {
+        guint binding_n_values = bindings->n_values;
+        const GValue *binding_values = bindings->values;
+        
+        if(binding_n_values % 2 == 0)
+        {
+            GelContext *let_context = gel_context_new_with_outer(context);
+            gboolean failed = FALSE;
+
+            while(binding_n_values > 0 && !failed)
+            {
+                const gchar *name = NULL;
+                GValue *value = NULL;
+                if(gel_context_eval_params(let_context, __FUNCTION__,
+                        &binding_n_values, &binding_values,
+                        &tmp_list, "sV*", &name, &value))
+                    gel_context_insert(let_context, name, gel_value_dup(value));
+                else
+                    failed = TRUE;
+            }
+
+            if(!failed)
+                do_(self, return_value, n_values, values, let_context);
+
+            gel_context_free(let_context);
+        }
+        else
+            g_warning("%s: bindings must be pairs", __FUNCTION__);
+    }
+
+    gel_value_list_free(tmp_list);
+}
+
+
+static
 void set_(GClosure *self, GValue *return_value,
           guint n_values, const GValue *values, GelContext *context)
 {
@@ -1412,9 +1462,8 @@ GHashTable* gel_make_default_symbols(void)
         CLOSURE(def),
         CLOSURE(defn),
         CLOSURE(fn),
-
-        /* block */
         CLOSURE(do),
+        CLOSURE(let),
 
         /* imperative */
         CLOSURE_NAME("set!", set),

@@ -1,4 +1,10 @@
 
+(let (a 20 b (/ a 2) c (/ b 2) )
+    (def result (+ a b c))
+    result
+)
+
+
 (defn primes-lesser-than (top)
     (def primes (array 2))
     (def n 3)
