@@ -11,6 +11,10 @@
 (array-set! (palette) 3 "black")
 (print colors)
 
+(set! (palette) (array "cyan" "magenta" "yellow"))
+(print colors)
+
+
 (def message "hello")
 
 (defn salutation ()

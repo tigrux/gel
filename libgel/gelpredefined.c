@@ -221,7 +221,8 @@ void set_(GClosure *self, GValue *return_value,
     }
 
     GValue *dest_value = NULL;
-    GValue tmp_value = {0};
+    GValue tmp1_value = {0};
+    GValue tmp2_value = {0};
 
     GType type = GEL_VALUE_TYPE(values + 0);
     if(type == GEL_TYPE_SYMBOL)
@@ -229,12 +230,22 @@ void set_(GClosure *self, GValue *return_value,
         GelSymbol *symbol = gel_value_get_boxed(values + 0);
         dest_value = gel_symbol_get_value(symbol);
     }
+    else
+    {
+        const GValue *value =
+            gel_context_eval_into_value(context, values + 0, &tmp1_value);
+        if(GEL_VALUE_HOLDS(value, GEL_TYPE_VARIABLE))
+        {
+            GelVariable *dest_variable = gel_value_get_boxed(value);
+            dest_value = gel_variable_get_value(dest_variable);
+        }
+    }
 
     gboolean copied = FALSE;
     if(dest_value != NULL)
     {
         const GValue *src_value =
-            gel_context_eval_param_into_value(context, values + 1, &tmp_value);
+            gel_context_eval_param_into_value(context, values + 1, &tmp2_value);
         if(src_value != NULL)
             copied = gel_value_copy(src_value, dest_value);
     }
@@ -242,8 +253,11 @@ void set_(GClosure *self, GValue *return_value,
     if(!copied)
         g_warning("%s: Expected symbol or variable", __FUNCTION__);
 
-    if(GEL_IS_VALUE(&tmp_value))
-        g_value_unset(&tmp_value);
+    if(GEL_IS_VALUE(&tmp1_value))
+        g_value_unset(&tmp1_value);
+
+    if(GEL_IS_VALUE(&tmp2_value))
+        g_value_unset(&tmp2_value);
 }
 
 
