@@ -229,6 +229,11 @@ void set_(GClosure *self, GValue *return_value,
     {
         GelSymbol *symbol = gel_value_get_boxed(values + 0);
         dest_value = gel_symbol_get_value(symbol);
+        if(dest_value == NULL)
+        {
+            const gchar *name = gel_symbol_get_name(symbol);
+            dest_value = gel_context_lookup(context, name);
+        }
     }
     else
     {
