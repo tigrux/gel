@@ -1056,55 +1056,6 @@ void apply_(GClosure *self, GValue *return_value,
 
 
 static
-void zip_(GClosure *self, GValue *return_value,
-          guint n_values, const GValue *values, GelContext *context)
-{
-    GList *tmp_list = NULL;
-
-    guint n_arrays = n_values;
-    GValueArray **arrays = g_new0(GValueArray*, n_values);
-    guint i;
-
-    for(i = 0; i < n_arrays; i++)
-        if(!gel_context_eval_params(context, __FUNCTION__,
-                &n_values, &values, &tmp_list, "A*", arrays + i))
-            break;
-
-    if(i == n_arrays)
-    {
-        guint min_n_values = arrays[0]->n_values;
-        for(i = 1; i < n_arrays; i++)
-        {
-            guint i_n_values = arrays[i]->n_values;
-            if(i_n_values < min_n_values)
-                min_n_values = i_n_values;
-        }
-
-        GValueArray *result_array = g_value_array_new(min_n_values);
-        GValue *result_array_values = result_array->values;
-        result_array->n_values = min_n_values;
-
-        for(i = 0; i < min_n_values; i++)
-        {
-            GValueArray *array = g_value_array_new(n_arrays);
-            guint j;
-            for(j = 0; j < n_arrays; j++)
-                g_value_array_append(array, arrays[j]->values + i);
-            g_value_init(result_array_values + i, G_TYPE_VALUE_ARRAY);
-            gel_value_take_boxed(result_array_values + i, array);
-        }
-        g_value_init(return_value, G_TYPE_VALUE_ARRAY);
-        gel_value_take_boxed(return_value, result_array);
-    }
-    else
-        g_warning("%s: Argument %u is not an array", __FUNCTION__, i);
-
-    g_free(arrays);
-    gel_value_list_free(tmp_list);
-}
-
-
-static
 void map_(GClosure *self, GValue *return_value,
           guint n_values, const GValue *values, GelContext *context)
 {
@@ -1636,7 +1587,6 @@ GHashTable* gel_make_default_symbols(void)
         CLOSURE(find),
         CLOSURE(filter),
         CLOSURE(apply),
-        CLOSURE(zip),
         CLOSURE(map),
 
         /* hash */
