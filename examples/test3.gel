@@ -2,46 +2,31 @@
 (def S (array -6 77 0.0 30.6 -15))
 
 
-(apply or S)
+(fn-call or S)
 
-(apply and S)
+(fn-call and S)
 
 
 (defn negative-of (n)
     (- 0 n)
 )
 
-(map negative-of S)
+(fn-map negative-of S)
 
 
 (defn is-positive (n)
     (> n 0)
 )
 
-(filter is-positive S)
+(array-filter S is-positive)
 
 
 (def values (array 4.5 2))
 (def operators (array + - * /))
 
-(defn apply-oper (oper)
-    (apply oper values)
+(defn fn-call-oper (oper)
+    (fn-call oper values)
 )
 
-(map apply-oper operators)
-
-
-(defn multiply-by (factor)
-    (fn (n) (* n factor) )
-)
-
-(def A (range 1 4))
-(def B (map (multiply-by 10) A))
-(def C (map (multiply-by 10) B))
-
-(defn sum-of (values)
-    (apply + values)
-)
-
-(map sum-of (zip A B C))
+(fn-map fn-call-oper operators)
 
