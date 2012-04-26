@@ -1086,20 +1086,6 @@ void array_filter_(GClosure *self, GValue *return_value,
 }
 
 
-static guint
-gel_value_hash(const GValue *value)
-{
-    GType type = GEL_VALUE_TYPE(value);
-    switch(type)
-    {
-        case G_TYPE_STRING:
-            return g_str_hash(gel_value_get_string(value));
-        default:
-            return value->data[0].v_uint;
-    }
-}
-
-
 static
 void hash_(GClosure *self, GValue *return_value,
            guint n_values, const GValue *values, GelContext *context)

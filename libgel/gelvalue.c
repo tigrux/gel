@@ -324,6 +324,8 @@ GType gel_value_simple_type(const GValue *value)
                 return G_TYPE_INT64;
             if(GEL_VALUE_HOLDS(value, G_TYPE_VALUE_ARRAY))
                 return G_TYPE_VALUE_ARRAY;
+            if(GEL_VALUE_HOLDS(value, G_TYPE_HASH_TABLE))
+                return G_TYPE_HASH_TABLE;
             if(g_value_fits_pointer(value))
                 return G_TYPE_POINTER;
             g_warning("Type %s could not be simplified", g_type_name(type));
@@ -351,6 +353,19 @@ GType gel_values_simple_type(const GValue *v1, const GValue *v2)
         return G_TYPE_DOUBLE;
 
     return G_TYPE_INVALID;
+}
+
+
+guint gel_value_hash(const GValue *value)
+{
+    GType type = GEL_VALUE_TYPE(value);
+    switch(type)
+    {
+        case G_TYPE_STRING:
+            return g_str_hash(gel_value_get_string(value));
+        default:
+            return value->data[0].v_uint;
+    }
 }
 
 
@@ -400,6 +415,38 @@ gboolean gel_values_simple_add(const GValue *v1, const GValue *v2,
                 for(guint i = 0; i < n2_values; i++)
                     g_value_array_append(array, a2_values + i);
                 gel_value_take_boxed(dest_value, array);
+                return TRUE;
+            }
+            else
+            if(type == G_TYPE_HASH_TABLE)
+            {
+                GHashTable *h1 = gel_value_get_boxed(v1);
+                GHashTable *h2 = gel_value_get_boxed(v2);
+                GHashTable *hash = g_hash_table_new_full(
+                    (GHashFunc)gel_value_hash,
+                    (GEqualFunc)gel_values_eq,
+                    (GDestroyNotify)gel_value_free,
+                    (GDestroyNotify)gel_value_free);
+
+                GHashTableIter iter;
+                GValue *k = NULL;
+                GValue *v = NULL;
+
+                g_hash_table_iter_init(&iter, h1);
+                while(g_hash_table_iter_next(&iter, (void**)&k, (void**)&v))
+                {
+                    g_hash_table_insert(hash,
+                        gel_value_dup(k), gel_value_dup(v));
+                }
+
+                g_hash_table_iter_init(&iter, h2);
+                while(g_hash_table_iter_next(&iter, (void**)&k, (void**)&v))
+                {
+                    g_hash_table_insert(hash,
+                        gel_value_dup(k), gel_value_dup(v));
+                }
+
+                gel_value_take_boxed(dest_value, hash);
                 return TRUE;
             }
             return FALSE;
