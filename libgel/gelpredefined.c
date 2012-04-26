@@ -1604,7 +1604,7 @@ GHashTable* gel_make_default_symbols(void)
         /* object */
         CLOSURE_NAME("object-new", object_new),
         CLOSURE_NAME("object-get", object_get),
-        CLOSURE_NAME("object-set", object_set),
+        CLOSURE_NAME("object-set!", object_set),
         CLOSURE_NAME("object-connect", object_connect),
 
         {NULL,NULL}
