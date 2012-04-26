@@ -12,6 +12,7 @@ GType gel_symbol_get_type(void)
 {
     static volatile gsize once = 0;
     static GType type = G_TYPE_INVALID;
+
     if(g_once_init_enter(&once))
     {
         type = g_boxed_type_register_static("GelSymbol",
@@ -42,8 +43,7 @@ GelSymbol* gel_symbol_dup(const GelSymbol *self)
 {
     g_return_val_if_fail(self != NULL, NULL);
 
-    GelSymbol *symbol = gel_symbol_new(self->name, self->variable);
-    return symbol;
+    return gel_symbol_new(self->name, self->variable);
 }
 
 
@@ -78,10 +78,7 @@ void gel_symbol_set_variable(GelSymbol *self, GelVariable *variable)
 
     if(self->variable != NULL)
         gel_variable_unref(self->variable);
-    if(variable != NULL)
-        self->variable = gel_variable_ref(variable);
-    else
-        self->variable = NULL;
+    self->variable = variable != NULL ? gel_variable_ref(variable) : NULL;
 }
 
 
@@ -89,8 +86,10 @@ GValue* gel_symbol_get_value(const GelSymbol *self)
 {
     g_return_val_if_fail(self != NULL, NULL);
 
+    GValue *value = NULL;
     if(self->variable != NULL)
-        return gel_variable_get_value(self->variable);
-    return NULL;
+        value = gel_variable_get_value(self->variable);
+
+    return value;
 }
 
