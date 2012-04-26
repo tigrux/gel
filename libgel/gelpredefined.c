@@ -242,14 +242,15 @@ void fn_args_(GClosure *self, GValue *return_value,
         {
             guint n = g_strv_length(args);
             GValueArray *array = g_value_array_new(n);
-            for(guint i = 0; args[i] != NULL; i++)
+            array->n_values = n;
+            GValue *array_values = array->values;
+
+            for(guint i = 0; i < n; i++)
             {
-                GValue tmp_value = {0};
-                g_value_init(&tmp_value, G_TYPE_STRING);
-                g_value_take_string(&tmp_value, args[i]);
-                g_value_array_append(array, &tmp_value);
-                g_value_unset(&tmp_value);
+                g_value_init(array_values + i, G_TYPE_STRING);
+                g_value_take_string(array_values + i, args[i]);
             }
+
             g_free(args);
             g_value_init(return_value, G_TYPE_VALUE_ARRAY);
             g_value_take_boxed(return_value, array);
