@@ -186,9 +186,8 @@ gchar* gel_value_to_string(const GValue *value)
             {
                 gchar *ks = gel_value_to_string(key);
                 gchar *vs = gel_value_to_string(value);
-                g_string_append_printf(buffer, "(%s %s)", ks, vs);
-                if(i != last)
-                    g_string_append_c(buffer, ' ');
+                g_string_append_printf(buffer, "%s %s%s",
+                    ks, vs, i!=last ? " " : "");
                 g_free(ks);
                 g_free(vs);
                 i++;
