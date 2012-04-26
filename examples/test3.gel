@@ -30,6 +30,7 @@
 
 (fn-map operate-values operators)
 
+
 (def units (array 1 2 3))
 (def tens (10 20 30))
 
