@@ -24,9 +24,16 @@
 (def values (array 4.5 2))
 (def operators (array + - * /))
 
-(defn fn-call-oper (oper)
+(defn operate-values (oper)
     (fn-call oper values)
 )
 
-(fn-map fn-call-oper operators)
+(fn-map operate-values operators)
+
+(def units (array 1 2 3))
+(def tens (10 20 30))
+
+(fn-map array units tens)
+
+(fn-call + (fn-map * units tens))
 
