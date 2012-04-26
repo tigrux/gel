@@ -110,30 +110,6 @@ void defn_(GClosure *self, GValue *return_value,
 
 
 static
-void fn_(GClosure *self, GValue *return_value,
-         guint n_values, const GValue *values, GelContext *context)
-{
-    GValueArray *array;
-    GList *tmp_list = NULL;
-
-    if(gel_context_eval_params(context, __FUNCTION__,
-            &n_values, &values, &tmp_list, "a*", &array))
-    {
-        GClosure *closure = fn(context, "lambda",
-            array->n_values, array->values, n_values, values);
-        if(closure != NULL)
-        {
-            gel_closure_close_over(closure);
-            g_value_init(return_value, G_TYPE_CLOSURE);
-            gel_value_take_boxed(return_value, closure);
-        }
-    }
-
-    gel_value_list_free(tmp_list);
-}
-
-
-static
 void do_(GClosure *self, GValue *return_value,
          guint n_values, const GValue *values, GelContext *context)
 {
@@ -202,6 +178,101 @@ void let_(GClosure *self, GValue *return_value,
         }
         else
             g_warning("%s: bindings must be pairs", __FUNCTION__);
+    }
+
+    gel_value_list_free(tmp_list);
+}
+
+
+static
+void fn_(GClosure *self, GValue *return_value,
+         guint n_values, const GValue *values, GelContext *context)
+{
+    GValueArray *array;
+    GList *tmp_list = NULL;
+
+    if(gel_context_eval_params(context, __FUNCTION__,
+            &n_values, &values, &tmp_list, "a*", &array))
+    {
+        GClosure *closure = fn(context, "lambda",
+            array->n_values, array->values, n_values, values);
+        if(closure != NULL)
+        {
+            gel_closure_close_over(closure);
+            g_value_init(return_value, G_TYPE_CLOSURE);
+            gel_value_take_boxed(return_value, closure);
+        }
+    }
+
+    gel_value_list_free(tmp_list);
+}
+
+
+static
+void fn_name_(GClosure *self, GValue *return_value,
+              guint n_values, const GValue *values, GelContext *context)
+{
+    GList *tmp_list = NULL;
+    GClosure *closure = NULL;
+
+    if(gel_context_eval_params(context, __FUNCTION__,
+            &n_values, &values, &tmp_list, "C", &closure))
+    {
+        const gchar *name = gel_closure_get_name(closure);
+        g_value_init(return_value, G_TYPE_STRING);
+        g_value_set_string(return_value, name);
+    }
+
+    gel_value_list_free(tmp_list);
+}
+
+
+static
+void fn_args_(GClosure *self, GValue *return_value,
+              guint n_values, const GValue *values, GelContext *context)
+{
+    GList *tmp_list = NULL;
+    GClosure *closure = NULL;
+
+    if(gel_context_eval_params(context, __FUNCTION__,
+            &n_values, &values, &tmp_list, "C", &closure))
+    {
+        gchar **args = gel_closure_get_args(closure);
+        if(args != NULL)
+        {
+            guint n = g_strv_length(args);
+            GValueArray *array = g_value_array_new(n);
+            for(guint i = 0; args[i] != NULL; i++)
+            {
+                GValue tmp_value = {0};
+                g_value_init(&tmp_value, G_TYPE_STRING);
+                g_value_take_string(&tmp_value, args[i]);
+                g_value_array_append(array, &tmp_value);
+                g_value_unset(&tmp_value);
+            }
+            g_free(args);
+            g_value_init(return_value, G_TYPE_VALUE_ARRAY);
+            g_value_take_boxed(return_value, array);
+        }
+    }
+
+    gel_value_list_free(tmp_list);
+}
+
+
+static
+void fn_code_(GClosure *self, GValue *return_value,
+              guint n_values, const GValue *values, GelContext *context)
+{
+    GList *tmp_list = NULL;
+    GClosure *closure = NULL;
+
+    if(gel_context_eval_params(context, __FUNCTION__,
+            &n_values, &values, &tmp_list, "C", &closure))
+    {
+        GValueArray *code = gel_closure_get_code(closure);
+        g_value_init(return_value, G_TYPE_VALUE_ARRAY);
+        gel_value_take_boxed(return_value, code);
     }
 
     gel_value_list_free(tmp_list);
@@ -1510,9 +1581,14 @@ GHashTable* gel_make_default_symbols(void)
         /* binding */
         CLOSURE(def),
         CLOSURE(defn),
-        CLOSURE(fn),
         CLOSURE(do),
         CLOSURE(let),
+
+        /* closures */
+        CLOSURE(fn),
+        CLOSURE_NAME("fn-name", fn_name),
+        CLOSURE_NAME("fn-args", fn_args),
+        CLOSURE_NAME("fn-code", fn_code),
 
         /* imperative */
         CLOSURE_NAME("set!", set),
