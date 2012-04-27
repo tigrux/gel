@@ -1542,8 +1542,6 @@ void while_(GClosure *self, GValue *return_value,
             g_value_unset(&tmp_value);
     }
 
-    g_value_init(return_value, G_TYPE_BOOLEAN);
-    gel_value_set_boolean(return_value, !cond_is_true);
     gel_context_free(loop_context);
 }
 
@@ -1555,7 +1553,6 @@ void for_(GClosure *self, GValue *return_value,
     const gchar *iter_name;
     GValueArray *array;
     GList *tmp_list = NULL;
-    gboolean result = FALSE;
 
     if(gel_context_eval_params(context, __FUNCTION__,
             &n_values, &values,&tmp_list, "sA*", &iter_name, &array))
@@ -1567,20 +1564,18 @@ void for_(GClosure *self, GValue *return_value,
         GValue *iter_value = gel_value_new();
         gel_context_insert(loop_context, iter_name, iter_value);
 
-        guint i;
-        for(i = 0; i < last; i++)
+        for(guint i = 0; i < last; i++)
         {
             gel_value_copy(array_values + i, iter_value);
-            do_(self, return_value, n_values, values, loop_context);
+            GValue tmp_value = {0};
+            do_(self, &tmp_value, n_values, values, loop_context);
+            if(GEL_IS_VALUE(&tmp_value))
+                g_value_unset(&tmp_value);
             g_value_unset(iter_value);
         }
-        if(i == last)
-            result = TRUE;  
+
         gel_context_free(loop_context);
     }
-
-    g_value_init(return_value, G_TYPE_BOOLEAN);
-    gel_value_set_boolean(return_value, result);
 
     gel_value_list_free(tmp_list);
 }
