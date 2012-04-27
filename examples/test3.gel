@@ -2,16 +2,16 @@
 (def S (array -6 77 0.0 30.6 -15))
 
 
-(fn-call or S)
+(apply or S)
 
-(fn-call and S)
+(apply and S)
 
 
 (defn negative-of (n)
     (- 0 n)
 )
 
-(fn-map negative-of S)
+(map negative-of S)
 
 
 (defn is-positive (n)
@@ -25,16 +25,16 @@
 (def operators (array + - * /))
 
 (defn operate-values (oper)
-    (fn-call oper values)
+    (apply oper values)
 )
 
-(fn-map operate-values operators)
+(map operate-values operators)
 
 
 (def units (array 1 2 3))
 (def tens (10 20 30))
 
-(fn-map array units tens)
+(map array units tens)
 
-(fn-call + (fn-map * units tens))
+(apply + (map * units tens))
 

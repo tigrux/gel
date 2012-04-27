@@ -22,7 +22,7 @@
 (hash-keys fundamentals)
 
 (defn hash-values (h)
-    (fn-map
+    (map
         (fn (k)
             (hash-get h k)
         )
@@ -51,8 +51,8 @@
     )
 )
 
-(fn-call +
-    (fn-map
+(apply +
+    (map
         (fn (i)
             (hash-get romans i)
         )

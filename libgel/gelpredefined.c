@@ -209,8 +209,8 @@ void fn_(GClosure *self, GValue *return_value,
 
 
 static
-void fn_call_(GClosure *self, GValue *return_value,
-              guint n_values, const GValue *values, GelContext *context)
+void apply_(GClosure *self, GValue *return_value,
+            guint n_values, const GValue *values, GelContext *context)
 {
     GList *tmp_list = NULL;
     GClosure *closure = NULL;
@@ -225,8 +225,8 @@ void fn_call_(GClosure *self, GValue *return_value,
 
 
 static
-void fn_map_(GClosure *self, GValue *return_value,
-             guint n_values, const GValue *values, GelContext *context)
+void map_(GClosure *self, GValue *return_value,
+          guint n_values, const GValue *values, GelContext *context)
 {
     GList *tmp_list = NULL;
     GClosure *closure = NULL;
@@ -1478,8 +1478,8 @@ GHashTable* gel_make_default_symbols(void)
 
         /* closures */
         CLOSURE(fn),
-        CLOSURE_NAME("fn-call", fn_call),
-        CLOSURE_NAME("fn-map", fn_map),
+        CLOSURE(apply),
+        CLOSURE(map),
 
         /* imperative */
         CLOSURE_NAME("set!", set),
