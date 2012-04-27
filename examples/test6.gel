@@ -33,14 +33,14 @@
 (values fundamentals)
 
 
-(def roman-keys ["M" "CM" "D" "CD" "C" "XC" "L" "XL" "X" "IX" "V" "IV" "I"])
-(def roman-values [1000 900 500 400 100 90 50 40 10 9 5 4 1])
-(def romans (apply hash (apply + (map array roman-values roman-keys))))
+(def arabigs [1000 900 500 400 100 90 50 40 10 9 5 4 1])
+(def romans ["M" "CM" "D" "CD" "C" "XC" "L" "XL" "X" "IX" "V" "IV" "I"])
+(def arabig-to-roman (apply hash (apply + (map array arabigs romans))))
 
 (apply +
     (map
         (fn (i)
-            (get romans i)
+            (get arabig-to-roman i)
         )
         [1000 900 50 10 10 5 1 1]
     )
