@@ -209,78 +209,6 @@ void fn_(GClosure *self, GValue *return_value,
 
 
 static
-void fn_name_(GClosure *self, GValue *return_value,
-              guint n_values, const GValue *values, GelContext *context)
-{
-    GList *tmp_list = NULL;
-    GClosure *closure = NULL;
-
-    if(gel_context_eval_params(context, __FUNCTION__,
-            &n_values, &values, &tmp_list, "C", &closure))
-    {
-        const gchar *name = gel_closure_get_name(closure);
-        g_value_init(return_value, G_TYPE_STRING);
-        g_value_set_string(return_value, name);
-    }
-
-    gel_value_list_free(tmp_list);
-}
-
-
-static
-void fn_args_(GClosure *self, GValue *return_value,
-              guint n_values, const GValue *values, GelContext *context)
-{
-    GList *tmp_list = NULL;
-    GClosure *closure = NULL;
-
-    if(gel_context_eval_params(context, __FUNCTION__,
-            &n_values, &values, &tmp_list, "C", &closure))
-    {
-        gchar **args = gel_closure_get_args(closure);
-        if(args != NULL)
-        {
-            guint n = g_strv_length(args);
-            GValueArray *array = g_value_array_new(n);
-            array->n_values = n;
-            GValue *array_values = array->values;
-
-            for(guint i = 0; i < n; i++)
-            {
-                g_value_init(array_values + i, G_TYPE_STRING);
-                g_value_take_string(array_values + i, args[i]);
-            }
-
-            g_free(args);
-            g_value_init(return_value, G_TYPE_VALUE_ARRAY);
-            g_value_take_boxed(return_value, array);
-        }
-    }
-
-    gel_value_list_free(tmp_list);
-}
-
-
-static
-void fn_code_(GClosure *self, GValue *return_value,
-              guint n_values, const GValue *values, GelContext *context)
-{
-    GList *tmp_list = NULL;
-    GClosure *closure = NULL;
-
-    if(gel_context_eval_params(context, __FUNCTION__,
-            &n_values, &values, &tmp_list, "C", &closure))
-    {
-        GValueArray *code = gel_closure_get_code(closure);
-        g_value_init(return_value, G_TYPE_VALUE_ARRAY);
-        gel_value_take_boxed(return_value, code);
-    }
-
-    gel_value_list_free(tmp_list);
-}
-
-
-static
 void fn_call_(GClosure *self, GValue *return_value,
               guint n_values, const GValue *values, GelContext *context)
 {
@@ -1550,9 +1478,6 @@ GHashTable* gel_make_default_symbols(void)
 
         /* closures */
         CLOSURE(fn),
-        CLOSURE_NAME("fn-name", fn_name),
-        CLOSURE_NAME("fn-args", fn_args),
-        CLOSURE_NAME("fn-code", fn_code),
         CLOSURE_NAME("fn-call", fn_call),
         CLOSURE_NAME("fn-map", fn_map),
 
