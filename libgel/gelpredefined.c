@@ -1061,8 +1061,10 @@ void array_find_(GClosure *self, GValue *return_value,
             &n_values, &values, &tmp_list, "AC", &array, &closure))
     {
         const GValue *array_values = array->values;
+        guint array_n_values = array->n_values;
         gint64 result = -1;
-        for(guint i = 0; i < array->n_values && result == -1; i++)
+
+        for(guint i = 0; i < array_n_values && result == -1; i++)
         {
             GValue value = {0};
             g_closure_invoke(closure, &value, 1, array_values + i, context);
@@ -1089,14 +1091,17 @@ void array_filter_(GClosure *self, GValue *return_value,
     if(gel_context_eval_params(context, __FUNCTION__,
             &n_values, &values, &tmp_list, "AC", &array, &closure))
     {
-        GValueArray *result_array = g_value_array_new(array->n_values);
-        for(guint i = 0; i < array->n_values; i++)
+        guint array_n_values = array->n_values;
+        GValue *array_values = array->values;
+        GValueArray *result_array = g_value_array_new(array_n_values);
+
+        for(guint i = 0; i < array_n_values; i++)
         {
             GValue tmp_value = {0};
             g_closure_invoke(closure,
-                &tmp_value, 1, array->values + i, context);
+                &tmp_value, 1, array_values + i, context);
             if(gel_value_to_boolean(&tmp_value))
-                g_value_array_append(result_array, array->values + i);
+                g_value_array_append(result_array, array_values + i);
             g_value_unset(&tmp_value);
         }
 
