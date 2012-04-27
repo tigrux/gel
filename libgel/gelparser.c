@@ -34,9 +34,30 @@ const gchar *scanner_errors[] = {
 
 
 static
-GValueArray* gel_parse_scanner(GScanner *scanner, guint line, guint pos)
+GValueArray* gel_parse_scanner(GScanner *scanner, guint line, guint pos,
+                               gchar delim)
 {
     GValueArray *array = g_value_array_new(ARRAY_N_PREALLOCATED);
+
+    const gchar *pre_symbol = NULL;
+    switch(delim)
+    {
+        case '[':
+            pre_symbol = "array";
+            break;
+         case '{':
+            pre_symbol = "hash";
+            break;
+        default:
+            break;
+    }
+
+    if(pre_symbol != NULL)
+    {
+        const GValue *pre_value = gel_value_lookup_predefined(pre_symbol);
+        if(pre_value != NULL)
+            g_value_array_append(array, pre_value);
+    }
 
     gboolean parsing = TRUE;
     while(parsing)
@@ -61,20 +82,24 @@ GValueArray* gel_parse_scanner(GScanner *scanner, guint line, guint pos)
                 g_value_init(&value, G_TYPE_INT64);
                 gel_value_set_int64(&value, (gint64)scanner->value.v_int64);
                 break;
-            case G_TOKEN_LEFT_PAREN:
+            case '(':
+            case '[':
+            case '{':
                 g_scanner_get_next_token(scanner);
                 g_value_init(&value, G_TYPE_VALUE_ARRAY);
-                gel_value_take_boxed(&value,gel_parse_scanner(scanner,
-                    scanner->line, scanner->position));
+                gel_value_take_boxed(&value, gel_parse_scanner(scanner,
+                    scanner->line, scanner->position, token));
                 break;
-            case G_TOKEN_RIGHT_PAREN:
+            case ')':
+            case ']':
+            case '}':
                 g_scanner_get_next_token(scanner);
                 parsing = FALSE;
                 break;
             case G_TOKEN_EOF:
                 if(line != 0)
-                    g_error("'(' opened at line %u, char %u was not closed",
-                        line, pos);
+                    g_error("'%c' opened at line %u, char %u was not closed",
+                            delim, line, pos);
                 parsing = FALSE;
                 break;
             case G_TOKEN_STRING:
@@ -102,10 +127,13 @@ GValueArray* gel_parse_scanner(GScanner *scanner, guint line, guint pos)
             {
                 GScanner *num_scanner = g_scanner_new(NULL);
                 num_scanner->config->store_int64 = TRUE;
+
                 g_scanner_input_text(num_scanner, name+1, len-1);
                 guint num_token = g_scanner_get_next_token(num_scanner);
+
                 if(g_scanner_peek_next_token(num_scanner) != G_TOKEN_EOF)
                     num_token = G_TOKEN_EOF;
+
                 switch(num_token)
                 {
                     case G_TOKEN_FLOAT:
@@ -202,7 +230,7 @@ GValueArray* gel_parse_text(const gchar *text, guint text_len)
 
     g_scanner_input_text(scanner, text, text_len);
 
-    GValueArray *array = gel_parse_scanner(scanner, 0, 0);
+    GValueArray *array = gel_parse_scanner(scanner, 0, 0, 0);
     g_scanner_destroy(scanner);
 
     return array;
