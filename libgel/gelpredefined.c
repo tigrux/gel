@@ -1004,6 +1004,7 @@ void array_find_(GClosure *self, GValue *return_value,
         g_value_init(return_value, G_TYPE_INT64);
         gel_value_set_int64(return_value, result);
     }
+
     gel_value_list_free(tmp_list);
 }
 
@@ -1036,6 +1037,7 @@ void array_filter_(GClosure *self, GValue *return_value,
         g_value_init(return_value, G_TYPE_VALUE_ARRAY);
         gel_value_take_boxed(return_value, result_array);
     }
+
     gel_value_list_free(tmp_list);
 }
 
@@ -1064,6 +1066,7 @@ void hash_(GClosure *self, GValue *return_value,
 
     g_value_init(return_value, G_TYPE_HASH_TABLE);
     gel_value_take_boxed(return_value, hash);
+
     gel_value_list_free(tmp_list);
 }
 
@@ -1093,7 +1096,6 @@ void hash_append_(GClosure *self, GValue *return_value,
         else
             g_warning("%s: arguments must be pairs", __FUNCTION__);
     }
-
 
     gel_value_list_free(tmp_list);
 }
@@ -1168,6 +1170,78 @@ void hash_size_(GClosure *self, GValue *return_value,
 
     gel_value_list_free(tmp_list);
 }
+
+
+static
+void hash_find_(GClosure *self, GValue *return_value,
+                guint n_values, const GValue *values, GelContext *context)
+{
+    GList *tmp_list = NULL;
+    GHashTable *hash = NULL;
+    GClosure *closure = NULL;
+
+    if(gel_context_eval_params(context, __FUNCTION__,
+            &n_values, &values, &tmp_list, "HC", &hash, &closure))
+    {
+        GHashTableIter iter = {0};
+        g_hash_table_iter_init(&iter, hash);
+
+        const GValue *k = NULL;
+        const GValue *v = NULL;
+        gboolean running = TRUE;
+
+        while(g_hash_table_iter_next(&iter, (void**)&k, (void**)&v) && running)
+        {
+            GValue value = {0};
+            g_closure_invoke(closure, &value, 1, v, context);
+            if(gel_value_to_boolean(&value))
+            {
+                gel_value_copy(k, return_value);
+                running = FALSE;
+            }
+            g_value_unset(&value);
+        }
+    }
+
+    gel_value_list_free(tmp_list);
+}
+
+
+static
+void hash_filter_(GClosure *self, GValue *return_value,
+                  guint n_values, const GValue *values, GelContext *context)
+{
+    GList *tmp_list = NULL;
+    GHashTable *hash = NULL;
+    GClosure *closure = NULL;
+
+    if(gel_context_eval_params(context, __FUNCTION__,
+            &n_values, &values, &tmp_list, "HC", &hash, &closure))
+    {
+        GValueArray *result_array = g_value_array_new(g_hash_table_size(hash));
+
+        GHashTableIter iter = {0};
+        g_hash_table_iter_init(&iter, hash);
+
+        const GValue *k = NULL;
+        const GValue *v = NULL;
+
+        while(g_hash_table_iter_next(&iter, (void**)&k, (void**)&v))
+        {
+            GValue value = {0};
+            g_closure_invoke(closure, &value, 1, v, context);
+            if(gel_value_to_boolean(&value))
+                g_value_array_append(result_array, k);
+            g_value_unset(&value);
+        }
+
+        g_value_init(return_value, G_TYPE_VALUE_ARRAY);
+        gel_value_take_boxed(return_value, result_array);
+    }
+
+    gel_value_list_free(tmp_list);
+}
+
 
 
 static
@@ -1532,6 +1606,8 @@ GHashTable* gel_make_default_symbols(void)
         CLOSURE_NAME("hash-set!", hash_set),
         CLOSURE_NAME("hash-remove!", hash_remove),
         CLOSURE_NAME("hash-size", hash_size),
+        CLOSURE_NAME("hash-find", hash_find),
+        CLOSURE_NAME("hash-filter", hash_filter),
         CLOSURE_NAME("hash-keys", hash_keys),
 
         /* introspection */
