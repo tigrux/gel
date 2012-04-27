@@ -1,17 +1,17 @@
 
-(def colors (array "red" "green" "blue"))
+(def colors ["red" "green" "blue"])
 
 (defn palette ()
     (var colors)
 )
 
-(array-append! (palette) "white")
+(append (palette) "white")
 (print colors)
 
-(array-set! (palette) 3 "black")
+(set (palette) 3 "black")
 (print colors)
 
-(set! (palette) (array "cyan" "magenta" "yellow"))
+(set (palette) ["cyan" "magenta" "yellow"])
 (print colors)
 
 

@@ -317,34 +317,3 @@ const gchar* gel_closure_get_name(const GClosure *closure)
     return name;
 }
 
-
-gchar** gel_closure_get_args(const GClosure *closure)
-{
-    gchar **args = NULL;
-    if(closure->marshal == (GClosureMarshal)gel_closure_marshal)
-    {
-        GelClosure *self = (GelClosure*)closure;
-        guint n = g_strv_length(self->args);
-        args = g_new0(gchar *, n+1);
-        gchar **self_args = self->args;
-
-        for(guint i = 0; i < n; i++)
-            args[i] = g_strdup(self_args[i]);
-    }
-
-    return args;
-}
-
-
-GValueArray* gel_closure_get_code(const GClosure *closure)
-{
-    GValueArray *code = NULL;
-    if(closure->marshal == (GClosureMarshal)gel_closure_marshal)
-    {
-        GelClosure *self = (GelClosure*)closure;
-        code = g_value_array_copy(self->code);
-    }
-
-    return code;
-}
-

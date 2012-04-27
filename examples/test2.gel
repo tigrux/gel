@@ -6,19 +6,19 @@
 
 
 (defn primes-lesser-than (top)
-    (def primes (array 2))
+    (def primes [2])
     (def n 3)
     (defn can-divide-n (i)
         (= (% n i) 0)
     )
     (defn none-prime (predicate)
-        (= (array-find primes predicate) -1)
+        (= (find primes predicate) -1)
     )
     (while (< n top)
         (if (none-prime can-divide-n )
-            (array-append! primes n)
+            (append primes n)
         )
-        (set! n (+ n 2))
+        (set n (+ n 2))
     )
     primes
 )
@@ -29,7 +29,7 @@
     (defn equal-to-value (i)
         (= i value)
     )
-    (array-find values equal-to-value)
+    (find values equal-to-value)
 )
 
 (for iter primes
@@ -37,8 +37,8 @@
 )
 
 
-(print "The first prime is" (array-get primes 0))
-(print "The last prime is" (array-get primes -1))
+(print "The first prime is" (get primes 0))
+(print "The last prime is" (get primes -1))
 
 
 (defn factorial (n)

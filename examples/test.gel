@@ -3,46 +3,46 @@
 
 ( (. Gtk init) )
 
-(defn object-add! (parent child)
-    (object-set! parent "child" child)
+(defn add (parent child)
+    (set parent "child" child)
 )
 
-(def window (object-new (. Gtk Window)))
+(def window (new (. Gtk Window)))
 
 # the variable 'title' was defined in the interpreter
-(object-set! window "title" title)
+(set window "title" title)
 
-(object-set! window "default-width" 320)
-(object-set! window "default-height" 120)
+(set window "default-width" 320)
+(set window "default-height" 120)
 
-(object-connect window "hide"
+(connect window "hide"
     (fn (widget)
         ( (. Gtk main-quit) )
     )
 )
 
-(def box (object-new (. Gtk VBox)))
-(object-add! window box)
-(object-set! box "border-width" 12)
+(def box (new (. Gtk VBox)))
+(add window box)
+(set box "border-width" 12)
 
 # get-label-from-native was defined in the interpreter
 (def label (get-label-from-native))
-(object-add! box label)
+(add box label)
 
-(def button (object-new (. Gtk Button)))
-(object-add! box button)
-(object-set! button "label" "Click me!")
+(def button (new (. Gtk Button)))
+(add box button)
+(set button "label" "Click me!")
 
-(def entry (object-new (. Gtk Entry)))
-(object-add! box entry)
+(def entry (new (. Gtk Entry)))
+(add box entry)
 
 (def counter 0)
 
-(object-connect button "clicked"
+(connect button "clicked"
     (fn (widget)
-        (object-set! widget "label" "Thanks!")
-        (set! counter (+ counter 1))
-        (object-set! entry "text" counter)
+        (set widget "label" "Thanks!")
+        (set counter (+ counter 1))
+        (set entry "text" counter)
         (print counter)
     )
 )

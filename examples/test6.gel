@@ -1,82 +1,68 @@
 
 (def fundamentals
-    (hash
+    {
         "e" 2.718281828459045
         "pi" 3.141592653589793
         "c" 299792458
-    )
+    }
 )
 
 (print fundamentals)
 
-(hash-size fundamentals)
+(size fundamentals)
 
-(hash-set! fundamentals "g" 9.822)
+(set fundamentals "g" 9.822)
 
 (print fundamentals)
 
-(hash-remove! fundamentals "c")
+(remove fundamentals "c")
 
-(hash-get fundamentals "pi")
+(get fundamentals "pi")
 
-(hash-keys fundamentals)
+(keys fundamentals)
 
-(defn hash-values (h)
+(defn values (h)
     (map
         (fn (k)
-            (hash-get h k)
+            (get h k)
         )
-        (hash-keys h)
+        (keys h)
     )
 )
 
-(hash-values fundamentals)
+(values fundamentals)
 
 
-(def romans
-    (hash
-        1000 "M"
-        900 "CM"
-        500 "D"
-        400 "CD"
-        100 "C"
-        90 "XC"
-        50 "L"
-        40 "XL"
-        10 "X"
-        9 "IX"
-        5 "V"
-        4 "IV"
-        1 "I"
-    )
-)
+(def roman-keys ["M" "CM" "D" "CD" "C" "XC" "L" "XL" "X" "IX" "V" "IV" "I"])
+(def roman-values [1000 900 500 400 100 90 50 40 10 9 5 4 1])
+(def romans (apply hash (apply + (map array roman-values roman-keys))))
 
 (apply +
     (map
         (fn (i)
-            (hash-get romans i)
+            (get romans i)
         )
-        (array 1000 900 50 10 10 5 1 1)
+        [1000 900 50 10 10 5 1 1]
     )
 )
 
 
 (defn Person (name age)
-    (def self (hash))
-    (hash-append! self
+    (def self {})
+    (append self
         "name" name
         "age" age
         "greet"
             (fn (name-of-person)
                 (print "Nice to meet you" name-of-person)
-                (print "I am" (hash-get self "name"))
+                (print "I am" (get self "name"))
             )
         "set"
             (fn (attr value)
                 (case attr
                     ("age")
                         (do
-                            (hash-set! self "age" value)
+                            (set self "age" value)
                             (print "Now I am" value "years old")
                         )
                     #else
@@ -85,7 +71,7 @@
             )
     )
     (fn (s)
-        (hash-get self s)
+        (get self s)
     )
 )
 

@@ -1,5 +1,5 @@
 
-(def S (array -6 77 0.0 30.6 -15))
+(def S [-6 77 0.0 30.6 -15])
 
 
 (apply or S)
@@ -18,11 +18,11 @@
     (> n 0)
 )
 
-(array-filter S is-positive)
+(filter S is-positive)
 
 
-(def values (array 4.5 2))
-(def operators (array + - * /))
+(def values [4.5 2])
+(def operators [+ - * /])
 
 (defn operate-values (oper)
     (apply oper values)
@@ -31,8 +31,8 @@
 (map operate-values operators)
 
 
-(def units (array 1 2 3))
-(def tens (10 20 30))
+(def units [1 2 3])
+(def tens [10 20 30])
 
 (map array units tens)
 

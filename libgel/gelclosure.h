@@ -10,8 +10,4 @@ GClosure* gel_closure_new_native(const gchar *name, GClosureMarshal marshal);
 
 const gchar* gel_closure_get_name(const GClosure *closure);
 
-gchar** gel_closure_get_args(const GClosure *closure);
-
-GValueArray* gel_closure_get_code(const GClosure *closure);
-
 #endif

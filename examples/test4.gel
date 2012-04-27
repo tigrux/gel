@@ -1,10 +1,10 @@
 
 (defn generate-primes ()
-    (def primes (array))
+    (def primes [])
     (def candidate 2)
 
     (defn none-prime (predicate)
-        (= (array-find primes predicate) -1)
+        (= (find primes predicate) -1)
     )
 
     (defn can-divide-candidate (i)
@@ -16,11 +16,11 @@
         (while (= calculated-prime 0)
             (if (none-prime can-divide-candidate)
                 (do
-                    (array-append! primes candidate)
-                    (set! calculated-prime candidate)
+                    (append primes candidate)
+                    (set calculated-prime candidate)
                 )
             )
-            (set! candidate (+ candidate 1))
+            (set candidate (+ candidate 1))
         )
         calculated-prime
     )
@@ -29,6 +29,6 @@
 (def next-prime (generate-primes))
 
 (for i (range 1 12)
-    (print "Primes(" i ") =" (next-prime))
+    (print (next-prime))
 )
 
