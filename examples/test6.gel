@@ -33,9 +33,9 @@
 (values fundamentals)
 
 
-(defn comp (& Fs)
+(defn comp (& functions)
     (fn (& result)
-        (for f (reverse Fs)
+        (for f (reverse functions)
             (set result (apply f result))
         )
         result
@@ -44,12 +44,12 @@
 
 (def arabics [1000 900 500 400 100 90 50 40 10 9 5 4 1])
 (def romans ["M" "CM" "D" "CD" "C" "XC" "L" "XL" "X" "IX" "V" "IV" "I"])
-(def arabics-from-romans ((comp hash + map) array arabics romans))
+(def romans-from-arabigs ((comp hash + map) array arabics romans))
 
 (apply +
     (map
         (fn (i)
-            (get arabics-from-romans i)
+            (get romans-from-arabigs i)
         )
         [1000 900 50 10 10 5 1 1]
     )
