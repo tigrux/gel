@@ -494,4 +494,3 @@ void gel_context_set_outer(GelContext *self, GelContext *context)
         self->level = context->level + 1;
 }
 
-

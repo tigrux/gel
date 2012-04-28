@@ -23,7 +23,5 @@ gboolean gel_values_le(const GValue *v1, const GValue *v2);
 gboolean gel_values_lt(const GValue *v1, const GValue *v2);
 gboolean gel_values_ne(const GValue *v1, const GValue *v2);
 
-const GValue* gel_value_lookup_predefined(const gchar *name);
-
 #endif
 

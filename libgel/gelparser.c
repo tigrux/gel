@@ -173,14 +173,11 @@ GValueArray* gel_parse_scanner(GScanner *scanner, guint line, guint pos,
             
             if(!is_number)
             {
-                const GValue *symbol = gel_value_lookup_predefined(name);
-                if(symbol != NULL)
-                    g_value_array_append(array, symbol);
-                else
-                {
-                    g_value_init(&value, GEL_TYPE_SYMBOL);
-                    gel_value_take_boxed(&value, gel_symbol_new(name, NULL));
-                }
+                GelVariable *variable =
+                    gel_variable_lookup_predefined(name);
+                GelSymbol *symbol = gel_symbol_new(name, variable);
+                g_value_init(&value, GEL_TYPE_SYMBOL);
+                gel_value_take_boxed(&value, symbol);
             }
         }
 

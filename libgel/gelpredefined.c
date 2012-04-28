@@ -1932,31 +1932,37 @@ GHashTable* gel_make_default_symbols(void)
         {NULL,NULL}
     };
 
-    GValue *value;
+
     GHashTable *symbols = g_hash_table_new_full(
             g_str_hash, g_str_equal,
-            (GDestroyNotify)g_free, (GDestroyNotify)gel_value_free);
+            (GDestroyNotify)g_free, (GDestroyNotify)gel_variable_unref);
+
+    GValue *value;
+    GelVariable *variable;
 
     for(c = closures; c->name != NULL; c++)
     {
         GClosure *closure = gel_closure_new_native(c->name, c->marshal);
         value = gel_value_new_from_boxed(G_TYPE_CLOSURE, closure);
-        g_hash_table_insert(symbols, g_strdup(c->name), value);
+        variable = gel_variable_new(value, TRUE);
+        g_hash_table_insert(symbols, g_strdup(c->name), variable);
     }
 
     value = gel_value_new_of_type(G_TYPE_BOOLEAN);
     gel_value_set_boolean(value, TRUE);
-    g_hash_table_insert(symbols, g_strdup("TRUE"), value);
+    variable = gel_variable_new(value, TRUE);
+    g_hash_table_insert(symbols, g_strdup("TRUE"), variable);
 
     value = gel_value_new_of_type(G_TYPE_BOOLEAN);
     gel_value_set_boolean(value, FALSE);
-    g_hash_table_insert(symbols, g_strdup("FALSE"), value);
+    variable = gel_variable_new(value, TRUE);
+    g_hash_table_insert(symbols, g_strdup("FALSE"), variable);
 
     return symbols;
 }
 
 
-const GValue *gel_value_lookup_predefined(const gchar *name)
+GelVariable* gel_variable_lookup_predefined(const gchar *name)
 {
     static GHashTable *symbols = NULL;
     static volatile gsize once = 0;
@@ -1968,5 +1974,17 @@ const GValue *gel_value_lookup_predefined(const gchar *name)
     }
 
     return g_hash_table_lookup(symbols, name);
+}
+
+
+const GValue* gel_value_lookup_predefined(const gchar *name)
+{
+    const GValue *value = NULL;
+
+    const GelVariable *variable = gel_variable_lookup_predefined(name);
+    if(variable != NULL)
+        value = gel_variable_get_value(variable);
+
+    return value;
 }
 

@@ -3,6 +3,8 @@
 
 #include <glib-object.h>
 
+#include <gelvariable.h>
+
 #ifndef GEL_VALUE_USE_MACRO
 #define GEL_VALUE_USE_MACRO 1
 #endif
@@ -82,6 +84,10 @@ GValue* gel_value_dup(const GValue *value);
 void gel_value_free(GValue *value);
 
 GHashTable* gel_hash_table_new(void);
+
+GelVariable* gel_variable_lookup_predefined(const gchar *name);
+
+const GValue* gel_value_lookup_predefined(const gchar *name);
 
 #endif
 
