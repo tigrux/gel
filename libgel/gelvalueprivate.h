@@ -79,7 +79,7 @@ GValue* gel_value_new_from_boxed(GType type, gpointer boxed);
 GValue* gel_value_dup(const GValue *value);
 void gel_value_free(GValue *value);
 
-guint gel_value_hash(const GValue *value);
+GHashTable* gel_hash_table_new(void);
 
 #endif
 

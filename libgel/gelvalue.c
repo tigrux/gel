@@ -356,6 +356,7 @@ GType gel_values_simple_type(const GValue *v1, const GValue *v2)
 }
 
 
+static
 guint gel_value_hash(const GValue *value)
 {
     GType type = GEL_VALUE_TYPE(value);
@@ -366,6 +367,15 @@ guint gel_value_hash(const GValue *value)
         default:
             return value->data[0].v_uint;
     }
+}
+
+
+GHashTable* gel_hash_table_new(void)
+{
+    GHashTable *hash = g_hash_table_new_full(
+            (GHashFunc)gel_value_hash, (GEqualFunc)gel_values_eq,
+            (GDestroyNotify)gel_value_free, (GDestroyNotify)gel_value_free);
+    return hash;
 }
 
 
@@ -422,11 +432,7 @@ gboolean gel_values_simple_add(const GValue *v1, const GValue *v2,
             {
                 GHashTable *h1 = gel_value_get_boxed(v1);
                 GHashTable *h2 = gel_value_get_boxed(v2);
-                GHashTable *hash = g_hash_table_new_full(
-                    (GHashFunc)gel_value_hash,
-                    (GEqualFunc)gel_values_eq,
-                    (GDestroyNotify)gel_value_free,
-                    (GDestroyNotify)gel_value_free);
+                GHashTable *hash = gel_hash_table_new();
 
                 GHashTableIter iter;
                 GValue *k = NULL;

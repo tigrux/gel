@@ -750,9 +750,7 @@ void hash_(GClosure *self, GValue *return_value,
            guint n_values, const GValue *values, GelContext *context)
 {
     GList *tmp_list = NULL;
-    GHashTable *hash = g_hash_table_new_full(
-            (GHashFunc)gel_value_hash, (GEqualFunc)gel_values_eq,
-            (GDestroyNotify)gel_value_free, (GDestroyNotify)gel_value_free);
+    GHashTable *hash = gel_hash_table_new();
 
     if(n_values % 2 == 0)
         while(n_values > 0)
