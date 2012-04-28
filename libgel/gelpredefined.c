@@ -1296,6 +1296,26 @@ void filter_(GClosure *self, GValue *return_value,
 }
 
 
+
+static
+void compare_(GClosure *self, GValue *return_value,
+              guint n_values, const GValue *values, GelContext *context)
+{
+    GList *tmp_list = NULL;
+    GValue *v1 = NULL;
+    GValue *v2 = NULL;
+
+    if(gel_context_eval_params(context, __FUNCTION__,
+            &n_values, &values, &tmp_list, "VV", &v1, &v2))
+    {
+        g_value_init(return_value, G_TYPE_INT64);
+        gel_value_set_int64(return_value, gel_values_cmp(v1, v2));
+    }
+
+    gel_value_list_free(tmp_list);
+}
+
+
 static
 void sort_(GClosure *self, GValue *return_value,
            guint n_values, const GValue *values, GelContext *context)
@@ -1868,6 +1888,7 @@ GHashTable* gel_make_default_symbols(void)
         CLOSURE(size), /* array hash */
         CLOSURE(find), /* array hash */
         CLOSURE(filter), /* array hash */
+        CLOSURE(compare),
         CLOSURE(sort), /* array */
         CLOSURE(reverse), /* array */
         CLOSURE(keys), /* hash */
