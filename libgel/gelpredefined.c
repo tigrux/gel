@@ -325,6 +325,8 @@ void array_remove(GValueArray *array, GValue *return_value,
             gel_warning_index_out_of_bounds(__FUNCTION__);
             return;
         }
+
+        gel_value_copy(array->values + index, return_value);
         g_value_array_remove(array, index);
     }
 
@@ -341,7 +343,14 @@ void hash_remove(GHashTable *hash, GValue *return_value,
 
     if(gel_context_eval_params(context, __FUNCTION__,
             &n_values, &values, &tmp_list, "V", &key))
-        g_hash_table_remove(hash, key);
+    {
+        GValue *value = g_hash_table_lookup(hash, key);
+        if(value != NULL)
+        {
+            gel_value_copy(value, return_value); 
+            g_hash_table_remove(hash, key);
+        }
+    }
 
     gel_value_list_free(tmp_list);
 }
