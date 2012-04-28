@@ -481,7 +481,7 @@ void hash_filter(GHashTable *hash, GValue *return_value,
     if(gel_context_eval_params(context, __FUNCTION__,
             &n_values, &values, &tmp_list, "C", &closure))
     {
-        GValueArray *result_array = g_value_array_new(g_hash_table_size(hash));
+        GHashTable *result_hash = gel_hash_table_new();
 
         GHashTableIter iter = {0};
         g_hash_table_iter_init(&iter, hash);
@@ -494,12 +494,13 @@ void hash_filter(GHashTable *hash, GValue *return_value,
             GValue value = {0};
             g_closure_invoke(closure, &value, 1, v, context);
             if(gel_value_to_boolean(&value))
-                g_value_array_append(result_array, k);
+                g_hash_table_insert(result_hash,
+                    gel_value_dup(k), gel_value_dup(v));
             g_value_unset(&value);
         }
 
-        g_value_init(return_value, G_TYPE_VALUE_ARRAY);
-        gel_value_take_boxed(return_value, result_array);
+        g_value_init(return_value, G_TYPE_HASH_TABLE);
+        gel_value_take_boxed(return_value, result_hash);
     }
 
     gel_value_list_free(tmp_list);
