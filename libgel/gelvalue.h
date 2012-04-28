@@ -7,7 +7,7 @@ gchar *gel_value_to_string(const GValue *value);
 gboolean gel_value_to_boolean(const GValue *value);
 
 void gel_value_list_free(GList *value_list);
-gboolean gel_value_copy(const GValue *src_value, GValue *dest_value);
+void gel_value_copy(const GValue *src_value, GValue *dest_value);
 gint gel_values_cmp(const GValue *v1, const GValue *v2);
 const GValue* gel_value_lookup_predefined(const gchar *name);
 

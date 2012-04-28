@@ -49,15 +49,13 @@ GValue *gel_value_dup(const GValue *value)
  * If @dest_value is empty, #g_value_init and #g_value_copy are used.
  * If not, #g_value_transform is used.
  *
- * Returns: #TRUE on success , #FALSE otherwise
  */
-gboolean gel_value_copy(const GValue *src_value, GValue *dest_value)
+void gel_value_copy(const GValue *src_value, GValue *dest_value)
 {
-    g_return_val_if_fail(src_value != NULL, FALSE);
-    g_return_val_if_fail(dest_value != NULL, FALSE);
-    g_return_val_if_fail(GEL_IS_VALUE(src_value), FALSE);
+    g_return_if_fail(src_value != NULL);
+    g_return_if_fail(dest_value != NULL);
+    g_return_if_fail(GEL_IS_VALUE(src_value));
 
-    gboolean result = TRUE;
     GType src_type = GEL_VALUE_TYPE(src_value);
 
     if(!GEL_IS_VALUE(dest_value))
@@ -87,11 +85,13 @@ gboolean gel_value_copy(const GValue *src_value, GValue *dest_value)
                 g_value_copy(src_value, dest_value);
         }
     else
-    if(!(result = g_value_transform(src_value, dest_value)))
-        g_warning("Cannot assign from %s to %s",
-            g_type_name(src_type), g_type_name(dest_type));
-
-    return result;
+        if(!g_value_transform(src_value, dest_value))
+        {
+            if(GEL_IS_VALUE(dest_value))
+                g_value_unset(dest_value);
+            g_value_init(dest_value, src_type);
+            g_value_copy(src_value, dest_value);
+        }
 }
 
 

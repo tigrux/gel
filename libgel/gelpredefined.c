@@ -99,7 +99,10 @@ void set(GValue *return_value,
         const GValue *src_value =
             gel_context_eval_param_into_value(context, values + 1, &tmp2_value);
         if(src_value != NULL)
-            copied = gel_value_copy(src_value, dest_value);
+        {
+            gel_value_copy(src_value, dest_value);
+            copied = TRUE;
+        }
     }
 
     if(!copied)
