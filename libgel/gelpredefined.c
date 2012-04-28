@@ -557,12 +557,8 @@ static
 void do_(GClosure *self, GValue *return_value,
          guint n_values, const GValue *values, GelContext *context)
 {
-    guint n_args = 1;
-    if(n_values < n_args)
-    {
-        gel_warning_needs_at_least_n_arguments(__FUNCTION__, n_args);
+    if(n_values < 1)
         return;
-    }
 
     guint last = n_values-1;
     for(guint i = 0; i <= last; i++)
