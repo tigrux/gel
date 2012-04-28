@@ -1338,6 +1338,30 @@ void sort_(GClosure *self, GValue *return_value,
 
 
 static
+void reverse_(GClosure *self, GValue *return_value,
+              guint n_values, const GValue *values, GelContext *context)
+{
+    GList *tmp_list = NULL;
+    GValueArray *array = NULL;
+
+    if(gel_context_eval_params(context, __FUNCTION__,
+            &n_values, &values, &tmp_list, "A", &array))
+    {
+        guint array_n_values = array->n_values;
+        const GValue *array_values = array->values;
+        GValueArray *result_array = g_value_array_new(array_n_values);
+        
+        for(guint i = array_n_values; i > 0; i--)
+            g_value_array_append(result_array, array_values + (i-1));
+
+        g_value_init(return_value, G_TYPE_VALUE_ARRAY);
+        gel_value_take_boxed(return_value, result_array);
+    }
+
+}
+
+
+static
 void keys_(GClosure *self, GValue *return_value,
            guint n_values, const GValue *values, GelContext *context)
 {
@@ -1841,6 +1865,7 @@ GHashTable* gel_make_default_symbols(void)
         CLOSURE(find), /* array hash */
         CLOSURE(filter), /* array hash */
         CLOSURE(sort), /* array */
+        CLOSURE(reverse), /* array */
         CLOSURE(keys), /* hash */
 
         /* objects */
