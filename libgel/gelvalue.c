@@ -157,9 +157,7 @@ gchar* gel_value_to_string(const GValue *value)
             for(guint i = 0; i <= last; i++)
             {
                 gchar *s = gel_value_to_string(array_values + i);
-                g_string_append(buffer, s);
-                if(i != last)
-                    g_string_append_c(buffer, ' ');
+                g_string_append_printf(buffer, "%s%s", s, i != last ? " " : "");
                 g_free(s);
             }
         }
@@ -170,7 +168,7 @@ gchar* gel_value_to_string(const GValue *value)
     if(GEL_VALUE_HOLDS(value, G_TYPE_HASH_TABLE))
     {
         GHashTable *hash = gel_value_get_boxed(value);
-        GString *buffer = g_string_new("(");
+        GString *buffer = g_string_new("{");
         guint n_values = g_hash_table_size(hash);
         if(n_values > 0)
         {
@@ -193,7 +191,7 @@ gchar* gel_value_to_string(const GValue *value)
                 i++;
             }
         }
-        g_string_append_c(buffer, ')');
+        g_string_append_c(buffer, '}');
         result =  g_string_free(buffer, FALSE);
     }
     else
