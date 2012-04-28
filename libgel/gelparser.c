@@ -93,14 +93,30 @@ GValueArray* gel_parse_scanner(GScanner *scanner, guint line, guint pos,
             case ')':
             case ']':
             case '}':
-                g_scanner_get_next_token(scanner);
-                parsing = FALSE;
+                if((delim == '(' && token != ')') ||
+                   (delim == '[' && token != ']') ||
+                   (delim == '{' && token != '}'))
+                    g_error("Cannot close '%c' at line %u, char %u with '%c' at line %u, char %u",
+                            delim, line, pos, token,
+                            scanner->next_line, scanner->next_position);
+                else
+                if(delim == 0)
+                    g_error("Unexpected '%c' at line %u, char %u",
+                            token, scanner->next_line, scanner->next_position);
+                else
+                {
+                    g_scanner_get_next_token(scanner);
+                    parsing = FALSE;
+                }
                 break;
             case G_TOKEN_EOF:
                 if(line != 0)
+                {
                     g_error("'%c' opened at line %u, char %u was not closed",
                             delim, line, pos);
-                parsing = FALSE;
+                }
+                else
+                    parsing = FALSE;
                 break;
             case G_TOKEN_STRING:
                 g_scanner_get_next_token(scanner);
