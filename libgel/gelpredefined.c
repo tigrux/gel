@@ -1955,24 +1955,18 @@ GHashTable* gel_make_default_symbols(void)
     return symbols;
 }
 
-/**
- * gel_value_lookup_predefined:
- * @name: name of the predefined value to lookup
- *
- * Lookups the table of predefined values and retrieves
- * the value that correspond to @name.
- *
- * Returns: The #GValue that correspond to @name
- */
+
 const GValue *gel_value_lookup_predefined(const gchar *name)
 {
     static GHashTable *symbols = NULL;
     static volatile gsize once = 0;
+
     if(g_once_init_enter(&once))
     {
         symbols = gel_make_default_symbols();
         g_once_init_leave(&once, 1);
     }
+
     return g_hash_table_lookup(symbols, name);
 }
 
