@@ -1,0 +1,39 @@
+
+(defn Person (name age)
+    (def self {})
+    (append self
+        "name" name
+        "age" age
+        "greet"
+            (fn (name-of-person)
+                (print "Nice to meet you" name-of-person)
+                (print "I am" (get self "name"))
+            )
+        "set"
+            (fn (attr value)
+                (case attr
+                    ("age")
+                        (do
+                            (set self "age" value)
+                            (print "Now I am" value "years old")
+                        )
+                    #else
+                        (print "I don't think you can change my" attr)
+                )
+            )
+    )
+    (fn (s)
+        (get self s)
+    )
+)
+
+(def mary (Person "Maria Romanov" 35))
+
+(print "My name is" (mary "name") "and I'm" (mary "age"))
+( (mary "greet") "Hanna")
+
+( (mary "set") "age" 37)
+(mary "age")
+
+( (mary "set") "name" "Boris")
+
