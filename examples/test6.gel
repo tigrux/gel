@@ -33,55 +33,25 @@
 (values fundamentals)
 
 
-(def arabigs [1000 900 500 400 100 90 50 40 10 9 5 4 1])
+(defn comp (& Fs)
+    (fn (& result)
+        (for f (reverse Fs)
+            (set result (apply f result))
+        )
+        result
+    )
+)
+
+(def arabics [1000 900 500 400 100 90 50 40 10 9 5 4 1])
 (def romans ["M" "CM" "D" "CD" "C" "XC" "L" "XL" "X" "IX" "V" "IV" "I"])
-(def arabig-to-roman (apply hash (apply + (map array arabigs romans))))
+(def arabics-from-romans ((comp hash + map) array arabics romans))
 
 (apply +
     (map
         (fn (i)
-            (get arabig-to-roman i)
+            (get arabics-from-romans i)
         )
         [1000 900 50 10 10 5 1 1]
     )
 )
-
-
-(defn Person (name age)
-    (def self {})
-    (append self
-        "name" name
-        "age" age
-        "greet"
-            (fn (name-of-person)
-                (print "Nice to meet you" name-of-person)
-                (print "I am" (get self "name"))
-            )
-        "set"
-            (fn (attr value)
-                (case attr
-                    ("age")
-                        (do
-                            (set self "age" value)
-                            (print "Now I am" value "years old")
-                        )
-                    #else
-                        (print "I don't think you can change my" attr)
-                )
-            )
-    )
-    (fn (s)
-        (get self s)
-    )
-)
-
-(def mary (Person "Maria Romanov" 35))
-
-(print "My name is" (mary "name") "and I'm" (mary "age"))
-( (mary "greet") "Hanna")
-
-( (mary "set") "age" 37)
-(mary "age")
-
-( (mary "set") "name" "Boris")
 
