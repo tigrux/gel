@@ -134,6 +134,7 @@ void array_set(GValueArray *array, GValue *return_value,
         }
         gel_value_copy(value, array->values + index);
     }
+
     gel_value_list_free(tmp_list);
 }
 
@@ -249,6 +250,7 @@ void object_get(GObject *object, GValue *return_value,
         {
             GObjectClass *gclass = G_OBJECT_GET_CLASS(object);
             GParamSpec *spec = g_object_class_find_property(gclass, name);
+
             if(spec != NULL)
             {
                 g_value_init(return_value, spec->value_type);
@@ -273,7 +275,9 @@ void array_append(GValueArray *array, GValue *return_value,
         GValue tmp_value = {0};
         const GValue *value =
             gel_context_eval_into_value(context,values + i, &tmp_value);
+
         g_value_array_append(array, value);
+
         if(GEL_IS_VALUE(&tmp_value))
             g_value_unset(&tmp_value);
     }
@@ -293,6 +297,7 @@ void hash_append(GHashTable *hash, GValue *return_value,
         {
             GValue *key = NULL;
             GValue *value = NULL;
+
             if(gel_context_eval_params(context, __FUNCTION__,
                     &n_values, &values, &tmp_list, "VV*", &key, &value))
                 g_hash_table_insert(hash,
@@ -659,6 +664,7 @@ void apply_(GClosure *self, GValue *return_value,
             &n_values, &values, &tmp_list, "CA", &closure, &array))
         g_closure_invoke(closure, return_value,
             array->n_values, array->values, context);
+
     gel_value_list_free(tmp_list);
 }
 
@@ -718,7 +724,7 @@ static
 void array_(GClosure *self, GValue *return_value,
             guint n_values, const GValue *values, GelContext *context)
 {
-    GValueArray *array = g_value_array_new(n_values);
+    GValueArray *array = g_value_array_new(n_values > 8 ? n_values : 8);
     for(guint i = 0; i < n_values; i++)
     {
         GValue tmp_value = {0};
@@ -1314,13 +1320,13 @@ void sort_(GClosure *self, GValue *return_value,
             GValue tmp_value = {0};
             g_closure_invoke(closure, &tmp_value, 2, pair->values, context);
 
-            GValue int_value = {0};
-            g_value_init(&int_value, G_TYPE_INT);
-            g_value_transform(&tmp_value, &int_value);
-            gint result = gel_value_get_int(&int_value);
+            GValue result_value = {0};
+            g_value_init(&result_value, G_TYPE_INT);
+            g_value_transform(&tmp_value, &result_value);
+            gint result = gel_value_get_int(&result_value);
 
-            if(GEL_IS_VALUE(&int_value))
-                g_value_unset(&int_value);
+            if(GEL_IS_VALUE(&result_value))
+                g_value_unset(&result_value);
             if(GEL_IS_VALUE(&tmp_value))
                 g_value_unset(&tmp_value);
             g_value_array_free(pair);
@@ -1514,7 +1520,6 @@ void case_(GClosure *self, GValue *return_value,
     if(gel_context_eval_params(context, __FUNCTION__,
             &n_values, &values, &tmp_list, "V*", &probe_value))
         while(n_values > 0)
-        {
             if(n_values == 1)
                 do_(self, return_value, n_values--, values++, context);
             else
@@ -1526,6 +1531,7 @@ void case_(GClosure *self, GValue *return_value,
                 {
                     const GValue *test_values = tests->values;
                     guint test_n_values = tests->n_values;
+
                     for(guint i = 0; i < test_n_values; i++)
                         if(gel_values_eq(test_values + i, probe_value))
                         {
@@ -1535,7 +1541,6 @@ void case_(GClosure *self, GValue *return_value,
                         }
                 }
             }
-        }
 
     gel_value_list_free(tmp_list);
 }
@@ -1665,6 +1670,7 @@ void print_(GClosure *self, GValue *return_value,
         GValue tmp_value = {0};
         const GValue *value =
             gel_context_eval_into_value(context, values + i, &tmp_value);
+
         if(GEL_IS_VALUE(value))
         {
             gchar *value_string = gel_value_to_string(value);
