@@ -1286,6 +1286,47 @@ void filter_(GClosure *self, GValue *return_value,
 
 
 static
+void sort_(GClosure *self, GValue *return_value,
+           guint n_values, const GValue *values, GelContext *context)
+{
+    GList *tmp_list = NULL;
+    GValueArray *array = NULL;
+    GClosure *closure = NULL;
+
+    if(gel_context_eval_params(context, __FUNCTION__,
+            &n_values, &values, &tmp_list, "AC", &array, &closure))
+    {
+        gint compare(GValue *v1, GValue *v2)
+        {
+            GValueArray *pair = g_value_array_new(2);
+            g_value_array_append(pair, v1);
+            g_value_array_append(pair, v2);
+
+            GValue tmp_value = {0};
+            g_closure_invoke(closure, &tmp_value, 2, pair->values, context);
+
+            GValue int_value = {0};
+            g_value_init(&int_value, G_TYPE_INT);
+            g_value_transform(&tmp_value, &int_value);
+            gint result = gel_value_get_int(&int_value);
+
+            if(GEL_IS_VALUE(&int_value))
+                g_value_unset(&int_value);
+            if(GEL_IS_VALUE(&tmp_value))
+                g_value_unset(&tmp_value);
+            g_value_array_free(pair);
+
+            return result;
+        }
+
+        g_value_array_sort(array, (GCompareFunc)compare);
+    }
+
+    gel_value_list_free(tmp_list);
+}
+
+
+static
 void keys_(GClosure *self, GValue *return_value,
            guint n_values, const GValue *values, GelContext *context)
 {
@@ -1788,6 +1829,7 @@ GHashTable* gel_make_default_symbols(void)
         CLOSURE(size), /* array hash */
         CLOSURE(find), /* array hash */
         CLOSURE(filter), /* array hash */
+        CLOSURE(sort), /* array */
         CLOSURE(keys), /* hash */
 
         /* objects */

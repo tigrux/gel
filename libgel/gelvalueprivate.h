@@ -10,6 +10,7 @@
 #if GEL_VALUE_USE_MACRO
 
 #define gel_value_get_boolean(v) ((v)->data[0].v_int != FALSE)
+#define gel_value_get_int(v) ((v)->data[0].v_int)
 #define gel_value_get_long(v) ((v)->data[0].v_long)
 #define gel_value_get_int64(v) ((v)->data[0].v_int64)
 #define gel_value_get_double(v) ((v)->data[0].v_double)
@@ -38,6 +39,7 @@
 #else
 
 #define gel_value_get_boolean g_value_get_boolean
+#define gel_value_get_int g_value_get_int
 #define gel_value_get_long g_value_get_long
 #define gel_value_get_int64 g_value_get_int64
 #define gel_value_get_double g_value_get_double
