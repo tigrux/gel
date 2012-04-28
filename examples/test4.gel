@@ -4,7 +4,7 @@
     (def candidate 2)
 
     (defn none-prime (predicate)
-        (= (find primes predicate) -1)
+        (= (find predicate primes) -1)
     )
 
     (defn can-divide-candidate (i)

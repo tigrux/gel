@@ -12,7 +12,7 @@
         (= (% n i) 0)
     )
     (defn none-prime (predicate)
-        (= (find primes predicate) -1)
+        (= (find predicate primes) -1)
     )
     (while (< n top)
         (if (none-prime can-divide-n )
@@ -29,7 +29,7 @@
     (defn equal-to-value (i)
         (= i value)
     )
-    (find values equal-to-value)
+    (find equal-to-value values)
 )
 
 (for iter primes

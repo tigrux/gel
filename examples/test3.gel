@@ -18,7 +18,7 @@
     (> n 0)
 )
 
-(filter S is-positive)
+(filter is-positive S)
 
 
 (def values [4.5 2])

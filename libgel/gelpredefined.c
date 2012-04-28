@@ -375,64 +375,54 @@ void hash_size(GHashTable *hash, GValue *return_value,
 
 
 static
-void array_find(GValueArray *array, GValue *return_value,
+void array_find(GClosure *closure, GValueArray *array, GValue *return_value,
                 guint n_values, const GValue *values, GelContext *context)
 {
     GList *tmp_list = NULL;
-    GClosure *closure = NULL;
 
-    if(gel_context_eval_params(context, __FUNCTION__,
-            &n_values, &values, &tmp_list, "C", &closure))
+    const GValue *array_values = array->values;
+    guint array_n_values = array->n_values;
+    gint64 result = -1;
+
+    for(guint i = 0; i < array_n_values && result == -1; i++)
     {
-        const GValue *array_values = array->values;
-        guint array_n_values = array->n_values;
-        gint64 result = -1;
-
-        for(guint i = 0; i < array_n_values && result == -1; i++)
-        {
-            GValue value = {0};
-            g_closure_invoke(closure, &value, 1, array_values + i, context);
-            if(gel_value_to_boolean(&value))
-                result = i;
-            g_value_unset(&value);
-        }
-
-        g_value_init(return_value, G_TYPE_INT64);
-        gel_value_set_int64(return_value, result);
+        GValue value = {0};
+        g_closure_invoke(closure, &value, 1, array_values + i, context);
+        if(gel_value_to_boolean(&value))
+            result = i;
+        g_value_unset(&value);
     }
+
+    g_value_init(return_value, G_TYPE_INT64);
+    gel_value_set_int64(return_value, result);
 
     gel_value_list_free(tmp_list);
 }
 
 
 static
-void hash_find(GHashTable *hash, GValue *return_value,
+void hash_find(GClosure *closure, GHashTable *hash, GValue *return_value,
                guint n_values, const GValue *values, GelContext *context)
 {
     GList *tmp_list = NULL;
-    GClosure *closure = NULL;
 
-    if(gel_context_eval_params(context, __FUNCTION__,
-            &n_values, &values, &tmp_list, "C", &closure))
+    GHashTableIter iter = {0};
+    g_hash_table_iter_init(&iter, hash);
+
+    const GValue *k = NULL;
+    const GValue *v = NULL;
+    gboolean running = TRUE;
+
+    while(g_hash_table_iter_next(&iter, (void**)&k, (void**)&v) && running)
     {
-        GHashTableIter iter = {0};
-        g_hash_table_iter_init(&iter, hash);
-
-        const GValue *k = NULL;
-        const GValue *v = NULL;
-        gboolean running = TRUE;
-
-        while(g_hash_table_iter_next(&iter, (void**)&k, (void**)&v) && running)
+        GValue value = {0};
+        g_closure_invoke(closure, &value, 1, v, context);
+        if(gel_value_to_boolean(&value))
         {
-            GValue value = {0};
-            g_closure_invoke(closure, &value, 1, v, context);
-            if(gel_value_to_boolean(&value))
-            {
-                gel_value_copy(k, return_value);
-                running = FALSE;
-            }
-            g_value_unset(&value);
+            gel_value_copy(k, return_value);
+            running = FALSE;
         }
+        g_value_unset(&value);
     }
 
     gel_value_list_free(tmp_list);
@@ -440,68 +430,57 @@ void hash_find(GHashTable *hash, GValue *return_value,
 
 
 static
-void array_filter(GValueArray *array, GValue *return_value,
+void array_filter(GClosure *closure, GValueArray *array, GValue *return_value,
                   guint n_values, const GValue *values, GelContext *context)
 {
     GList *tmp_list = NULL;
-    GClosure *closure = NULL;
 
-    if(gel_context_eval_params(context, __FUNCTION__,
-            &n_values, &values, &tmp_list, "C", &closure))
+    guint array_n_values = array->n_values;
+    GValue *array_values = array->values;
+    GValueArray *result_array = g_value_array_new(array_n_values);
+
+    for(guint i = 0; i < array_n_values; i++)
     {
-        guint array_n_values = array->n_values;
-        GValue *array_values = array->values;
-        GValueArray *result_array = g_value_array_new(array_n_values);
-
-        for(guint i = 0; i < array_n_values; i++)
-        {
-            GValue tmp_value = {0};
-            g_closure_invoke(closure,
-                &tmp_value, 1, array_values + i, context);
-            if(gel_value_to_boolean(&tmp_value))
-                g_value_array_append(result_array, array_values + i);
-            g_value_unset(&tmp_value);
-        }
-
-        g_value_init(return_value, G_TYPE_VALUE_ARRAY);
-        gel_value_take_boxed(return_value, result_array);
+        GValue tmp_value = {0};
+        g_closure_invoke(closure,
+            &tmp_value, 1, array_values + i, context);
+        if(gel_value_to_boolean(&tmp_value))
+            g_value_array_append(result_array, array_values + i);
+        g_value_unset(&tmp_value);
     }
+
+    g_value_init(return_value, G_TYPE_VALUE_ARRAY);
+    gel_value_take_boxed(return_value, result_array);
 
     gel_value_list_free(tmp_list);
 }
 
 
 static
-void hash_filter(GHashTable *hash, GValue *return_value,
+void hash_filter(GClosure *closure, GHashTable *hash, GValue *return_value,
                  guint n_values, const GValue *values, GelContext *context)
 {
     GList *tmp_list = NULL;
-    GClosure *closure = NULL;
 
-    if(gel_context_eval_params(context, __FUNCTION__,
-            &n_values, &values, &tmp_list, "C", &closure))
+    GHashTable *result_hash = gel_hash_table_new();
+    GHashTableIter iter = {0};
+    g_hash_table_iter_init(&iter, hash);
+
+    const GValue *k = NULL;
+    const GValue *v = NULL;
+
+    while(g_hash_table_iter_next(&iter, (void**)&k, (void**)&v))
     {
-        GHashTable *result_hash = gel_hash_table_new();
-
-        GHashTableIter iter = {0};
-        g_hash_table_iter_init(&iter, hash);
-
-        const GValue *k = NULL;
-        const GValue *v = NULL;
-
-        while(g_hash_table_iter_next(&iter, (void**)&k, (void**)&v))
-        {
-            GValue value = {0};
-            g_closure_invoke(closure, &value, 1, v, context);
-            if(gel_value_to_boolean(&value))
-                g_hash_table_insert(result_hash,
-                    gel_value_dup(k), gel_value_dup(v));
-            g_value_unset(&value);
-        }
-
-        g_value_init(return_value, G_TYPE_HASH_TABLE);
-        gel_value_take_boxed(return_value, result_hash);
+        GValue value = {0};
+        g_closure_invoke(closure, &value, 1, v, context);
+        if(gel_value_to_boolean(&value))
+            g_hash_table_insert(result_hash,
+                gel_value_dup(k), gel_value_dup(v));
+        g_value_unset(&value);
     }
+
+    g_value_init(return_value, G_TYPE_HASH_TABLE);
+    gel_value_take_boxed(return_value, result_hash);
 
     gel_value_list_free(tmp_list);
 }
@@ -1244,22 +1223,23 @@ void find_(GClosure *self, GValue *return_value,
     }
 
     GList *tmp_list = NULL;
+    GClosure *closure = NULL;
     GValue *value = NULL;
 
     gel_context_eval_params(context, __FUNCTION__,
-            &n_values, &values, &tmp_list, "V*", &value);
+            &n_values, &values, &tmp_list, "CV", &closure, &value);
 
     GType type = GEL_VALUE_TYPE(value);
     if(type == G_TYPE_VALUE_ARRAY)
     {
         GValueArray *array = gel_value_get_boxed(value);
-        array_find(array, return_value, n_values, values, context);
+        array_find(closure, array, return_value, n_values, values, context);
     }
     else
     if(type == G_TYPE_HASH_TABLE)
     {
         GHashTable *hash = gel_value_get_boxed(value);
-        hash_find(hash, return_value, n_values, values, context);
+        hash_find(closure, hash, return_value, n_values, values, context);
     }
     else
         gel_warning_expected(__FUNCTION__, "array or hash");
@@ -1280,22 +1260,23 @@ void filter_(GClosure *self, GValue *return_value,
     }
 
     GList *tmp_list = NULL;
+    GClosure *closure = NULL;
     GValue *value = NULL;
 
     gel_context_eval_params(context, __FUNCTION__,
-            &n_values, &values, &tmp_list, "V*", &value);
+            &n_values, &values, &tmp_list, "CV", &closure, &value);
 
     GType type = GEL_VALUE_TYPE(value);
     if(type == G_TYPE_VALUE_ARRAY)
     {
         GValueArray *array = gel_value_get_boxed(value);
-        array_filter(array, return_value, n_values, values, context);
+        array_filter(closure, array, return_value, n_values, values, context);
     }
     else
     if(type == G_TYPE_HASH_TABLE)
     {
         GHashTable *hash = gel_value_get_boxed(value);
-        hash_filter(hash, return_value, n_values, values, context);
+        hash_filter(closure, hash, return_value, n_values, values, context);
     }
     else
         gel_warning_expected(__FUNCTION__, "array or hash");
