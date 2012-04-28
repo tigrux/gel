@@ -96,7 +96,8 @@ GValueArray* gel_parse_scanner(GScanner *scanner, guint line, guint pos,
                 if((delim == '(' && token != ')') ||
                    (delim == '[' && token != ']') ||
                    (delim == '{' && token != '}'))
-                    g_error("Cannot close '%c' at line %u, char %u with '%c' at line %u, char %u",
+                    g_error("Cannot close '%c' at line %u, char %u "
+                            "with '%c' at line %u, char %u",
                             delim, line, pos, token,
                             scanner->next_line, scanner->next_position);
                 else
