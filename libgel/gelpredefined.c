@@ -1336,13 +1336,8 @@ void sort_(GClosure *self, GValue *return_value,
             GValue tmp_value = {0};
             g_closure_invoke(closure, &tmp_value, 2, pair->values, context);
 
-            GValue result_value = {0};
-            g_value_init(&result_value, G_TYPE_INT);
-            g_value_transform(&tmp_value, &result_value);
-            gint result = gel_value_get_int(&result_value);
+            gboolean result = gel_value_to_boolean(&tmp_value) ? -1 : 1;
 
-            if(GEL_IS_VALUE(&result_value))
-                g_value_unset(&result_value);
             if(GEL_IS_VALUE(&tmp_value))
                 g_value_unset(&tmp_value);
             g_value_array_free(pair);
