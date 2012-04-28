@@ -1330,7 +1330,11 @@ void sort_(GClosure *self, GValue *return_value,
             return result;
         }
 
-        g_value_array_sort(array, (GCompareFunc)compare);
+        GValueArray *result_array = g_value_array_copy(array);
+        g_value_array_sort(result_array, (GCompareFunc)compare);
+
+        g_value_init(return_value, G_TYPE_VALUE_ARRAY);
+        g_value_take_boxed(return_value, result_array);
     }
 
     gel_value_list_free(tmp_list);
