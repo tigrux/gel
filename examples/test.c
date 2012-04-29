@@ -37,12 +37,13 @@ int main(int argc, char *argv[])
     }
 
     // parsing a file returns an array of values
-    GError *exception_e = NULL;
-    GValueArray *parsed_array = gel_parse_file(argv[1], &exception_e);
-    if(exception_e != NULL)
+    GError *error = NULL;
+    GValueArray *parsed_array = gel_parse_file(argv[1], &error);
+    if(error != NULL)
     {
-        g_print("Could not parse file '%s'\n", argv[1]);
-        g_error_free(exception_e);
+        g_print("There was an error parsing '%s'\n", argv[1]);
+        g_print("%s\n", error->message);
+        g_error_free(error);
         return 1;
     }
 

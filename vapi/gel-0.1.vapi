@@ -12,7 +12,7 @@ namespace Gel {
         public unowned GLib.Value lookup(string name);
         public unowned Context outer {get;}
         public GLib.List<unowned string> variables {get;}
-        public void insert(string name, owned GLib.Value value);
+        public void insert(string name, owned GLib.Value? value);
         public void insert_object(string name, owned GLib.Object object);
         public void insert_function(string name, Gel.Function function);
         public bool remove(string name);
@@ -20,8 +20,16 @@ namespace Gel {
         public unowned GLib.Value eval_into_value(GLib.Value value, out GLib.Value tmp_value);
     }
 
-    GLib.ValueArray parse_file(string file) throws GLib.FileError;
-    GLib.ValueArray parse_text(string text, uint text_len);
+    errordomain ParseError {
+        SCANNER,
+        UNMATCHED_DELIM,
+        UNEXPECTED_DELIM,
+        EXPECTED_DELIM,
+        UNKNOWN_TOKEN
+    }
+
+    GLib.ValueArray parse_file(string file) throws GLib.FileError, ParseError;
+    GLib.ValueArray parse_text(string text, uint text_len) throws ParseError;
 
     namespace Value {
         string to_string(GLib.Value value);

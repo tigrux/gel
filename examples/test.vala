@@ -17,8 +17,9 @@ int main(string[] args) {
         // parsing a file returns an array of values
         parsed_array = Gel.parse_file(args[1]);
     }
-    catch {
-        print("Could not parse file '%s'\n", args[1]);
+    catch(Error error){
+        print("There was an error parsing '%s'\n", args[1]);
+        print("%s\n", error.message);
         return 1;
     }
 
