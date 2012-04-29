@@ -361,7 +361,7 @@ GObject* gel_introspection_closure_get_object(GelIntrospectionClosure *self)
  *
  * Gets the name for closures predefined or written in gel.
  *
- * Returns: The name of the gel closure, or #NULL if it is not predefined nor written in gel.
+ * Returns: The name of the closure, or #NULL if it is handled by gel.
  */
 const gchar* gel_closure_get_name(const GClosure *closure)
 {
