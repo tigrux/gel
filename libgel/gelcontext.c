@@ -56,6 +56,7 @@ static
 GelContext* gel_context_alloc(void)
 {
     GelContext *self = g_slice_new0(GelContext);
+    self->inner = g_hash_table_new(g_direct_hash, g_direct_equal);
     self->variables = g_hash_table_new_full(
         g_str_hash, g_str_equal,
         (GDestroyNotify)g_free, (GDestroyNotify)gel_variable_unref);
@@ -68,6 +69,7 @@ static
 void gel_context_dispose(GelContext *self)
 {
     g_hash_table_unref(self->variables);
+    g_hash_table_unref(self->inner);
     g_slice_free(GelContext, self);
 }
 
@@ -112,7 +114,6 @@ GelContext* gel_context_new_with_outer(GelContext *outer)
 #else
     self = gel_context_alloc();
 #endif
-    self->inner = g_hash_table_new(g_direct_hash, g_direct_equal);
     gel_context_set_outer(self, outer);
 
     return self;
@@ -154,8 +155,17 @@ void gel_context_free(GelContext *self)
 {
     g_return_if_fail(self != NULL);
 
+    GList *inner_list = g_hash_table_get_keys(self->inner);
+    for(GList *iter = inner_list; iter != NULL; iter = iter->next)
+    {
+        GelContext *inner = iter->data;
+        gel_context_set_outer(inner, self->outer);
+    }
+    g_list_free(inner_list);
+
 #if GEL_CONTEXT_USE_POOL
     g_hash_table_remove_all(self->variables);
+    g_hash_table_remove_all(self->inner);
 
     G_LOCK(contexts);
     contexts_POOL = g_list_append(contexts_POOL, self);
@@ -168,16 +178,6 @@ void gel_context_free(GelContext *self)
 #else
     gel_context_dispose(self);
 #endif
-
-    GList *inner_list = g_hash_table_get_keys(self->inner);
-    for(GList *iter = inner_list; iter != NULL; iter = iter->next)
-    {
-        GelContext *inner = iter->data;
-        gel_context_set_outer(inner, self->outer);
-    }
-
-    g_list_free(inner_list);
-    g_hash_table_unref(self->inner);
 }
 
 
