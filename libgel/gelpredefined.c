@@ -1132,29 +1132,30 @@ void get_(GClosure *self, GValue *return_value,
     GList *tmp_list = NULL;
     GValue *value = NULL;
 
-    gel_context_eval_params(context, __FUNCTION__,
-            &n_values, &values, &tmp_list, "V*", &value);
-
-    GType type = GEL_VALUE_TYPE(value);
-    if(type == G_TYPE_VALUE_ARRAY)
+    if(gel_context_eval_params(context, __FUNCTION__,
+            &n_values, &values, &tmp_list, "V*", &value))
     {
-        GValueArray *array = gel_value_get_boxed(value);
-        array_get(array, return_value, n_values, values, context);
+        GType type = GEL_VALUE_TYPE(value);
+        if(type == G_TYPE_VALUE_ARRAY)
+        {
+            GValueArray *array = gel_value_get_boxed(value);
+            array_get(array, return_value, n_values, values, context);
+        }
+        else
+        if(type == G_TYPE_HASH_TABLE)
+        {
+            GHashTable *hash = gel_value_get_boxed(value);
+            hash_get(hash, return_value, n_values, values, context);
+        }
+        else
+        if(G_TYPE_IS_OBJECT(type))
+        {
+            GObject *object = gel_value_get_boxed(value);
+            object_get(object, return_value, n_values, values, context);
+        }
+        else
+            gel_warning_expected(__FUNCTION__, "array, hash or object");
     }
-    else
-    if(type == G_TYPE_HASH_TABLE)
-    {
-        GHashTable *hash = gel_value_get_boxed(value);
-        hash_get(hash, return_value, n_values, values, context);
-    }
-    else
-    if(G_TYPE_IS_OBJECT(type))
-    {
-        GObject *object = gel_value_get_boxed(value);
-        object_get(object, return_value, n_values, values, context);
-    }
-    else
-        gel_warning_expected(__FUNCTION__, "array, hash or object");
 
     gel_value_list_free(tmp_list);
 }
@@ -1174,23 +1175,24 @@ void remove_(GClosure *self, GValue *return_value,
     GList *tmp_list = NULL;
     GValue *value = NULL;
 
-    gel_context_eval_params(context, __FUNCTION__,
-            &n_values, &values, &tmp_list, "V*", &value);
-
-    GType type = GEL_VALUE_TYPE(value);
-    if(type == G_TYPE_VALUE_ARRAY)
+    if(gel_context_eval_params(context, __FUNCTION__,
+            &n_values, &values, &tmp_list, "V*", &value))
     {
-        GValueArray *array = gel_value_get_boxed(value);
-        array_remove(array, return_value, n_values, values, context);
+        GType type = GEL_VALUE_TYPE(value);
+        if(type == G_TYPE_VALUE_ARRAY)
+        {
+            GValueArray *array = gel_value_get_boxed(value);
+            array_remove(array, return_value, n_values, values, context);
+        }
+        else
+        if(type == G_TYPE_HASH_TABLE)
+        {
+            GHashTable *hash = gel_value_get_boxed(value);
+            hash_remove(hash, return_value, n_values, values, context);
+        }
+        else
+            gel_warning_expected(__FUNCTION__, "array or hash");
     }
-    else
-    if(type == G_TYPE_HASH_TABLE)
-    {
-        GHashTable *hash = gel_value_get_boxed(value);
-        hash_remove(hash, return_value, n_values, values, context);
-    }
-    else
-        gel_warning_expected(__FUNCTION__, "array or hash");
 
     gel_value_list_free(tmp_list);
 }
@@ -1210,23 +1212,24 @@ void size_(GClosure *self, GValue *return_value,
     GList *tmp_list = NULL;
     GValue *value = NULL;
 
-    gel_context_eval_params(context, __FUNCTION__,
-            &n_values, &values, &tmp_list, "V*", &value);
-
-    GType type = GEL_VALUE_TYPE(value);
-    if(type == G_TYPE_VALUE_ARRAY)
+    if(gel_context_eval_params(context, __FUNCTION__,
+            &n_values, &values, &tmp_list, "V*", &value))
     {
-        GValueArray *array = gel_value_get_boxed(value);
-        array_size(array, return_value, n_values, values, context);
+        GType type = GEL_VALUE_TYPE(value);
+        if(type == G_TYPE_VALUE_ARRAY)
+        {
+            GValueArray *array = gel_value_get_boxed(value);
+            array_size(array, return_value, n_values, values, context);
+        }
+        else
+        if(type == G_TYPE_HASH_TABLE)
+        {
+            GHashTable *hash = gel_value_get_boxed(value);
+            hash_size(hash, return_value, n_values, values, context);
+        }
+        else
+            gel_warning_expected(__FUNCTION__, "array or hash");
     }
-    else
-    if(type == G_TYPE_HASH_TABLE)
-    {
-        GHashTable *hash = gel_value_get_boxed(value);
-        hash_size(hash, return_value, n_values, values, context);
-    }
-    else
-        gel_warning_expected(__FUNCTION__, "array or hash");
 
     gel_value_list_free(tmp_list);
 }
@@ -1248,23 +1251,24 @@ void find_(GClosure *self, GValue *return_value,
     GClosure *closure = NULL;
     GValue *value = NULL;
 
-    gel_context_eval_params(context, __FUNCTION__,
-            &n_values, &values, &tmp_list, "CV", &closure, &value);
-
-    GType type = GEL_VALUE_TYPE(value);
-    if(type == G_TYPE_VALUE_ARRAY)
+    if(gel_context_eval_params(context, __FUNCTION__,
+            &n_values, &values, &tmp_list, "CV", &closure, &value))
     {
-        GValueArray *array = gel_value_get_boxed(value);
-        array_find(closure, array, return_value, n_values, values, context);
+        GType type = GEL_VALUE_TYPE(value);
+        if(type == G_TYPE_VALUE_ARRAY)
+        {
+            GValueArray *array = gel_value_get_boxed(value);
+            array_find(closure, array, return_value, n_values, values, context);
+        }
+        else
+        if(type == G_TYPE_HASH_TABLE)
+        {
+            GHashTable *hash = gel_value_get_boxed(value);
+            hash_find(closure, hash, return_value, n_values, values, context);
+        }
+        else
+            gel_warning_expected(__FUNCTION__, "array or hash");
     }
-    else
-    if(type == G_TYPE_HASH_TABLE)
-    {
-        GHashTable *hash = gel_value_get_boxed(value);
-        hash_find(closure, hash, return_value, n_values, values, context);
-    }
-    else
-        gel_warning_expected(__FUNCTION__, "array or hash");
 
     gel_value_list_free(tmp_list);
 }
@@ -1285,23 +1289,24 @@ void filter_(GClosure *self, GValue *return_value,
     GClosure *closure = NULL;
     GValue *value = NULL;
 
-    gel_context_eval_params(context, __FUNCTION__,
-            &n_values, &values, &tmp_list, "CV", &closure, &value);
-
-    GType type = GEL_VALUE_TYPE(value);
-    if(type == G_TYPE_VALUE_ARRAY)
+    if(gel_context_eval_params(context, __FUNCTION__,
+            &n_values, &values, &tmp_list, "CV", &closure, &value))
     {
-        GValueArray *array = gel_value_get_boxed(value);
-        array_filter(closure, array, return_value, n_values, values, context);
+        GType type = GEL_VALUE_TYPE(value);
+        if(type == G_TYPE_VALUE_ARRAY)
+        {
+            GValueArray *array = gel_value_get_boxed(value);
+            array_filter(closure, array, return_value, n_values, values, context);
+        }
+        else
+        if(type == G_TYPE_HASH_TABLE)
+        {
+            GHashTable *hash = gel_value_get_boxed(value);
+            hash_filter(closure, hash, return_value, n_values, values, context);
+        }
+        else
+            gel_warning_expected(__FUNCTION__, "array or hash");
     }
-    else
-    if(type == G_TYPE_HASH_TABLE)
-    {
-        GHashTable *hash = gel_value_get_boxed(value);
-        hash_filter(closure, hash, return_value, n_values, values, context);
-    }
-    else
-        gel_warning_expected(__FUNCTION__, "array or hash");
 
     gel_value_list_free(tmp_list);
 }
