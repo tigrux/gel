@@ -1,5 +1,3 @@
-#include <string.h>
-
 #include <gelcontext.h>
 #include <gelcontextprivate.h>
 #include <geldebug.h>

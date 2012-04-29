@@ -1,4 +1,5 @@
 #include <config.h>
+
 #include <geltypeinfo.h>
 #include <gelvalueprivate.h>
 #include <gelclosureprivate.h>

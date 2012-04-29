@@ -1,3 +1,5 @@
+#include <config.h>
+
 #include <gelcontext.h>
 #include <gelcontextprivate.h>
 #include <geldebug.h>
@@ -5,7 +7,10 @@
 #include <gelvalueprivate.h>
 #include <gelsymbol.h>
 #include <gelclosure.h>
+
+#ifdef HAVE_GOBJECT_INTROSPECTION
 #include <geltypelib.h>
+#endif
 
 
 static
@@ -1726,6 +1731,7 @@ void print_(GClosure *self, GValue *return_value,
 }
 
 
+#ifdef HAVE_GOBJECT_INTROSPECTION
 static
 void require_(GClosure *self, GValue *return_value,
               guint n_values, const GValue *values, GelContext *context)
@@ -1849,6 +1855,7 @@ void dot_(GClosure *self, GValue *return_value,
     if(type_info != NULL)
         gel_type_info_to_value(type_info, object, return_value);
 }
+#endif
 
 
 #define CLOSURE_NAME(N, S) {N, (GClosureMarshal)S##_}
@@ -1925,9 +1932,11 @@ GHashTable* gel_make_default_symbols(void)
         CLOSURE_NAME("<=", le), /* number string */
         CLOSURE_NAME("!=", ne), /* number string */
 
+#ifdef HAVE_GOBJECT_INTROSPECTION
         /* introspection */
         CLOSURE(require),
         CLOSURE_NAME(".", dot),
+#endif
 
         {NULL,NULL}
     };

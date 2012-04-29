@@ -12,7 +12,15 @@ AC_SUBST(CFLAGS)
 AC_SUBST(CPPFLAGS)
 AC_SUBST(LDFLAGS)
 
-PKG_CHECK_MODULES(GI, gobject-introspection-1.0)
+PKG_CHECK_MODULES(GOBJECT, gobject-2.0)
+AC_SUBST(GOBJECT_CFLAGS)
+AC_SUBST(GOBJECT_LIBS)
+
+PKG_CHECK_MODULES(GI, gobject-introspection-1.0,
+    HAVE_GOBJECT_INTROSPECTION=1
+    AC_DEFINE(HAVE_GOBJECT_INTROSPECTION, 1,
+              Define to 1 if gobject-introspection is installed),
+    HAVE_GOBJECT_INTROSPECTION=0)
 AC_SUBST(GI_CFLAGS)
 AC_SUBST(GI_LIBS)
 
@@ -32,14 +40,24 @@ AC_CONFIG_FILES([
 AC_SEARCH_LIBS(g_info_type_to_string,
     girepository-1.0,
     AC_DEFINE(HAVE_G_INFO_TYPE_TO_STRING, 1,
-              Define to 1 if you have g_info_type_to_string)
+              Define to 1 if g_info_type_to_string is provided)
 )
 
 AC_SEARCH_LIBS(g_constant_info_free_value,
     girepository-1.0,
     AC_DEFINE(HAVE_G_CONSTANT_INFO_FREE_VALUE, 1,
-              Define to 1 if you have g_constant_info_free_value)
+              Define to 1 if g_constant_info_free_value is provided)
 )
 
+
+AM_CONDITIONAL(HAVE_GOBJECT_INTROSPECTION, test $HAVE_GOBJECT_INTROSPECTION = 1)
+
 AC_OUTPUT
+
+if test $HAVE_GOBJECT_INTROSPECTION = 0; then
+    echo
+    echo "gobject-introspection-1.0 is not installed"
+    echo "You can continue but it's strongly recommended that you install it"
+    echo
+fi
 

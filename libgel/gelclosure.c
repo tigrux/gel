@@ -1,10 +1,16 @@
+#include <config.h>
+
 #include <gelclosure.h>
 #include <gelcontext.h>
 #include <gelcontextprivate.h>
 #include <gelvalue.h>
 #include <gelvalueprivate.h>
 #include <gelsymbol.h>
+
+#ifdef HAVE_GOBJECT_INTROSPECTION
 #include <geltypeinfo.h>
+#endif
+
 
 /**
  * SECTION:gelclosure
@@ -304,7 +310,7 @@ GClosure* gel_closure_new_native(const gchar *name, GClosureMarshal marshal)
     return closure;
 }
 
-
+#ifdef HAVE_GOBJECT_INTROSPECTION
 struct _GelIntrospectionClosure
 {
     GClosure closure;
@@ -357,7 +363,7 @@ GObject* gel_introspection_closure_get_object(GelIntrospectionClosure *self)
 {
     return self->object;
 }
-
+#endif
 
 /**
  * gel_closure_get_name:
@@ -376,9 +382,11 @@ const gchar* gel_closure_get_name(const GClosure *closure)
     if(closure->marshal == (GClosureMarshal)gel_native_closure_marshal)
         name = ((GelNativeClosure*)closure)->name;
     else
+#ifdef HAVE_GOBJECT_INTROSPECTION
     if(closure->marshal == (GClosureMarshal)gel_type_info_closure_marshal)
         name = ((GelIntrospectionClosure*)closure)->name;
     else
+#endif
         name = NULL;
 
     return name;
