@@ -71,16 +71,13 @@ void gel_closure_marshal(GelClosure *closure, GValue *return_value,
     GelContext *outer = gel_closure_get_context(closure);
     GelContext *context = gel_context_new_with_outer(outer);
 
-    GList *iter = closure->args;
     guint i = 0;
-    while(iter != NULL)
+    for(GList *iter = closure->args; iter != NULL; iter = iter->next, i++)
     {
+        const gchar *arg_name = iter->data;
         GValue *value = gel_value_new();
         gel_context_eval(invocation_context, values + i, value);
-        const gchar *arg = iter->data;
-        gel_context_insert(context, arg, value);
-        iter = iter->next;
-        i++;
+        gel_context_insert(context, arg_name, value);
     }
 
     if(is_variadic)
