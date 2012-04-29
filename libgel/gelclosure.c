@@ -90,13 +90,8 @@ void gel_closure_marshal(GelClosure *closure, GValue *return_value,
         array->n_values = array_n_values;
         GValue *array_values = array->values;
 
-        guint j = 0;
-        while(i < n_values)
-        {
+        for(guint j = 0; i < n_values; i++, j++)
             gel_context_eval(invocation_context, values + i, array_values + j);
-            i++;
-            j++;
-        }
 
         GValue *value = gel_value_new_from_boxed(G_TYPE_VALUE_ARRAY, array);
         gel_context_insert(context, closure->variadic, value);
