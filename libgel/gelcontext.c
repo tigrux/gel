@@ -25,7 +25,7 @@ struct _GelContext
 {
     GHashTable *variables;
     GelContext *outer;
-    guint level;
+    GHashTable *inner;
 };
 
 
@@ -112,6 +112,7 @@ GelContext* gel_context_new_with_outer(GelContext *outer)
 #else
     self = gel_context_alloc();
 #endif
+    self->inner = g_hash_table_new(g_direct_hash, g_direct_equal);
     gel_context_set_outer(self, outer);
 
     return self;
@@ -130,12 +131,12 @@ GelContext* gel_context_dup(const GelContext *self)
 {
     g_return_val_if_fail(self != NULL, NULL);
 
-    GHashTableIter iter;
     const gchar *name;
     GelVariable *variable;
-
     GelContext *context = gel_context_new_with_outer(self->outer);
+    GHashTableIter iter;
     g_hash_table_iter_init(&iter, self->variables);
+
     while(g_hash_table_iter_next(&iter, (void **)&name, (void **)&variable))
         gel_context_insert_variable(context, name, variable);
 
@@ -167,6 +168,16 @@ void gel_context_free(GelContext *self)
 #else
     gel_context_dispose(self);
 #endif
+
+    GList *inner_list = g_hash_table_get_keys(self->inner);
+    for(GList *iter = inner_list; iter != NULL; iter = iter->next)
+    {
+        GelContext *inner = iter->data;
+        gel_context_set_outer(inner, self->outer);
+    }
+
+    g_list_free(inner_list);
+    g_hash_table_unref(self->inner);
 }
 
 
@@ -328,12 +339,10 @@ GelVariable* gel_context_lookup_variable(const GelContext *self,
 
     GelVariable *variable = NULL;
     const GelContext *context = self;
-    guint level = 0;
-    while(context != NULL && variable == NULL && level <= self->level)
+    while(context != NULL && variable == NULL)
     {
         variable = gel_context_get_variable(context, name);
         context = gel_context_get_outer(context);
-        level++;
     }
 
     return variable;
@@ -489,8 +498,13 @@ void gel_context_set_outer(GelContext *self, GelContext *context)
 {
     g_return_if_fail(self != NULL);
 
-    self->outer = context;
+    GelContext *old_outer = self->outer;
+    if(old_outer != NULL)
+        g_hash_table_remove(old_outer->inner, self);
+
     if(context != NULL)
-        self->level = context->level + 1;
+        g_hash_table_insert(context->inner, self, self);
+
+    self->outer = context;
 }
 
