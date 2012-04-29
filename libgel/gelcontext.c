@@ -482,6 +482,7 @@ gboolean gel_context_remove(GelContext *self, const gchar *name)
 GelContext* gel_context_get_outer(const GelContext* self)
 {
     g_return_val_if_fail(self != NULL, NULL);
+
     return self->outer;
 }
 
@@ -489,6 +490,7 @@ GelContext* gel_context_get_outer(const GelContext* self)
 void gel_context_set_outer(GelContext *self, GelContext *context)
 {
     g_return_if_fail(self != NULL);
+
     self->outer = context;
     if(context != NULL)
         self->level = context->level + 1;
