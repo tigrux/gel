@@ -77,7 +77,7 @@ void gel_closure_marshal(GelClosure *closure, GValue *return_value,
         i++;
     }
 
-    if(is_variadic && i < n_values)
+    if(is_variadic)
     {
         guint array_n_values = n_values - i;
         GValueArray *array = g_value_array_new(array_n_values);
