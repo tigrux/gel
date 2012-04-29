@@ -212,6 +212,9 @@ gchar* gel_value_to_string(const GValue *value)
         if(name != NULL)
             result = g_strdup(name);
     }
+    else
+    if(GEL_VALUE_HOLDS(value, G_TYPE_GTYPE))
+        result = g_strdup(g_type_name(gel_value_get_gtype(value)));
 
     if(result == NULL)
     {

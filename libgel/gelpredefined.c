@@ -1731,6 +1731,42 @@ void print_(GClosure *self, GValue *return_value,
 }
 
 
+static
+void str_(GClosure *self, GValue *return_value,
+          guint n_values, const GValue *values, GelContext *context)
+{
+    GList *tmp_list = NULL;
+    GValue *value;
+
+    if(gel_context_eval_params(context, __FUNCTION__,
+            &n_values, &values, &tmp_list, "V", &value))
+    {
+        g_value_init(return_value, G_TYPE_STRING);
+        g_value_take_string(return_value, gel_value_to_string(value));
+    }
+
+    g_list_free(tmp_list);
+}
+
+
+static
+void type_(GClosure *self, GValue *return_value,
+           guint n_values, const GValue *values, GelContext *context)
+{
+    GList *tmp_list = NULL;
+    GValue *value;
+
+    if(gel_context_eval_params(context, __FUNCTION__,
+            &n_values, &values, &tmp_list, "V", &value))
+    {
+        g_value_init(return_value, G_TYPE_GTYPE);
+        gel_value_set_gtype(return_value, GEL_VALUE_TYPE(value));
+    }
+
+    g_list_free(tmp_list);
+}
+
+
 #ifdef HAVE_GOBJECT_INTROSPECTION
 static
 void require_(GClosure *self, GValue *return_value,
@@ -1914,6 +1950,8 @@ GHashTable* gel_make_default_symbols(void)
 
         /* output */
         CLOSURE(print),
+        CLOSURE(str),
+        CLOSURE(type),
 
         /* arithmetic */
         CLOSURE_NAME("+", add), /* number string array hash */

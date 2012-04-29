@@ -6,7 +6,7 @@
 #include <gelvariable.h>
 
 #ifndef GEL_VALUE_USE_MACRO
-#define GEL_VALUE_USE_MACRO 1
+#define GEL_VALUE_USE_MACRO 0
 #endif
 
 #if GEL_VALUE_USE_MACRO
@@ -31,6 +31,7 @@
 #define gel_value_set_enum(v, a) ((v)->data[0].v_long = (glong)(a))
 #define gel_value_set_gtype(v, a) ((v)->data[0].v_pointer = (gpointer)(gsize)(a))
 #define gel_value_set_pointer(v, a) ((v)->data[0].v_pointer = (gpointer)(a))
+#define gel_value_take_string(v, a) ((v)->data[0].v_pointer = (gpointer)(a))
 #define gel_value_take_boxed(v, a) ((v)->data[0].v_pointer = (gpointer)(a))
 #define gel_value_take_object(v, a) ((v)->data[0].v_pointer = (gpointer)(a))
 #define GEL_VALUE_HOLDS(v, t) ((v)->g_type == (t) || g_type_is_a((v)->g_type, (t)))
@@ -60,6 +61,7 @@
 #define gel_value_set_enum g_value_set_enum
 #define gel_value_set_gtype g_value_set_gtype
 #define gel_value_set_pointer g_value_set_pointer
+#define gel_value_take_string g_value_take_string
 #define gel_value_take_boxed g_value_take_boxed
 #define gel_value_take_object g_value_take_object
 #define GEL_VALUE_HOLDS G_VALUE_HOLDS
