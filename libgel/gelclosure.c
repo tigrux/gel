@@ -35,7 +35,7 @@ struct _GelClosure
     GelContext *context;
     gchar *name;
     GList *args;
-    gchar *variadic;
+    gchar *variadic_arg;
     GHashTable *args_hash;
     GValueArray *code;
 };
@@ -47,9 +47,9 @@ void gel_closure_marshal(GelClosure *closure, GValue *return_value,
                          GelContext *invocation_context)
 {
     const guint n_args = g_list_length(closure->args);
-    gboolean is_variadic = (closure->variadic != NULL);
+    gboolean is_variadic_arg = (closure->variadic_arg != NULL);
 
-    if(is_variadic)
+    if(is_variadic_arg)
     {
         if(n_values < n_args)
         {
@@ -59,13 +59,11 @@ void gel_closure_marshal(GelClosure *closure, GValue *return_value,
         }
     }
     else
+    if(n_values != n_args)
     {
-        if(n_values != n_args)
-        {
-            g_warning("Function '%s' takes %u arguments, got %u",
-                closure->name, n_args, n_values);
-            return;
-        }
+        g_warning("Function '%s' takes %u arguments, got %u",
+            closure->name, n_args, n_values);
+        return;
     }
 
     GelContext *outer = gel_closure_get_context(closure);
@@ -80,7 +78,7 @@ void gel_closure_marshal(GelClosure *closure, GValue *return_value,
         gel_context_insert(context, arg_name, value);
     }
 
-    if(is_variadic)
+    if(is_variadic_arg)
     {
         guint array_n_values = n_values - i;
         GValueArray *array = g_value_array_new(array_n_values);
@@ -91,7 +89,7 @@ void gel_closure_marshal(GelClosure *closure, GValue *return_value,
             gel_context_eval(invocation_context, values + i, array_values + j);
 
         GValue *value = gel_value_new_from_boxed(G_TYPE_VALUE_ARRAY, array);
-        gel_context_insert(context, closure->variadic, value);
+        gel_context_insert(context, closure->variadic_arg, value);
     }
 
     guint closure_code_n_values = closure->code->n_values;
@@ -123,8 +121,8 @@ void gel_closure_finalize(void *data, GelClosure *self)
     g_free(self->name);
     g_list_foreach(self->args, (GFunc)g_free, NULL);
     g_list_free(self->args);
-    if(self->variadic != NULL)
-        g_free(self->variadic);
+    if(self->variadic_arg != NULL)
+        g_free(self->variadic_arg);
     g_hash_table_unref(self->args_hash);
     g_value_array_free(self->code);
     gel_context_free(self->context);
@@ -210,22 +208,22 @@ GClosure* gel_closure_new(const gchar *name, gchar **args, GValueArray *code,
     GelClosure *self = (GelClosure*)closure;
     GHashTable *args_hash = g_hash_table_new(g_str_hash, g_str_equal);
     GList *list_args = NULL;
-    gboolean next_is_variadic = FALSE;
+    gboolean next_is_variadic_arg = FALSE;
 
     for(guint i = 0; args[i] != NULL; i++)
     {
         gchar *arg = args[i];
-        if(self->variadic == NULL)
+        if(self->variadic_arg == NULL)
         {
             if(g_strcmp0(arg, "&") == 0)
             {
-                next_is_variadic = TRUE;
+                next_is_variadic_arg = TRUE;
                 arg = NULL;
             }
             else
-            if(next_is_variadic)
+            if(next_is_variadic_arg)
             {
-                self->variadic = g_strdup(arg);
+                self->variadic_arg = g_strdup(arg);
                 g_hash_table_insert(args_hash, arg, arg);
                 arg = NULL;
             }
