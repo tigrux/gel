@@ -14,6 +14,7 @@ void gel_typelib_to_string_transform(const GValue *source, GValue *dest)
 {
     GelTypelib *self = g_value_get_boxed(source);
     const gchar *name = g_typelib_get_namespace(self->typelib);
+
     gchar *buffer = g_strdup_printf("<GelTypelib %s>", name);
     g_value_take_string(dest, buffer);
 }
@@ -23,6 +24,7 @@ GType gel_typelib_get_type(void)
 {
     static volatile gsize once = 0;
     static GType type = G_TYPE_INVALID;
+
     if(g_once_init_enter(&once))
     {
         type = g_boxed_type_register_static("GelTypelib",
@@ -74,6 +76,7 @@ GelTypelib* gel_typelib_ref(GelTypelib *self)
     g_return_val_if_fail(self != NULL, NULL);
 
     g_atomic_int_inc(&self->ref_count);
+
     return self;
 }
 

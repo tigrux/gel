@@ -74,6 +74,7 @@ void gel_closure_marshal(GelClosure *closure, GValue *return_value,
     {
         const gchar *arg_name = iter->data;
         GValue *value = gel_value_new();
+
         gel_context_eval(invocation_context, values + i, value);
         gel_context_insert(context, arg_name, value);
     }
@@ -97,6 +98,7 @@ void gel_closure_marshal(GelClosure *closure, GValue *return_value,
     {
         guint last = closure_code_n_values - 1;
         const GValue *closure_code_values = closure->code->values;
+
         for(guint i = 0; i <= last; i++)
         {
             GValue tmp_value = {0};
@@ -121,8 +123,10 @@ void gel_closure_finalize(void *data, GelClosure *self)
     g_free(self->name);
     g_list_foreach(self->args, (GFunc)g_free, NULL);
     g_list_free(self->args);
+
     if(self->variadic_arg != NULL)
         g_free(self->variadic_arg);
+
     g_hash_table_unref(self->args_hash);
     g_value_array_free(self->code);
     gel_context_free(self->context);
@@ -139,6 +143,7 @@ void gel_closure_bind_symbols_of_array(GelClosure *self, GValueArray *array)
     {
         const GValue *value = array_values + i;
         GType type = GEL_VALUE_TYPE(value);
+
         if(type == G_TYPE_VALUE_ARRAY)
         {
             GValueArray *array = gel_value_get_boxed(value);
@@ -195,6 +200,7 @@ GClosure* gel_closure_new(const gchar *name, gchar **args, GValueArray *code,
     g_return_val_if_fail(code != NULL, NULL);
 
     GClosure *closure = g_closure_new_simple(sizeof(GelClosure), NULL);
+
     g_closure_set_marshal(closure, (GClosureMarshal)gel_closure_marshal);
     g_closure_add_finalize_notifier(closure,
         NULL, (GClosureNotify)gel_closure_finalize);
@@ -288,6 +294,7 @@ GClosure* gel_closure_new_native(const gchar *name, GClosureMarshal marshal)
     gchar *dup_name = g_strdup(name);
     self->name = dup_name;
     self->native_marshal = marshal;
+
     g_closure_set_marshal(closure, (GClosureMarshal)gel_native_closure_marshal);
     g_closure_add_finalize_notifier(closure, dup_name, (GClosureNotify)g_free);
 
@@ -329,6 +336,7 @@ GClosure* gel_closure_new_introspection(const GelTypeInfo *info,
     GelIntrospectionClosure *self = (GelIntrospectionClosure*)closure;
     self->name = gel_type_info_to_string(info);
     self->info = info;
+
     if(object != NULL)
         self->object = g_object_ref(object);
     else

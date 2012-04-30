@@ -134,6 +134,7 @@ GelContext* gel_context_dup(const GelContext *self)
     const gchar *name;
     GelVariable *variable;
     GelContext *context = gel_context_new_with_outer(self->outer);
+
     GHashTableIter iter;
     g_hash_table_iter_init(&iter, self->variables);
 

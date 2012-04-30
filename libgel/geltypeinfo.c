@@ -72,6 +72,7 @@ void gel_type_info_to_string_transform(const GValue *source, GValue *dest)
     gchar *name = gel_type_info_to_string(info);
     const gchar *type =
         g_info_type_to_string(g_base_info_get_type(info->info));
+
     g_value_take_string(dest,
         g_strdup_printf("<GelTypeInfo %s %s>", type, name));
     g_free(name);
@@ -82,6 +83,7 @@ GType gel_type_info_get_type(void)
 {
     static volatile gsize once = 0;
     static GType type = G_TYPE_INVALID;
+
     if(g_once_init_enter(&once))
     {
         type = g_boxed_type_register_static("GelTypeInfo",
@@ -126,6 +128,7 @@ void gel_type_info_register(GelTypeInfo *self)
 {
     if(gel_type_info_gtypes == NULL)
         gel_type_info_gtypes = g_hash_table_new(g_direct_hash, g_direct_equal);
+
     GType type = g_registered_type_info_get_g_type(self->info);
     g_hash_table_insert(gel_type_info_gtypes, GINT_TO_POINTER(type), self);
 }
@@ -233,6 +236,7 @@ GelTypeInfo* gel_type_info_ref(GelTypeInfo *self)
     g_return_val_if_fail(self != NULL, NULL);
 
     g_atomic_int_inc(&self->ref_count);
+
     return self;
 }
 
@@ -270,6 +274,7 @@ const GelTypeInfo* gel_type_info_lookup(const GelTypeInfo *self,
             GIObjectInfo *parent_info = g_object_info_get_parent(base_info);
             if(parent_info == NULL)
                 break;
+
             GType parent_type = g_registered_type_info_get_g_type(parent_info);
             container_info = gel_type_info_from_gtype(parent_type);
             g_base_info_unref(parent_info);
@@ -313,6 +318,7 @@ gchar* gel_type_info_to_string(const GelTypeInfo *self)
     g_list_free(name_list);
     gchar *name = g_strjoinv(".", name_array);
     g_free(name_array);
+
     return name;
 }
 
@@ -385,15 +391,18 @@ static
 gboolean gel_type_info_registered_type_to_value(const GelTypeInfo *self,
                                                 GValue *return_value)
 {
+    gboolean result = FALSE;
     GIBaseInfo *info = self->info;
+
     if(GI_IS_REGISTERED_TYPE_INFO(info))
     {
         g_value_init(return_value, G_TYPE_GTYPE);
         GType type = g_registered_type_info_get_g_type(info);
         g_value_set_gtype(return_value, type);
-        return TRUE;
+        result = TRUE;
     }
-    return FALSE;
+
+    return result;
 }
 
 
@@ -404,14 +413,18 @@ gboolean gel_type_info_constant_to_value(const GelTypeInfo *self,
     GIBaseInfo *info = self->info;
     GITypeInfo *arg_info = g_constant_info_get_type(info);
     GITypeTag arg_tag = g_type_info_get_tag(arg_info);
+
     GArgument argument = {0};
     g_constant_info_get_value(info, &argument);
+
     gboolean converted =
         gel_argument_to_value(&argument, arg_tag, return_value);
+
     #if HAVE_G_CONSTANT_INFO_FREE_VALUE
     g_constant_info_free_value(info, &argument);
     #endif
     g_base_info_unref(arg_info);
+
     return converted;
 }
 
@@ -424,6 +437,7 @@ gboolean gel_type_info_enum_to_value(const GelTypeInfo *self,
         g_registered_type_info_get_g_type(self->container->info);
     GIBaseInfo *info = self->info;
     glong enum_value = g_value_info_get_value(info);
+
     if(G_TYPE_IS_ENUM(enum_type))
     {
         g_value_init(return_value, enum_type);
@@ -434,6 +448,7 @@ gboolean gel_type_info_enum_to_value(const GelTypeInfo *self,
         g_value_init(return_value, G_TYPE_INT64);
         gel_value_set_int64(return_value, enum_value);
     }
+
     return TRUE;
 }
 
@@ -446,13 +461,16 @@ gboolean gel_type_info_property_to_value(const GelTypeInfo *self,
     const gchar *name = g_base_info_get_name(info);
     GObjectClass *gclass = G_OBJECT_GET_CLASS(object);
     GParamSpec *spec = g_object_class_find_property(gclass, name);
+    gboolean result = FALSE;
+
     if(spec != NULL)
     {
         g_value_init(return_value, spec->value_type);
         g_object_get_property(object, name, return_value);
-        return TRUE;
+        result = TRUE;
     }
-    return FALSE;
+
+    return result;;
 }
 
 
@@ -540,8 +558,7 @@ void gel_type_info_closure_marshal(GClosure *gclosure,
     g_function_info_invoke(function_info,
         inputs, n_inputs,
         outputs, n_outputs,
-        &return_arg,
-        FALSE);
+        &return_arg, FALSE);
 
     GITypeInfo *return_type = g_callable_info_get_return_type(function_info);
     GITypeTag return_tag = g_type_info_get_tag(return_type);
@@ -552,6 +569,7 @@ void gel_type_info_closure_marshal(GClosure *gclosure,
         g_base_info_unref(types[i]);
         g_base_info_unref(infos[i]);
     }
+
     g_free(outputs);
     g_free(inputs);
     g_free(indirect_args);
@@ -568,6 +586,7 @@ gboolean gel_type_info_function_to_value(const GelTypeInfo *self,
 
     g_value_init(return_value, G_TYPE_CLOSURE);
     g_value_take_boxed(return_value, closure);
+
     return TRUE;
 }
 
@@ -604,6 +623,7 @@ gboolean gel_type_info_to_value(const GelTypeInfo *self,
 
     g_value_init(return_value, GEL_TYPE_TYPEINFO);
     g_value_set_boxed(return_value, self);
+
     return FALSE;
 }
 

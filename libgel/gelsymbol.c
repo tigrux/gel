@@ -30,6 +30,7 @@ GelSymbol* gel_symbol_new(const gchar *name, GelVariable *variable)
 
     GelSymbol *self = g_slice_new0(GelSymbol);
     self->name = g_strdup(name);
+
     if(variable != NULL)
         self->variable = gel_variable_ref(variable);
     else
@@ -61,6 +62,7 @@ void gel_symbol_free(GelSymbol *self)
 const gchar* gel_symbol_get_name(const GelSymbol *self)
 {
     g_return_val_if_fail(self != NULL, NULL);
+
     return self->name;
 }
 
@@ -68,6 +70,7 @@ const gchar* gel_symbol_get_name(const GelSymbol *self)
 GelVariable* gel_symbol_get_variable(const GelSymbol *self)
 {
     g_return_val_if_fail(self != NULL, NULL);
+
     return self->variable;
 }
 

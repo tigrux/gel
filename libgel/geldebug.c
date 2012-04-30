@@ -32,6 +32,7 @@ void gel_warning_value_not_of_type(const gchar *func,
                                    const GValue *value, GType type)
 {
     gchar *value_string = gel_value_to_string(value);
+
     g_warning("%s: '%s' is not of type '%s'", func,
         value_string, g_type_name(type));
     g_free(value_string);
@@ -55,6 +56,7 @@ void gel_warning_invalid_value_for_property(const gchar *func,
                                             const GParamSpec *pspec)
 {
     gchar *value_string = gel_value_to_string(value);
+
     g_print("%s: '%s' of type '%s' is invalid for property '%s' of type '%s'",
         func, value_string, GEL_VALUE_TYPE_NAME(value),
         pspec->name, g_type_name(pspec->value_type));

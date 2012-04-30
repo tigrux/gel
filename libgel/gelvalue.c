@@ -23,6 +23,7 @@ GValue* gel_value_new_from_boxed(GType type, void *boxed)
 {
     GValue *value = gel_value_new_of_type(type);
     gel_value_take_boxed(value, boxed);
+
     return value;
 }
 
@@ -150,6 +151,7 @@ gchar* gel_value_to_string(const GValue *value)
         const GValueArray *array = gel_value_get_boxed(value);
         GString *buffer = g_string_new("(");
         const guint n_values = array->n_values;
+
         if(n_values > 0)
         {
             guint last = n_values - 1;
@@ -170,6 +172,7 @@ gchar* gel_value_to_string(const GValue *value)
         GHashTable *hash = gel_value_get_boxed(value);
         GString *buffer = g_string_new("{");
         guint n_values = g_hash_table_size(hash);
+
         if(n_values > 0)
         {
             GHashTableIter iter;
@@ -199,6 +202,7 @@ gchar* gel_value_to_string(const GValue *value)
     {
         const GelSymbol *symbol = gel_value_get_boxed(value);
         const GValue *symbol_value = gel_symbol_get_value(symbol);
+
         if(symbol_value != NULL)
             result = gel_value_to_string(symbol_value);
         else
@@ -209,6 +213,7 @@ gchar* gel_value_to_string(const GValue *value)
     {
         const GClosure *closure = gel_value_get_boxed(value);
         const gchar *name = gel_closure_get_name(closure);
+
         if(name != NULL)
             result = g_strdup(name);
     }

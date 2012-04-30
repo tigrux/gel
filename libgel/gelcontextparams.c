@@ -50,6 +50,7 @@ GNode* gel_params_parse_format(const gchar *format, guint *count)
 
     guint pos = 0;
     *count = 0;
+
     return gel_params_format_to_node(format, &pos, count);
 }
 
@@ -247,8 +248,8 @@ gboolean gel_context_eval_params_args(GelContext *self, const gchar *func,
     GList *o_list = *list;
     guint o_n_values = *n_values;
     const GValue *o_values = *values;
-
     GNode *node = g_node_first_child(format_node);
+
     while(node != 0 && *n_values >= 0 && parsed)
     {
         if(G_NODE_IS_LEAF(node))
@@ -263,6 +264,7 @@ gboolean gel_context_eval_params_args(GelContext *self, const gchar *func,
                 GValueArray *array = gel_value_get_boxed(*values);
                 guint n_values = array->n_values;
                 const GValue *values = array->values;
+
                 gel_context_eval_params_args(self,
                     func, &n_values, &values, list, node,  args);
             }

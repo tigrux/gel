@@ -6,6 +6,7 @@ GType gel_variable_get_type(void)
 {
     static volatile gsize once = 0;
     static GType type = G_TYPE_INVALID;
+
     if(g_once_init_enter(&once))
     {
         type = g_boxed_type_register_static("GelVariable",
@@ -44,6 +45,7 @@ GelVariable* gel_variable_ref(GelVariable *self)
     g_return_val_if_fail(self != NULL, NULL);
 
     g_atomic_int_inc(&self->ref_count);
+
     return self;
 }
 
@@ -64,6 +66,7 @@ void gel_variable_unref(GelVariable *self)
 GValue* gel_variable_get_value(const GelVariable *self)
 {
     g_return_val_if_fail(self != NULL, NULL);
+
     return self->value;
 }
 
@@ -71,6 +74,7 @@ GValue* gel_variable_get_value(const GelVariable *self)
 gboolean gel_variable_get_owned(const GelVariable *self)
 {
     g_return_val_if_fail(self != NULL, FALSE);
+
     return self->owned;
 }
 
