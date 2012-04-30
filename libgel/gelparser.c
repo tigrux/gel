@@ -207,6 +207,7 @@ GValueArray* gel_parse_scanner(GScanner *scanner, guint line, guint pos,
                     default:
                         break;
                 }
+
                 g_scanner_destroy(num_scanner);
             }
             
@@ -247,13 +248,15 @@ GValueArray* gel_parse_scanner(GScanner *scanner, guint line, guint pos,
  */
 GValueArray* gel_parse_file(const gchar *file, GError **error)
 {
-    gchar *content;
-    gsize content_len;
-    if(!g_file_get_contents(file, &content, &content_len, error))
-        return NULL;
+    gchar *content = NULL;
+    gsize content_len = 0;
+    GValueArray *array = NULL;
 
-    GValueArray *array = gel_parse_text(content, content_len, error);
-    g_free(content);
+    if(g_file_get_contents(file, &content, &content_len, error))
+    {
+        array = gel_parse_text(content, content_len, error);
+        g_free(content);
+    }
 
     return array;
 }

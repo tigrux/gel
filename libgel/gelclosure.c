@@ -267,6 +267,7 @@ void gel_native_closure_marshal(GClosure *closure, GValue *return_value,
     /* Hack to work around closures invoked as signal callbacks */
     if(((GSignalInvocationHint*)context)->signal_id < 32767)
         context = NULL;
+
     ((GelNativeClosure *)closure)->native_marshal(
         closure, return_value, n_values, values, context, closure->data);
 }
@@ -300,6 +301,7 @@ GClosure* gel_closure_new_native(const gchar *name, GClosureMarshal marshal)
 
     return closure;
 }
+
 
 #ifdef HAVE_GOBJECT_INTROSPECTION
 struct _GelIntrospectionClosure
@@ -357,6 +359,7 @@ GObject* gel_introspection_closure_get_object(GelIntrospectionClosure *self)
 }
 #endif
 
+
 /**
  * gel_closure_get_name:
  * @closure: a #GClosure whose name will be retrieved
@@ -367,20 +370,17 @@ GObject* gel_introspection_closure_get_object(GelIntrospectionClosure *self)
  */
 const gchar* gel_closure_get_name(const GClosure *closure)
 {
-    const gchar *name;
     if(closure->marshal == (GClosureMarshal)gel_closure_marshal)
-        name = ((GelClosure*)closure)->name;
-    else
+        return ((GelClosure*)closure)->name;
+
     if(closure->marshal == (GClosureMarshal)gel_native_closure_marshal)
-        name = ((GelNativeClosure*)closure)->name;
-    else
+        return ((GelNativeClosure*)closure)->name;
+
 #ifdef HAVE_GOBJECT_INTROSPECTION
     if(closure->marshal == (GClosureMarshal)gel_type_info_closure_marshal)
-        name = ((GelIntrospectionClosure*)closure)->name;
-    else
+        return ((GelIntrospectionClosure*)closure)->name;
 #endif
-        name = NULL;
 
-    return name;
+    return NULL;
 }
 

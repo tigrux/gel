@@ -33,6 +33,7 @@ GType gel_context_get_type(void)
 {
     static volatile gsize once = 0;
     static GType type = G_TYPE_INVALID;
+
     if(g_once_init_enter(&once))
     {
         type = g_boxed_type_register_static("GelContext",
@@ -198,6 +199,7 @@ gboolean gel_context_eval(GelContext *self, const GValue *value, GValue *dest)
     g_return_val_if_fail(dest != NULL, FALSE);
 
     const GValue *result = gel_context_eval_into_value(self, value, dest);
+
     if(GEL_IS_VALUE(result))
     {
         if(result != dest)
@@ -219,6 +221,7 @@ const GValue* gel_context_eval_param_into_value(GelContext *self,
 {
     const GValue *result_value =
         gel_context_eval_into_value(self, value, out_value);
+
     if(GEL_VALUE_HOLDS(result_value, GEL_TYPE_VARIABLE))
     {
         const GelVariable *variable = gel_value_get_boxed(result_value);
@@ -337,6 +340,7 @@ GelVariable* gel_context_lookup_variable(const GelContext *self,
 
     GelVariable *variable = NULL;
     const GelContext *context = self;
+
     while(context != NULL && variable == NULL)
     {
         variable = gel_context_get_variable(context, name);
