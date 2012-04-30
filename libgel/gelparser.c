@@ -63,7 +63,9 @@ GValueArray* gel_parse_scanner(GScanner *scanner, guint line, guint pos,
             g_value_array_append(array, pre_value);
     }
 
+    gboolean failed = FALSE;
     gboolean parsing = TRUE;
+
     while(parsing)
     {
         GValue value = {0};
@@ -89,11 +91,17 @@ GValueArray* gel_parse_scanner(GScanner *scanner, guint line, guint pos,
             case '(':
             case '[':
             case '{':
+            {
                 g_scanner_get_next_token(scanner);
                 g_value_init(&value, G_TYPE_VALUE_ARRAY);
-                gel_value_take_boxed(&value, gel_parse_scanner(scanner,
-                    scanner->line, scanner->position, token, error));
+                GValueArray *inner_array = gel_parse_scanner(scanner,
+                    scanner->line, scanner->position, token, error);
+                if(array != NULL)
+                    gel_value_take_boxed(&value, inner_array);
+                else
+                    failed = TRUE;
                 break;
+            }
             case ')':
             case ']':
             case '}':
@@ -108,6 +116,7 @@ GValueArray* gel_parse_scanner(GScanner *scanner, guint line, guint pos,
                         "with '%c' at line %u, char %u",
                         delim, line, pos, token,
                         scanner->next_line, scanner->next_position));
+                    failed = TRUE;
                     parsing = FALSE;
                 }
                 else
@@ -118,6 +127,7 @@ GValueArray* gel_parse_scanner(GScanner *scanner, guint line, guint pos,
                         GEL_PARSE_ERROR_UNEXPECTED_DELIM,
                         "Unexpected '%c' at line %u, char %u",
                         token, scanner->next_line, scanner->next_position));
+                    failed = TRUE;
                     parsing = FALSE;
                 }
                 else
@@ -128,11 +138,14 @@ GValueArray* gel_parse_scanner(GScanner *scanner, guint line, guint pos,
                 break;
             case G_TOKEN_EOF:
                 if(line != 0)
+                {
                     g_propagate_error(error, g_error_new(
                         gel_parse_error_quark(),
                         GEL_PARSE_ERROR_EXPECTED_DELIM,
                         "'%c' opened at line %u, char %u was not closed",
                         delim, line, pos));
+                    failed = TRUE;
+                }
                 parsing = FALSE;
                 break;
             case G_TOKEN_STRING:
@@ -148,6 +161,7 @@ GValueArray* gel_parse_scanner(GScanner *scanner, guint line, guint pos,
                     "%s at line %u, char %u",
                     scanner_errors[scanner->value.v_error],
                     scanner->line, scanner->position));
+                failed = TRUE;
                 parsing = FALSE;
                 break;
             default:
@@ -156,6 +170,7 @@ GValueArray* gel_parse_scanner(GScanner *scanner, guint line, guint pos,
                     GEL_PARSE_ERROR_UNKNOWN_TOKEN,
                     "Unknown token '%c' (%d) at line %u, char %u",
                     token, token, scanner->next_line, scanner->next_position));
+                failed = TRUE;
                 parsing = FALSE;
                 break;
         }
@@ -211,7 +226,7 @@ GValueArray* gel_parse_scanner(GScanner *scanner, guint line, guint pos,
         }
     }
 
-    if(*error != NULL)
+    if(failed)
     {
         g_value_array_free(array);
         array = NULL;
