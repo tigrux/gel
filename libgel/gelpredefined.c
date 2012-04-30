@@ -314,7 +314,7 @@ void hash_append(GHashTable *hash, GValue *return_value,
                 break;
         }
     else
-        g_warning("%s: arguments must be pairs", __FUNCTION__);
+        gel_warning_expected(__FUNCTION__, "an even number of values");
 
     gel_value_list_free(tmp_list);
 }
@@ -625,7 +625,8 @@ void let_(GClosure *self, GValue *return_value,
             gel_context_free(let_context);
         }
         else
-            g_warning("%s: bindings must be pairs", __FUNCTION__);
+            gel_warning_expected(__FUNCTION__,
+                "an even number of values in bindings");
     }
 
     gel_value_list_free(tmp_list);
@@ -762,7 +763,7 @@ void hash_(GClosure *self, GValue *return_value,
                     gel_value_dup(key), gel_value_dup(value));
         }
     else
-        g_warning("%s: arguments must be pairs", __FUNCTION__);
+        gel_warning_expected(__FUNCTION__, "an even number of values");
 
     g_value_init(return_value, G_TYPE_HASH_TABLE);
     gel_value_take_boxed(return_value, hash);
@@ -1885,7 +1886,7 @@ void dot_(GClosure *self, GValue *return_value,
 
             if(type_info == NULL)
             {
-                g_warning("%s: Could not resolve '%s'", __FUNCTION__, name);
+                gel_warning_unknown_symbol(__FUNCTION__, name);
                 break;
             }
         }
