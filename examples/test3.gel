@@ -21,6 +21,11 @@
 (filter is-positive S)
 
 
+(sort > [3 1 8 7 5 9])
+
+(sort < ["omicron" "alpha" "gamma" "beta" "delta" "omega"])
+
+
 (def values [4.5 2])
 (def operators [+ - * /])
 

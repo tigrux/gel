@@ -1338,11 +1338,11 @@ void sort_(GClosure *self, GValue *return_value,
            guint n_values, const GValue *values, GelContext *context)
 {
     GList *tmp_list = NULL;
-    GValueArray *array = NULL;
     GClosure *closure = NULL;
+    GValueArray *array = NULL;
 
     if(gel_context_eval_params(context, __FUNCTION__,
-            &n_values, &values, &tmp_list, "AC", &array, &closure))
+            &n_values, &values, &tmp_list, "CA", &closure, &array))
     {
         gint compare(GValue *v1, GValue *v2)
         {
