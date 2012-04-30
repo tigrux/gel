@@ -83,8 +83,7 @@ void gel_context_dispose(GelContext *self)
  */
 GelContext* gel_context_new(void)
 {
-    GelContext *self = gel_context_new_with_outer(NULL);
-    return self;
+    return gel_context_new_with_outer(NULL);
 }
 
 
@@ -99,7 +98,7 @@ GelContext* gel_context_new(void)
  */
 GelContext* gel_context_new_with_outer(GelContext *outer)
 {
-    GelContext *self;
+    GelContext *self = NULL;
 #if GEL_CONTEXT_USE_POOL
     G_LOCK(contexts);
     if(contexts_POOL != NULL)
@@ -325,9 +324,7 @@ GList* gel_context_get_variables(const GelContext *self)
 GelVariable* gel_context_get_variable(const GelContext *self,
                                       const gchar *name)
 {
-    GelVariable *variable = NULL;
-    variable = g_hash_table_lookup(self->variables, name);
-    return variable;
+    return g_hash_table_lookup(self->variables, name);
 }
 
 
@@ -366,11 +363,10 @@ GValue* gel_context_lookup(const GelContext *self, const gchar *name)
     g_return_val_if_fail(name != NULL, NULL);
 
     GelVariable *variable = gel_context_lookup_variable(self, name);
-    GValue *result;
+    GValue *result = NULL;
+
     if(variable != NULL)
         result = gel_variable_get_value(variable);
-    else
-        result = NULL;
 
     return result;
 }
@@ -429,6 +425,7 @@ void gel_context_insert_object(GelContext *self, const gchar *name,
     GValue *value = gel_value_new_of_type(G_OBJECT_TYPE(object));
     if(G_IS_INITIALLY_UNOWNED(object))
         g_object_ref_sink(object);
+
     gel_value_take_object(value, object);
     gel_context_insert(self, name, value);
 }
@@ -455,6 +452,7 @@ void gel_context_insert_function(GelContext *self, const gchar *name,
     GClosure *closure = gel_closure_new_native(
             g_strdup(name), (GClosureMarshal)function);
     closure->data = user_data;
+
     gel_value_take_boxed(value, closure);
     gel_context_insert(self, name, value);
 }
