@@ -9,7 +9,7 @@
 
 (def window (new (. Gtk Window)))
 
-# the variable 'title' was defined in the interpreter
+# the string 'title' was defined in the interpreter
 (set window "title" title)
 
 (set window "default-width" 320)
@@ -25,8 +25,8 @@
 (add window box)
 (set box "border-width" 12)
 
-# get-label-from-native was defined in the interpreter
-(def label (get-label-from-native))
+# the function 'make-label' was defined in the interpreter
+(def label (make-label))
 (add box label)
 
 (def button (new (. Gtk Button)))

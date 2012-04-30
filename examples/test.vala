@@ -27,7 +27,7 @@ int main(string[] args) {
     Gel.Context context = new Gel.Context();
 
     // insert a function to make it available to the script
-    context.insert_function("get-label-from-native",
+    context.insert_function("make-label",
         (closure, out return_value) => {
             Type label_t = Type.from_name("GtkLabel");
             return_value = Object.new(label_t, "label", "Label made in Vala");
