@@ -6,7 +6,7 @@
 #include <gelvariable.h>
 
 #ifndef GEL_VALUE_USE_MACRO
-#define GEL_VALUE_USE_MACRO 0
+#define GEL_VALUE_USE_MACRO 1
 #endif
 
 #if GEL_VALUE_USE_MACRO
