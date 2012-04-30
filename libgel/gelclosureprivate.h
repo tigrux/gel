@@ -5,7 +5,6 @@
 
 typedef struct _GelClosure GelClosure;
 
-GelContext* gel_closure_get_context(GelClosure *self);
 void gel_closure_close_over(GClosure *closure);
 
 #ifdef HAVE_GOBJECT_INTROSPECTION

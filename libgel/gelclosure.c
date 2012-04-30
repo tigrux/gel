@@ -66,7 +66,7 @@ void gel_closure_marshal(GelClosure *closure, GValue *return_value,
         return;
     }
 
-    GelContext *outer = gel_closure_get_context(closure);
+    GelContext *outer = closure->context;
     GelContext *context = gel_context_new_with_outer(outer);
 
     guint i = 0;
@@ -129,12 +129,6 @@ void gel_closure_finalize(void *data, GelClosure *self)
 }
 
 
-GelContext* gel_closure_get_context(GelClosure *self)
-{
-    return self->context;
-}
-
-
 static
 void gel_closure_bind_symbols_of_array(GelClosure *self, GValueArray *array)
 {
@@ -155,7 +149,7 @@ void gel_closure_bind_symbols_of_array(GelClosure *self, GValueArray *array)
         {
             GelSymbol *symbol = gel_value_get_boxed(value);
             const gchar *name = gel_symbol_get_name(symbol);
-            const GelContext *context = gel_closure_get_context(self);
+            const GelContext *context = self->context;
 
             if(g_hash_table_lookup(self->args_hash, name) == NULL)
             {
