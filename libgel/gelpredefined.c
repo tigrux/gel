@@ -841,7 +841,7 @@ void set_(GClosure *self, GValue *return_value,
         else
         if(G_TYPE_IS_OBJECT(type))
         {
-            GObject *object = gel_value_get_boxed(value);
+            GObject *object = gel_value_get_object(value);
             object_set(object, return_value, n_values, values, context);
         }
         else
@@ -1150,7 +1150,7 @@ void get_(GClosure *self, GValue *return_value,
         else
         if(G_TYPE_IS_OBJECT(type))
         {
-            GObject *object = gel_value_get_boxed(value);
+            GObject *object = gel_value_get_object(value);
             object_get(object, return_value, n_values, values, context);
         }
         else
@@ -1461,7 +1461,7 @@ void new_(GClosure *self, GValue *return_value,
             GObject *new_object = g_object_new(type, NULL);
             if(G_IS_INITIALLY_UNOWNED(new_object))
                 g_object_ref_sink(new_object);
-            gel_value_take_boxed(return_value, new_object);
+            gel_value_take_object(return_value, new_object);
         }
     }
 
