@@ -18,8 +18,6 @@ const GValue* gel_context_eval_param_into_value(GelContext *self,
 GelVariable* gel_context_get_variable(const GelContext *self,
                                       const gchar *name);
 
-void gel_context_append_closure(GelContext *self, GelClosure *closure);
-
 void gel_context_set_outer(GelContext *self, GelContext *context);
 
 #endif
