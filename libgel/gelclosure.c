@@ -81,7 +81,14 @@ void gel_closure_marshal(GelClosure *closure, GValue *return_value,
         GValue *value = gel_value_new();
 
         gel_context_eval_value(invocation_context, values + i, value);
-        gel_context_insert(context, arg_name, value);
+
+        if(gel_context_error(invocation_context) == NULL)
+            gel_context_insert(context, arg_name, value);
+        else
+        {
+            g_free(value);
+            goto end;
+        }
     }
 
     if(is_variadic_arg)
@@ -92,8 +99,16 @@ void gel_closure_marshal(GelClosure *closure, GValue *return_value,
         GValue *array_values = array->values;
 
         for(guint j = 0; i < n_values; i++, j++)
+        {
             gel_context_eval_value(invocation_context,
                 values + i, array_values + j);
+
+            if(gel_context_error(invocation_context) != NULL)
+            {
+                g_value_array_free(array);
+                goto end;
+            }
+        }
 
         GValue *value = gel_value_new_from_boxed(G_TYPE_VALUE_ARRAY, array);
         gel_context_insert(context, closure->variadic_arg, value);
@@ -111,14 +126,19 @@ void gel_closure_marshal(GelClosure *closure, GValue *return_value,
             const GValue *value = gel_context_eval_into_value(context,
                     closure_code_values + i, &tmp_value);
 
-            if(i == last && return_value != NULL && GEL_IS_VALUE(value))
-                gel_value_copy(value, return_value);
+            if(gel_context_error(invocation_context) == NULL)
+                if(i == last && return_value != NULL && GEL_IS_VALUE(value))
+                    gel_value_copy(value, return_value);
 
             if(GEL_IS_VALUE(&tmp_value))
                 g_value_unset(&tmp_value);
+
+            if(gel_context_error(invocation_context) != NULL)
+                goto end;
         }
     }
 
+    end:
     gel_context_free(context);
 }
 

@@ -103,6 +103,8 @@ void gel_warning_symbol_exists(GelContext *context,
 void gel_warning_expected(GelContext *context,
                           const gchar *func, const gchar *s)
 {
-    g_warning("%s: Expected %s", func, s);
+    gel_context_set_error(context, g_error_new(
+        GEL_CONTEXT_ERROR, GEL_CONTEXT_ERROR_EXPECTED,
+        "%s: Expected %s", func, s));
 }
 

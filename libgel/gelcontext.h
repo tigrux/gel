@@ -3,6 +3,15 @@
 
 #include <glib-object.h>
 
+#define GEL_CONTEXT_ERROR (gel_context_error_quark())
+
+GQuark gel_context_error_quark(void);
+
+typedef enum _GelContextError
+{
+   GEL_CONTEXT_ERROR_EXPECTED
+} GelContextError;
+
 typedef struct _GelContext GelContext;
 GType gel_context_get_type(void) G_GNUC_CONST;
 
@@ -22,6 +31,8 @@ GType gel_context_get_type(void) G_GNUC_CONST;
 typedef void (*GelFunction)(GClosure *closure, GValue *return_value,
                             guint n_param_values, GValue *param_values,
                             GelContext *invocation_context, gpointer user_data);
+
+GQuark gel_parse_error_quark(void);
 
 GelContext* gel_context_new(void);
 GelContext* gel_context_new_with_outer(GelContext *outer);

@@ -30,6 +30,12 @@ struct _GelContext
 };
 
 
+GQuark gel_context_error_quark(void)
+{
+    return g_quark_from_static_string("gel-context-error");
+}
+
+
 GType gel_context_get_type(void)
 {
     static volatile gsize once = 0;
@@ -332,8 +338,7 @@ GError* gel_context_error(const GelContext* self)
 
 void gel_context_set_error(GelContext* self, GError *error)
 {
-    if(self->error != NULL)
-        g_clear_error(&self->error);
+    g_assert(self->error == NULL);
 
     self->error = error;
 }
