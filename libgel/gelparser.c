@@ -110,8 +110,7 @@ GValueArray* gel_parse_scanner(GScanner *scanner, guint line, guint pos,
                    (delim == '{' && token != '}'))
                 {
                     g_propagate_error(error, g_error_new(
-                        gel_parse_error_quark(),
-                        GEL_PARSE_ERROR_UNMATCHED_DELIM,
+                        GEL_PARSE_ERROR, GEL_PARSE_ERROR_UNMATCHED_DELIM,
                         "Cannot close '%c' at line %u, char %u "
                         "with '%c' at line %u, char %u",
                         delim, line, pos, token,
@@ -123,8 +122,7 @@ GValueArray* gel_parse_scanner(GScanner *scanner, guint line, guint pos,
                 if(delim == 0)
                 {
                     g_propagate_error(error, g_error_new(
-                        gel_parse_error_quark(),
-                        GEL_PARSE_ERROR_UNEXPECTED_DELIM,
+                        GEL_PARSE_ERROR, GEL_PARSE_ERROR_UNEXPECTED_DELIM,
                         "Unexpected '%c' at line %u, char %u",
                         token, scanner->next_line, scanner->next_position));
                     failed = TRUE;
@@ -140,8 +138,7 @@ GValueArray* gel_parse_scanner(GScanner *scanner, guint line, guint pos,
                 if(line != 0)
                 {
                     g_propagate_error(error, g_error_new(
-                        gel_parse_error_quark(),
-                        GEL_PARSE_ERROR_EXPECTED_DELIM,
+                        GEL_PARSE_ERROR, GEL_PARSE_ERROR_EXPECTED_DELIM,
                         "'%c' opened at line %u, char %u was not closed",
                         delim, line, pos));
                     failed = TRUE;
@@ -156,8 +153,7 @@ GValueArray* gel_parse_scanner(GScanner *scanner, guint line, guint pos,
             case G_TOKEN_ERROR:
                 g_scanner_get_next_token(scanner);
                 g_propagate_error(error, g_error_new(
-                    gel_parse_error_quark(),
-                    GEL_PARSE_ERROR_SCANNER,
+                    GEL_PARSE_ERROR, GEL_PARSE_ERROR_SCANNER,
                     "%s at line %u, char %u",
                     scanner_errors[scanner->value.v_error],
                     scanner->line, scanner->position));
@@ -166,8 +162,7 @@ GValueArray* gel_parse_scanner(GScanner *scanner, guint line, guint pos,
                 break;
             default:
                 g_propagate_error(error, g_error_new(
-                    gel_parse_error_quark(),
-                    GEL_PARSE_ERROR_UNKNOWN_TOKEN,
+                    GEL_PARSE_ERROR, GEL_PARSE_ERROR_UNKNOWN_TOKEN,
                     "Unknown token '%c' (%d) at line %u, char %u",
                     token, token, scanner->next_line, scanner->next_position));
                 failed = TRUE;
