@@ -237,19 +237,6 @@ const GValue* gel_context_eval_param_into_value(GelContext *self,
 }
 
 
-/**
- * gel_context_eval_into_value:
- * @self: #GelContext where to evaluate @value
- * @value: value to evaluate
- * @out_value: value where a result may be written.
- *
- * Evaluates the given value.
- * If @value matches a symbol, returns the corresponding value.
- * If @value is a literal (number or string), returns @value itself.
- * If not, then @value is evaluated and the result stored in @out_value.
- *
- * Returns: A #GValue with the result
- */
 const GValue* gel_context_eval_into_value(GelContext *self,
                                           const GValue *value,
                                           GValue *out_value)

@@ -293,68 +293,7 @@ gboolean gel_context_eval_params_args(GelContext *self, const gchar *func,
     return parsed;
 }
 
-/**
- * gel_context_eval_params:
- * @self: #GelContext where to evaluate
- * @func: name of the invoker function, usually __FUNCTION__
- * @list: pointer to a list to keep temporary values
- * @format: string describing types to get
- * @n_values: pointer to the number of values in @values
- * @values: pointer to an array of values
- * @...: list of pointers to store the retrieved variables
- *
- * Convenience method to be used in implementation of new closures.
- *
- * Each character in @format indicates the type of variable you are parsing.
- * Posible formats are: vVaAHsSIOC
- *
- * <itemizedlist>
-  *   <listitem><para>
- *     v: get a literal value (#GValue *).
- *   </para></listitem>
- *   <listitem><para>
- *     V: evaluate and get a value (#GValue *).
- *   </para></listitem>
- *   <listitem><para>
- *     a: get a literal array (#GValueArray *).
- *   </para></listitem>
- *   <listitem><para>
- *     A: evaluate and get an array (#GValueArray *).
- *   </para></listitem>
- *   <listitem><para>
- *     H: evaluate and get a hash (#GHashTable *).
- *   </para></listitem>
- *   <listitem><para>
- *     s: get a literal string (#gchararray).
- *   </para></listitem>
- *   <listitem><para>
- *     S: evaluate and get a string (#gchararray).
- *   </para></listitem>
- *   <listitem><para>
- *     I: evaluate and get an integer (#gint64).
- *   </para></listitem>
- *   <listitem><para>
- *     F: evaluate and get a float (#gdouble).
- *   </para></listitem>
- *   <listitem><para>
- *     O: evaluate and get an object (#GObject *).
- *   </para></listitem>
- *   <listitem><para>
- *     C: evaluate and get a closure (#GClosure *).
- *   </para></listitem>
- *   <listitem><para>
- *     *: Do not check for exact number or arguments.
- *   </para></listitem>
- * </itemizedlist>
- *
- * On success, @n_values will be decreased and @values repositioned
- * to match the first remaining argument,
- * @list must be disposed with #gel_value_list_free.
- *
- * On failure , @n_values and @values are left untouched.
- * 
- * Returns: #TRUE on sucess, #FALSE otherwise.
- */
+
 gboolean gel_context_eval_params(GelContext *self,const gchar *func,
                                  guint *n_values, const GValue **values,
                                  GList **list, const gchar *format, ...)

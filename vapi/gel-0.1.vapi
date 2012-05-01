@@ -2,7 +2,12 @@
 namespace Gel {
 
     [CCode (instance_pos = -1)]
-    public delegate void Function(GLib.Closure closure, out GLib.Value return_value, [CCode (array_length_pos = 2.9, array_length_type = "guint")] GLib.Value[] param_values, Gel.Context? invocation_context);
+    public delegate void Function(
+        GLib.Closure closure,
+        out GLib.Value return_value,
+        [CCode (array_length_pos = 2.9, array_length_type = "guint")]
+        GLib.Value[] param_values,
+        Gel.Context? invocation_context);
 
     [CCode (type_id = "GEL_TYPE_CONTEXT")]
     [Compact]
@@ -17,7 +22,6 @@ namespace Gel {
         public void insert_function(string name, Gel.Function function);
         public bool remove(string name);
         public bool eval(GLib.Value value, out GLib.Value dest_value);
-        public unowned GLib.Value eval_into_value(GLib.Value value, out GLib.Value tmp_value);
     }
 
     errordomain ParseError {
@@ -37,10 +41,6 @@ namespace Gel {
         bool copy(GLib.Value src_value, out GLib.Value dest_value);
     }
 
-    namespace ValueList {
-        void free(GLib.List<GLib.Value> value_list);
-    }
-
     namespace Values {
         bool add(GLib.Value v1, GLib.Value v2, out GLib.Value dest_value);
         bool sub(GLib.Value v1, GLib.Value v2, out GLib.Value dest_value);
@@ -57,5 +57,6 @@ namespace Gel {
         bool lt(GLib.Value v1, GLib.Value v2);
         bool ne(GLib.Value v1, GLib.Value v2);
     }
+
 }
 
