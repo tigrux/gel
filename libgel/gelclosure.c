@@ -43,10 +43,22 @@ struct _GelClosure
 
 
 static
+GelContext* gel_closure_validate_context(GelContext *context)
+{
+    /* Hack to work around closures invoked as signal callbacks */
+    if(((GSignalInvocationHint*)context)->signal_id < 32767)
+        context = gel_context_global();
+    return context;
+}
+
+
+static
 void gel_closure_marshal(GelClosure *closure, GValue *return_value,
                          guint n_values, const GValue *values,
                          GelContext *invocation_context)
 {
+    invocation_context = gel_closure_validate_context(invocation_context);
+
     const guint n_args = g_list_length(closure->args);
     gboolean is_variadic_arg = (closure->variadic_arg != NULL);
 
@@ -79,6 +91,7 @@ void gel_closure_marshal(GelClosure *closure, GValue *return_value,
     {
         const gchar *arg_name = iter->data;
         GValue *value = gel_value_new();
+
 
         gel_context_eval_value(invocation_context, values + i, value);
 
@@ -289,12 +302,9 @@ void gel_native_closure_marshal(GClosure *closure, GValue *return_value,
                                 guint n_values, const GValue *values,
                                 GelContext *context)
 {
-    /* Hack to work around closures invoked as signal callbacks */
-    if(((GSignalInvocationHint*)context)->signal_id < 32767)
-        context = NULL;
-
     ((GelNativeClosure *)closure)->native_marshal(
-        closure, return_value, n_values, values, context, closure->data);
+        closure, return_value, n_values, values,
+        gel_closure_validate_context(context), closure->data);
 }
 
 

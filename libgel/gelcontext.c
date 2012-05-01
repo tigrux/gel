@@ -59,6 +59,8 @@ static GList *contexts_POOL;
 G_LOCK_DEFINE_STATIC(contexts);
 #endif
 
+static GelContext *context_SOLITON;
+
 
 static
 GelContext* gel_context_alloc(void)
@@ -91,7 +93,10 @@ void gel_context_dispose(GelContext *self)
  */
 GelContext* gel_context_new(void)
 {
-    return gel_context_new_with_outer(NULL);
+    if(context_SOLITON == NULL)
+        context_SOLITON = gel_context_new_with_outer(NULL);
+
+    return context_SOLITON;
 }
 
 
@@ -121,9 +126,16 @@ GelContext* gel_context_new_with_outer(GelContext *outer)
 #else
     self = gel_context_alloc();
 #endif
+
     gel_context_set_outer(self, outer);
 
     return self;
+}
+
+
+GelContext* gel_context_global()
+{
+    return context_SOLITON;
 }
 
 
@@ -186,6 +198,8 @@ void gel_context_free(GelContext *self)
 #else
     gel_context_dispose(self);
 #endif
+    if(self == context_SOLITON)
+        context_SOLITON = NULL;
 }
 
 
