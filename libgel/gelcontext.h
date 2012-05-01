@@ -9,7 +9,11 @@ GQuark gel_context_error_quark(void);
 
 typedef enum _GelContextError
 {
-   GEL_CONTEXT_ERROR_EXPECTED
+   GEL_CONTEXT_ERROR_ARGUMENTS,
+   GEL_CONTEXT_ERROR_SYMBOL,
+   GEL_CONTEXT_ERROR_TYPE,
+   GEL_CONTEXT_ERROR_PROPERTY,
+   GEL_CONTEXT_ERROR_INDEX
 } GelContextError;
 
 typedef struct _GelContext GelContext;

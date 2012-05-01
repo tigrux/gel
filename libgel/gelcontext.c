@@ -246,16 +246,17 @@ const GValue* gel_context_eval_param_into_value(GelContext *self,
     const GValue *result_value =
         gel_context_eval_into_value(self, value, out_value);
 
-    if(GEL_VALUE_HOLDS(result_value, GEL_TYPE_VARIABLE))
-    {
-        const GelVariable *variable = gel_value_get_boxed(result_value);
-        if(variable != NULL)
+    if(gel_context_error(self) == NULL)
+        if(GEL_VALUE_HOLDS(result_value, GEL_TYPE_VARIABLE))
         {
-            const GValue *value = gel_variable_get_value(variable);
-            if(value != NULL)
-                result_value = value;
+            const GelVariable *variable = gel_value_get_boxed(result_value);
+            if(variable != NULL)
+            {
+                const GValue *value = gel_variable_get_value(variable);
+                if(value != NULL)
+                    result_value = value;
+            }
         }
-    }
 
     return result_value;
 }
@@ -300,13 +301,15 @@ const GValue* gel_context_eval_into_value(GelContext *self,
             const GValue *first_value =
                 gel_context_eval_into_value(self, array_values + 0, &tmp_value);
 
-            if(GEL_VALUE_HOLDS(first_value, G_TYPE_CLOSURE))
-            {
-                GClosure *closure = gel_value_get_boxed(first_value);
-                g_closure_invoke(closure,
-                    out_value, array_n_values - 1 , array_values + 1, self);
-                result = out_value;
-            }
+
+            if(gel_context_error(self) == NULL)
+                if(GEL_VALUE_HOLDS(first_value, G_TYPE_CLOSURE))
+                {
+                    GClosure *closure = gel_value_get_boxed(first_value);
+                    g_closure_invoke(closure,
+                        out_value, array_n_values - 1 , array_values + 1, self);
+                    result = out_value;
+                }
 
             if(GEL_IS_VALUE(&tmp_value))
                 g_value_unset(&tmp_value);
