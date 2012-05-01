@@ -56,7 +56,6 @@ GType gel_context_get_type(void)
 #if GEL_CONTEXT_USE_POOL
 static guint contexts_COUNT;
 static GList *contexts_POOL;
-G_LOCK_DEFINE_STATIC(contexts);
 #endif
 
 static GelContext *context_SOLITON;
@@ -113,7 +112,6 @@ GelContext* gel_context_new_with_outer(GelContext *outer)
 {
     GelContext *self = NULL;
 #if GEL_CONTEXT_USE_POOL
-    G_LOCK(contexts);
     if(contexts_POOL != NULL)
     {
         self = contexts_POOL->data;
@@ -122,7 +120,6 @@ GelContext* gel_context_new_with_outer(GelContext *outer)
     else
         self = gel_context_alloc();
     contexts_COUNT++;
-    G_UNLOCK(contexts);
 #else
     self = gel_context_alloc();
 #endif
@@ -187,14 +184,12 @@ void gel_context_free(GelContext *self)
     g_hash_table_remove_all(self->variables);
     g_hash_table_remove_all(self->inner);
 
-    G_LOCK(contexts);
     contexts_POOL = g_list_append(contexts_POOL, self);
     if(--contexts_COUNT == 0)
     {
         g_list_foreach(contexts_POOL, (GFunc)gel_context_dispose, NULL);
         g_list_free(contexts_POOL);
     }
-    G_UNLOCK(contexts);
 #else
     gel_context_dispose(self);
 #endif
