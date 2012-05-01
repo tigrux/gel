@@ -84,7 +84,7 @@ int main(int argc, char *argv[])
         }
         else
         /* else .. if an error occurred when evaluating ... */
-        if(gel_context_error(context) != NULL)
+        if(error != NULL)
         {
             /* ... then print information about the error */
             g_print("There was an error evaluating '%s'\n", argv[1]);

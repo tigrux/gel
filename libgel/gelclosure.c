@@ -126,15 +126,14 @@ void gel_closure_marshal(GelClosure *closure, GValue *return_value,
             const GValue *value = gel_context_eval_into_value(context,
                     closure_code_values + i, &tmp_value);
 
-            if(gel_context_error(invocation_context) == NULL)
-                if(i == last && return_value != NULL && GEL_IS_VALUE(value))
-                    gel_value_copy(value, return_value);
+            if(gel_context_error(invocation_context) != NULL)
+                goto end;
+
+            if(i == last && return_value != NULL && GEL_IS_VALUE(value))
+                gel_value_copy(value, return_value);
 
             if(GEL_IS_VALUE(&tmp_value))
                 g_value_unset(&tmp_value);
-
-            if(gel_context_error(invocation_context) != NULL)
-                goto end;
         }
     }
 
