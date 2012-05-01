@@ -130,9 +130,12 @@ GelContext* gel_context_new_with_outer(GelContext *outer)
 }
 
 
-GelContext* gel_context_global()
+GelContext* gel_context_validate(GelContext *context)
 {
-    return context_SOLITON;
+    /* Hack to work around closures invoked as signal callbacks */
+    if(((GSignalInvocationHint*)context)->signal_id < 32767)
+        context = context_SOLITON;
+    return context;
 }
 
 
