@@ -21,7 +21,7 @@ namespace Gel {
         public void insert_object(string name, owned GLib.Object object);
         public void insert_function(string name, Gel.Function function);
         public bool remove(string name);
-        public bool eval(GLib.Value value, out GLib.Value dest_value);
+        public bool eval(GLib.Value value, out GLib.Value dest_value) throws GLib.Error;
     }
 
     errordomain ParseError {

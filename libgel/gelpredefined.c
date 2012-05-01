@@ -48,7 +48,8 @@ GClosure* fn(GelContext *context, const gchar *name,
     }
     else
     {
-        gel_warning_invalid_argument_name(__FUNCTION__, invalid_arg_name);
+        gel_warning_invalid_argument_name(context,
+            __FUNCTION__, invalid_arg_name);
         g_free(invalid_arg_name);
         for(guint i = 0; i < n_vars; i++)
             if(vars[i] != NULL)
@@ -68,7 +69,7 @@ void set(GValue *return_value,
     guint n_args = 2;
     if(n_values != n_args)
     {
-        gel_warning_needs_n_arguments(__FUNCTION__, n_args);
+        gel_warning_needs_n_arguments(context, __FUNCTION__, n_args);
         return;
     }
 
@@ -111,7 +112,7 @@ void set(GValue *return_value,
     }
 
     if(!copied)
-        gel_warning_expected(__FUNCTION__, "symbol or variable");
+        gel_warning_expected(context, __FUNCTION__, "symbol or variable");
 
     if(GEL_IS_VALUE(&tmp1_value))
         g_value_unset(&tmp1_value);
@@ -137,7 +138,7 @@ void array_set(GValueArray *array, GValue *return_value,
             index += array_n_values;
         if(index < 0 || index >= array_n_values)
         {
-            gel_warning_index_out_of_bounds(__FUNCTION__);
+            gel_warning_index_out_of_bounds(context, __FUNCTION__);
             return;
         }
         gel_value_copy(value, array->values + index);
@@ -188,11 +189,11 @@ void object_set(GObject *object, GValue *return_value,
                     g_value_unset(&result_value);
                 }
                 else
-                    gel_warning_invalid_value_for_property(__FUNCTION__,
-                        value, spec);
+                    gel_warning_invalid_value_for_property(context,
+                        __FUNCTION__, value, spec);
             }
             else
-                gel_warning_no_such_property(__FUNCTION__, name);
+                gel_warning_no_such_property(context, __FUNCTION__, name);
         }
 
     gel_value_list_free(tmp_list);
@@ -215,7 +216,7 @@ void array_get(GValueArray *array, GValue *return_value,
 
         if(index < 0 || index >= array_n_values)
         {
-            gel_warning_index_out_of_bounds(__FUNCTION__);
+            gel_warning_index_out_of_bounds(context, __FUNCTION__);
             return;
         }
 
@@ -265,7 +266,7 @@ void object_get(GObject *object, GValue *return_value,
                 g_object_get_property(object, name, return_value);
             }
             else
-                gel_warning_no_such_property(__FUNCTION__, name);
+                gel_warning_no_such_property(context, __FUNCTION__, name);
         }
 
     gel_value_list_free(tmp_list);
@@ -314,7 +315,7 @@ void hash_append(GHashTable *hash, GValue *return_value,
                 break;
         }
     else
-        gel_warning_expected(__FUNCTION__, "an even number of values");
+        gel_warning_expected(context, __FUNCTION__, "an even number of values");
 
     gel_value_list_free(tmp_list);
 }
@@ -335,7 +336,7 @@ void array_remove(GValueArray *array, GValue *return_value,
             index += array_n_values;
         if(index < 0 || index >= array_n_values)
         {
-            gel_warning_index_out_of_bounds(__FUNCTION__);
+            gel_warning_index_out_of_bounds(context, __FUNCTION__);
             return;
         }
 
@@ -520,7 +521,7 @@ void def_(GClosure *self, GValue *return_value,
             &n_values, &values, &tmp_list, "sV", &name, &value))
     {
         if(gel_context_get_variable(context, name) != NULL)
-            gel_warning_symbol_exists(__FUNCTION__, name);
+            gel_warning_symbol_exists(context, __FUNCTION__, name);
         else
             gel_context_insert(context, name, gel_value_dup(value));
     }
@@ -541,7 +542,7 @@ void defn_(GClosure *self, GValue *return_value,
             &tmp_list, "sa*", &name, &vars))
     {
         if(gel_context_get_variable(context, name) != NULL)
-            gel_warning_symbol_exists(__FUNCTION__, name);
+            gel_warning_symbol_exists(context, __FUNCTION__, name);
         else
         {
             GClosure *closure = fn(context, name,
@@ -589,7 +590,7 @@ void let_(GClosure *self, GValue *return_value,
     guint n_args = 2;
     if(n_values < n_args)
     {
-        gel_warning_needs_at_least_n_arguments(__FUNCTION__, n_args);
+        gel_warning_needs_at_least_n_arguments(context, __FUNCTION__, n_args);
         return;
     }
 
@@ -625,7 +626,7 @@ void let_(GClosure *self, GValue *return_value,
             gel_context_free(let_context);
         }
         else
-            gel_warning_expected(__FUNCTION__,
+            gel_warning_expected(context, __FUNCTION__,
                 "an even number of values in bindings");
     }
 
@@ -763,7 +764,7 @@ void hash_(GClosure *self, GValue *return_value,
                     gel_value_dup(key), gel_value_dup(value));
         }
     else
-        gel_warning_expected(__FUNCTION__, "an even number of values");
+        gel_warning_expected(context, __FUNCTION__, "an even number of values");
 
     g_value_init(return_value, G_TYPE_HASH_TABLE);
     gel_value_take_boxed(return_value, hash);
@@ -779,7 +780,7 @@ void var_(GClosure *self, GValue *return_value,
     guint n_args = 1;
     if(n_values != n_args)
     {
-        gel_warning_needs_n_arguments(__FUNCTION__, n_args);
+        gel_warning_needs_n_arguments(context, __FUNCTION__, n_args);
         return;
     }
 
@@ -795,11 +796,12 @@ void var_(GClosure *self, GValue *return_value,
         else
         {
             const gchar *name = gel_symbol_get_name(symbol);
-            gel_warning_unknown_symbol(__FUNCTION__, name);
+            gel_warning_unknown_symbol(context, __FUNCTION__, name);
         }
     }
     else
-        gel_warning_value_not_of_type(__FUNCTION__, values, GEL_TYPE_SYMBOL);
+        gel_warning_value_not_of_type(context,
+            __FUNCTION__, values, GEL_TYPE_SYMBOL);
 }
 
 
@@ -810,7 +812,7 @@ void set_(GClosure *self, GValue *return_value,
     guint n_args = 2;
     if(n_values < n_args)
     {
-        gel_warning_needs_at_least_n_arguments(__FUNCTION__, n_args);
+        gel_warning_needs_at_least_n_arguments(context, __FUNCTION__, n_args);
         return;
     }
 
@@ -846,7 +848,8 @@ void set_(GClosure *self, GValue *return_value,
             object_set(object, return_value, n_values, values, context);
         }
         else
-            gel_warning_expected(__FUNCTION__, "array, hash or object");
+            gel_warning_expected(context,
+                __FUNCTION__, "array, hash or object");
     }
 
     gel_value_list_free(tmp_list);
@@ -861,7 +864,7 @@ void arithmetic(GClosure *self, GValue *return_value,
     guint n_args = 2;
     if(n_values < n_args)
     {
-        gel_warning_needs_at_least_n_arguments(__FUNCTION__, n_args);
+        gel_warning_needs_at_least_n_arguments(context, __FUNCTION__, n_args);
         return;
     }
 
@@ -953,7 +956,7 @@ void logic(GClosure *self, GValue *return_value,
     guint n_args = 2;
     if(n_values < n_args)
     {
-        gel_warning_needs_at_least_n_arguments(__FUNCTION__, n_args);
+        gel_warning_needs_at_least_n_arguments(context, __FUNCTION__, n_args);
         return;
     }
 
@@ -987,7 +990,7 @@ void and_(GClosure *self, GValue *return_value,
     guint n_args = 1;
     if(n_values < n_args)
     {
-        gel_warning_needs_at_least_n_arguments(__FUNCTION__, n_args);
+        gel_warning_needs_at_least_n_arguments(context, __FUNCTION__, n_args);
         return;
     }
 
@@ -1014,7 +1017,7 @@ void or_(GClosure *self, GValue *return_value,
     guint n_args = 1;
     if(n_values < n_args)
     {
-        gel_warning_needs_at_least_n_arguments(__FUNCTION__, n_args);
+        gel_warning_needs_at_least_n_arguments(context, __FUNCTION__, n_args);
         return;
     }
 
@@ -1089,7 +1092,7 @@ void append_(GClosure *self, GValue *return_value,
     guint n_args = 2;
     if(n_values < n_args)
     {
-        gel_warning_needs_at_least_n_arguments(__FUNCTION__, n_args);
+        gel_warning_needs_at_least_n_arguments(context, __FUNCTION__, n_args);
         return;
     }
 
@@ -1112,7 +1115,7 @@ void append_(GClosure *self, GValue *return_value,
             hash_append(hash, return_value, n_values, values, context);
         }
         else
-            gel_warning_expected(__FUNCTION__, "array or hash");
+            gel_warning_expected(context, __FUNCTION__, "array or hash");
     }
 
     gel_value_list_free(tmp_list);
@@ -1126,7 +1129,7 @@ void get_(GClosure *self, GValue *return_value,
     guint n_args = 2;
     if(n_values != n_args)
     {
-        gel_warning_needs_n_arguments(__FUNCTION__, n_args);
+        gel_warning_needs_n_arguments(context, __FUNCTION__, n_args);
         return;
     }
 
@@ -1155,7 +1158,8 @@ void get_(GClosure *self, GValue *return_value,
             object_get(object, return_value, n_values, values, context);
         }
         else
-            gel_warning_expected(__FUNCTION__, "array, hash or object");
+            gel_warning_expected(context,
+                __FUNCTION__, "array, hash or object");
     }
 
     gel_value_list_free(tmp_list);
@@ -1169,7 +1173,7 @@ void remove_(GClosure *self, GValue *return_value,
     guint n_args = 2;
     if(n_values != n_args)
     {
-        gel_warning_needs_n_arguments(__FUNCTION__, n_args);
+        gel_warning_needs_n_arguments(context, __FUNCTION__, n_args);
         return;
     }
 
@@ -1192,7 +1196,7 @@ void remove_(GClosure *self, GValue *return_value,
             hash_remove(hash, return_value, n_values, values, context);
         }
         else
-            gel_warning_expected(__FUNCTION__, "array or hash");
+            gel_warning_expected(context, __FUNCTION__, "array or hash");
     }
 
     gel_value_list_free(tmp_list);
@@ -1206,7 +1210,7 @@ void size_(GClosure *self, GValue *return_value,
     guint n_args = 1;
     if(n_values != n_args)
     {
-        gel_warning_needs_n_arguments(__FUNCTION__, n_args);
+        gel_warning_needs_n_arguments(context, __FUNCTION__, n_args);
         return;
     }
 
@@ -1229,7 +1233,7 @@ void size_(GClosure *self, GValue *return_value,
             hash_size(hash, return_value, n_values, values, context);
         }
         else
-            gel_warning_expected(__FUNCTION__, "array or hash");
+            gel_warning_expected(context, __FUNCTION__, "array or hash");
     }
 
     gel_value_list_free(tmp_list);
@@ -1244,7 +1248,7 @@ void find_(GClosure *self, GValue *return_value,
     guint n_args = 2;
     if(n_values != n_args)
     {
-        gel_warning_needs_n_arguments(__FUNCTION__, n_args);
+        gel_warning_needs_n_arguments(context, __FUNCTION__, n_args);
         return;
     }
 
@@ -1268,7 +1272,7 @@ void find_(GClosure *self, GValue *return_value,
             hash_find(closure, hash, return_value, n_values, values, context);
         }
         else
-            gel_warning_expected(__FUNCTION__, "array or hash");
+            gel_warning_expected(context, __FUNCTION__, "array or hash");
     }
 
     gel_value_list_free(tmp_list);
@@ -1282,7 +1286,7 @@ void filter_(GClosure *self, GValue *return_value,
     guint n_args = 2;
     if(n_values != n_args)
     {
-        gel_warning_needs_n_arguments(__FUNCTION__, n_args);
+        gel_warning_needs_n_arguments(context, __FUNCTION__, n_args);
         return;
     }
 
@@ -1297,7 +1301,8 @@ void filter_(GClosure *self, GValue *return_value,
         if(type == G_TYPE_VALUE_ARRAY)
         {
             GValueArray *array = gel_value_get_boxed(value);
-            array_filter(closure, array, return_value, n_values, values, context);
+            array_filter(closure,
+                array, return_value, n_values, values, context);
         }
         else
         if(type == G_TYPE_HASH_TABLE)
@@ -1306,7 +1311,7 @@ void filter_(GClosure *self, GValue *return_value,
             hash_filter(closure, hash, return_value, n_values, values, context);
         }
         else
-            gel_warning_expected(__FUNCTION__, "array or hash");
+            gel_warning_expected(context, __FUNCTION__, "array or hash");
     }
 
     gel_value_list_free(tmp_list);
@@ -1430,7 +1435,7 @@ void new_(GClosure *self, GValue *return_value,
     guint n_args = 1;
     if(n_values != n_args)
     {
-        gel_warning_needs_n_arguments(__FUNCTION__, n_args);
+        gel_warning_needs_n_arguments(context, __FUNCTION__, n_args);
         return;
     }
 
@@ -1446,13 +1451,13 @@ void new_(GClosure *self, GValue *return_value,
         const gchar *type_name = gel_value_get_string(value);
         type = g_type_from_name(type_name);
         if(type == G_TYPE_INVALID)
-            gel_warning_type_name_invalid(__FUNCTION__, type_name);
+            gel_warning_type_name_invalid(context, __FUNCTION__, type_name);
     }
     else
     if(value_type == G_TYPE_GTYPE)
         type = gel_value_get_gtype(&tmp_value);
     else
-        gel_warning_expected(__FUNCTION__, "typename or type");
+        gel_warning_expected(context, __FUNCTION__, "typename or type");
 
     if(type != G_TYPE_INVALID)
     {
@@ -1492,7 +1497,7 @@ void connect_(GClosure *self, GValue *return_value,
             gel_value_set_int64(return_value, connect_id);
         }
         else
-            gel_warning_value_not_of_type(
+            gel_warning_value_not_of_type(context,
                 __FUNCTION__, values + 0, G_TYPE_OBJECT);
     }
 
@@ -1507,7 +1512,8 @@ void if_(GClosure *self, GValue *return_value,
     guint n_args = 2;
     if(n_values < n_args)
     {
-        gel_warning_needs_at_least_n_arguments(__FUNCTION__, n_args);
+        gel_warning_needs_at_least_n_arguments(context,
+            __FUNCTION__, n_args);
         return;
     }
 
@@ -1516,10 +1522,10 @@ void if_(GClosure *self, GValue *return_value,
         gel_context_eval_into_value(context, values + 0, &tmp_value);
 
     if(gel_value_to_boolean(cond_value))
-        gel_context_eval(context, values + 1, return_value);
+        gel_context_eval_value(context, values + 1, return_value);
     else
         if(n_values > 2)
-            gel_context_eval(context, values + 2, return_value);
+            gel_context_eval_value(context, values + 2, return_value);
 
     if(GEL_IS_VALUE(&tmp_value))
         g_value_unset(&tmp_value);
@@ -1533,7 +1539,7 @@ void cond_(GClosure *self, GValue *return_value,
     guint n_args = 2;
     if(n_values < n_args)
     {
-        gel_warning_needs_at_least_n_arguments(__FUNCTION__, n_args);
+        gel_warning_needs_at_least_n_arguments(context, __FUNCTION__, n_args);
         return;
     }
 
@@ -1566,7 +1572,7 @@ void case_(GClosure *self, GValue *return_value,
     guint n_args = 2;
     if(n_values < n_args)
     {
-        gel_warning_needs_at_least_n_arguments(__FUNCTION__, n_args);
+        gel_warning_needs_at_least_n_arguments(context, __FUNCTION__, n_args);
         return;
     }
 
@@ -1609,7 +1615,7 @@ void while_(GClosure *self, GValue *return_value,
     guint n_args = 2;
     if(n_values < n_args)
     {
-        gel_warning_needs_at_least_n_arguments(__FUNCTION__, n_args);
+        gel_warning_needs_at_least_n_arguments(context, __FUNCTION__, n_args);
         return;
     }
 
@@ -1716,7 +1722,7 @@ void print_(GClosure *self, GValue *return_value,
     guint n_args = 1;
     if(n_values < n_args)
     {
-        gel_warning_needs_at_least_n_arguments(__FUNCTION__, n_args);
+        gel_warning_needs_at_least_n_arguments(context, __FUNCTION__, n_args);
         return;
     }
 
@@ -1798,7 +1804,7 @@ void require_(GClosure *self, GValue *return_value,
             }    
         }
         else
-            gel_warning_symbol_exists(__FUNCTION__, namespace_);
+            gel_warning_symbol_exists(context, __FUNCTION__, namespace_);
     }
 
     g_value_init(return_value, G_TYPE_BOOLEAN);
@@ -1815,7 +1821,7 @@ void dot_(GClosure *self, GValue *return_value,
     guint n_args = 2;
     if(n_values < n_args)
     {
-        gel_warning_needs_at_least_n_arguments(__FUNCTION__, n_args);
+        gel_warning_needs_at_least_n_arguments(context, __FUNCTION__, n_args);
         return;
     }
 
@@ -1841,19 +1847,21 @@ void dot_(GClosure *self, GValue *return_value,
     {
         type_info = gel_type_info_from_gtype(gel_value_get_gtype(value));
         if(type_info == NULL)
-            gel_warning_type_name_invalid(__FUNCTION__, g_type_name(type));
+            gel_warning_type_name_invalid(context,
+                __FUNCTION__, g_type_name(type));
     }
     else
     if(G_TYPE_IS_OBJECT(type))
     {
         type_info = gel_type_info_from_gtype(type);
         if(type_info == NULL)
-            gel_warning_type_name_invalid(__FUNCTION__, g_type_name(type));
+            gel_warning_type_name_invalid(context,
+                __FUNCTION__, g_type_name(type));
         else
             object = gel_value_get_object(value);
     }
     else
-        gel_warning_expected(__FUNCTION__, "typelib, type or object");
+        gel_warning_expected(context, __FUNCTION__, "typelib, type or object");
 
     if(GEL_IS_VALUE(&tmp_value))
         g_value_unset(&tmp_value);
@@ -1886,12 +1894,12 @@ void dot_(GClosure *self, GValue *return_value,
 
             if(type_info == NULL)
             {
-                gel_warning_unknown_symbol(__FUNCTION__, name);
+                gel_warning_unknown_symbol(context, __FUNCTION__, name);
                 break;
             }
         }
         else
-            gel_warning_expected(__FUNCTION__, "symbol or string");
+            gel_warning_expected(context, __FUNCTION__, "symbol or string");
 
         values++;
         n_values--;    

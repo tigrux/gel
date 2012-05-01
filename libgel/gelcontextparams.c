@@ -77,7 +77,8 @@ gboolean gel_context_eval_param(GelContext *self, const gchar *func,
                 gel_args_pop(args, const GValue *) = result;
             else
             {
-                g_warning("%s: Not a GValue", func);
+                gel_warning_value_not_of_type(self,
+                    func, *values, G_TYPE_VALUE);
                 parsed = FALSE;
             }
             break;
@@ -86,8 +87,8 @@ gboolean gel_context_eval_param(GelContext *self, const gchar *func,
                 gel_args_pop(args, void *) = gel_value_get_boxed(*values);
             else
             {
-                gel_warning_value_not_of_type(func,
-                    *values, G_TYPE_VALUE_ARRAY);
+                gel_warning_value_not_of_type(self,
+                    func, *values, G_TYPE_VALUE_ARRAY);
                 parsed = FALSE;
             }
             break;
@@ -99,8 +100,8 @@ gboolean gel_context_eval_param(GelContext *self, const gchar *func,
                 gel_args_pop(args, void *) = gel_value_get_boxed(result);
             else
             {
-                gel_warning_value_not_of_type(func,
-                    result, G_TYPE_VALUE_ARRAY);
+                gel_warning_value_not_of_type(self,
+                    func, result, G_TYPE_VALUE_ARRAY);
                 parsed = FALSE;
             }
             break;
@@ -112,8 +113,8 @@ gboolean gel_context_eval_param(GelContext *self, const gchar *func,
                 gel_args_pop(args, void *) = gel_value_get_boxed(result);
             else
             {
-                gel_warning_value_not_of_type(func,
-                    result, G_TYPE_HASH_TABLE);
+                gel_warning_value_not_of_type(self,
+                    func, result, G_TYPE_HASH_TABLE);
                 parsed = FALSE;
             }
             break;
@@ -125,8 +126,8 @@ gboolean gel_context_eval_param(GelContext *self, const gchar *func,
             }
             else
             {
-                gel_warning_value_not_of_type(func,
-                    *values, GEL_TYPE_SYMBOL);
+                gel_warning_value_not_of_type(self,
+                    func, *values, GEL_TYPE_SYMBOL);
                 parsed = FALSE;
             }
             break;
@@ -138,8 +139,8 @@ gboolean gel_context_eval_param(GelContext *self, const gchar *func,
                 gel_args_pop(args, const gchar *) = gel_value_get_string(result);
             else
             {
-                gel_warning_value_not_of_type(func,
-                    result, G_TYPE_STRING);
+                gel_warning_value_not_of_type(self,
+                    func, result, G_TYPE_STRING);
                 parsed = FALSE;
             }
             break;
@@ -151,8 +152,8 @@ gboolean gel_context_eval_param(GelContext *self, const gchar *func,
                 gel_args_pop(args, gint64) = gel_value_get_int64(result);
             else
             {
-                gel_warning_value_not_of_type(func,
-                    result, G_TYPE_INT64);
+                gel_warning_value_not_of_type(self,
+                    func, result, G_TYPE_INT64);
                 parsed = FALSE;
             }
             break;
@@ -164,8 +165,8 @@ gboolean gel_context_eval_param(GelContext *self, const gchar *func,
                 gel_args_pop(args, gdouble) = gel_value_get_double(result);
             else
             {
-                gel_warning_value_not_of_type(func,
-                    result, G_TYPE_DOUBLE);
+                gel_warning_value_not_of_type(self,
+                    func, result, G_TYPE_DOUBLE);
                 parsed = FALSE;
             }
             break;
@@ -177,8 +178,8 @@ gboolean gel_context_eval_param(GelContext *self, const gchar *func,
                 gel_args_pop(args, void *) = gel_value_get_object(result);
             else
             {
-                gel_warning_value_not_of_type(func,
-                    result, G_TYPE_OBJECT);
+                gel_warning_value_not_of_type(self,
+                    func, result, G_TYPE_OBJECT);
                 parsed = FALSE;
             }
             break;
@@ -190,8 +191,8 @@ gboolean gel_context_eval_param(GelContext *self, const gchar *func,
                 gel_args_pop(args, void *) = gel_value_get_boxed(result);
             else
             {
-                gel_warning_value_not_of_type(func,
-                    result, G_TYPE_CLOSURE);
+                gel_warning_value_not_of_type(self,
+                    func, result, G_TYPE_CLOSURE);
                 parsed = FALSE;
             }
             break;
@@ -233,13 +234,13 @@ gboolean gel_context_eval_params_args(GelContext *self, const gchar *func,
 
     if(exact && n_args != *n_values)
     {
-        gel_warning_needs_n_arguments(func, n_args);
+        gel_warning_needs_n_arguments(self, func, n_args);
         return FALSE;
     }
 
     if(!exact && n_args > *n_values)
     {
-        gel_warning_needs_at_least_n_arguments(func, n_args);
+        gel_warning_needs_at_least_n_arguments(self, func, n_args);
         return FALSE;
     }
 
@@ -270,8 +271,8 @@ gboolean gel_context_eval_params_args(GelContext *self, const gchar *func,
             }
             else
             {
-                gel_warning_value_not_of_type(func,
-                    *values, G_TYPE_VALUE_ARRAY);
+                gel_warning_value_not_of_type(self,
+                    func, *values, G_TYPE_VALUE_ARRAY);
                 parsed = FALSE;
             }
 

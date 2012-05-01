@@ -37,10 +37,11 @@ int main(int argc, char *argv[])
     }
 
     GError *error = NULL;
+
     /* parsing a file returns an array of values, unless an error occurs */
     GValueArray *parsed_array = gel_parse_file(argv[1], &error);
 
-    /* if an errors occurred ... */
+    /* if an error occurred when parsing ... */
     if(error != NULL)
     {
         /* ... then print information about the error */
@@ -73,13 +74,23 @@ int main(int argc, char *argv[])
 
         GValue result_value = {0};
         /* if the evaluation yields a value ... */
-        if(gel_context_eval(context, iter_value, &result_value))
+        if(gel_context_eval(context, iter_value, &result_value, &error))
         {
             /* ... then print the value obtained from the evaluation */
             value_string = gel_value_to_string(&result_value);
             g_value_unset(&result_value);
             g_print("= %s\n", value_string);
             g_free(value_string);
+        }
+        else
+        /* else .. if an error occurred when evaluating ... */
+        if(gel_context_error(context) != NULL)
+        {
+            /* ... then print information about the error */
+            g_print("There was an error evaluating '%s'\n", argv[1]);
+            g_print("%s\n", error->message);
+            g_error_free(error);
+            break;
         }
     }
 

@@ -40,7 +40,10 @@ void gel_context_insert_function(GelContext *self, const gchar *name,
 
 gboolean gel_context_remove(GelContext *self, const gchar *name);
 
-gboolean gel_context_eval(GelContext *self, const GValue *value, GValue *dest);
+gboolean gel_context_eval(GelContext *self, const GValue *value, GValue *dest,
+                          GError **error);
+GError* gel_context_error(const GelContext* self);
+void gel_context_set_error(GelContext* self, GError *error);
 
 gboolean gel_context_get_running(const GelContext *self);
 void gel_context_set_running(GelContext *self, gboolean running);

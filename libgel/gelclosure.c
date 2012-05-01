@@ -6,6 +6,7 @@
 #include <gelvalue.h>
 #include <gelvalueprivate.h>
 #include <gelsymbol.h>
+#include <geldebug.h>
 
 #ifdef HAVE_GOBJECT_INTROSPECTION
 #include <geltypeinfo.h>
@@ -53,16 +54,20 @@ void gel_closure_marshal(GelClosure *closure, GValue *return_value,
     {
         if(n_values < n_args)
         {
-            g_warning("Function '%s' takes at least %u arguments, got %u",
-                closure->name, n_args, n_values);
+            gchar *message = g_strdup_printf(
+                "at least %u arguments, got %u", n_args, n_values);
+            gel_warning_expected(invocation_context, closure->name, message);
+            g_free(message);
             return;
         }
     }
     else
     if(n_values != n_args)
     {
-        g_warning("Function '%s' takes %u arguments, got %u",
-            closure->name, n_args, n_values);
+        gchar *message = g_strdup_printf(
+            "%u arguments, got %u", n_args, n_values);
+        gel_warning_expected(invocation_context, closure->name, message);
+        g_free(message);
         return;
     }
 
@@ -75,7 +80,7 @@ void gel_closure_marshal(GelClosure *closure, GValue *return_value,
         const gchar *arg_name = iter->data;
         GValue *value = gel_value_new();
 
-        gel_context_eval(invocation_context, values + i, value);
+        gel_context_eval_value(invocation_context, values + i, value);
         gel_context_insert(context, arg_name, value);
     }
 
@@ -87,7 +92,8 @@ void gel_closure_marshal(GelClosure *closure, GValue *return_value,
         GValue *array_values = array->values;
 
         for(guint j = 0; i < n_values; i++, j++)
-            gel_context_eval(invocation_context, values + i, array_values + j);
+            gel_context_eval_value(invocation_context,
+                values + i, array_values + j);
 
         GValue *value = gel_value_new_from_boxed(G_TYPE_VALUE_ARRAY, array);
         gel_context_insert(context, closure->variadic_arg, value);

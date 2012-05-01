@@ -12,6 +12,8 @@ void gel_context_insert_variable(GelContext *self,
 GelVariable* gel_context_lookup_variable(const GelContext *self,
                                          const gchar *name);
 
+gboolean gel_context_eval_value(GelContext *self,
+                                const GValue *value, GValue *dest);
 const GValue* gel_context_eval_into_value(GelContext *self,
                                           const GValue *value,
                                           GValue *out_value);

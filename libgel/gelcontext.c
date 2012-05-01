@@ -26,6 +26,7 @@ struct _GelContext
     GHashTable *variables;
     GelContext *outer;
     GHashTable *inner;
+    GError *error;
 };
 
 
@@ -192,12 +193,29 @@ void gel_context_free(GelContext *self)
  *
  * Returns: #TRUE if @dest was written, #FALSE otherwise.
  */
-gboolean gel_context_eval(GelContext *self, const GValue *value, GValue *dest)
+gboolean gel_context_eval(GelContext *self,
+                          const GValue *value, GValue *dest, GError **error)
 {
     g_return_val_if_fail(self != NULL, FALSE);
     g_return_val_if_fail(value != NULL, FALSE);
     g_return_val_if_fail(dest != NULL, FALSE);
 
+    gboolean result = gel_context_eval_value(self, value, dest);
+    GError *context_error = gel_context_error(self);
+
+    if(context_error != NULL)
+    {
+        g_propagate_error(error, context_error);
+        result = FALSE;
+    }
+
+    return result;
+}
+
+
+gboolean gel_context_eval_value(GelContext *self,
+                                const GValue *value, GValue *dest)
+{
     const GValue *result = gel_context_eval_into_value(self, value, dest);
 
     if(GEL_IS_VALUE(result))
@@ -261,7 +279,7 @@ const GValue* gel_context_eval_into_value(GelContext *self,
             result = gel_context_lookup(self, name);
 
         if(result == NULL)
-            gel_warning_unknown_symbol(__FUNCTION__, name);
+            gel_warning_unknown_symbol(self, __FUNCTION__, name);
     }
     else
     if(type == G_TYPE_VALUE_ARRAY)
@@ -293,6 +311,45 @@ const GValue* gel_context_eval_into_value(GelContext *self,
         result = value;
 
     return result;
+}
+
+
+/**
+ * gel_context_error:
+ * @self: #GelContext to get its error
+ *
+ * Retrieves the error associated to @self
+ *
+ * Returns: the error of the context, or #NULL if no error has occurred
+ */
+GError* gel_context_error(const GelContext* self)
+{
+    g_return_val_if_fail(self != NULL, NULL);
+
+    return self->error;
+}
+
+
+void gel_context_set_error(GelContext* self, GError *error)
+{
+    if(self->error != NULL)
+        g_clear_error(&self->error);
+
+    self->error = error;
+}
+
+
+/**
+ * gel_context_clear_error:
+ * @self: #GelContext to clear its error, if any
+ *
+ * Clears the error associated to the context, if any
+ */
+void gel_context_clear_error(GelContext* self)
+{
+    g_return_if_fail(self != NULL);
+
+    g_clear_error(&self->error);
 }
 
 
@@ -472,7 +529,7 @@ gboolean gel_context_remove(GelContext *self, const gchar *name)
  * gel_context_get_outer:
  * @self: #GelContext to get its outer context
  *
- * Retrieves @self's outer context
+ * Retrieves the outer context of @self
  *
  * Returns: the outer context, or #NULL if @self is the outermost context.
  */
