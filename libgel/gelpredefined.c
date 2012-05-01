@@ -92,6 +92,10 @@ void set(GValue *return_value,
     {
         const GValue *value =
             gel_context_eval_into_value(context, values + 0, &tmp1_value);
+
+        if(gel_context_error(context) != NULL)
+            goto end;
+
         if(GEL_VALUE_HOLDS(value, GEL_TYPE_VARIABLE))
         {
             GelVariable *dest_variable = gel_value_get_boxed(value);
@@ -104,6 +108,10 @@ void set(GValue *return_value,
     {
         const GValue *src_value =
             gel_context_eval_param_into_value(context, values + 1, &tmp2_value);
+
+        if(gel_context_error(context) != NULL)
+            goto end;
+
         if(src_value != NULL)
         {
             gel_value_copy(src_value, dest_value);
@@ -114,6 +122,7 @@ void set(GValue *return_value,
     if(!copied)
         gel_warning_expected(context, __FUNCTION__, "symbol or variable");
 
+    end:
     if(GEL_IS_VALUE(&tmp1_value))
         g_value_unset(&tmp1_value);
 
@@ -138,7 +147,7 @@ void array_set(GValueArray *array, GValue *return_value,
             index += array_n_values;
         if(index < 0 || index >= array_n_values)
         {
-            gel_warning_index_out_of_bounds(context, __FUNCTION__);
+            gel_warning_index_out_of_bounds(context, __FUNCTION__, index);
             return;
         }
         gel_value_copy(value, array->values + index);
@@ -216,7 +225,7 @@ void array_get(GValueArray *array, GValue *return_value,
 
         if(index < 0 || index >= array_n_values)
         {
-            gel_warning_index_out_of_bounds(context, __FUNCTION__);
+            gel_warning_index_out_of_bounds(context, __FUNCTION__, index);
             return;
         }
 
@@ -240,6 +249,8 @@ void hash_get(GHashTable *hash, GValue *return_value,
         GValue *value = g_hash_table_lookup(hash, key);
         if(value != NULL)
             gel_value_copy(value, return_value);
+        else
+            gel_warning_invalid_key(context, __FUNCTION__, key);
     }
 
     gel_value_list_free(tmp_list);
@@ -283,7 +294,10 @@ void array_append(GValueArray *array, GValue *return_value,
     {
         GValue tmp_value = {0};
         const GValue *value =
-            gel_context_eval_into_value(context,values + i, &tmp_value);
+            gel_context_eval_into_value(context, values + i, &tmp_value);
+
+        if(gel_context_error(context) != NULL)
+            goto end;
 
         g_value_array_append(array, value);
 
@@ -291,6 +305,7 @@ void array_append(GValueArray *array, GValue *return_value,
             g_value_unset(&tmp_value);
     }
 
+    end:
     gel_value_list_free(tmp_list);
 }
 
@@ -336,7 +351,7 @@ void array_remove(GValueArray *array, GValue *return_value,
             index += array_n_values;
         if(index < 0 || index >= array_n_values)
         {
-            gel_warning_index_out_of_bounds(context, __FUNCTION__);
+            gel_warning_index_out_of_bounds(context, __FUNCTION__, index);
             return;
         }
 
@@ -575,8 +590,13 @@ void do_(GClosure *self, GValue *return_value,
         GValue tmp_value = {0};
         const GValue *value =
             gel_context_eval_into_value(context, values + i, &tmp_value);
+
+        if(gel_context_error(context) != NULL)
+            return;
+
         if(i == last && GEL_IS_VALUE(value))
             gel_value_copy(value, return_value);
+
         if(GEL_IS_VALUE(&tmp_value))
             g_value_unset(&tmp_value);
     }
@@ -731,18 +751,27 @@ void array_(GClosure *self, GValue *return_value,
             guint n_values, const GValue *values, GelContext *context)
 {
     GValueArray *array = g_value_array_new(n_values > 8 ? n_values : 8);
-    for(guint i = 0; i < n_values; i++)
+    guint i;
+
+    for(i = 0; i < n_values; i++)
     {
         GValue tmp_value = {0};
         const GValue *value =
             gel_context_eval_into_value(context, values + i, &tmp_value);
+
+        if(gel_context_error(context) != NULL)
+            break;
+
         g_value_array_append(array, value);
         if(GEL_IS_VALUE(&tmp_value))
             g_value_unset(&tmp_value);
     }
 
-    g_value_init(return_value, G_TYPE_VALUE_ARRAY);
-    gel_value_take_boxed(return_value, array);
+    if(i == n_values)
+    {
+        g_value_init(return_value, G_TYPE_VALUE_ARRAY);
+        gel_value_take_boxed(return_value, array);
+    }
 }
 
 
@@ -762,12 +791,17 @@ void hash_(GClosure *self, GValue *return_value,
                     &n_values, &values, &tmp_list, "VV*", &key, &value))
                 g_hash_table_insert(hash,
                     gel_value_dup(key), gel_value_dup(value));
+            else
+                break;
         }
     else
         gel_warning_expected(context, __FUNCTION__, "an even number of values");
 
-    g_value_init(return_value, G_TYPE_HASH_TABLE);
-    gel_value_take_boxed(return_value, hash);
+    if(n_values == 0)
+    {
+        g_value_init(return_value, G_TYPE_HASH_TABLE);
+        gel_value_take_boxed(return_value, hash);
+    }
 
     gel_value_list_free(tmp_list);
 }
@@ -859,7 +893,8 @@ void set_(GClosure *self, GValue *return_value,
 static
 void arithmetic(GClosure *self, GValue *return_value,
                 guint n_values, const GValue *values,
-                GelContext *context, GelValuesArithmetic values_function)
+                GelContext *context,
+                GelValuesArithmetic values_function, const gchar *f)
 {
     guint n_args = 2;
     if(n_values < n_args)
@@ -873,10 +908,22 @@ void arithmetic(GClosure *self, GValue *return_value,
     GValue tmp3 = {0};
     GValue *v2 = &tmp3;
 
-    gboolean running = values_function(
-            gel_context_eval_into_value(context, values + 0, &tmp1),
-            gel_context_eval_into_value(context, values + 1, &tmp2),
-            &tmp3);
+    gboolean running = FALSE;
+
+    const GValue *v0 =
+        gel_context_eval_into_value(context, values + 0, &tmp1);
+
+    if(gel_context_error(context) == NULL)
+    {
+        const GValue *v1 =
+            gel_context_eval_into_value(context, values + 1, &tmp2);
+
+        if(gel_context_error(context) == NULL)
+            running = values_function(v0, v1, &tmp3);
+
+        if(!running)
+            gel_warning_incompatible(context, f, v0, v1);
+    }
 
     if(GEL_IS_VALUE(&tmp1))
         g_value_unset(&tmp1);
@@ -892,13 +939,26 @@ void arithmetic(GClosure *self, GValue *return_value,
         else
             v2 = &tmp3, v1 = &tmp2;
 
-        running = values_function(
-            v1, gel_context_eval_into_value(context, values + i, &tmp1), v2);
+        const GValue *v =
+            gel_context_eval_into_value(context, values + i, &tmp1);
+
+        if(gel_context_error(context) == NULL)
+        {
+            running = values_function(v1, v, v2);
+            if(!running)
+                gel_warning_incompatible(context, f, v1, v);
+        }
 
         if(GEL_IS_VALUE(v1))
             g_value_unset(v1);
         if(GEL_IS_VALUE(&tmp1))
             g_value_unset(&tmp1);
+
+        if(gel_context_error(context) != NULL)
+        {
+            running = FALSE;
+            break;
+        }
     }
 
     if(running)
@@ -912,7 +972,8 @@ static
 void add_(GClosure *self, GValue *return_value,
           guint n_values, const GValue *values, GelContext *context)
 {
-    arithmetic(self, return_value, n_values, values, context, gel_values_add);
+    arithmetic(self, return_value, n_values, values,
+        context, gel_values_add, __FUNCTION__);
 }
 
 
@@ -920,7 +981,8 @@ static
 void sub_(GClosure *self, GValue *return_value,
           guint n_values, const GValue *values, GelContext *context)
 {
-    arithmetic(self, return_value, n_values, values, context, gel_values_sub);
+    arithmetic(self, return_value, n_values, values,
+        context, gel_values_sub, __FUNCTION__);
 }
 
 
@@ -928,7 +990,8 @@ static
 void mul_(GClosure *self, GValue *return_value,
           guint n_values, const GValue *values, GelContext *context)
 {
-    arithmetic(self, return_value, n_values, values, context, gel_values_mul);
+    arithmetic(self, return_value, n_values, values,
+        context, gel_values_mul, __FUNCTION__);
 }
 
 
@@ -936,7 +999,8 @@ static
 void div_(GClosure *self, GValue *return_value,
           guint n_values, const GValue *values, GelContext *context)
 {
-    arithmetic(self, return_value, n_values, values, context, gel_values_div);
+    arithmetic(self, return_value, n_values, values,
+        context, gel_values_div, __FUNCTION__);
 }
 
 
@@ -944,7 +1008,8 @@ static
 void mod_(GClosure *self, GValue *return_value,
           guint n_values, const GValue *values, GelContext *context)
 {
-    arithmetic(self, return_value, n_values, values, context, gel_values_mod);
+    arithmetic(self, return_value, n_values, values,
+        context, gel_values_mod, __FUNCTION__);
 }
 
 
@@ -962,15 +1027,28 @@ void logic(GClosure *self, GValue *return_value,
 
     gboolean result = TRUE;
     guint last = n_values - 1;
+    gboolean failed = FALSE;
 
-    for(guint i = 0; i < last && result; i++)
+    for(guint i = 0; i < last && result && !failed; i++)
     {
         GValue tmp1 = {0};
         GValue tmp2 = {0};
+
         const GValue *j = values + i;
-        result = values_function(
-            gel_context_eval_into_value(context, j, &tmp1),
-            gel_context_eval_into_value(context, j+1, &tmp2));
+        const GValue *v1 = gel_context_eval_into_value(context, j, &tmp1);
+
+        if(gel_context_error(context) == NULL)
+        {
+            const GValue *v2 =
+                gel_context_eval_into_value(context, j+1, &tmp2);
+
+            if(gel_context_error(context) == NULL)
+                result = values_function(v1, v2);
+            else
+                failed = TRUE;
+        }
+        else
+            failed = TRUE;
 
         if(GEL_IS_VALUE(&tmp1))
             g_value_unset(&tmp1);
@@ -978,8 +1056,11 @@ void logic(GClosure *self, GValue *return_value,
             g_value_unset(&tmp2);
     }
 
-    g_value_init(return_value, G_TYPE_BOOLEAN);
-    gel_value_set_boolean(return_value, result);
+    if(!failed)
+    {
+        g_value_init(return_value, G_TYPE_BOOLEAN);
+        gel_value_set_boolean(return_value, result);
+    }
 }
 
 
@@ -996,14 +1077,24 @@ void and_(GClosure *self, GValue *return_value,
 
     gboolean result = TRUE;
     guint last = n_values - 1;
-    for(guint i = 0; i <= last && result == TRUE; i++)
+    gboolean failed = FALSE;
+
+    for(guint i = 0; i <= last && result == TRUE && !failed; i++)
     {
         GValue tmp_value = {0};
+
         const GValue *value =
             gel_context_eval_into_value(context, values + i, &tmp_value);
-        result = gel_value_to_boolean(value);
-        if(!result || i == last)
-            gel_value_copy(value, return_value);
+
+        if(gel_context_error(context) == NULL)
+        {
+            result = gel_value_to_boolean(value);
+            if(!result || i == last)
+                gel_value_copy(value, return_value);
+        }
+        else
+            failed = TRUE;
+
         if(GEL_IS_VALUE(&tmp_value))
             g_value_unset(&tmp_value);
     }
@@ -1023,14 +1114,24 @@ void or_(GClosure *self, GValue *return_value,
 
     guint last =  n_values - 1;
     gboolean result = FALSE;
-    for(guint i = 0; i <= last && result == FALSE; i++)
+    gboolean failed = FALSE;
+
+    for(guint i = 0; i <= last && result == FALSE && !failed; i++)
     {
         GValue tmp_value = {0};
+
         const GValue *value =
             gel_context_eval_into_value(context, values + i, &tmp_value);
-        result = gel_value_to_boolean(value);
-        if(result || i == last)
-            gel_value_copy(value, return_value);
+
+        if(gel_context_error(context) == NULL)
+        {
+            result = gel_value_to_boolean(value);
+            if(result || i == last)
+                gel_value_copy(value, return_value);
+        }
+        else
+            failed = TRUE;
+
         if(GEL_IS_VALUE(&tmp_value))
             g_value_unset(&tmp_value);
     }
@@ -1418,6 +1519,7 @@ void keys_(GClosure *self, GValue *return_value,
 
         for(GList *iter = keys; iter != NULL; iter = g_list_next(iter))
             g_value_array_append(array, iter->data);
+
         g_value_init(return_value, G_TYPE_VALUE_ARRAY);
         gel_value_take_boxed(return_value, array);
         g_list_free(keys);
@@ -1545,7 +1647,7 @@ void cond_(GClosure *self, GValue *return_value,
 
     GList *tmp_list = NULL;
 
-    while(n_values > 0)
+    while(n_values > 0 && gel_context_error(context) == NULL)
         if(n_values == 1)
             do_(self, return_value, n_values--, values++, context);
         else
@@ -1553,7 +1655,7 @@ void cond_(GClosure *self, GValue *return_value,
             GValue *test_value = NULL;
             GValue *value = NULL;
             if(gel_context_eval_params(context, __FUNCTION__,
-                &n_values, &values, &tmp_list, "Vv*", &test_value, &value))
+                    &n_values, &values, &tmp_list, "Vv*", &test_value, &value))
                 if(gel_value_to_boolean(test_value))
                 {
                     do_(self, return_value, 1, value, context);
@@ -1581,7 +1683,7 @@ void case_(GClosure *self, GValue *return_value,
 
     if(gel_context_eval_params(context, __FUNCTION__,
             &n_values, &values, &tmp_list, "V*", &probe_value))
-        while(n_values > 0)
+        while(n_values > 0 && gel_context_error(context) == NULL)
             if(n_values == 1)
                 do_(self, return_value, n_values--, values++, context);
             else
@@ -1595,12 +1697,17 @@ void case_(GClosure *self, GValue *return_value,
                     guint test_n_values = tests->n_values;
 
                     for(guint i = 0; i < test_n_values; i++)
+                    {
                         if(gel_values_eq(test_values + i, probe_value))
                         {
                             do_(self, return_value, 1, value, context);
                             n_values = 0;
                             break;
                         }
+
+                        if(gel_context_error(context) != NULL)
+                            break;
+                    }
                 }
             }
 
@@ -1629,9 +1736,14 @@ void while_(GClosure *self, GValue *return_value,
         const GValue *cond_value =
             gel_context_eval_into_value(loop_context, values + 0, &tmp_value);
 
-        cond_is_true = gel_value_to_boolean(cond_value);
-        if(cond_is_true)
-            do_(self, return_value, n_values-1, values+1, loop_context);
+        if(gel_context_error(context) == NULL)
+        {
+            cond_is_true = gel_value_to_boolean(cond_value);
+            if(cond_is_true)
+                do_(self, return_value, n_values-1, values+1, loop_context);
+            else
+                running = FALSE;
+        }
         else
             running = FALSE;
 
@@ -1661,11 +1773,12 @@ void for_(GClosure *self, GValue *return_value,
         GValue *iter_value = gel_value_new();
         gel_context_insert(loop_context, iter_name, iter_value);
 
-        for(guint i = 0; i < last; i++)
+        for(guint i = 0; i < last && gel_context_error(context) == NULL; i++)
         {
             gel_value_copy(array_values + i, iter_value);
             GValue tmp_value = {0};
             do_(self, &tmp_value, n_values, values, loop_context);
+
             if(GEL_IS_VALUE(&tmp_value))
                 g_value_unset(&tmp_value);
             g_value_unset(iter_value);
@@ -1733,14 +1846,19 @@ void print_(GClosure *self, GValue *return_value,
         const GValue *value =
             gel_context_eval_into_value(context, values + i, &tmp_value);
 
-        if(GEL_IS_VALUE(value))
+        if(gel_context_error(context) == NULL)
         {
-            gchar *value_string = gel_value_to_string(value);
-            g_print("%s%s", value_string, i == last ? "" : " ");
-            g_free(value_string);
+            if(GEL_IS_VALUE(value))
+            {
+                gchar *value_string = gel_value_to_string(value);
+                g_print("%s%s", value_string, i == last ? "" : " ");
+                g_free(value_string);
+            }
+            if(GEL_IS_VALUE(&tmp_value))
+                g_value_unset(&tmp_value);
         }
-        if(GEL_IS_VALUE(&tmp_value))
-            g_value_unset(&tmp_value);
+        else
+            break;
     }
     g_print("\n");
 }
@@ -1829,6 +1947,9 @@ void dot_(GClosure *self, GValue *return_value,
     const GValue *value =
         gel_context_eval_into_value(context, values + 0, &tmp_value);
 
+    if(gel_context_error(context) != NULL)
+        return;
+
     values++;
     n_values--;
 
@@ -1869,7 +1990,9 @@ void dot_(GClosure *self, GValue *return_value,
     if(type_info == NULL && typelib == NULL)
         return;
 
-    while(n_values > 0)
+    gboolean failed = FALSE;
+
+    while(n_values > 0 && !failed)
     {
         const gchar *name = NULL;
         value = values + 0;
@@ -1899,13 +2022,16 @@ void dot_(GClosure *self, GValue *return_value,
             }
         }
         else
+        {
             gel_warning_expected(context, __FUNCTION__, "symbol or string");
+            break;
+        }
 
         values++;
         n_values--;    
     }
 
-    if(type_info != NULL)
+    if(!failed && type_info != NULL)
         gel_type_info_to_value(type_info, object, return_value);
 }
 #endif

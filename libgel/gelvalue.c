@@ -293,12 +293,19 @@ gboolean gel_value_to_boolean(const GValue *value)
                 result = (array != NULL && array->n_values != 0);
                 break;
             }
+            else
+            if(type == G_TYPE_HASH_TABLE)
+            {
+                GHashTable *hash = gel_value_get_boxed(value);
+                result = (hash != NULL && g_hash_table_size(hash) != 0);
+                break;
+            }
+            else
             if(g_value_fits_pointer(value))
             {
                 result = (gel_value_peek_pointer(value) != NULL);
                 break;
             }
-            g_warning("Could not convert %s to gboolean", g_type_name(type));
     }
 
     return result;
@@ -337,7 +344,7 @@ GType gel_value_simple_type(const GValue *value)
                 return G_TYPE_HASH_TABLE;
             if(g_value_fits_pointer(value))
                 return G_TYPE_POINTER;
-            g_warning("Type %s could not be simplified", g_type_name(type));
+
             return type;
     }
 }
@@ -578,7 +585,9 @@ GType gel_values_simple_transform(const GValue *v1, const GValue *v2,
     g_return_val_if_fail(v2 != NULL, FALSE);
 
     GType simple_type = gel_values_simple_type(v1, v2);
-    g_return_val_if_fail(simple_type != G_TYPE_INVALID, FALSE);
+
+    if(simple_type == G_TYPE_INVALID)
+        return G_TYPE_INVALID;
 
     if(GEL_VALUE_TYPE(v1) == simple_type && GEL_VALUE_TYPE(v2) == simple_type)
     {
@@ -628,7 +637,6 @@ gboolean gel_values_can_cmp(const GValue *v1, const GValue *v2)
         default:
             if(type == G_TYPE_VALUE_ARRAY)
                 return TRUE;
-            g_warning("Values cannot be compared");
             return FALSE;
     }
 }
@@ -718,17 +726,20 @@ gboolean gel_values_arithmetic(const GValue *v1, const GValue *v2,
     const GValue *vv1 = NULL;
     const GValue *vv2 = NULL;
 
+    gboolean result = FALSE;
     GType dest_type =
         gel_values_simple_transform(v1, v2, &tmp1, &tmp2, &vv1, &vv2);
-    g_return_val_if_fail(dest_type != G_TYPE_INVALID, FALSE);
 
-    g_value_init(dest_value, dest_type);
-    gboolean result = values_function(vv1, vv2, dest_value);
+    if(dest_type != G_TYPE_INVALID)
+    {
+        g_value_init(dest_value, dest_type);
+        result = values_function(vv1, vv2, dest_value);
 
-    if(GEL_IS_VALUE(&tmp1))
-        g_value_unset(&tmp1);
-    if(GEL_IS_VALUE(&tmp2))
-        g_value_unset(&tmp2);
+        if(GEL_IS_VALUE(&tmp1))
+            g_value_unset(&tmp1);
+        if(GEL_IS_VALUE(&tmp2))
+            g_value_unset(&tmp2);
+    }
 
     return result;
 }
@@ -755,7 +766,9 @@ gint gel_values_cmp(const GValue *v1, const GValue *v2)
 
     GType simple_type =
         gel_values_simple_transform(v1, v2, &tmp1, &tmp2, &vv1, &vv2);
-    g_return_val_if_fail(simple_type != G_TYPE_INVALID, FALSE);
+
+    if(simple_type == G_TYPE_INVALID)
+        return FALSE;
 
     gboolean result = -1;
     switch(simple_type)
@@ -844,7 +857,9 @@ gboolean gel_values_logic(const GValue *v1, const GValue *v2,
 
     GType dest_type =
         gel_values_simple_transform(v1, v2, &tmp1, &tmp2, &vv1, &vv2);
-    g_return_val_if_fail(dest_type != G_TYPE_INVALID, FALSE);
+
+    if(dest_type == G_TYPE_INVALID)
+        return FALSE;
 
     gboolean result = values_function(vv1, vv2);
 

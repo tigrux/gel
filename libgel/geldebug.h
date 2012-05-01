@@ -35,13 +35,19 @@ void gel_warning_invalid_argument_name(GelContext *context,
                                        const gchar *func, const gchar *name);
 
 void gel_warning_index_out_of_bounds(GelContext *context,
-                                     const gchar *func);
+                                     const gchar *func, gint index);
+
+void gel_warning_invalid_key(GelContext *context,
+                             const gchar *func, GValue *key);
 
 void gel_warning_symbol_exists(GelContext *context,
                                const gchar *func, const gchar *name);
 
 void gel_warning_expected(GelContext *context,
                           const gchar *func, const gchar *s);
+
+void gel_warning_incompatible(GelContext *context, const gchar *f,
+                              const GValue *v1, const GValue *v2);
 
 #endif
 
