@@ -68,7 +68,7 @@ int main(int argc, char *argv[])
     {
         /* ... print a representation of the value to be evaluated */
         GValue *iter_value = parsed_array->values + i;
-        gchar *value_string = gel_value_to_string(iter_value);
+        gchar *value_string = gel_value_repr(iter_value);
         g_print("\n%s ?\n", value_string);
         g_free(value_string);
 
