@@ -66,24 +66,25 @@ int main(int argc, char *argv[])
     /* for each value obtained during the parsing ... */
     for(guint i = 0; i < parsed_array->n_values; i++)
     {
-        /* ... print a representation of the value to be evaluated */
         GValue *iter_value = parsed_array->values + i;
-        gchar *value_string = gel_value_repr(iter_value);
-        g_print("\n%s ?\n", value_string);
-        g_free(value_string);
+
+        /* ... print a representation of the value to be evaluated */
+        gchar *value_repr = gel_value_repr(iter_value);
+        g_print("\n%s ?\n", value_repr);
+        g_free(value_repr);
 
         GValue result_value = {0};
         /* if the evaluation yields a value ... */
         if(gel_context_eval(context, iter_value, &result_value, &error))
         {
             /* ... then print the value obtained from the evaluation */
-            value_string = gel_value_to_string(&result_value);
-            g_value_unset(&result_value);
+            gchar *value_string = gel_value_to_string(&result_value);
             g_print("= %s\n", value_string);
             g_free(value_string);
+            g_value_unset(&result_value);
         }
         else
-        /* else .. if an error occurred when evaluating ... */
+        /* else if an error occurred when evaluating ... */
         if(error != NULL)
         {
             /* ... then print information about the error */
