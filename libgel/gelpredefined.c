@@ -632,6 +632,7 @@ void let_(GClosure *self, GValue *return_value,
             {
                 const gchar *name = NULL;
                 GValue *value = NULL;
+
                 if(gel_context_eval_params(let_context, __FUNCTION__,
                         &binding_n_values, &binding_values,
                         &tmp_list, "sV*", &name, &value))
@@ -642,6 +643,9 @@ void let_(GClosure *self, GValue *return_value,
 
             if(!failed)
                 do_(self, return_value, n_values, values, let_context);
+
+            if(gel_context_error(let_context))
+                failed = TRUE;
 
             gel_context_free(let_context);
         }
@@ -1750,7 +1754,7 @@ void while_(GClosure *self, GValue *return_value,
         const GValue *cond_value =
             gel_context_eval_into_value(loop_context, values + 0, &tmp_value);
 
-        if(!gel_context_error(context))
+        if(!gel_context_error(loop_context))
         {
             cond_is_true = gel_value_to_boolean(cond_value);
             if(cond_is_true)
@@ -1759,6 +1763,9 @@ void while_(GClosure *self, GValue *return_value,
                 running = FALSE;
         }
         else
+            running = FALSE;
+
+        if(gel_context_error(loop_context))
             running = FALSE;
 
         if(GEL_IS_VALUE(&tmp_value))
@@ -1787,11 +1794,16 @@ void for_(GClosure *self, GValue *return_value,
         GValue *iter_value = gel_value_new();
         gel_context_insert(loop_context, iter_name, iter_value);
 
-        for(guint i = 0; i < last && !gel_context_error(context); i++)
+        gboolean running = TRUE;
+
+        for(guint i = 0; i < last && running; i++)
         {
             gel_value_copy(array_values + i, iter_value);
             GValue tmp_value = {0};
             do_(self, &tmp_value, n_values, values, loop_context);
+
+            if(gel_context_error(loop_context))
+                running = FALSE;
 
             if(GEL_IS_VALUE(&tmp_value))
                 g_value_unset(&tmp_value);

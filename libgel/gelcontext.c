@@ -183,6 +183,14 @@ void gel_context_free(GelContext *self)
     }
     g_list_free(inner_list);
 
+    if(self->error)
+    {
+        if(self->outer != NULL)
+            gel_context_set_error(self->outer, self->error);
+        else
+            g_error_free(self->error);
+    }
+
 #if GEL_CONTEXT_USE_POOL
     g_hash_table_remove_all(self->variables);
     g_hash_table_remove_all(self->inner);
