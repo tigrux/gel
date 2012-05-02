@@ -65,7 +65,7 @@ GValueArray* gel_parse_scanner(GScanner *scanner, guint line, guint pos,
     gboolean failed = FALSE;
     gboolean parsing = TRUE;
 
-    while(parsing)
+    while(parsing && !failed)
     {
         GValue value = {0};
         const gchar *name = NULL;
@@ -95,7 +95,7 @@ GValueArray* gel_parse_scanner(GScanner *scanner, guint line, guint pos,
                 g_value_init(&value, G_TYPE_VALUE_ARRAY);
                 GValueArray *inner_array = gel_parse_scanner(scanner,
                     scanner->line, scanner->position, token, error);
-                if(array != NULL)
+                if(inner_array != NULL)
                     gel_value_take_boxed(&value, inner_array);
                 else
                     failed = TRUE;
@@ -115,7 +115,6 @@ GValueArray* gel_parse_scanner(GScanner *scanner, guint line, guint pos,
                         delim, line, pos, token,
                         scanner->next_line, scanner->next_position));
                     failed = TRUE;
-                    parsing = FALSE;
                 }
                 else
                 if(delim == 0)
@@ -125,7 +124,6 @@ GValueArray* gel_parse_scanner(GScanner *scanner, guint line, guint pos,
                         "Unexpected '%c' at line %u, char %u",
                         token, scanner->next_line, scanner->next_position));
                     failed = TRUE;
-                    parsing = FALSE;
                 }
                 else
                 {
@@ -157,7 +155,6 @@ GValueArray* gel_parse_scanner(GScanner *scanner, guint line, guint pos,
                     scanner_errors[scanner->value.v_error],
                     scanner->line, scanner->position));
                 failed = TRUE;
-                parsing = FALSE;
                 break;
             default:
                 g_propagate_error(error, g_error_new(
@@ -165,7 +162,6 @@ GValueArray* gel_parse_scanner(GScanner *scanner, guint line, guint pos,
                     "Unknown token '%c' (%d) at line %u, char %u",
                     token, token, scanner->next_line, scanner->next_position));
                 failed = TRUE;
-                parsing = FALSE;
                 break;
         }
 
