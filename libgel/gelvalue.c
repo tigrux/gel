@@ -869,7 +869,7 @@ gint gel_values_cmp(const GValue *v1, const GValue *v2)
 
 
 static
-gboolean gel_values_logic(const GValue *v1, const GValue *v2,
+gint gel_values_logic(const GValue *v1, const GValue *v2,
                           GelValuesLogic values_function)
 {
     g_return_val_if_fail(v1 != NULL, FALSE);
@@ -884,9 +884,9 @@ gboolean gel_values_logic(const GValue *v1, const GValue *v2,
         gel_values_simple_transform(v1, v2, &tmp1, &tmp2, &vv1, &vv2);
 
     if(dest_type == G_TYPE_INVALID)
-        return FALSE;
+        return -1;
 
-    gboolean result = values_function(vv1, vv2);
+    gint result = values_function(vv1, vv2) ? 1 : 0;
 
     if(GEL_IS_VALUE(&tmp1))
         g_value_unset(&tmp1);
@@ -898,7 +898,7 @@ gboolean gel_values_logic(const GValue *v1, const GValue *v2,
 
 
 #define DEFINE_LOGIC(op) \
-gboolean gel_values_##op(const GValue *v1, const GValue *v2) \
+gint gel_values_##op(const GValue *v1, const GValue *v2) \
 { \
     return gel_values_logic(v1, v2, gel_values_simple_##op); \
 }
@@ -910,7 +910,7 @@ gboolean gel_values_##op(const GValue *v1, const GValue *v2) \
  *
  * Checks if @v1 > @v2
  *
- * Returns: The result of the logic operation
+ * Returns: 1 if true, 0 if false, or -1 if the values cannot be compared
  */
 DEFINE_LOGIC(gt)
 
@@ -921,7 +921,7 @@ DEFINE_LOGIC(gt)
  *
  * Checks if @v1 >= @v2
  *
- * Returns: The result of the logic operation
+ * Returns: 1 if true, 0 if false, or -1 if the values cannot be compared
  */
 DEFINE_LOGIC(ge)
 
@@ -932,7 +932,7 @@ DEFINE_LOGIC(ge)
  *
  * Checks if @v1 == @v2
  *
- * Returns: The result of the logic operation
+ * Returns: 1 if true, 0 if false, or -1 if the values cannot be compared
  */
 DEFINE_LOGIC(eq)
 
@@ -943,7 +943,7 @@ DEFINE_LOGIC(eq)
  *
  * Checks if @v1 <= @v2
  *
- * Returns: The result of the logic operation
+ * Returns: 1 if true, 0 if false, or -1 if the values cannot be compared
  */
 DEFINE_LOGIC(le)
 
@@ -954,7 +954,7 @@ DEFINE_LOGIC(le)
  *
  * Checks if @v1 < @v2
  *
- * Returns: The result of the logic operation
+ * Returns: 1 if true, 0 if false, or -1 if the values cannot be compared
  */
 DEFINE_LOGIC(lt)
 
@@ -965,7 +965,7 @@ DEFINE_LOGIC(lt)
  *
  * Checks if @v1 != @v2
  *
- * Returns: The result of the logic operation
+ * Returns: 1 if true, 0 if false, or -1 if the values cannot be compared
  */
 DEFINE_LOGIC(ne)
 

@@ -1016,7 +1016,8 @@ void mod_(GClosure *self, GValue *return_value,
 static
 void logic(GClosure *self, GValue *return_value,
            guint n_values, const GValue *values,
-           GelContext *context, GelValuesLogic values_function)
+           GelContext *context,
+           GelValuesLogic values_function, const gchar *f)
 {
     guint n_args = 2;
     if(n_values < n_args)
@@ -1025,11 +1026,11 @@ void logic(GClosure *self, GValue *return_value,
         return;
     }
 
-    gboolean result = TRUE;
+    gint result = -1;
     guint last = n_values - 1;
     gboolean failed = FALSE;
 
-    for(guint i = 0; i < last && result && !failed; i++)
+    for(guint i = 0; i < last && result != 1 && !failed; i++)
     {
         GValue tmp1 = {0};
         GValue tmp2 = {0};
@@ -1043,7 +1044,14 @@ void logic(GClosure *self, GValue *return_value,
                 gel_context_eval_into_value(context, j+1, &tmp2);
 
             if(!gel_context_error(context))
+            {
                 result = values_function(v1, v2);
+                if(result == -1)
+                {
+                    gel_error_incompatible(context, f, v1, v2);
+                    failed = TRUE;
+                }
+            }
             else
                 failed = TRUE;
         }
@@ -1059,7 +1067,7 @@ void logic(GClosure *self, GValue *return_value,
     if(!failed)
     {
         g_value_init(return_value, G_TYPE_BOOLEAN);
-        gel_value_set_boolean(return_value, result);
+        gel_value_set_boolean(return_value, result == 1 ? TRUE : FALSE);
     }
 }
 
@@ -1142,7 +1150,8 @@ static
 void gt_(GClosure *self, GValue *return_value,
          guint n_values, const GValue *values, GelContext *context)
 {
-    logic(self, return_value, n_values, values, context, gel_values_gt);
+    logic(self, return_value, n_values, values,
+        context, gel_values_gt, __FUNCTION__);
 }
 
 
@@ -1150,7 +1159,8 @@ static
 void ge_(GClosure *self, GValue *return_value,
          guint n_values, const GValue *values, GelContext *context)
 {
-    logic(self, return_value, n_values, values, context, gel_values_ge);
+    logic(self, return_value, n_values, values,
+        context, gel_values_ge, __FUNCTION__);
 }
 
 
@@ -1158,7 +1168,8 @@ static
 void eq_(GClosure *self, GValue *return_value,
          guint n_values, const GValue *values, GelContext *context)
 {
-    logic(self, return_value, n_values, values, context, gel_values_eq);
+    logic(self, return_value, n_values, values,
+        context, gel_values_eq, __FUNCTION__);
 }
 
 
@@ -1166,7 +1177,8 @@ static
 void le_(GClosure *self, GValue *return_value,
          guint n_values, const GValue *values, GelContext *context)
 {
-    logic(self, return_value, n_values, values, context, gel_values_le);
+    logic(self, return_value, n_values, values, context,
+        gel_values_le, __FUNCTION__);
 }
 
 
@@ -1174,7 +1186,8 @@ static
 void lt_(GClosure *self, GValue *return_value,
          guint n_values, const GValue *values, GelContext *context)
 {
-    logic(self, return_value, n_values, values, context, gel_values_lt);
+    logic(self, return_value, n_values, values,
+        context, gel_values_lt, __FUNCTION__);
 }
 
 
@@ -1182,7 +1195,8 @@ static
 void ne_(GClosure *self, GValue *return_value,
          guint n_values, const GValue *values, GelContext *context)
 {
-    logic(self, return_value, n_values, values, context, gel_values_ne);
+    logic(self, return_value, n_values, values,
+        context, gel_values_ne, __FUNCTION__);
 }
 
 
