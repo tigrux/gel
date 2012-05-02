@@ -183,7 +183,7 @@ void gel_context_free(GelContext *self)
     }
     g_list_free(inner_list);
 
-    if(self->error)
+    if(self->error != NULL)
     {
         if(self->outer != NULL)
             gel_context_set_error(self->outer, self->error);
@@ -417,7 +417,7 @@ GelVariable* gel_context_lookup_variable(const GelContext *self,
     while(context != NULL && variable == NULL)
     {
         variable = gel_context_get_variable(context, name);
-        context = gel_context_get_outer(context);
+        context = context->outer;
     }
 
     return variable;

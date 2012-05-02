@@ -8,7 +8,6 @@ gel_context_new_with_outer
 gel_context_dup
 gel_context_free
 gel_context_lookup
-gel_context_get_outer
 gel_context_get_variables
 gel_context_insert
 gel_context_insert_object
