@@ -120,22 +120,9 @@ void gel_value_list_free(GList *value_list)
 }
 
 
-/**
- * gel_value_to_string:
- * @value: #GValue to get its representation
- *
- * Provides a debug friendly representation of @value
- *
- * Returns: a newly allocated string
- */
-gchar* gel_value_to_string(const GValue *value)
+static
+gchar* gel_value_stringify(const GValue *value, gchar* (*str)(const GValue *))
 {
-    g_return_val_if_fail(value != NULL, NULL);
-    g_return_val_if_fail(GEL_IS_VALUE(value), NULL);
-
-    if(GEL_VALUE_HOLDS(value, G_TYPE_STRING))
-        return g_value_dup_string(value);
-
     gchar *result = NULL;
     GValue string_value = {0};
 
@@ -159,13 +146,13 @@ gchar* gel_value_to_string(const GValue *value)
 
             for(guint i = 0; i <= last; i++)
             {
-                gchar *s = gel_value_to_string(array_values + i);
-                g_string_append_printf(buffer, "%s%s", s, i != last ? " " : "");
+                gchar *s = str(array_values + i);
+                g_string_append_printf(buffer,
+                    "%s%s", s, i != last ? " " : ")");
                 g_free(s);
             }
         }
 
-        g_string_append_c(buffer, ')');
         result =  g_string_free(buffer, FALSE);
     }
     else
@@ -187,17 +174,16 @@ gchar* gel_value_to_string(const GValue *value)
             while(g_hash_table_iter_next(&iter,
                     (void *)&key, (void *)&value))
             {
-                gchar *ks = gel_value_to_string(key);
-                gchar *vs = gel_value_to_string(value);
-                g_string_append_printf(buffer, "%s %s%s",
-                    ks, vs, i!=last ? " " : "");
+                gchar *ks = str(key);
+                gchar *vs = str(value);
+                g_string_append_printf(buffer,
+                    "%s %s%s", ks, vs, i!=last ? " " : "}");
                 g_free(ks);
                 g_free(vs);
                 i++;
             }
         }
 
-        g_string_append_c(buffer, '}');
         result =  g_string_free(buffer, FALSE);
     }
     else
@@ -207,7 +193,7 @@ gchar* gel_value_to_string(const GValue *value)
         const GValue *symbol_value = gel_symbol_get_value(symbol);
 
         if(symbol_value != NULL)
-            result = gel_value_to_string(symbol_value);
+            result = str(symbol_value);
         else
             result = g_strdup(gel_symbol_get_name(symbol));
     }
@@ -244,6 +230,45 @@ gchar* gel_value_to_string(const GValue *value)
     return result;
 }
 
+
+/**
+ * gel_value_repr:
+ * @value: #GValue to make a string from
+ *
+ * Provides a representation of @value
+ *
+ * Returns: a newly allocated string
+ */
+gchar* gel_value_repr(const GValue *value)
+{
+    g_return_val_if_fail(value != NULL, NULL);
+    g_return_val_if_fail(GEL_IS_VALUE(value), NULL);
+
+    if(GEL_VALUE_HOLDS(value, G_TYPE_STRING))
+        return g_strdup_printf("\"%s\"", gel_value_get_string(value));
+
+    return gel_value_stringify(value, gel_value_repr);
+}
+
+
+/**
+ * gel_value_to_string:
+ * @value: #GValue to get its representation
+ *
+ * Provides a debug friendly representation of @value
+ *
+ * Returns: a newly allocated string
+ */
+gchar* gel_value_to_string(const GValue *value)
+{
+    g_return_val_if_fail(value != NULL, NULL);
+    g_return_val_if_fail(GEL_IS_VALUE(value), NULL);
+
+    if(GEL_VALUE_HOLDS(value, G_TYPE_STRING))
+        return g_strdup(gel_value_get_string(value));
+
+    return gel_value_stringify(value, gel_value_to_string);
+}
 
 
 /**
@@ -878,23 +903,137 @@ gboolean gel_values_##op(const GValue *v1, const GValue *v2) \
     return gel_values_logic(v1, v2, gel_values_simple_##op); \
 }
 
+/**
+ * gel_values_gt:
+ * @v1: A valid #GValue
+ * @v2: A valid #GValue
+ *
+ * Checks if @v1 > @v2
+ *
+ * Returns: The result of the logic operation
+ */
 DEFINE_LOGIC(gt)
+
+/**
+ * gel_values_ge:
+ * @v1: A valid #GValue
+ * @v2: A valid #GValue
+ *
+ * Checks if @v1 >= @v2
+ *
+ * Returns: The result of the logic operation
+ */
 DEFINE_LOGIC(ge)
+
+/**
+ * gel_values_eq:
+ * @v1: A valid #GValue
+ * @v2: A valid #GValue
+ *
+ * Checks if @v1 == @v2
+ *
+ * Returns: The result of the logic operation
+ */
 DEFINE_LOGIC(eq)
+
+/**
+ * gel_values_le:
+ * @v1: A valid #GValue
+ * @v2: A valid #GValue
+ *
+ * Checks if @v1 <= @v2
+ *
+ * Returns: The result of the logic operation
+ */
 DEFINE_LOGIC(le)
+
+/**
+ * gel_values_lt:
+ * @v1: A valid #GValue
+ * @v2: A valid #GValue
+ *
+ * Checks if @v1 < @v2
+ *
+ * Returns: The result of the logic operation
+ */
 DEFINE_LOGIC(lt)
+
+/**
+ * gel_values_ne:
+ * @v1: A valid #GValue
+ * @v2: A valid #GValue
+ *
+ * Checks if @v1 != @v2
+ *
+ * Returns: The result of the logic operation
+ */
 DEFINE_LOGIC(ne)
 
 
 #define DEFINE_ARITHMETIC(op) \
-gboolean gel_values_##op(const GValue *v1, const GValue *v2, GValue *value) \
+gboolean gel_values_##op(const GValue *v1, const GValue *v2, GValue *dest_value) \
 { \
-    return gel_values_arithmetic(v1, v2, value, gel_values_simple_##op); \
+    return gel_values_arithmetic(v1, v2, dest_value, gel_values_simple_##op); \
 }
 
+
+/**
+ * gel_values_add:
+ * @v1: A valid #GValue
+ * @v2: A valid #GValue
+ * @dest_value: A pointer to #GValue to store the result of the operation
+ *
+ * Performs @dest_value = @v1 + @v2
+ *
+ * Returns: #TRUE if the operation was possible, #FALSE otherwise
+ */
 DEFINE_ARITHMETIC(add)
+
+/**
+ * gel_values_sub:
+ * @v1: A valid #GValue
+ * @v2: A valid #GValue
+ * @dest_value: A pointer to #GValue to store the result of the operation
+ *
+ * Performs @dest_value = @v1 - @v2
+ *
+ * Returns: #TRUE if the operation was possible, #FALSE otherwise
+ */
 DEFINE_ARITHMETIC(sub)
+
+/**
+ * gel_values_mul:
+ * @v1: A valid #GValue
+ * @v2: A valid #GValue
+ * @dest_value: A pointer to #GValue to store the result of the operation
+ *
+ * Performs @dest_value = @v1 * @v2
+ *
+ * Returns: #TRUE if the operation was possible, #FALSE otherwise
+ */
 DEFINE_ARITHMETIC(mul)
+
+/**
+ * gel_values_div:
+ * @v1: A valid #GValue
+ * @v2: A valid #GValue
+ * @dest_value: A pointer to #GValue to store the result of the operation
+ *
+ * Performs @dest_value = @v1 / @v2
+ *
+ * Returns: #TRUE if the operation was possible, #FALSE otherwise
+ */
 DEFINE_ARITHMETIC(div)
+
+/**
+ * gel_values_mod:
+ * @v1: A valid #GValue
+ * @v2: A valid #GValue
+ * @dest_value: A pointer to #GValue to store the result of the operation
+ *
+ * Performs @dest_value = @v1 % @v2
+ *
+ * Returns: #TRUE if the operation was possible, #FALSE otherwise
+ */
 DEFINE_ARITHMETIC(mod)
 

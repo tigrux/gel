@@ -3,20 +3,43 @@
 
 #include <glib-object.h>
 
+
+/**
+ * GEL_CONTEXT_ERROR:
+ *
+ * Error domain for errors reported by #gel_context_eval.
+ * Errors in this domain will be from the #GelContextError enumeration.
+ * See #GError for information on error domains.
+ */
+
 #define GEL_CONTEXT_ERROR (gel_context_error_quark())
 
+#ifndef __GTK_DOC_IGNORE__
 GQuark gel_context_error_quark(void);
+#endif
+
+/**
+ * GelContextError:
+ * @GEL_CONTEXT_ERROR_ARGUMENTS: wrong arguments
+ * @GEL_CONTEXT_ERROR_UNKNOWN_SYMBOL: unknown symbol
+ * @GEL_CONTEXT_ERROR_SYMBOL_EXISTS: symbol exists and canot be redefined
+ * @GEL_CONTEXT_ERROR_TYPE: wrong value type
+ * @GEL_CONTEXT_ERROR_PROPERTY: wrong property
+ * @GEL_CONTEXT_ERROR_INDEX: invalid index
+ * @GEL_CONTEXT_ERROR_KEY: invalid key
+ *
+ * Error codes reported by #gel_context_eval
+ */
 
 typedef enum _GelContextError
 {
    GEL_CONTEXT_ERROR_ARGUMENTS,
-   GEL_CONTEXT_ERROR_SYMBOL,
+   GEL_CONTEXT_ERROR_UNKNOWN_SYMBOL,
+   GEL_CONTEXT_ERROR_SYMBOL_EXISTS,
    GEL_CONTEXT_ERROR_TYPE,
    GEL_CONTEXT_ERROR_PROPERTY,
    GEL_CONTEXT_ERROR_INDEX,
-   GEL_CONTEXT_ERROR_KEY,
-   GEL_CONTEXT_ERROR_ARITHMETIC,
-   GEL_CONTEXT_ERROR_LOGIC
+   GEL_CONTEXT_ERROR_KEY
 } GelContextError;
 
 typedef struct _GelContext GelContext;
@@ -39,8 +62,6 @@ typedef void (*GelFunction)(GClosure *closure, GValue *return_value,
                             guint n_param_values, GValue *param_values,
                             GelContext *invocation_context, gpointer user_data);
 
-GQuark gel_parse_error_quark(void);
-
 GelContext* gel_context_new(void);
 GelContext* gel_context_new_with_outer(GelContext *outer);
 GelContext* gel_context_dup(const GelContext *self);
@@ -60,11 +81,9 @@ gboolean gel_context_remove(GelContext *self, const gchar *name);
 
 gboolean gel_context_eval(GelContext *self, const GValue *value, GValue *dest,
                           GError **error);
-GError* gel_context_error(const GelContext* self);
-void gel_context_set_error(GelContext* self, GError *error);
 
-gboolean gel_context_get_running(const GelContext *self);
-void gel_context_set_running(GelContext *self, gboolean running);
+gboolean gel_context_error(const GelContext* self);
+void gel_context_clear_error(GelContext* self);
 
 #endif
 

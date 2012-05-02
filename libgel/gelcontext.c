@@ -1,6 +1,6 @@
 #include <gelcontext.h>
 #include <gelcontextprivate.h>
-#include <geldebug.h>
+#include <gelerrors.h>
 #include <gelvalue.h>
 #include <gelvalueprivate.h>
 #include <gelsymbol.h>
@@ -206,6 +206,7 @@ void gel_context_free(GelContext *self)
  * @self: #GelContext where to evaluate @value
  * @value: #GValue to evaluate
  * @dest: destination #GValue
+ * @error: return location for a #GError, or NULL
  *
  * Evaluates @value, stores the result in @dest
  *
@@ -219,7 +220,7 @@ gboolean gel_context_eval(GelContext *self,
     g_return_val_if_fail(dest != NULL, FALSE);
 
     gboolean result = gel_context_eval_value(self, value, dest);
-    GError *context_error = gel_context_error(self);
+    GError *context_error = self->error;
 
     if(context_error != NULL)
     {
@@ -258,7 +259,7 @@ const GValue* gel_context_eval_param_into_value(GelContext *self,
     const GValue *result_value =
         gel_context_eval_into_value(self, value, out_value);
 
-    if(gel_context_error(self) == NULL)
+    if(!gel_context_error(self))
         if(GEL_VALUE_HOLDS(result_value, GEL_TYPE_VARIABLE))
         {
             const GelVariable *variable = gel_value_get_boxed(result_value);
@@ -298,7 +299,7 @@ const GValue* gel_context_eval_into_value(GelContext *self,
             result = gel_context_lookup(self, name);
 
         if(result == NULL)
-            gel_warning_unknown_symbol(self, __FUNCTION__, name);
+            gel_error_unknown_symbol(self, __FUNCTION__, name);
     }
     else
     if(type == G_TYPE_VALUE_ARRAY)
@@ -314,7 +315,7 @@ const GValue* gel_context_eval_into_value(GelContext *self,
                 gel_context_eval_into_value(self, array_values + 0, &tmp_value);
 
 
-            if(gel_context_error(self) == NULL)
+            if(!gel_context_error(self))
                 if(GEL_VALUE_HOLDS(first_value, G_TYPE_CLOSURE))
                 {
                     GClosure *closure = gel_value_get_boxed(first_value);
@@ -337,17 +338,17 @@ const GValue* gel_context_eval_into_value(GelContext *self,
 
 /**
  * gel_context_error:
- * @self: #GelContext to get its error
+ * @self: #GelContext to check for errors
  *
  * Retrieves the error associated to @self
  *
- * Returns: the error of the context, or #NULL if no error has occurred
+ * Returns: #TRUE if an error has occurred, #FALSE otherwise
  */
-GError* gel_context_error(const GelContext* self)
+gboolean gel_context_error(const GelContext* self)
 {
-    g_return_val_if_fail(self != NULL, NULL);
+    g_return_val_if_fail(self != NULL, FALSE);
 
-    return self->error;
+    return self->error != NULL;
 }
 
 

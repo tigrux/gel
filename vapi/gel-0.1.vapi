@@ -9,6 +9,17 @@ namespace Gel {
         GLib.Value[] param_values,
         Gel.Context? invocation_context);
 
+    public errordomain ContextError {
+       ARGUMENTS,
+       SYMBOL,
+       TYPE,
+       PROPERTY,
+       INDEX,
+       KEY,
+       ARITHMETIC,
+       LOGIC
+    }
+
     [CCode (type_id = "GEL_TYPE_CONTEXT")]
     [Compact]
     public class Context {
@@ -21,10 +32,14 @@ namespace Gel {
         public void insert_object(string name, owned GLib.Object object);
         public void insert_function(string name, Gel.Function function);
         public bool remove(string name);
-        public bool eval(GLib.Value value, out GLib.Value dest_value) throws GLib.Error;
+        public bool eval(GLib.Value value, out GLib.Value dest_value) throws ContextError;
+
+        bool gel_context_error();
+        void gel_context_set_error(GLib.Error error);
+        void gel_context_clear_error();
     }
 
-    errordomain ParseError {
+    public errordomain ParseError {
         SCANNER,
         UNMATCHED_DELIM,
         UNEXPECTED_DELIM,
@@ -32,30 +47,32 @@ namespace Gel {
         UNKNOWN_TOKEN
     }
 
-    GLib.ValueArray parse_file(string file) throws GLib.FileError, ParseError;
-    GLib.ValueArray parse_text(string text, uint text_len) throws ParseError;
+    public GLib.ValueArray parse_file(string file) throws GLib.FileError, ParseError;
+    public GLib.ValueArray parse_text(string text, uint text_len) throws ParseError;
 
     namespace Value {
-        string to_string(GLib.Value value);
-        bool to_boolean(GLib.Value value);
         bool copy(GLib.Value src_value, out GLib.Value dest_value);
+        string repr(GLib.Value? value);
+        string to_string(GLib.Value? value);
+        bool to_boolean(GLib.Value? value);
+
     }
 
     namespace Values {
-        bool add(GLib.Value v1, GLib.Value v2, out GLib.Value dest_value);
-        bool sub(GLib.Value v1, GLib.Value v2, out GLib.Value dest_value);
-        bool mul(GLib.Value v1, GLib.Value v2, out GLib.Value dest_Value);
-        bool div(GLib.Value v1, GLib.Value v2, out GLib.Value dest_value);
-        bool mod(GLib.Value v1, GLib.Value v2, out GLib.Value dest_value);
+        public bool add(GLib.Value v1, GLib.Value v2, out GLib.Value dest_value);
+        public bool sub(GLib.Value v1, GLib.Value v2, out GLib.Value dest_value);
+        public bool mul(GLib.Value v1, GLib.Value v2, out GLib.Value dest_Value);
+        public bool div(GLib.Value v1, GLib.Value v2, out GLib.Value dest_value);
+        public bool mod(GLib.Value v1, GLib.Value v2, out GLib.Value dest_value);
 
-        int cmp(GLib.Value v1, GLib.Value v2);
+        public int cmp(GLib.Value v1, GLib.Value v2);
 
-        bool gt(GLib.Value v1, GLib.Value v2);
-        bool ge(GLib.Value v1, GLib.Value v2);
-        bool eq(GLib.Value v1, GLib.Value v2);
-        bool le(GLib.Value v1, GLib.Value v2);
-        bool lt(GLib.Value v1, GLib.Value v2);
-        bool ne(GLib.Value v1, GLib.Value v2);
+        public bool gt(GLib.Value v1, GLib.Value v2);
+        public bool ge(GLib.Value v1, GLib.Value v2);
+        public bool eq(GLib.Value v1, GLib.Value v2);
+        public bool le(GLib.Value v1, GLib.Value v2);
+        public bool lt(GLib.Value v1, GLib.Value v2);
+        public bool ne(GLib.Value v1, GLib.Value v2);
     }
 
 }

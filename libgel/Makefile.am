@@ -17,7 +17,7 @@ libgel_la_SOURCES = \
 	gelclosure.c \
 	gelcontext.c \
 	gelcontextparams.c \
-	geldebug.c \
+	gelerrors.c \
 	gelparser.c \
 	gelpredefined.c \
 	gelvalue.c \
@@ -41,7 +41,7 @@ noinst_HEADERS = \
 	gelvalueprivate.h \
 	gelclosureprivate.h \
 	gelsymbol.h \
-	geldebug.h \
+	gelerrors.h \
 	gelvariable.h
 
 if HAVE_GOBJECT_INTROSPECTION

@@ -3,6 +3,7 @@
 
 #include <glib-object.h>
 
+gchar* gel_value_repr(const GValue *value);
 gchar *gel_value_to_string(const GValue *value);
 gboolean gel_value_to_boolean(const GValue *value);
 
@@ -12,7 +13,7 @@ gint gel_values_cmp(const GValue *v1, const GValue *v2);
 
 gboolean gel_values_add(const GValue *v1, const GValue *v2, GValue *dest_value);
 gboolean gel_values_sub(const GValue *v1, const GValue *v2, GValue *dest_value);
-gboolean gel_values_mul(const GValue *v1, const GValue *v2, GValue *dest_Value);
+gboolean gel_values_mul(const GValue *v1, const GValue *v2, GValue *dest_value);
 gboolean gel_values_div(const GValue *v1, const GValue *v2, GValue *dest_value);
 gboolean gel_values_mod(const GValue *v1, const GValue *v2, GValue *dest_value);
 

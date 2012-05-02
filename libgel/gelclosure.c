@@ -6,7 +6,7 @@
 #include <gelvalue.h>
 #include <gelvalueprivate.h>
 #include <gelsymbol.h>
-#include <geldebug.h>
+#include <gelerrors.h>
 
 #ifdef HAVE_GOBJECT_INTROSPECTION
 #include <geltypeinfo.h>
@@ -58,7 +58,7 @@ void gel_closure_marshal(GelClosure *closure, GValue *return_value,
         {
             gchar *message = g_strdup_printf(
                 "at least %u arguments, got %u", n_args, n_values);
-            gel_warning_expected(invocation_context, closure->name, message);
+            gel_error_expected(invocation_context, closure->name, message);
             g_free(message);
             return;
         }
@@ -68,7 +68,7 @@ void gel_closure_marshal(GelClosure *closure, GValue *return_value,
     {
         gchar *message = g_strdup_printf(
             "%u arguments, got %u", n_args, n_values);
-        gel_warning_expected(invocation_context, closure->name, message);
+        gel_error_expected(invocation_context, closure->name, message);
         g_free(message);
         return;
     }
@@ -85,13 +85,13 @@ void gel_closure_marshal(GelClosure *closure, GValue *return_value,
 
         gel_context_eval_value(invocation_context, values + i, value);
 
-        if(gel_context_error(invocation_context) == NULL)
-            gel_context_insert(context, arg_name, value);
-        else
+        if(gel_context_error(invocation_context))
         {
             g_free(value);
             goto end;
         }
+        else
+            gel_context_insert(context, arg_name, value);
     }
 
     if(is_variadic_arg)
@@ -106,7 +106,7 @@ void gel_closure_marshal(GelClosure *closure, GValue *return_value,
             gel_context_eval_value(invocation_context,
                 values + i, array_values + j);
 
-            if(gel_context_error(invocation_context) != NULL)
+            if(gel_context_error(invocation_context))
             {
                 g_value_array_free(array);
                 goto end;
@@ -129,7 +129,7 @@ void gel_closure_marshal(GelClosure *closure, GValue *return_value,
             const GValue *value = gel_context_eval_into_value(context,
                     closure_code_values + i, &tmp_value);
 
-            if(gel_context_error(invocation_context) != NULL)
+            if(gel_context_error(invocation_context))
                 goto end;
 
             if(i == last && return_value != NULL && GEL_IS_VALUE(value))

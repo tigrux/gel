@@ -1,6 +1,7 @@
-#include <geldebug.h>
+#include <gelerrors.h>
 #include <gelvalue.h>
 #include <gelvalueprivate.h>
+#include <gelcontextprivate.h>
 
 
 static
@@ -10,7 +11,7 @@ const gchar* plural(guint n)
 }
 
 
-void gel_warning_needs_at_least_n_arguments(GelContext *context,const gchar *f,
+void gel_error_needs_at_least_n_arguments(GelContext *context,const gchar *f,
                                             guint n)
 {
     gel_context_set_error(context, g_error_new(
@@ -19,7 +20,7 @@ void gel_warning_needs_at_least_n_arguments(GelContext *context,const gchar *f,
 }
 
 
-void gel_warning_needs_n_arguments(GelContext *context, const gchar *f,
+void gel_error_needs_n_arguments(GelContext *context, const gchar *f,
                                    guint n)
 {
     gel_context_set_error(context, g_error_new(
@@ -28,7 +29,7 @@ void gel_warning_needs_n_arguments(GelContext *context, const gchar *f,
 }
 
 
-void gel_warning_no_such_property(GelContext *context, const gchar *f,
+void gel_error_no_such_property(GelContext *context, const gchar *f,
                                   const gchar *prop_name)
 {
     gel_context_set_error(context, g_error_new(
@@ -37,10 +38,10 @@ void gel_warning_no_such_property(GelContext *context, const gchar *f,
 }
 
 
-void gel_warning_value_not_of_type(GelContext *context, const gchar *f,
+void gel_error_value_not_of_type(GelContext *context, const gchar *f,
                                    const GValue *value, GType type)
 {
-    gchar *value_string = gel_value_to_string(value);
+    gchar *value_string = gel_value_repr(value);
 
     gel_context_set_error(context, g_error_new(
         GEL_CONTEXT_ERROR, GEL_CONTEXT_ERROR_TYPE,
@@ -51,16 +52,16 @@ void gel_warning_value_not_of_type(GelContext *context, const gchar *f,
 }
 
 
-void gel_warning_unknown_symbol(GelContext *context, const gchar *f,
+void gel_error_unknown_symbol(GelContext *context, const gchar *f,
                                 const gchar *symbol)
 {
     gel_context_set_error(context, g_error_new(
-        GEL_CONTEXT_ERROR, GEL_CONTEXT_ERROR_SYMBOL,
+        GEL_CONTEXT_ERROR, GEL_CONTEXT_ERROR_UNKNOWN_SYMBOL,
         "%s: Unknown symbol '%s'", f, symbol));
 }
 
 
-void gel_warning_type_not_instantiatable(GelContext *context, const gchar *f,
+void gel_error_type_not_instantiatable(GelContext *context, const gchar *f,
                                          GType type)
 {
     gel_context_set_error(context, g_error_new(
@@ -69,11 +70,11 @@ void gel_warning_type_not_instantiatable(GelContext *context, const gchar *f,
 }
 
 
-void gel_warning_invalid_value_for_property(GelContext *context, const gchar *f,
+void gel_error_invalid_value_for_property(GelContext *context, const gchar *f,
                                             const GValue *value,
                                             const GParamSpec *pspec)
 {
-    gchar *value_string = gel_value_to_string(value);
+    gchar *value_string = gel_value_repr(value);
 
     gel_context_set_error(context, g_error_new(
         GEL_CONTEXT_ERROR, GEL_CONTEXT_ERROR_PROPERTY,
@@ -85,7 +86,7 @@ void gel_warning_invalid_value_for_property(GelContext *context, const gchar *f,
 }
 
 
-void gel_warning_type_name_invalid(GelContext *context, const gchar *f,
+void gel_error_type_name_invalid(GelContext *context, const gchar *f,
                                    const gchar *name)
 {
 
@@ -95,7 +96,7 @@ void gel_warning_type_name_invalid(GelContext *context, const gchar *f,
 }
 
 
-void gel_warning_invalid_argument_name(GelContext *context, const gchar *f,
+void gel_error_invalid_argument_name(GelContext *context, const gchar *f,
                                        const gchar *name)
 {
     gel_context_set_error(context, g_error_new(
@@ -104,7 +105,7 @@ void gel_warning_invalid_argument_name(GelContext *context, const gchar *f,
 }
 
 
-void gel_warning_index_out_of_bounds(GelContext *context, const gchar *f,
+void gel_error_index_out_of_bounds(GelContext *context, const gchar *f,
                                      gint index)
 {
     gel_context_set_error(context, g_error_new(
@@ -113,10 +114,10 @@ void gel_warning_index_out_of_bounds(GelContext *context, const gchar *f,
 }
 
 
-void gel_warning_invalid_key(GelContext *context, const gchar *f,
+void gel_error_invalid_key(GelContext *context, const gchar *f,
                              GValue *key)
 {
-    gchar *value_string = gel_value_to_string(key);
+    gchar *value_string = gel_value_repr(key);
 
     gel_context_set_error(context, g_error_new(
         GEL_CONTEXT_ERROR, GEL_CONTEXT_ERROR_KEY,
@@ -126,16 +127,16 @@ void gel_warning_invalid_key(GelContext *context, const gchar *f,
 }
 
 
-void gel_warning_symbol_exists(GelContext *context, const gchar *f,
+void gel_error_symbol_exists(GelContext *context, const gchar *f,
                                const gchar *name)
 {
     gel_context_set_error(context, g_error_new(
-        GEL_CONTEXT_ERROR, GEL_CONTEXT_ERROR_SYMBOL,
+        GEL_CONTEXT_ERROR, GEL_CONTEXT_ERROR_SYMBOL_EXISTS,
         "%s: Symbol '%s' already exists", f, name));
 }
 
 
-void gel_warning_expected(GelContext *context, const gchar *f,
+void gel_error_expected(GelContext *context, const gchar *f,
                           const gchar *s)
 {
     gel_context_set_error(context, g_error_new(
@@ -144,11 +145,11 @@ void gel_warning_expected(GelContext *context, const gchar *f,
 }
 
 
-void gel_warning_incompatible(GelContext *context, const gchar *f,
+void gel_error_incompatible(GelContext *context, const gchar *f,
                               const GValue *v1, const GValue *v2)
 {
-    gchar *s1 = gel_value_to_string(v1);
-    gchar *s2 = gel_value_to_string(v2);
+    gchar *s1 = gel_value_repr(v1);
+    gchar *s2 = gel_value_repr(v2);
 
     gel_context_set_error(context, g_error_new(
         GEL_CONTEXT_ERROR, GEL_CONTEXT_ERROR_ARGUMENTS,

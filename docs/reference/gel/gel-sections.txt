@@ -1,5 +1,7 @@
 <SECTION>
 <FILE>gelcontext</FILE>
+GelContextError
+GEL_CONTEXT_ERROR
 GelContext
 gel_context_new
 gel_context_new_with_outer
@@ -14,16 +16,16 @@ GelFunction
 gel_context_insert_function
 gel_context_remove
 gel_context_eval
-gel_context_eval_into_value
-gel_context_eval_params
-gel_context_get_running
-gel_context_set_running
+gel_context_clear_error
+gel_context_error
 <SUBSECTION Private>
 gel_context_get_type
 </SECTION>
 
 <SECTION>
 <FILE>gelparser</FILE>
+GelParseError
+GEL_PARSE_ERROR
 gel_parse_file
 gel_parse_text
 </SECTION>
@@ -39,9 +41,9 @@ gel_closure_new_native
 <FILE>gelvalue</FILE>
 gel_value_copy
 gel_value_to_boolean
+gel_value_repr
 gel_value_to_string
 gel_value_list_free
-gel_value_lookup_predefined
 gel_values_add
 gel_values_sub
 gel_values_mul

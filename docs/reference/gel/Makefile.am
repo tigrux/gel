@@ -62,7 +62,7 @@ IGNORE_HFILES= \
 gelcontextprivate.h \
 gelvalueprivate.h \
 gelclosureprivate.h \
-geldebug.h \
+gelerrors.h \
 gelsymbol.h \
 gelvariable.h \
 geltypelib.h \
