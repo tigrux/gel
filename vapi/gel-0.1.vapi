@@ -67,12 +67,12 @@ namespace Gel {
 
         public int cmp(GLib.Value v1, GLib.Value v2);
 
-        public bool gt(GLib.Value v1, GLib.Value v2);
-        public bool ge(GLib.Value v1, GLib.Value v2);
-        public bool eq(GLib.Value v1, GLib.Value v2);
-        public bool le(GLib.Value v1, GLib.Value v2);
-        public bool lt(GLib.Value v1, GLib.Value v2);
-        public bool ne(GLib.Value v1, GLib.Value v2);
+        public int gt(GLib.Value v1, GLib.Value v2);
+        public int ge(GLib.Value v1, GLib.Value v2);
+        public int eq(GLib.Value v1, GLib.Value v2);
+        public int le(GLib.Value v1, GLib.Value v2);
+        public int lt(GLib.Value v1, GLib.Value v2);
+        public int ne(GLib.Value v1, GLib.Value v2);
     }
 
 }
