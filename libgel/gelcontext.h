@@ -68,7 +68,6 @@ GelContext* gel_context_dup(const GelContext *self);
 void gel_context_free(GelContext *self);
 
 GValue* gel_context_lookup(const GelContext *self, const gchar *name);
-GList* gel_context_get_variables(const GelContext *self);
 
 void gel_context_insert(GelContext *self, const gchar *name, GValue *value);
 void gel_context_insert_object(GelContext *self, const gchar *name,

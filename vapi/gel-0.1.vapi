@@ -26,7 +26,6 @@ namespace Gel {
         public Context();
         public Context.with_outer(Gel.Context outer);
         public unowned GLib.Value lookup(string name);
-        public GLib.List<unowned string> variables {get;}
         public void insert(string name, owned GLib.Value? value);
         public void insert_object(string name, owned GLib.Object object);
         public void insert_function(string name, Gel.Function function);
