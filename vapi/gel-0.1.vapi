@@ -38,11 +38,17 @@ namespace Gel {
     }
 
     public errordomain ParseError {
-        SCANNER,
-        UNMATCHED_DELIM,
-        UNEXPECTED_DELIM,
-        EXPECTED_DELIM,
-        UNKNOWN_TOKEN
+	    UNKNOWN,
+	    UNEXP_EOF,
+	    UNEXP_EOF_IN_STRING,
+	    UNEXP_EOF_IN_COMMENT,
+	    NON_DIGIT_IN_CONST,
+	    DIGIT_RADIX,
+	    FLOAT_RADIX,
+	    FLOAT_MALFORMED,
+	    UNEXP_DELIM,
+	    UNEXP_EOF_IN_ARRAY,
+	    UNKNOWN_TOKEN
     }
 
     public GLib.ValueArray parse_file(string file) throws GLib.FileError, ParseError;
