@@ -562,9 +562,13 @@ gboolean gel_values_simple_div(const GValue *v1, const GValue *v2,
     switch(GEL_VALUE_TYPE(dest_value))
     {
         case G_TYPE_INT64:
-            gel_value_set_int64(dest_value,
-                gel_value_get_int64(v1) / gel_value_get_int64(v2));
+        {
+            gint64 divisor = gel_value_get_int64(v2);
+            if(divisor == 0)
+                return FALSE;
+            gel_value_set_int64(dest_value, gel_value_get_int64(v1) / divisor);
             return TRUE;
+        }
         case G_TYPE_DOUBLE:
             gel_value_set_double(dest_value,
                 gel_value_get_double(v1) / gel_value_get_double(v2));
