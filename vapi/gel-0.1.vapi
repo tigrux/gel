@@ -33,8 +33,6 @@ namespace Gel {
         public bool eval(GLib.Value value, out GLib.Value dest_value) throws ContextError;
 
         bool gel_context_error();
-        void gel_context_set_error(GLib.Error error);
-        void gel_context_clear_error();
     }
 
     public errordomain ParseError {
