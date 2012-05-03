@@ -35,6 +35,7 @@ struct _GelClosure
     GClosure closure;
     GelContext *context;
     gchar *name;
+    gboolean is_macro;
     GList *args;
     gchar *variadic_arg;
     GHashTable *args_hash;
@@ -43,14 +44,15 @@ struct _GelClosure
 
 
 static
-void gel_closure_marshal(GelClosure *closure, GValue *return_value,
+void gel_closure_marshal(GelClosure *self, GValue *return_value,
                          guint n_values, const GValue *values,
                          GelContext *invocation_context)
 {
     invocation_context = gel_context_validate(invocation_context);
 
-    const guint n_args = g_list_length(closure->args);
-    gboolean is_variadic_arg = (closure->variadic_arg != NULL);
+    const guint n_args = g_list_length(self->args);
+    gboolean is_variadic_arg = (self->variadic_arg != NULL);
+    gboolean is_macro = self->is_macro;
 
     if(is_variadic_arg)
     {
@@ -58,7 +60,7 @@ void gel_closure_marshal(GelClosure *closure, GValue *return_value,
         {
             gchar *message = g_strdup_printf(
                 "at least %u arguments, got %u", n_args, n_values);
-            gel_error_expected(invocation_context, closure->name, message);
+            gel_error_expected(invocation_context, self->name, message);
             g_free(message);
             return;
         }
@@ -68,68 +70,77 @@ void gel_closure_marshal(GelClosure *closure, GValue *return_value,
     {
         gchar *message = g_strdup_printf(
             "%u arguments, got %u", n_args, n_values);
-        gel_error_expected(invocation_context, closure->name, message);
+        gel_error_expected(invocation_context, self->name, message);
         g_free(message);
         return;
     }
 
-    GelContext *outer = closure->context;
-    GelContext *context = gel_context_new_with_outer(outer);
+    GelContext *context = gel_context_new_with_outer(self->context);
 
     guint i = 0;
-    for(GList *iter = closure->args; iter != NULL; iter = iter->next, i++)
+    for(GList *iter = self->args; iter != NULL; iter = iter->next, i++)
     {
         const gchar *arg_name = iter->data;
         GValue *value = gel_value_new();
 
-
-        gel_context_eval_value(invocation_context, values + i, value);
-
-        if(gel_context_error(invocation_context))
-        {
-            g_free(value);
-            goto end;
-        }
+        if(is_macro)
+            gel_context_insert(context, arg_name, gel_value_dup(values + i));
         else
-            gel_context_insert(context, arg_name, value);
+        {
+            gel_context_eval_value(invocation_context, values + i, value);
+
+            if(gel_context_error(invocation_context))
+            {
+                g_free(value);
+                goto end;
+            }
+            else
+                gel_context_insert(context, arg_name, value);
+        }
     }
 
     if(is_variadic_arg)
     {
         guint array_n_values = n_values - i;
         GValueArray *array = g_value_array_new(array_n_values);
-        array->n_values = array_n_values;
-        GValue *array_values = array->values;
-
-        for(guint j = 0; i < n_values; i++, j++)
+        if(is_macro)
+            for(guint j = 0; i < n_values; i++, j++)
+                g_value_array_append(array, values + i);
+        else
         {
-            gel_context_eval_value(invocation_context,
-                values + i, array_values + j);
+            array->n_values = array_n_values;
+            GValue *array_values = array->values;
 
-            if(gel_context_error(invocation_context))
+            for(guint j = 0; i < n_values; i++, j++)
             {
-                g_value_array_free(array);
-                goto end;
+                gel_context_eval_value(invocation_context,
+                    values + i, array_values + j);
+
+                if(gel_context_error(invocation_context))
+                {
+                    g_value_array_free(array);
+                    goto end;
+                }
             }
         }
 
         GValue *value = gel_value_new_from_boxed(G_TYPE_VALUE_ARRAY, array);
-        gel_context_insert(context, closure->variadic_arg, value);
+        gel_context_insert(context, self->variadic_arg, value);
     }
 
-    guint closure_code_n_values = closure->code->n_values;
-    if(closure_code_n_values > 0)
+    guint code_n_values = self->code->n_values;
+    if(code_n_values > 0)
     {
-        guint last = closure_code_n_values - 1;
-        const GValue *closure_code_values = closure->code->values;
+        guint last = code_n_values - 1;
+        const GValue *code_values = self->code->values;
 
         for(guint i = 0; i <= last; i++)
         {
             GValue tmp_value = {0};
             const GValue *value = gel_context_eval_into_value(context,
-                    closure_code_values + i, &tmp_value);
+                    code_values + i, &tmp_value);
 
-            if(gel_context_error(invocation_context))
+            if(gel_context_error(context))
                 goto end;
 
             if(i == last && return_value != NULL && GEL_IS_VALUE(value))
@@ -141,7 +152,10 @@ void gel_closure_marshal(GelClosure *closure, GValue *return_value,
     }
 
     end:
-    gel_context_free(context);
+
+    if(gel_context_error(context))
+        gel_context_transfer_error(context, invocation_context);
+    gel_context_free(context);  
 }
 
 
@@ -219,7 +233,8 @@ void gel_closure_close_over(GClosure *closure)
  *
  * Returns: a new #GClosure
  */
-GClosure* gel_closure_new(const gchar *name, gchar **args, GValueArray *code,
+GClosure* gel_closure_new(const gchar *name, gboolean is_macro,
+                          gchar **args, GValueArray *code,
                           GelContext *context)
 {
     g_return_val_if_fail(context != NULL, NULL);
@@ -267,9 +282,10 @@ GClosure* gel_closure_new(const gchar *name, gchar **args, GValueArray *code,
     GelContext *closure_context = gel_context_dup(context);
     gel_context_set_outer(closure_context, context);
 
-    self->args_hash = args_hash;
     self->name = g_strdup(name);
+    self->is_macro = is_macro;
     self->args = list_args;
+    self->args_hash = args_hash;
     self->code = code;
     self->context = closure_context;
 

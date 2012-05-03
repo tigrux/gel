@@ -1,0 +1,45 @@
+
+(macro not (test)
+    (if (eval test)
+        FALSE
+        TRUE
+    )
+)
+
+(macro when (test & body)
+    (if (eval test)
+        (apply do body)
+        FALSE
+    )
+)
+
+(macro unless (test & body)
+    (if (eval test)
+        TRUE
+        (apply do body)
+    )
+)
+
+
+(def n 5)
+
+(when (= n 5)
+    (print "Positive test of 'when'")
+)
+
+(when (not (= n 5))
+    (print "Negative test of 'when'")
+)
+
+(unless (= n 5)
+    (print "Negative test of 'unless'")
+)
+
+(unless (not (= n 5))
+    (print "Positive test of 'unless'")
+)
+
+(not 0)
+
+(not 1)
+

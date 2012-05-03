@@ -362,9 +362,14 @@ gboolean gel_context_error(const GelContext* self)
 
 void gel_context_set_error(GelContext* self, GError *error)
 {
-    g_assert(self->error == NULL);
-
     self->error = error;
+}
+
+
+void gel_context_transfer_error(GelContext *self, GelContext *context)
+{
+    gel_context_set_error(context, self->error);
+    self->error = NULL;
 }
 
 

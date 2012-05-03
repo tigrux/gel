@@ -3,7 +3,8 @@
 
 #include <gelcontext.h>
 
-GClosure* gel_closure_new(const gchar *name, gchar **args, GValueArray *code,
+GClosure* gel_closure_new(const gchar *name, gboolean is_macro,
+                          gchar **args, GValueArray *code,
                           GelContext *context);
 
 GClosure* gel_closure_new_native(const gchar *name, GClosureMarshal marshal);

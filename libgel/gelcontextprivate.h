@@ -29,6 +29,7 @@ GelVariable* gel_context_get_variable(const GelContext *self,
 
 void gel_context_set_outer(GelContext *self, GelContext *context);
 void gel_context_set_error(GelContext* self, GError *error);
+void gel_context_transfer_error(GelContext *self, GelContext *context);
 
 GelContext* gel_context_validate(GelContext *context);
 

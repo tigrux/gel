@@ -14,7 +14,7 @@
 
 
 static
-GClosure* fn(GelContext *context, const gchar *name,
+GClosure* fn(GelContext *context, const gchar *name, gboolean is_macro,
              guint n_vars, const GValue *var_values,
              guint n_values, const GValue *values)
 {
@@ -42,7 +42,7 @@ GClosure* fn(GelContext *context, const gchar *name,
         GValueArray *code = g_value_array_new(n_values);
         for(guint i = 0; i < n_values; i++)
             g_value_array_append(code, values + i);
-        self = gel_closure_new(name, vars, code, context);
+        self = gel_closure_new(name, is_macro, vars, code, context);
         g_closure_ref(self);
         g_closure_sink(self);
     }
@@ -560,7 +560,7 @@ void defn_(GClosure *self, GValue *return_value,
             gel_error_symbol_exists(context, __FUNCTION__, name);
         else
         {
-            GClosure *closure = fn(context, name,
+            GClosure *closure = fn(context, name, FALSE,
                                    vars->n_values, vars->values,
                                    n_values, values);
             if(closure != NULL)
@@ -659,6 +659,59 @@ void let_(GClosure *self, GValue *return_value,
 
 
 static
+void macro_(GClosure *self, GValue *return_value,
+           guint n_values, const GValue *values, GelContext *context)
+{
+    GList *tmp_list = NULL;
+    gchar *name = NULL;
+    GValueArray *vars = NULL;
+
+    if(gel_context_eval_params(context, __FUNCTION__, &n_values, &values, 
+            &tmp_list, "sa*", &name, &vars))
+    {
+        if(gel_context_get_variable(context, name) != NULL)
+            gel_error_symbol_exists(context, __FUNCTION__, name);
+        else
+        {
+            GClosure *closure = fn(context, name, TRUE,
+                                   vars->n_values, vars->values,
+                                   n_values, values);
+            if(closure != NULL)
+            {
+                GValue *value =
+                    gel_value_new_from_boxed(G_TYPE_CLOSURE, closure);
+                gel_context_insert(context, name, value);
+                gel_closure_close_over(closure);
+            }
+        }
+    }
+
+    gel_value_list_free(tmp_list);
+}
+
+
+static
+void eval_(GClosure *self, GValue *return_value,
+           guint n_values, const GValue *values, GelContext *context)
+{
+    guint n_args = 1;
+    if(n_values != n_args)
+    {
+        gel_error_needs_n_arguments(context, __FUNCTION__, n_args);
+        return;
+    }
+
+    GValue tmp_value = {0};
+    if(gel_context_eval_value(context, values + 0, &tmp_value))
+    {
+        gel_context_eval_value(context, &tmp_value, return_value);
+        g_value_unset(&tmp_value);
+    }
+    else
+        gel_value_copy(values + 0, return_value);
+}
+
+static
 void fn_(GClosure *self, GValue *return_value,
          guint n_values, const GValue *values, GelContext *context)
 {
@@ -668,7 +721,7 @@ void fn_(GClosure *self, GValue *return_value,
     if(gel_context_eval_params(context, __FUNCTION__,
             &n_values, &values, &tmp_list, "a*", &array))
     {
-        GClosure *closure = fn(context, "lambda",
+        GClosure *closure = fn(context, "lambda", FALSE,
             array->n_values, array->values, n_values, values);
         if(closure != NULL)
         {
@@ -2077,6 +2130,10 @@ GHashTable* gel_make_default_symbols(void)
         CLOSURE(defn),
         CLOSURE(do),
         CLOSURE(let),
+
+        /* macros */
+        CLOSURE(macro),
+        CLOSURE(eval),
 
         /* closures */
         CLOSURE(fn), /* array */
