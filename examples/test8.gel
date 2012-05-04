@@ -8,8 +8,8 @@
     )
 )
 
-(def K ["a" "b" "c"])
-(def V [1 2 3])
+(define K ["a" "b" "c"])
+(define V [1 2 3])
 
 ((comp hash + map) array K V)
 

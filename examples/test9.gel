@@ -21,7 +21,7 @@
 )
 
 
-(def n 5)
+(define n 5)
 
 (when (= n 5)
     (print "Positive test of 'when'")

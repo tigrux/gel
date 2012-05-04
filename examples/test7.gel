@@ -1,6 +1,6 @@
 
 (function Person (name age)
-    (def self {})
+    (define self {})
     (append self
         "name" name
         "age" age
@@ -27,7 +27,7 @@
     )
 )
 
-(def mary (Person "Maria Romanov" 35))
+(define mary (Person "Maria Romanov" 35))
 
 (print "My name is" (mary "name") "and I'm" (mary "age"))
 ( (mary "greet") "Hanna")

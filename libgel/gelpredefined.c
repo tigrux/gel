@@ -525,8 +525,8 @@ void hash_filter(GClosure *closure, GHashTable *hash, GValue *return_value,
 
 
 static
-void def_(GClosure *self, GValue *return_value,
-          guint n_values, const GValue *values, GelContext *context)
+void define_(GClosure *self, GValue *return_value,
+             guint n_values, const GValue *values, GelContext *context)
 {
     GList *tmp_list = NULL;
     gchar *name = NULL;
@@ -2138,7 +2138,7 @@ GHashTable* gel_make_default_symbols(void)
     struct {const gchar *name; GClosureMarshal marshal;} *c, closures[] =
     {
         /* bindings */
-        CLOSURE(def),
+        CLOSURE(define),
         CLOSURE(function),
         CLOSURE(do),
         CLOSURE(let),

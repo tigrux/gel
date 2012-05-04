@@ -7,9 +7,9 @@
     (set parent "child" child)
 )
 
-(def window (new (. Gtk Window)))
+(define window (new (. Gtk Window)))
 
-# the string 'title' was defined in the interpreter
+# the string 'title' was defineined in the interpreter
 (set window "title" title)
 
 (set window "default-width" 320)
@@ -21,22 +21,22 @@
     )
 )
 
-(def box (new (. Gtk VBox)))
+(define box (new (. Gtk VBox)))
 (add window box)
 (set box "border-width" 12)
 
-# the function 'make-label' was defined in the interpreter
-(def label (make-label))
+# the function 'make-label' was defineined in the interpreter
+(define label (make-label))
 (add box label)
 
-(def button (new (. Gtk Button)))
+(define button (new (. Gtk Button)))
 (add box button)
 (set button "label" "Click me!")
 
-(def entry (new (. Gtk Entry)))
+(define entry (new (. Gtk Entry)))
 (add box entry)
 
-(def counter 0)
+(define counter 0)
 
 (connect button "clicked"
     (function (widget)

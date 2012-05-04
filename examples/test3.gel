@@ -1,5 +1,5 @@
 
-(def S [-6 77 0.0 30.6 -15])
+(define S [-6 77 0.0 30.6 -15])
 
 
 (apply or S)
@@ -26,8 +26,8 @@
 (sort < ["omicron" "alpha" "gamma" "beta" "delta" "omega"])
 
 
-(def values [4.5 2])
-(def operators [+ - * /])
+(define values [4.5 2])
+(define operators [+ - * /])
 
 (function operate-values (oper)
     (apply oper values)
@@ -36,8 +36,8 @@
 (map operate-values operators)
 
 
-(def units [1 2 3])
-(def tens [10 20 30])
+(define units [1 2 3])
+(define tens [10 20 30])
 
 (map array units tens)
 

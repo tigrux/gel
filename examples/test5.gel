@@ -1,5 +1,5 @@
 
-(def colors ["red" "green" "blue"])
+(define colors ["red" "green" "blue"])
 
 (function palette ()
     (var colors)
@@ -15,10 +15,10 @@
 (print colors)
 
 
-(def message "hello")
+(define message "hello")
 
 (function salutation ()
-    (def message "hallo")
+    (define message "hallo")
     (print message)
 )
 

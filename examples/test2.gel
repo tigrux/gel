@@ -1,13 +1,13 @@
 
 (let (a 20 b (/ a 2) c (/ b 2) )
-    (def result (+ a b c))
+    (define result (+ a b c))
     result
 )
 
 
 (function primes-lesser-than (top)
-    (def primes [2])
-    (def n 3)
+    (define primes [2])
+    (define n 3)
     (function can-divide-n (i)
         (= (% n i) 0)
     )
@@ -23,7 +23,7 @@
     primes
 )
 
-(def primes (primes-lesser-than 100))
+(define primes (primes-lesser-than 100))
 
 (function index-of (value values)
     (function equal-to-value (i)
@@ -48,7 +48,7 @@
     )
 )
 
-(def n 10)
+(define n 10)
 (print "Factorial of" n "is" (factorial n))
 (print n "is" (if (= (% n 2) 0) "even" "odd"))
 
@@ -83,7 +83,7 @@
     )
 )
 
-(def month-I-was-born "December")
+(define month-I-was-born "December")
 
 (print month-I-was-born "has" (how-many-days-have? month-I-was-born) "days")
 
