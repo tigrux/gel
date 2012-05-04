@@ -265,8 +265,11 @@ gchar* gel_value_repr(const GValue *value)
  */
 gchar* gel_value_to_string(const GValue *value)
 {
-    if(value == NULL || !GEL_IS_VALUE(value))
-        return NULL;
+    if(value == NULL)
+        return g_strdup("NULL");
+
+    if(!GEL_IS_VALUE(value))
+        return g_strdup("VOID");
 
     if(GEL_VALUE_HOLDS(value, G_TYPE_STRING))
         return g_strdup(gel_value_get_string(value));
