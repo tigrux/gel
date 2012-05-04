@@ -21,9 +21,9 @@
 
 (keys fundamentals)
 
-(defn values (h)
+(function values (h)
     (map
-        (fn (k)
+        (function (k)
             (get h k)
         )
         (keys h)
@@ -33,8 +33,8 @@
 (values fundamentals)
 
 
-(defn comp (& functions)
-    (fn (& result)
+(function comp (& functions)
+    (function (& result)
         (for f (reverse functions)
             (set result (apply f result))
         )
@@ -48,7 +48,7 @@
 
 (apply +
     (map
-        (fn (i)
+        (function (i)
             (get romans-from-arabigs i)
         )
         [1000 900 50 10 10 5 1 1]

@@ -238,7 +238,6 @@ GClosure* gel_closure_new(const gchar *name, gboolean is_macro,
                           GelContext *context)
 {
     g_return_val_if_fail(context != NULL, NULL);
-    g_return_val_if_fail(name != NULL, NULL);
     g_return_val_if_fail(args != NULL, NULL);
     g_return_val_if_fail(code != NULL, NULL);
 
@@ -282,7 +281,9 @@ GClosure* gel_closure_new(const gchar *name, gboolean is_macro,
     GelContext *closure_context = gel_context_dup(context);
     gel_context_set_outer(closure_context, context);
 
-    self->name = g_strdup(name);
+    static guint counter = 0;
+
+    self->name = name ? g_strdup(name) : g_strdup_printf("lambda%u", counter++);
     self->is_macro = is_macro;
     self->args = list_args;
     self->args_hash = args_hash;

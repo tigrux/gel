@@ -5,13 +5,13 @@
 )
 
 
-(defn primes-lesser-than (top)
+(function primes-lesser-than (top)
     (def primes [2])
     (def n 3)
-    (defn can-divide-n (i)
+    (function can-divide-n (i)
         (= (% n i) 0)
     )
-    (defn none-prime (predicate)
+    (function none-prime (predicate)
         (= (find predicate primes) -1)
     )
     (while (< n top)
@@ -25,8 +25,8 @@
 
 (def primes (primes-lesser-than 100))
 
-(defn index-of (value values)
-    (defn equal-to-value (i)
+(function index-of (value values)
+    (function equal-to-value (i)
         (= i value)
     )
     (find equal-to-value values)
@@ -41,7 +41,7 @@
 (print "The last prime is" (get primes -1))
 
 
-(defn factorial (n)
+(function factorial (n)
     (if (<= n 0)
         1
         (* n (factorial (- n 1)))
@@ -52,7 +52,7 @@
 (print "Factorial of" n "is" (factorial n))
 (print n "is" (if (= (% n 2) 0) "even" "odd"))
 
-(defn fibonacci (n)
+(function fibonacci (n)
     (cond
         (= n 0)
             0
@@ -70,7 +70,7 @@
 )
 
 
-(defn how-many-days-have? (month)
+(function how-many-days-have? (month)
     (case month
         ("January" "March" "May" "July" "August" "October" "December")
             31

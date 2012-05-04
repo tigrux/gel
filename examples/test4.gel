@@ -1,17 +1,17 @@
 
-(defn generate-primes ()
+(function generate-primes ()
     (def primes [])
     (def candidate 2)
 
-    (defn none-prime (predicate)
+    (function none-prime (predicate)
         (= (find predicate primes) -1)
     )
 
-    (defn can-divide-candidate (i)
+    (function can-divide-candidate (i)
         (= (% candidate i) 0)
     )
 
-    (fn ()
+    (function ()
         (def calculated-prime 0)
         (while (= calculated-prime 0)
             (if (none-prime can-divide-candidate)

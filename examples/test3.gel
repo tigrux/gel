@@ -7,14 +7,14 @@
 (apply and S)
 
 
-(defn negative-of (n)
+(function negative-of (n)
     (- 0 n)
 )
 
 (map negative-of S)
 
 
-(defn is-positive (n)
+(function is-positive (n)
     (> n 0)
 )
 
@@ -29,7 +29,7 @@
 (def values [4.5 2])
 (def operators [+ - * /])
 
-(defn operate-values (oper)
+(function operate-values (oper)
     (apply oper values)
 )
 

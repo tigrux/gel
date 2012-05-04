@@ -546,34 +546,62 @@ void def_(GClosure *self, GValue *return_value,
 
 
 static
-void defn_(GClosure *self, GValue *return_value,
-           guint n_values, const GValue *values, GelContext *context)
+void function_(GClosure *self, GValue *return_value,
+               guint n_values, const GValue *values, GelContext *context)
 {
-    GList *tmp_list = NULL;
-    gchar *name = NULL;
-    GValueArray *vars = NULL;
-
-    if(gel_context_eval_params(context, __FUNCTION__, &n_values, &values, 
-            &tmp_list, "sa*", &name, &vars))
+    guint n_args = 2;
+    if(n_values < n_args)
     {
-        if(gel_context_get_variable(context, name) != NULL)
-            gel_error_symbol_exists(context, __FUNCTION__, name);
-        else
-        {
-            GClosure *closure = fn(context, name, FALSE,
-                                   vars->n_values, vars->values,
-                                   n_values, values);
-            if(closure != NULL)
-            {
-                GValue *value =
-                    gel_value_new_from_boxed(G_TYPE_CLOSURE, closure);
-                gel_context_insert(context, name, value);
-                gel_closure_close_over(closure);
-            }
-        }
+        gel_error_needs_at_least_n_arguments(context, __FUNCTION__, n_args);
+        return;
     }
 
-    gel_value_list_free(tmp_list);
+    const gchar *name = NULL;
+    const GValueArray *vars = NULL;
+
+    GType type = GEL_VALUE_TYPE(values + 0);
+    if(type == GEL_TYPE_SYMBOL)
+    {
+        const GelSymbol *symbol = gel_value_get_boxed(values + 0);
+        name = gel_symbol_get_name(symbol);
+        n_values--;
+        values++;
+    }
+
+    type = GEL_VALUE_TYPE(values + 0);
+    if(type == G_TYPE_VALUE_ARRAY)
+    {
+        vars = gel_value_get_boxed(values + 0);
+        n_values--;
+        values++;
+    }
+    else
+    {
+        gel_error_expected(context, __FUNCTION__, "array");
+        return;
+    }
+
+    if(name != NULL)
+        if(gel_context_get_variable(context, name) != NULL)
+        {
+            gel_error_symbol_exists(context, __FUNCTION__, name);
+            return;
+        }
+
+    GClosure *closure = fn(context, name, FALSE,
+                           vars->n_values, vars->values,
+                           n_values, values);
+    if(closure != NULL)
+    {
+        GValue *value =
+            gel_value_new_from_boxed(G_TYPE_CLOSURE, closure);
+        if(name != NULL)
+            gel_context_insert(context, name, value);
+        gel_closure_close_over(closure);
+
+        g_value_init(return_value, G_TYPE_CLOSURE);
+        g_value_set_boxed(return_value, closure);
+    }
 }
 
 
@@ -709,29 +737,6 @@ void eval_(GClosure *self, GValue *return_value,
     }
     else
         gel_value_copy(values + 0, return_value);
-}
-
-static
-void fn_(GClosure *self, GValue *return_value,
-         guint n_values, const GValue *values, GelContext *context)
-{
-    GValueArray *array;
-    GList *tmp_list = NULL;
-
-    if(gel_context_eval_params(context, __FUNCTION__,
-            &n_values, &values, &tmp_list, "a*", &array))
-    {
-        GClosure *closure = fn(context, "lambda", FALSE,
-            array->n_values, array->values, n_values, values);
-        if(closure != NULL)
-        {
-            gel_closure_close_over(closure);
-            g_value_init(return_value, G_TYPE_CLOSURE);
-            gel_value_take_boxed(return_value, closure);
-        }
-    }
-
-    gel_value_list_free(tmp_list);
 }
 
 
@@ -2134,7 +2139,7 @@ GHashTable* gel_make_default_symbols(void)
     {
         /* bindings */
         CLOSURE(def),
-        CLOSURE(defn),
+        CLOSURE(function),
         CLOSURE(do),
         CLOSURE(let),
 
@@ -2143,7 +2148,6 @@ GHashTable* gel_make_default_symbols(void)
         CLOSURE(eval),
 
         /* closures */
-        CLOSURE(fn), /* array */
         CLOSURE(apply),  /* array */
         CLOSURE(map),  /* array */
 

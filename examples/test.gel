@@ -3,7 +3,7 @@
 
 ( (. Gtk init) )
 
-(defn add (parent child)
+(function add (parent child)
     (set parent "child" child)
 )
 
@@ -16,7 +16,7 @@
 (set window "default-height" 120)
 
 (connect window "hide"
-    (fn (widget)
+    (function (widget)
         ( (. Gtk main-quit) )
     )
 )
@@ -39,7 +39,7 @@
 (def counter 0)
 
 (connect button "clicked"
-    (fn (widget)
+    (function (widget)
         (set widget "label" "Thanks!")
         (set counter (+ counter 1))
         (set entry "text" counter)

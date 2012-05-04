@@ -1,7 +1,7 @@
 
 (def colors ["red" "green" "blue"])
 
-(defn palette ()
+(function palette ()
     (var colors)
 )
 
@@ -17,7 +17,7 @@
 
 (def message "hello")
 
-(defn salutation ()
+(function salutation ()
     (def message "hallo")
     (print message)
 )
