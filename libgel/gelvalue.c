@@ -152,6 +152,8 @@ gchar* gel_value_stringify(const GValue *value, gchar* (*str)(const GValue *))
                 g_free(s);
             }
         }
+        else
+            g_string_append_c(buffer, ')');
 
         result =  g_string_free(buffer, FALSE);
     }
@@ -183,6 +185,8 @@ gchar* gel_value_stringify(const GValue *value, gchar* (*str)(const GValue *))
                 i++;
             }
         }
+        else
+            g_string_append_c(buffer, '}');
 
         result =  g_string_free(buffer, FALSE);
     }
