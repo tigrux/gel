@@ -687,7 +687,7 @@ void let_(GClosure *self, GValue *return_value,
 
 
 static
-void macro_(GClosure *self, GValue *return_value,
+void lazy_(GClosure *self, GValue *return_value,
            guint n_values, const GValue *values, GelContext *context)
 {
     GList *tmp_list = NULL;
@@ -2142,9 +2142,7 @@ GHashTable* gel_make_default_symbols(void)
         CLOSURE(function),
         CLOSURE(do),
         CLOSURE(let),
-
-        /* macros */
-        CLOSURE(macro),
+        CLOSURE(lazy),
         CLOSURE(eval),
 
         /* closures */

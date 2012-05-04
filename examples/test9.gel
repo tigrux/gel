@@ -1,25 +1,29 @@
 
-(macro not (test)
+(lazy not (test)
     (if (eval test)
         FALSE
         TRUE
     )
 )
 
-(macro when (test & body)
+(lazy when (test & body)
     (if (eval test)
         (apply do body)
         FALSE
     )
 )
 
-(macro unless (test & body)
+(lazy unless (test & body)
     (if (eval test)
         TRUE
         (apply do body)
     )
 )
 
+
+(not 0)
+
+(not 1)
 
 (define n 5)
 
@@ -38,8 +42,4 @@
 (unless (not (= n 5))
     (print "Positive test of 'unless'")
 )
-
-(not 0)
-
-(not 1)
 
