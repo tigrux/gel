@@ -14,9 +14,9 @@
 
 
 static
-GClosure* fn(GelContext *context, const gchar *name, gboolean is_macro,
-             guint n_vars, const GValue *var_values,
-             guint n_values, const GValue *values)
+GClosure* function(GelContext *context, const gchar *name, gboolean is_macro,
+                   guint n_vars, const GValue *var_values,
+                   guint n_values, const GValue *values)
 {
     gchar **vars = g_new0(gchar*, n_vars + 1);
     gchar *invalid_arg_name = NULL;
@@ -588,9 +588,9 @@ void function_(GClosure *self, GValue *return_value,
             return;
         }
 
-    GClosure *closure = fn(context, name, FALSE,
-                           vars->n_values, vars->values,
-                           n_values, values);
+    GClosure *closure = function(context, name, FALSE,
+                                 vars->n_values, vars->values,
+                                 n_values, values);
     if(closure != NULL)
     {
         GValue *value =
@@ -701,9 +701,9 @@ void lazy_(GClosure *self, GValue *return_value,
             gel_error_symbol_exists(context, __FUNCTION__, name);
         else
         {
-            GClosure *closure = fn(context, name, TRUE,
-                                   vars->n_values, vars->values,
-                                   n_values, values);
+            GClosure *closure = function(context, name, TRUE,
+                                         vars->n_values, vars->values,
+                                         n_values, values);
             if(closure != NULL)
             {
                 GValue *value =
