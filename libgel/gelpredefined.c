@@ -781,16 +781,23 @@ void map_(GClosure *self, GValue *return_value,
         if(i_array == n_arrays)
         {
             GValueArray *result_array = g_value_array_new(result_n_values);
-            GValue *result_values = result_array->values;
-            result_array->n_values = result_n_values;
 
             for(guint iv = 0; iv < result_n_values; iv++)
             {
                 GValueArray *array = g_value_array_new(n_arrays);
                 for(guint ia = 0; ia < n_arrays; ia++)
                     g_value_array_append(array, arrays[ia]->values + iv);
-                g_closure_invoke(closure, result_values + iv,
+
+                GValue tmp_value = {0};
+                g_closure_invoke(closure, &tmp_value,
                     array->n_values, array->values, context);
+
+                if(GEL_IS_VALUE(&tmp_value))
+                {
+                    g_value_array_append(result_array, &tmp_value);
+                    g_value_unset(&tmp_value);
+                }
+
                 g_value_array_free(array);
             }
 
