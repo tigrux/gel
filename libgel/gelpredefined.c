@@ -538,7 +538,7 @@ void define_(GClosure *self, GValue *return_value,
         if(gel_context_get_variable(context, name) != NULL)
             gel_error_symbol_exists(context, __FUNCTION__, name);
         else
-            gel_context_insert(context, name, gel_value_dup(value));
+            gel_context_define(context, name, gel_value_dup(value));
     }
 
     gel_value_list_free(tmp_list);
@@ -596,7 +596,7 @@ void function_(GClosure *self, GValue *return_value,
         GValue *value =
             gel_value_new_from_boxed(G_TYPE_CLOSURE, closure);
         if(name != NULL)
-            gel_context_insert(context, name, value);
+            gel_context_define(context, name, value);
         gel_closure_close_over(closure);
 
         g_value_init(return_value, G_TYPE_CLOSURE);
@@ -664,7 +664,7 @@ void let_(GClosure *self, GValue *return_value,
                 if(gel_context_eval_params(let_context, __FUNCTION__,
                         &binding_n_values, &binding_values,
                         &tmp_list, "sV*", &name, &value))
-                    gel_context_insert(let_context, name, gel_value_dup(value));
+                    gel_context_define(let_context, name, gel_value_dup(value));
                 else
                     failed = TRUE;
             }
@@ -708,7 +708,7 @@ void macro_(GClosure *self, GValue *return_value,
             {
                 GValue *value =
                     gel_value_new_from_boxed(G_TYPE_CLOSURE, closure);
-                gel_context_insert(context, name, value);
+                gel_context_define(context, name, value);
                 gel_closure_close_over(closure);
             }
         }
@@ -1857,7 +1857,7 @@ void for_(GClosure *self, GValue *return_value,
 
         GelContext *loop_context = gel_context_new_with_outer(context);
         GValue *iter_value = gel_value_new();
-        gel_context_insert(loop_context, iter_name, iter_value);
+        gel_context_define(loop_context, iter_name, iter_value);
 
         gboolean running = TRUE;
 
@@ -2009,7 +2009,7 @@ void require_(GClosure *self, GValue *return_value,
             if(ns != NULL)
             {
                 GValue *value = gel_value_new_from_boxed(GEL_TYPE_TYPELIB, ns);
-                gel_context_insert(context, namespace_, value);
+                gel_context_define(context, namespace_, value);
             }    
         }
         else

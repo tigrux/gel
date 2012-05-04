@@ -52,7 +52,7 @@ GType gel_context_get_type(void) G_GNUC_CONST;
  * @n_param_values: The number of parameters
  * @param_values: An array of #GValue with the parameters.
  * @invocation_context: The #GelContext for which this function is invoked, may be #NULL
- * @user_data: user data passed during the call to #gel_context_insert_function
+ * @user_data: user data passed during the call to #gel_context_define_function
  *
  * This type is used as the marshal of native closures.
  * It is basically a #GClosureMarshal with its arguments used to pass specific information.
@@ -69,10 +69,10 @@ void gel_context_free(GelContext *self);
 
 GValue* gel_context_lookup(const GelContext *self, const gchar *name);
 
-void gel_context_insert(GelContext *self, const gchar *name, GValue *value);
-void gel_context_insert_object(GelContext *self, const gchar *name,
+void gel_context_define(GelContext *self, const gchar *name, GValue *value);
+void gel_context_define_object(GelContext *self, const gchar *name,
                                GObject *object);
-void gel_context_insert_function(GelContext *self, const gchar *name,
+void gel_context_define_function(GelContext *self, const gchar *name,
                                  GelFunction function, void *user_data);
 
 gboolean gel_context_remove(GelContext *self, const gchar *name);

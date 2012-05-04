@@ -84,7 +84,7 @@ void gel_closure_marshal(GelClosure *self, GValue *return_value,
         GValue *value = gel_value_new();
 
         if(is_macro)
-            gel_context_insert(context, arg_name, gel_value_dup(values + i));
+            gel_context_define(context, arg_name, gel_value_dup(values + i));
         else
         {
             gel_context_eval_value(invocation_context, values + i, value);
@@ -95,7 +95,7 @@ void gel_closure_marshal(GelClosure *self, GValue *return_value,
                 goto end;
             }
             else
-                gel_context_insert(context, arg_name, value);
+                gel_context_define(context, arg_name, value);
         }
     }
 
@@ -125,7 +125,7 @@ void gel_closure_marshal(GelClosure *self, GValue *return_value,
         }
 
         GValue *value = gel_value_new_from_boxed(G_TYPE_VALUE_ARRAY, array);
-        gel_context_insert(context, self->variadic_arg, value);
+        gel_context_define(context, self->variadic_arg, value);
     }
 
     guint code_n_values = self->code->n_values;

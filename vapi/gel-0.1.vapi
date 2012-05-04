@@ -26,9 +26,9 @@ namespace Gel {
         public Context();
         public Context.with_outer(Gel.Context outer);
         public unowned GLib.Value lookup(string name);
-        public void insert(string name, owned GLib.Value? value);
-        public void insert_object(string name, owned GLib.Object object);
-        public void insert_function(string name, Gel.Function function);
+        public void define(string name, owned GLib.Value? value);
+        public void define_object(string name, owned GLib.Object object);
+        public void define_function(string name, Gel.Function function);
         public bool remove(string name);
         public bool eval(GLib.Value value, out GLib.Value dest_value) throws ContextError;
 

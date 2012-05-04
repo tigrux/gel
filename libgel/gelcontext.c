@@ -159,7 +159,7 @@ GelContext* gel_context_dup(const GelContext *self)
     g_hash_table_iter_init(&iter, self->variables);
 
     while(g_hash_table_iter_next(&iter, (void **)&name, (void **)&variable))
-        gel_context_insert_variable(context, name, variable);
+        gel_context_define_variable(context, name, variable);
 
     return context;
 }
@@ -448,7 +448,7 @@ GValue* gel_context_lookup(const GelContext *self, const gchar *name)
 }
 
 
-void gel_context_insert_variable(GelContext *self,
+void gel_context_define_variable(GelContext *self,
                                  const gchar *name, GelVariable *variable)
 {
     g_return_if_fail(self != NULL);
@@ -461,7 +461,7 @@ void gel_context_insert_variable(GelContext *self,
 
 
 /**
- * gel_context_insert:
+ * gel_context_define:
  * @self: #GelContext where to insert the symbol
  * @name: name of the symbol to insert
  * @value: value of the symbol to insert
@@ -469,7 +469,7 @@ void gel_context_insert_variable(GelContext *self,
  * Inserts a new symbol to @self with the name given by @name.
  * @self takes ownership of @value so it should not be freed or unset.
  */
-void gel_context_insert(GelContext *self,
+void gel_context_define(GelContext *self,
                         const gchar *name, GValue *value)
 {
     g_return_if_fail(self != NULL);
@@ -482,15 +482,15 @@ void gel_context_insert(GelContext *self,
 
 
 /**
- * gel_context_insert_object:
+ * gel_context_define_object:
  * @self: #GelContext where to insert the object
  * @name: name of the symbol to insert
  * @object: object to insert
  *
- * A wrapper for #gel_context_insert.
+ * A wrapper for #gel_context_define.
  * @self takes ownership of @object so it should not be freed or unset.
  */
-void gel_context_insert_object(GelContext *self, const gchar *name,
+void gel_context_define_object(GelContext *self, const gchar *name,
                                GObject *object)
 {
     g_return_if_fail(self != NULL);
@@ -503,21 +503,21 @@ void gel_context_insert_object(GelContext *self, const gchar *name,
         g_object_ref_sink(object);
 
     gel_value_take_object(value, object);
-    gel_context_insert(self, name, value);
+    gel_context_define(self, name, value);
 }
 
 
 /**
- * gel_context_insert_function:
+ * gel_context_define_function:
  * @self: #GelContext where to insert the function
  * @name: name of the symbol to insert
  * @function: a #GelFunction to invoke
  * @user_data: extra data to pass to @function
  *
- * A wrapper for #gel_context_insert that calls @marshal when
+ * A wrapper for #gel_context_define that calls @marshal when
  * @self evaluates a call to a function named @name.
  */
-void gel_context_insert_function(GelContext *self, const gchar *name,
+void gel_context_define_function(GelContext *self, const gchar *name,
                                  GelFunction function, void *user_data)
 {
     g_return_if_fail(self != NULL);
@@ -530,7 +530,7 @@ void gel_context_insert_function(GelContext *self, const gchar *name,
     closure->data = user_data;
 
     gel_value_take_boxed(value, closure);
-    gel_context_insert(self, name, value);
+    gel_context_define(self, name, value);
 }
 
 

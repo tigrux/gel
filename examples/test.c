@@ -55,13 +55,13 @@ int main(int argc, char *argv[])
     GelContext *context = gel_context_new();
 
     /* insert a function to make it available from the script */
-    gel_context_insert_function(context, "make-label", make_label, NULL);
+    gel_context_define_function(context, "make-label", make_label, NULL);
 
     /* insert a string to make it available from the script */
     GValue *title_value = g_new0(GValue, 1);
     g_value_init(title_value, G_TYPE_STRING);
     g_value_set_string(title_value, "Hello Gtk from Gel");
-    gel_context_insert(context, "title", title_value);
+    gel_context_define(context, "title", title_value);
 
     /* for each value obtained during the parsing ... */
     for(guint i = 0; i < parsed_array->n_values; i++)

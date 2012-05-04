@@ -6,7 +6,7 @@
 #include <gelclosure.h>
 #include <gelclosureprivate.h>
 
-void gel_context_insert_variable(GelContext *self,
+void gel_context_define_variable(GelContext *self,
                                  const gchar *name, GelVariable *variable);
 
 GelVariable* gel_context_lookup_variable(const GelContext *self,

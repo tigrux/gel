@@ -8,10 +8,10 @@ gel_context_new_with_outer
 gel_context_dup
 gel_context_free
 gel_context_lookup
-gel_context_insert
-gel_context_insert_object
+gel_context_define
+gel_context_define_object
 GelFunction
-gel_context_insert_function
+gel_context_define_function
 gel_context_remove
 gel_context_eval
 gel_context_clear_error
