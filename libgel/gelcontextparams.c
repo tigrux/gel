@@ -73,6 +73,9 @@ gboolean gel_context_eval_param(GelContext *self, const gchar *func,
             value = gel_value_new();
             result =
                 gel_context_eval_param_into_value(self, *values, value);
+            if(gel_context_error(self))
+                parsed = FALSE;
+            else
             if(!GEL_VALUE_HOLDS(result, GEL_TYPE_SYMBOL))
                 gel_args_pop(args, const GValue *) = result;
             else
@@ -96,6 +99,9 @@ gboolean gel_context_eval_param(GelContext *self, const gchar *func,
             value = gel_value_new();
             result =
                 gel_context_eval_param_into_value(self, *values, value);
+            if(gel_context_error(self))
+                parsed = FALSE;
+            else
             if(GEL_VALUE_HOLDS(result, G_TYPE_VALUE_ARRAY))
                 gel_args_pop(args, void *) = gel_value_get_boxed(result);
             else
@@ -109,6 +115,9 @@ gboolean gel_context_eval_param(GelContext *self, const gchar *func,
             value = gel_value_new();
             result =
                 gel_context_eval_param_into_value(self, *values, value);
+            if(gel_context_error(self))
+                parsed = FALSE;
+            else
             if(GEL_VALUE_HOLDS(result, G_TYPE_HASH_TABLE))
                 gel_args_pop(args, void *) = gel_value_get_boxed(result);
             else
@@ -135,6 +144,9 @@ gboolean gel_context_eval_param(GelContext *self, const gchar *func,
             value = gel_value_new();
             result =
                 gel_context_eval_param_into_value(self, *values, value);
+            if(gel_context_error(self))
+                parsed = FALSE;
+            else
             if(GEL_VALUE_HOLDS(result, G_TYPE_STRING))
                 gel_args_pop(args, const gchar *) = gel_value_get_string(result);
             else
@@ -148,6 +160,9 @@ gboolean gel_context_eval_param(GelContext *self, const gchar *func,
             value = gel_value_new();
             result =
                 gel_context_eval_param_into_value(self, *values, value);
+            if(gel_context_error(self))
+                parsed = FALSE;
+            else
             if(GEL_VALUE_HOLDS(result, G_TYPE_INT64))
                 gel_args_pop(args, gint64) = gel_value_get_int64(result);
             else
@@ -161,6 +176,9 @@ gboolean gel_context_eval_param(GelContext *self, const gchar *func,
             value = gel_value_new();
             result =
                 gel_context_eval_param_into_value(self, *values, value);
+            if(gel_context_error(self))
+                parsed = FALSE;
+            else
             if(GEL_VALUE_HOLDS(result, G_TYPE_DOUBLE))
                 gel_args_pop(args, gdouble) = gel_value_get_double(result);
             else
@@ -174,6 +192,9 @@ gboolean gel_context_eval_param(GelContext *self, const gchar *func,
             value = gel_value_new();
             result =
                 gel_context_eval_param_into_value(self, *values, value);
+            if(gel_context_error(self))
+                parsed = FALSE;
+            else
             if(GEL_VALUE_HOLDS(result, G_TYPE_OBJECT))
                 gel_args_pop(args, void *) = gel_value_get_object(result);
             else
@@ -187,6 +208,9 @@ gboolean gel_context_eval_param(GelContext *self, const gchar *func,
             value = gel_value_new();
             result =
                 gel_context_eval_param_into_value(self, *values, value);
+            if(gel_context_error(self))
+                parsed = FALSE;
+            else
             if(GEL_VALUE_HOLDS(result, G_TYPE_CLOSURE))
                 gel_args_pop(args, void *) = gel_value_get_boxed(result);
             else
