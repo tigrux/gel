@@ -35,7 +35,7 @@ struct _GelClosure
     GClosure closure;
     GelContext *context;
     gchar *name;
-    gboolean is_macro;
+    gboolean evaluate;
     GList *args;
     gchar *variadic_arg;
     GHashTable *args_hash;
@@ -52,7 +52,7 @@ void gel_closure_marshal(GelClosure *self, GValue *return_value,
 
     const guint n_args = g_list_length(self->args);
     gboolean is_variadic_arg = (self->variadic_arg != NULL);
-    gboolean is_macro = self->is_macro;
+    gboolean evaluate = self->evaluate;
 
     if(is_variadic_arg)
     {
@@ -83,7 +83,7 @@ void gel_closure_marshal(GelClosure *self, GValue *return_value,
         const gchar *arg_name = iter->data;
         GValue *value = gel_value_new();
 
-        if(is_macro)
+        if(evaluate)
             gel_context_define(context, arg_name, gel_value_dup(values + i));
         else
         {
@@ -103,7 +103,7 @@ void gel_closure_marshal(GelClosure *self, GValue *return_value,
     {
         guint array_n_values = n_values - i;
         GValueArray *array = g_value_array_new(array_n_values);
-        if(is_macro)
+        if(evaluate)
             for(guint j = 0; i < n_values; i++, j++)
                 g_value_array_append(array, values + i);
         else
@@ -220,6 +220,7 @@ void gel_closure_close_over(GClosure *closure)
 /**
  * gel_closure_new:
  * @name: name of the closure.
+ * @evaluate: #TRUE if the arguments are to be evaluated
  * @args: #NULL terminated array of strings with the closure argument names.
  * @code: #GValueArray with the code of the closure.
  * @context: #GelContext where to define a #GClosure.
@@ -233,7 +234,7 @@ void gel_closure_close_over(GClosure *closure)
  *
  * Returns: a new #GClosure
  */
-GClosure* gel_closure_new(const gchar *name, gboolean is_macro,
+GClosure* gel_closure_new(const gchar *name, gboolean evaluate,
                           gchar **args, GValueArray *code,
                           GelContext *context)
 {
@@ -284,7 +285,7 @@ GClosure* gel_closure_new(const gchar *name, gboolean is_macro,
     static guint counter = 0;
 
     self->name = name ? g_strdup(name) : g_strdup_printf("lambda%u", counter++);
-    self->is_macro = is_macro;
+    self->evaluate = evaluate;
     self->args = list_args;
     self->args_hash = args_hash;
     self->code = code;
