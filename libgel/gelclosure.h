@@ -4,8 +4,8 @@
 #include <gelcontext.h>
 
 GClosure* gel_closure_new(const gchar *name, gboolean evaluate,
-                          gchar **args, GValueArray *code,
-                          GelContext *context);
+                          GList *args, gchar *variadic, 
+                          GValueArray *code, GelContext *context);
 
 GClosure* gel_closure_new_native(const gchar *name, GClosureMarshal marshal);
 

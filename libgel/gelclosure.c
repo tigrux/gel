@@ -84,8 +84,6 @@ void gel_closure_marshal(GelClosure *self, GValue *return_value,
         GValue *value = gel_value_new();
 
         if(evaluate)
-            gel_context_define(context, arg_name, gel_value_dup(values + i));
-        else
         {
             gel_context_eval_value(invocation_context, values + i, value);
 
@@ -97,6 +95,8 @@ void gel_closure_marshal(GelClosure *self, GValue *return_value,
             else
                 gel_context_define(context, arg_name, value);
         }
+        else
+            gel_context_define(context, arg_name, gel_value_dup(values + i));
     }
 
     if(is_variadic_arg)
@@ -104,9 +104,6 @@ void gel_closure_marshal(GelClosure *self, GValue *return_value,
         guint array_n_values = n_values - i;
         GValueArray *array = g_value_array_new(array_n_values);
         if(evaluate)
-            for(guint j = 0; i < n_values; i++, j++)
-                g_value_array_append(array, values + i);
-        else
         {
             array->n_values = array_n_values;
             GValue *array_values = array->values;
@@ -123,6 +120,9 @@ void gel_closure_marshal(GelClosure *self, GValue *return_value,
                 }
             }
         }
+        else
+            for(guint j = 0; i < n_values; i++, j++)
+                g_value_array_append(array, values + i);
 
         GValue *value = gel_value_new_from_boxed(G_TYPE_VALUE_ARRAY, array);
         gel_context_define(context, self->variadic_arg, value);
@@ -235,11 +235,10 @@ void gel_closure_close_over(GClosure *closure)
  * Returns: a new #GClosure
  */
 GClosure* gel_closure_new(const gchar *name, gboolean evaluate,
-                          gchar **args, GValueArray *code,
-                          GelContext *context)
+                          GList *args, gchar *variadic, 
+                          GValueArray *code, GelContext *context)
 {
     g_return_val_if_fail(context != NULL, NULL);
-    g_return_val_if_fail(args != NULL, NULL);
     g_return_val_if_fail(code != NULL, NULL);
 
     GClosure *closure = g_closure_new_simple(sizeof(GelClosure), NULL);
@@ -250,34 +249,15 @@ GClosure* gel_closure_new(const gchar *name, gboolean evaluate,
 
     GelClosure *self = (GelClosure*)closure;
     GHashTable *args_hash = g_hash_table_new(g_str_hash, g_str_equal);
-    GList *list_args = NULL;
-    gboolean next_is_variadic_arg = FALSE;
 
-    for(guint i = 0; args[i] != NULL; i++)
+    for(GList *iter = args; iter != NULL; iter = iter->next)
     {
-        gchar *arg = args[i];
-        if(self->variadic_arg == NULL)
-        {
-            if(g_strcmp0(arg, "&") == 0)
-            {
-                next_is_variadic_arg = TRUE;
-                arg = NULL;
-            }
-            else
-            if(next_is_variadic_arg)
-            {
-                self->variadic_arg = g_strdup(arg);
-                g_hash_table_insert(args_hash, arg, arg);
-                arg = NULL;
-            }
-        }
-
-        if(arg != NULL)
-        {
-            list_args = g_list_append(list_args, g_strdup(arg));
-            g_hash_table_insert(args_hash, arg, arg);
-        }
+        const gchar *arg = iter->data;
+        g_hash_table_insert(args_hash, (void *)arg, (void *)arg);
     }
+    
+    if(variadic != NULL)
+        g_hash_table_insert(args_hash, (void *)variadic, (void *)variadic);
 
     GelContext *closure_context = gel_context_dup(context);
     gel_context_set_outer(closure_context, context);
@@ -286,7 +266,8 @@ GClosure* gel_closure_new(const gchar *name, gboolean evaluate,
 
     self->name = name ? g_strdup(name) : g_strdup_printf("lambda%u", counter++);
     self->evaluate = evaluate;
-    self->args = list_args;
+    self->args = args;
+    self->variadic_arg = variadic;
     self->args_hash = args_hash;
     self->code = code;
     self->context = closure_context;

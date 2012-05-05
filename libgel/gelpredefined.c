@@ -14,48 +14,35 @@
 
 
 static
-GClosure* function(GelContext *context, const gchar *name, gboolean is_macro,
-                   guint n_vars, const GValue *var_values,
+GClosure* function(GelContext *context, const gchar *name, gboolean evaluate,
+                   const GValueArray *vars,
                    guint n_values, const GValue *values)
 {
-    gchar **vars = g_new0(gchar*, n_vars + 1);
-    gchar *invalid_arg_name = NULL;
+    GValueArray *code = NULL;
+    gchar *variadic = NULL;
+    gchar *invalid = NULL;
 
-    for(guint i = 0; i < n_vars; i++)
-    {
-        const GValue *value = var_values + i;
-        if(GEL_VALUE_HOLDS(value, GEL_TYPE_SYMBOL))
-        {
-            GelSymbol *symbol = gel_value_get_boxed(value);
-            vars[i] = g_strdup(gel_symbol_get_name(symbol));
-        }
-        else
-        {
-            invalid_arg_name = gel_value_to_string(value);
-            break;
-        }
-    }
+    GList *args = gel_args_from_array(vars, &variadic, &invalid);
 
-    GClosure *self;
-    if(invalid_arg_name == NULL)
+    if(invalid == NULL)
     {
-        GValueArray *code = g_value_array_new(n_values);
+        code = g_value_array_new(n_values);
         for(guint i = 0; i < n_values; i++)
             g_value_array_append(code, values + i);
-        self = gel_closure_new(name, is_macro, vars, code, context);
-        g_closure_ref(self);
-        g_closure_sink(self);
     }
     else
     {
-        gel_error_invalid_argument_name(context,
-            __FUNCTION__, invalid_arg_name);
-        g_free(invalid_arg_name);
-        for(guint i = 0; i < n_vars; i++)
-            if(vars[i] != NULL)
-                g_free(vars[i]);
-        g_free(vars);
-        self = NULL;
+        gel_error_invalid_argument_name(context, __FUNCTION__, invalid);
+        g_free(invalid);
+    }
+
+    GClosure *self = NULL;
+
+    if(code != NULL)
+    {
+        self = gel_closure_new(name, evaluate, args, variadic, code, context);
+        g_closure_ref(self);
+        g_closure_sink(self);
     }
 
     return self;
@@ -558,8 +545,23 @@ void function_(GClosure *self, GValue *return_value,
 
     const gchar *name = NULL;
     const GValueArray *vars = NULL;
+    gboolean evaluate = TRUE;
 
     GType type = GEL_VALUE_TYPE(values + 0);
+    if(type == GEL_TYPE_SYMBOL)
+    {
+        const GelSymbol *symbol = gel_value_get_boxed(values + 0);
+        const gchar *symbol_name = gel_symbol_get_name(symbol);
+
+        if(g_strcmp0(symbol_name, "!") == 0)
+        {
+            evaluate = FALSE;
+            n_values--;
+            values++;
+        }
+    }
+
+    type = GEL_VALUE_TYPE(values + 0);
     if(type == GEL_TYPE_SYMBOL)
     {
         const GelSymbol *symbol = gel_value_get_boxed(values + 0);
@@ -588,9 +590,9 @@ void function_(GClosure *self, GValue *return_value,
             return;
         }
 
-    GClosure *closure = function(context, name, FALSE,
-                                 vars->n_values, vars->values,
-                                 n_values, values);
+    GClosure *closure =
+        function(context, name, evaluate, vars, n_values, values);
+
     if(closure != NULL)
     {
         GValue *value =
@@ -680,38 +682,6 @@ void let_(GClosure *self, GValue *return_value,
         else
             gel_error_expected(context, __FUNCTION__,
                 "an even number of values in bindings");
-    }
-
-    gel_value_list_free(tmp_list);
-}
-
-
-static
-void lazy_(GClosure *self, GValue *return_value,
-           guint n_values, const GValue *values, GelContext *context)
-{
-    GList *tmp_list = NULL;
-    gchar *name = NULL;
-    GValueArray *vars = NULL;
-
-    if(gel_context_eval_params(context, __FUNCTION__, &n_values, &values, 
-            &tmp_list, "sa*", &name, &vars))
-    {
-        if(gel_context_get_variable(context, name) != NULL)
-            gel_error_symbol_exists(context, __FUNCTION__, name);
-        else
-        {
-            GClosure *closure = function(context, name, TRUE,
-                                         vars->n_values, vars->values,
-                                         n_values, values);
-            if(closure != NULL)
-            {
-                GValue *value =
-                    gel_value_new_from_boxed(G_TYPE_CLOSURE, closure);
-                gel_context_define(context, name, value);
-                gel_closure_close_over(closure);
-            }
-        }
     }
 
     gel_value_list_free(tmp_list);
@@ -2142,7 +2112,6 @@ GHashTable* gel_make_default_symbols(void)
         CLOSURE(function),
         CLOSURE(do),
         CLOSURE(let),
-        CLOSURE(lazy),
         CLOSURE(eval),
 
         /* closures */

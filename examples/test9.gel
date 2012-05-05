@@ -1,19 +1,19 @@
 
-(lazy not (test)
+(function ! not (test)
     (if (eval test)
         FALSE
         TRUE
     )
 )
 
-(lazy when (test & body)
+(function ! when (test & body)
     (if (eval test)
         (apply do body)
         FALSE
     )
 )
 
-(lazy unless (test & body)
+(function ! unless (test & body)
     (if (eval test)
         TRUE
         (apply do body)
