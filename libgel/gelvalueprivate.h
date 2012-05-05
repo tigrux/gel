@@ -85,6 +85,9 @@ GValue* gel_value_new_from_boxed(GType type, gpointer boxed);
 GValue* gel_value_dup(const GValue *value);
 void gel_value_free(GValue *value);
 
+GList* gel_args_from_array(const GValueArray *vars, gchar **variadic,
+                           gchar **invalid);
+
 GHashTable* gel_hash_table_new(void);
 
 GelVariable* gel_variable_lookup_predefined(const gchar *name);

@@ -428,6 +428,61 @@ GHashTable* gel_hash_table_new(void)
 }
 
 
+GList* gel_args_from_array(const GValueArray *vars, gchar **variadic,
+                           gchar **invalid)
+{
+    gboolean next_is_variadic = FALSE;
+    GList *args = NULL;
+    gboolean failed = FALSE;
+
+    guint n_vars = vars->n_values;
+    const GValue *var_values = vars->values;
+
+    for(guint i = 0; i < n_vars; i++)
+    {
+        const GValue *value = var_values + i;
+        if(GEL_VALUE_HOLDS(value, GEL_TYPE_SYMBOL))
+        {
+            GelSymbol *symbol = gel_value_get_boxed(value);
+            const gchar *arg = gel_symbol_get_name(symbol);
+
+            if(*variadic == NULL)
+            {
+                if(g_strcmp0(arg, "&") == 0)
+                {
+                    next_is_variadic = TRUE;
+                    arg = NULL;
+                }
+                else
+                if(next_is_variadic)
+                {
+                    *variadic = g_strdup(arg);
+                    arg = NULL;
+                }
+            }
+
+            if(arg != NULL)
+                args = g_list_append(args, g_strdup(arg));
+        }
+        else
+        {
+            *invalid = gel_value_repr(value);
+            failed = TRUE;
+            break;
+        }
+    }
+
+    if(failed)
+    {
+        g_list_foreach(args, (GFunc)g_free, NULL);
+        g_list_free(args);
+        args = NULL;
+    }
+
+    return args;
+}
+
+
 static
 gboolean gel_values_simple_add(const GValue *v1, const GValue *v2, 
                                GValue *dest_value)
@@ -745,7 +800,6 @@ gboolean gel_values_simple_ne(const GValue *v1, const GValue *v2)
         return gel_values_cmp(v1, v2) != 0;
     return FALSE;
 }
-
 
 
 static
