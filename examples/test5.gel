@@ -14,13 +14,3 @@
 (set (palette) ["cyan" "magenta" "yellow"])
 (print colors)
 
-
-(define message "hello")
-
-(function salutation ()
-    (define message "hallo")
-    (print message)
-)
-
-(salutation)
-
