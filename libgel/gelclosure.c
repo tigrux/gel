@@ -51,10 +51,10 @@ void gel_closure_marshal(GelClosure *self, GValue *return_value,
     invocation_context = gel_context_validate(invocation_context);
 
     const guint n_args = g_list_length(self->args);
-    gboolean is_variadic_arg = (self->variadic_arg != NULL);
+    gboolean is_variadic = (self->variadic_arg != NULL);
     gboolean evaluate = self->evaluate;
 
-    if(is_variadic_arg)
+    if(is_variadic)
     {
         if(n_values < n_args)
         {
@@ -99,10 +99,11 @@ void gel_closure_marshal(GelClosure *self, GValue *return_value,
             gel_context_define(context, arg_name, gel_value_dup(values + i));
     }
 
-    if(is_variadic_arg)
+    if(is_variadic)
     {
         guint array_n_values = n_values - i;
         GValueArray *array = g_value_array_new(array_n_values);
+
         if(evaluate)
         {
             array->n_values = array_n_values;
@@ -221,7 +222,8 @@ void gel_closure_close_over(GClosure *closure)
  * gel_closure_new:
  * @name: name of the closure.
  * @evaluate: #TRUE if the arguments are to be evaluated
- * @args: #NULL terminated array of strings with the closure argument names.
+ * @args: #GList of strings with the closure argument names.
+ * @variadic: name of the argument to hold the array of remaining args
  * @code: #GValueArray with the code of the closure.
  * @context: #GelContext where to define a #GClosure.
  *
