@@ -13,7 +13,7 @@ struct _GelMacro
 };
 
 
-static GHashTable *gel_macros = NULL;
+static GHashTable *macros_HASH = NULL;
 
 
 GelMacro* gel_macro_new(const gchar *name,
@@ -43,9 +43,9 @@ void gel_macro_free(GelMacro *self)
 
 void gel_macros_new(void)
 {
-    g_return_if_fail(gel_macros == NULL);
+    g_return_if_fail(macros_HASH == NULL);
 
-    gel_macros = g_hash_table_new_full(
+    macros_HASH = g_hash_table_new_full(
         g_str_hash, g_str_equal,
         g_free, (GDestroyNotify)gel_macro_free);
 }
@@ -53,10 +53,10 @@ void gel_macros_new(void)
 
 void gel_macros_free(void)
 {
-    g_return_if_fail(gel_macros != NULL);
+    g_return_if_fail(macros_HASH != NULL);
 
-    g_hash_table_unref(gel_macros);
-    gel_macros = NULL;
+    g_hash_table_unref(macros_HASH);
+    macros_HASH = NULL;
 }
 
 
@@ -64,18 +64,18 @@ static
 void gel_macros_insert(const gchar *name, GList *args, gchar *variadic,
                        GValueArray *code)
 {
-    g_return_if_fail(gel_macros != NULL);
+    g_return_if_fail(macros_HASH != NULL);
 
-    g_hash_table_insert(gel_macros,
+    g_hash_table_insert(macros_HASH,
         g_strdup(name), gel_macro_new(name, args, variadic, code));
 }
 
 
 GelMacro* gel_macros_lookup(const gchar *name)
 {
-    g_return_val_if_fail(gel_macros != NULL, NULL);
+    g_return_val_if_fail(macros_HASH != NULL, NULL);
 
-    return g_hash_table_lookup(gel_macros, name);
+    return g_hash_table_lookup(macros_HASH, name);
 }
 
 
