@@ -6,6 +6,14 @@
     (quote name) value
 )
 
+(macro get-field (attr)
+    (get self (quote name))
+)
+
+(macro set-field (attr value)
+    (set self (quote name) value)
+)
+
 (macro class (name args & body)
     (function name args
         (define self {})
@@ -14,14 +22,6 @@
             (get self attr)
         )
     )
-)
-
-(macro get-field (attr)
-    (get self (quote name))
-)
-
-(macro set-field (attr value)
-    (set self (quote name) value)
 )
 
 
