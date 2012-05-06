@@ -61,8 +61,8 @@ void gel_macros_free(void)
 
 
 static
-void gel_register_macro(const gchar *name, GList *args, gchar *variadic,
-                        GValueArray *code)
+void gel_macros_insert(const gchar *name, GList *args, gchar *variadic,
+                       GValueArray *code)
 {
     g_return_if_fail(gel_macros != NULL);
 
@@ -71,14 +71,11 @@ void gel_register_macro(const gchar *name, GList *args, gchar *variadic,
 }
 
 
-GelMacro* gel_macro_lookup(const gchar *name)
+GelMacro* gel_macros_lookup(const gchar *name)
 {
-    GelMacro *macro = NULL;
+    g_return_val_if_fail(gel_macros != NULL, NULL);
 
-    if(gel_macros != NULL)
-        macro = g_hash_table_lookup(gel_macros, name);
-
-    return macro;
+    return g_hash_table_lookup(gel_macros, name);
 }
 
 
@@ -252,12 +249,12 @@ GValueArray* gel_macro_code_from_value(GValue *pre_value, GError **error)
             for(guint i = 0; i < n_values; i++)
                 g_value_array_append(code, values + i);
 
-            gel_register_macro(name, args, variadic, code);
+            gel_macros_insert(name, args, variadic, code);
             return g_value_array_new(0);
         }
         else
         {
-            GelMacro *macro = gel_macro_lookup(name);
+            GelMacro *macro = gel_macros_lookup(name);
             if(macro != NULL)
                 return gel_macro_invoke(macro, n_values, values, error);
         }
