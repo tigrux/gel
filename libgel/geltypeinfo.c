@@ -120,25 +120,25 @@ void gel_type_info_insert_multiple(GelTypeInfo *self,
 
 
 static
-GHashTable *gel_type_info_gtypes = NULL;
+GHashTable *gtypes_HASH = NULL;
 
 
 static
 void gel_type_info_register(GelTypeInfo *self)
 {
-    if(gel_type_info_gtypes == NULL)
-        gel_type_info_gtypes = g_hash_table_new(g_direct_hash, g_direct_equal);
+    if(gtypes_HASH == NULL)
+        gtypes_HASH = g_hash_table_new(g_direct_hash, g_direct_equal);
 
     GType type = g_registered_type_info_get_g_type(self->info);
-    g_hash_table_insert(gel_type_info_gtypes, GINT_TO_POINTER(type), self);
+    g_hash_table_insert(gtypes_HASH, GINT_TO_POINTER(type), self);
 }
 
 
 GelTypeInfo* gel_type_info_from_gtype(GType type)
 {
     GelTypeInfo *info = NULL;
-    if(gel_type_info_gtypes != NULL)
-        info = g_hash_table_lookup(gel_type_info_gtypes, GINT_TO_POINTER(type));
+    if(gtypes_HASH != NULL)
+        info = g_hash_table_lookup(gtypes_HASH, GINT_TO_POINTER(type));
 
     return info;
 }
@@ -470,7 +470,7 @@ gboolean gel_type_info_property_to_value(const GelTypeInfo *self,
         result = TRUE;
     }
 
-    return result;;
+    return result;
 }
 
 
