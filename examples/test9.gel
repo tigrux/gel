@@ -1,6 +1,3 @@
-(macro method (name args & body)
-    (quote name) (function args body)
-)
 
 (macro field (name value)
     (quote name) value
@@ -12,6 +9,10 @@
 
 (macro set-field (attr value)
     (set self (quote name) value)
+)
+
+(macro method (name args & body)
+    (quote name) (function args body)
 )
 
 (macro class (name args & body)
@@ -48,7 +49,7 @@
 )
 
 
-(define mary (Person "Maria Romanov" 35))
+(define mary (Person "Maria" 35))
 
 (print "My name is" (mary "name") "and I'm" (mary "age"))
 ( (mary "greet") "Hanna")

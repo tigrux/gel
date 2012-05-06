@@ -80,9 +80,9 @@ GelMacro* gel_macros_lookup(const gchar *name)
 
 
 static
-GValueArray* gel_macro_replace_array(const GelMacro *self,
-                                     GHashTable *hash, GValueArray *array,
-                                     GError **error)
+GValueArray* gel_macro_map_code(const GelMacro *self,
+                                 GHashTable *hash, GValueArray *array,
+                                 GError **error)
 {
     GValue *values = array->values;
     guint n_values = array->n_values;
@@ -120,7 +120,7 @@ GValueArray* gel_macro_replace_array(const GelMacro *self,
         {
             GValueArray *array = gel_value_get_boxed(values + i);
             GValueArray *new_array =
-                gel_macro_replace_array(self, hash, array, error);
+                gel_macro_map_code(self, hash, array, error);
 
             GValue tmp_value = {0};
             g_value_init(&tmp_value, G_TYPE_VALUE_ARRAY);
@@ -167,14 +167,14 @@ GValueArray* gel_macro_invoke(const GelMacro *self,
         return NULL;
     }
 
-    GHashTable *replacements = g_hash_table_new(g_str_hash, g_str_equal);
+    GHashTable *mappings = g_hash_table_new(g_str_hash, g_str_equal);
 
     guint i = 0;
     for(GList *iter = self->args; iter != NULL; iter = iter->next, i++)
     {
         const gchar *arg = iter->data;
         const GValue *value = values + i;
-        g_hash_table_insert(replacements, (void* )arg, (void *)value);
+        g_hash_table_insert(mappings, (void* )arg, (void *)value);
     }
 
     if(is_variadic)
@@ -186,12 +186,12 @@ GValueArray* gel_macro_invoke(const GelMacro *self,
             g_value_array_append(array, values + i);
 
         GValue *value = gel_value_new_from_boxed(G_TYPE_VALUE_ARRAY, array);
-        g_hash_table_insert(replacements, self->variadic, value);
+        g_hash_table_insert(mappings, self->variadic, value);
     }
 
     GValueArray *code =
-        gel_macro_replace_array(self, replacements, self->code, error);
-    g_hash_table_unref(replacements);
+        gel_macro_map_code(self, mappings, self->code, error);
+    g_hash_table_unref(mappings);
 
     return code;
 }
