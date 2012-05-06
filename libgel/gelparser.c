@@ -4,6 +4,7 @@
 #include <gelsymbol.h>
 #include <gelvalue.h>
 #include <gelvalueprivate.h>
+#include <gelmacro.h>
 
 #define ARRAY_N_PREALLOCATED 8
 
@@ -34,103 +35,6 @@ const gchar *scanner_errors[] = {
     "Non-decimal floating point number",
     "Malformed floating point number"
 };
-
-
-static
-void gel_register_macro(const gchar *name, gchar **args, GValueArray *code)
-{
-    // TODO
-}
-
-
-gint gel_post_parse(GValue *pre_value, GError **error)
-{
-    if(GEL_VALUE_TYPE(pre_value) == G_TYPE_VALUE_ARRAY)
-    {
-        GValueArray *array = gel_value_get_boxed(pre_value);
-
-        GValue *values = array->values;
-        guint n_values = array->n_values;
-
-        GType type = GEL_VALUE_TYPE(values + 0);
-        if(type != GEL_TYPE_SYMBOL)
-            return 1;
-
-        GelSymbol *symbol = gel_value_get_boxed(values + 0);
-        const gchar *name = gel_symbol_get_name(symbol);
-
-        if(g_strcmp0(name, "macro") == 0)
-        {
-            if(n_values < 3)
-            {
-                g_propagate_error(error, g_error_new(
-                    GEL_PARSE_ERROR, GEL_PARSE_ERROR_MACRO_MALFORMED,
-                    "Macro: expected arguments and code"));
-                return -1;
-            }
-
-            symbol = gel_value_get_boxed(values + 1);
-            name = gel_symbol_get_name(symbol);
-
-            GValueArray *var_array = gel_value_get_boxed(values + 2);
-            GValue *var_values = var_array->values;
-
-            guint n_vars = var_array->n_values;
-            gchar **vars = g_new0(gchar*, n_vars + 1);
-            gchar *invalid_arg_name = NULL;
-
-            for(guint i = 0; i < n_vars; i++)
-            {
-                const GValue *value = var_values + i;
-                if(GEL_VALUE_HOLDS(value, GEL_TYPE_SYMBOL))
-                {
-                    GelSymbol *symbol = gel_value_get_boxed(value);
-                    vars[i] = g_strdup(gel_symbol_get_name(symbol));
-                }
-                else
-                {
-                    invalid_arg_name = gel_value_to_string(value);
-                    g_propagate_error(error, g_error_new(
-                        GEL_PARSE_ERROR, GEL_PARSE_ERROR_MACRO_MALFORMED,
-                        "Macro %s: invalid arg name %s",
-                        name, invalid_arg_name));
-                    break;
-                }
-            }
-
-            if(invalid_arg_name == NULL)
-            {
-                values += 2;
-                n_values -= 2;
-                GValueArray *code = g_value_array_new(n_values);
-                for(guint i = 0; i < n_values; i++)
-                    g_value_array_append(code, values + i);
-                gel_register_macro(name, vars, code);
-                return 0;
-            }
-            else
-            {
-                g_free(invalid_arg_name);
-                for(guint i = 0; i < n_vars; i++)
-                    if(vars[i] != NULL)
-                        g_free(vars[i]);
-                g_free(vars);
-                return -1;
-            }
-        }
-        else
-        {
-            /*
-            GelMacro *macro = gel_macro_lookup(name);
-            if(macro != NULL)
-            {
-            }
-            */
-        }
-    }
-
-    return 1;
-}
 
 
 static
@@ -189,11 +93,13 @@ GValueArray* gel_parse_scanner(GScanner *scanner, guint line, guint pos,
             case '{':
             {
                 g_scanner_get_next_token(scanner);
-                g_value_init(&value, G_TYPE_VALUE_ARRAY);
                 GValueArray *inner_array = gel_parse_scanner(scanner,
                     scanner->line, scanner->position, token, error);
                 if(inner_array != NULL)
+                {
+                    g_value_init(&value, G_TYPE_VALUE_ARRAY);
                     gel_value_take_boxed(&value, inner_array);
+                }
                 else
                     failed = TRUE;
                 break;
@@ -309,17 +215,20 @@ GValueArray* gel_parse_scanner(GScanner *scanner, guint line, guint pos,
     
         if(G_IS_VALUE(&value))
         {
-            switch(gel_post_parse(&value, error))
+            GValueArray *code = gel_macro_code_from_value(&value, error);
+            if(code != NULL)
             {
-                case 1:
-                    g_value_array_append(array, &value);
-                    break;
-                case -1:
-                    failed = TRUE;
-                    break;
-                default:
-                    break;
+                GValue *code_values = code->values;
+                guint code_n_values = code->n_values;
+
+                for(guint i = 0; i < code_n_values; i++)
+                    g_value_array_append(array, code_values + i);
+
+                g_value_array_free(code);
             }
+            else
+                g_value_array_append(array, &value);
+
             g_value_unset(&value);
         }
     }
@@ -376,6 +285,7 @@ GValueArray* gel_parse_file(const gchar *file, GError **error)
  */
 GValueArray* gel_parse_text(const gchar *text, guint text_len, GError **error)
 {
+    gel_macros_new();
     GScanner *scanner = g_scanner_new(NULL);
     GScannerConfig *config = scanner->config;
 
@@ -388,9 +298,10 @@ GValueArray* gel_parse_text(const gchar *text, guint text_len, GError **error)
     config->store_int64 = TRUE;
 
     g_scanner_input_text(scanner, text, text_len);
-
     GValueArray *array = gel_parse_scanner(scanner, 0, 0, 0, error);
+
     g_scanner_destroy(scanner);
+    gel_macros_free();
 
     return array;
 }

@@ -22,7 +22,8 @@ libgel_la_SOURCES = \
 	gelpredefined.c \
 	gelvalue.c \
 	gelsymbol.c \
-	gelvariable.c
+	gelvariable.c \
+	gelmacro.c
 
 if HAVE_GOBJECT_INTROSPECTION
     libgel_la_SOURCES += geltypeinfo.c geltypelib.c
@@ -42,7 +43,8 @@ noinst_HEADERS = \
 	gelclosureprivate.h \
 	gelsymbol.h \
 	gelerrors.h \
-	gelvariable.h
+	gelvariable.h \
+	gelmacro.h
 
 if HAVE_GOBJECT_INTROSPECTION
     noinst_HEADERS += geltypeinfo.h geltypelib.h

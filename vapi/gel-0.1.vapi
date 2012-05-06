@@ -46,7 +46,9 @@ namespace Gel {
 	    FLOAT_MALFORMED,
 	    UNEXP_DELIM,
 	    UNEXP_EOF_IN_ARRAY,
-	    UNKNOWN_TOKEN
+	    UNKNOWN_TOKEN,
+	    MACRO_MALFORMED,
+	    MACRO_ARGUMENTS
     }
 
     public GLib.ValueArray parse_file(string file) throws GLib.FileError, ParseError;

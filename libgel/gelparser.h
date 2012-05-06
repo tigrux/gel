@@ -31,6 +31,7 @@ GQuark gel_parse_error_quark(void);
  * @GEL_PARSE_ERROR_UNEXP_EOF_IN_ARRAY: unterminated array
  * @GEL_PARSE_ERROR_UNKNOWN_TOKEN: unknown token
  * @GEL_PARSE_ERROR_MACRO_MALFORMED: malformed macro
+ * @GEL_PARSE_ERROR_MACRO_ARGUMENTS: wrong arguments for macro
  *
  * Error codes reported by #gel_parse_text and #gel_parse_file
  */
@@ -48,7 +49,8 @@ typedef enum _GelParseError
 	GEL_PARSE_ERROR_UNEXP_DELIM,
 	GEL_PARSE_ERROR_UNEXP_EOF_IN_ARRAY,
 	GEL_PARSE_ERROR_UNKNOWN_TOKEN,
-	GEL_PARSE_ERROR_MACRO_MALFORMED
+    GEL_PARSE_ERROR_MACRO_MALFORMED,
+    GEL_PARSE_ERROR_MACRO_ARGUMENTS
 } GelParseError;
 
 GValueArray* gel_parse_file(const gchar *file, GError **error);

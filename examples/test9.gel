@@ -1,45 +1,60 @@
+(macro method (name args & body)
+    (quote name) (function args body)
+)
 
-(function ! not (test)
-    (if (eval test)
-        FALSE
-        TRUE
+(macro field (name value)
+    (quote name) value
+)
+
+(macro class (name args & body)
+    (function name args
+        (define self {})
+        (append self body)
+        (function (attr)
+            (get self attr)
+        )
     )
 )
 
-(function ! when (test & body)
-    (if (eval test)
-        (apply do body)
-        FALSE
+(macro get-field (attr)
+    (get self (quote name))
+)
+
+(macro set-field (attr value)
+    (set self (quote name) value)
+)
+
+
+(class Person (init-name init-age)
+    (field name init-name)
+    (field age init-age)
+
+    (method greet (name-of-person)
+        (print "Nice to meet you" name-of-person)
+        (print "I am" (get-field name))
+    )
+
+    (method set (attr value)
+        (case attr
+            ("age")
+                (do
+                    (set-field age value)
+                    (print "Now I am" value "years old")
+                )
+            #else
+                (print "I don't think you can change my" attr)
+        )
     )
 )
 
-(function ! unless (test & body)
-    (if (eval test)
-        TRUE
-        (apply do body)
-    )
-)
 
+(define mary (Person "Maria Romanov" 35))
 
-(not 0)
+(print "My name is" (mary "name") "and I'm" (mary "age"))
+( (mary "greet") "Hanna")
 
-(not 1)
+( (mary "set") "age" 37)
+(mary "age")
 
-(define n 5)
-
-(when (= n 5)
-    (print "Positive test of 'when'")
-)
-
-(when (not (= n 5))
-    (print "Negative test of 'when'")
-)
-
-(unless (= n 5)
-    (print "Negative test of 'unless'")
-)
-
-(unless (not (= n 5))
-    (print "Positive test of 'unless'")
-)
+( (mary "set") "name" "Boris")
 

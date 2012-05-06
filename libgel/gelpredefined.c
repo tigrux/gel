@@ -14,7 +14,7 @@
 
 
 static
-GClosure* function(GelContext *context, const gchar *name, gboolean evaluate,
+GClosure* function(GelContext *context, const gchar *name,
                    const GValueArray *vars,
                    guint n_values, const GValue *values)
 {
@@ -40,7 +40,7 @@ GClosure* function(GelContext *context, const gchar *name, gboolean evaluate,
 
     if(code != NULL)
     {
-        self = gel_closure_new(name, evaluate, args, variadic, code, context);
+        self = gel_closure_new(name, args, variadic, code, context);
         g_closure_ref(self);
         g_closure_sink(self);
     }
@@ -545,23 +545,8 @@ void function_(GClosure *self, GValue *return_value,
 
     const gchar *name = NULL;
     const GValueArray *vars = NULL;
-    gboolean evaluate = TRUE;
 
     GType type = GEL_VALUE_TYPE(values + 0);
-    if(type == GEL_TYPE_SYMBOL)
-    {
-        const GelSymbol *symbol = gel_value_get_boxed(values + 0);
-        const gchar *symbol_name = gel_symbol_get_name(symbol);
-
-        if(g_strcmp0(symbol_name, "!") == 0)
-        {
-            evaluate = FALSE;
-            n_values--;
-            values++;
-        }
-    }
-
-    type = GEL_VALUE_TYPE(values + 0);
     if(type == GEL_TYPE_SYMBOL)
     {
         const GelSymbol *symbol = gel_value_get_boxed(values + 0);
@@ -591,7 +576,7 @@ void function_(GClosure *self, GValue *return_value,
         }
 
     GClosure *closure =
-        function(context, name, evaluate, vars, n_values, values);
+        function(context, name, vars, n_values, values);
 
     if(closure != NULL)
     {
@@ -707,6 +692,30 @@ void eval_(GClosure *self, GValue *return_value,
     }
     else
         gel_value_copy(values + 0, return_value);
+}
+
+
+static
+void quote_(GClosure *self, GValue *return_value,
+           guint n_values, const GValue *values, GelContext *context)
+{
+    guint n_args = 1;
+    if(n_values != n_args)
+    {
+        gel_error_needs_n_arguments(context, __FUNCTION__, n_args);
+        return;
+    }
+
+    GType type = GEL_VALUE_TYPE(values + 0);
+    if(type == GEL_TYPE_SYMBOL)
+    {
+        const GelSymbol *symbol = gel_value_get_boxed(values + 0);
+        const gchar *name = gel_symbol_get_name(symbol);
+        g_value_init(return_value, G_TYPE_STRING);
+        g_value_set_string(return_value, name);
+    }
+    else
+        gel_error_expected(context, __FUNCTION__, "symbol");
 }
 
 
@@ -2113,6 +2122,7 @@ GHashTable* gel_make_default_symbols(void)
         CLOSURE(do),
         CLOSURE(let),
         CLOSURE(eval),
+        CLOSURE(quote),
 
         /* closures */
         CLOSURE(apply),  /* array */

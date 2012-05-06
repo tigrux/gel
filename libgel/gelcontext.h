@@ -3,7 +3,6 @@
 
 #include <glib-object.h>
 
-
 /**
  * GEL_CONTEXT_ERROR:
  *
