@@ -14,42 +14,6 @@
 
 
 static
-GClosure* function(GelContext *context, const gchar *name,
-                   const GValueArray *vars,
-                   guint n_values, const GValue *values)
-{
-    GValueArray *code = NULL;
-    gchar *variadic = NULL;
-    gchar *invalid = NULL;
-
-    GList *args = gel_args_from_array(vars, &variadic, &invalid);
-
-    if(invalid == NULL)
-    {
-        code = g_value_array_new(n_values);
-        for(guint i = 0; i < n_values; i++)
-            g_value_array_append(code, values + i);
-    }
-    else
-    {
-        gel_error_invalid_argument_name(context, __FUNCTION__, invalid);
-        g_free(invalid);
-    }
-
-    GClosure *self = NULL;
-
-    if(code != NULL)
-    {
-        self = gel_closure_new(name, args, variadic, code, context);
-        g_closure_ref(self);
-        g_closure_sink(self);
-    }
-
-    return self;
-}
-
-
-static
 void set(GValue *return_value,
          guint n_values, const GValue *values, GelContext *context)
 {
@@ -555,6 +519,13 @@ void function_(GClosure *self, GValue *return_value,
         values++;
     }
 
+    if(name != NULL)
+        if(gel_context_get_variable(context, name) != NULL)
+        {
+            gel_error_symbol_exists(context, __FUNCTION__, name);
+            return;
+        }
+
     type = GEL_VALUE_TYPE(values + 0);
     if(type == G_TYPE_VALUE_ARRAY)
     {
@@ -568,26 +539,37 @@ void function_(GClosure *self, GValue *return_value,
         return;
     }
 
-    if(name != NULL)
-        if(gel_context_get_variable(context, name) != NULL)
-        {
-            gel_error_symbol_exists(context, __FUNCTION__, name);
-            return;
-        }
+    gchar *variadic = NULL;
+    gchar *invalid = NULL;
+    GList *args = gel_args_from_array(vars, &variadic, &invalid);
 
-    GClosure *closure =
-        function(context, name, vars, n_values, values);
-
-    if(closure != NULL)
+    if(invalid == NULL)
     {
+        GValueArray *code = g_value_array_new(n_values);
+        for(guint i = 0; i < n_values; i++)
+            g_value_array_append(code, values + i);
+
+        GClosure *closure =
+            gel_closure_new(name, args, variadic, code, context);
+
+        g_closure_ref(self);
+        g_closure_sink(self);
+
         GValue *value =
             gel_value_new_from_boxed(G_TYPE_CLOSURE, closure);
+
         if(name != NULL)
             gel_context_define(context, name, value);
+
         gel_closure_close_over(closure);
 
         g_value_init(return_value, G_TYPE_CLOSURE);
         g_value_set_boxed(return_value, closure);
+    }
+    else
+    {
+        gel_error_invalid_argument_name(context, __FUNCTION__, invalid);
+        g_free(invalid);
     }
 }
 
