@@ -14,8 +14,8 @@
 
 
 static
-void set(GValue *return_value,
-         guint n_values, const GValue *values, GelContext *context)
+void symbol_set(GValue *return_value,
+                guint n_values, const GValue *values, GelContext *context)
 {
     guint n_args = 2;
     if(n_values != n_args)
@@ -882,7 +882,7 @@ void set_(GClosure *self, GValue *return_value,
 
     if(n_values == 2)
     {
-        set(return_value, n_values, values, context);
+        symbol_set(return_value, n_values, values, context);
         return;
     }
 
