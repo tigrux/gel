@@ -156,6 +156,15 @@ gboolean gel_context_eval_param(GelContext *self, const gchar *func,
                 parsed = FALSE;
             }
             break;
+        case 'B':
+            value = gel_value_new();
+            result =
+                gel_context_eval_param_into_value(self, *values, value);
+            if(gel_context_error(self))
+                parsed = FALSE;
+            else
+                gel_args_pop(args, gboolean) = gel_value_to_boolean(result);
+            break;
         case 'I':
             value = gel_value_new();
             result =
@@ -188,6 +197,22 @@ gboolean gel_context_eval_param(GelContext *self, const gchar *func,
                 parsed = FALSE;
             }
             break;
+        case 'G':
+            value = gel_value_new();
+            result =
+                gel_context_eval_param_into_value(self, *values, value);
+            if(gel_context_error(self))
+                parsed = FALSE;
+            else
+            if(GEL_VALUE_HOLDS(result, G_TYPE_GTYPE))
+                gel_args_pop(args, GType) = gel_value_get_gtype(result);
+            else
+            {
+                gel_error_value_not_of_type(self,
+                    func, result, G_TYPE_GTYPE);
+                parsed = FALSE;
+            }
+            break;
         case 'O':
             value = gel_value_new();
             result =
@@ -196,11 +221,27 @@ gboolean gel_context_eval_param(GelContext *self, const gchar *func,
                 parsed = FALSE;
             else
             if(GEL_VALUE_HOLDS(result, G_TYPE_OBJECT))
-                gel_args_pop(args, void *) = gel_value_get_object(result);
+                gel_args_pop(args, GObject *) = gel_value_get_object(result);
             else
             {
                 gel_error_value_not_of_type(self,
                     func, result, G_TYPE_OBJECT);
+                parsed = FALSE;
+            }
+            break;
+        case 'X':
+            value = gel_value_new();
+            result =
+                gel_context_eval_param_into_value(self, *values, value);
+            if(gel_context_error(self))
+                parsed = FALSE;
+            else
+            if(GEL_VALUE_HOLDS(result, G_TYPE_BOXED))
+                gel_args_pop(args, void *) = gel_value_get_boxed(result);
+            else
+            {
+                gel_error_value_not_of_type(self,
+                    func, result, G_TYPE_BOXED);
                 parsed = FALSE;
             }
             break;
@@ -212,7 +253,7 @@ gboolean gel_context_eval_param(GelContext *self, const gchar *func,
                 parsed = FALSE;
             else
             if(GEL_VALUE_HOLDS(result, G_TYPE_CLOSURE))
-                gel_args_pop(args, void *) = gel_value_get_boxed(result);
+                gel_args_pop(args, GClosure *) = gel_value_get_boxed(result);
             else
             {
                 gel_error_value_not_of_type(self,

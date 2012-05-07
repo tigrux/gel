@@ -550,6 +550,16 @@ void gel_type_info_closure_marshal(GClosure *gclosure,
         if(!indirect_args[i])
             switch(g_type_info_get_tag(type))
             {
+                case GI_TYPE_TAG_BOOLEAN:
+                {
+                    gboolean number = FALSE;
+                    if(gel_context_eval_params(context, __FUNCTION__,
+                        &n_values, &values, &tmp_list, "B", &number))
+                    {
+                        inputs[n_inputs].v_boolean = number;
+                    }
+                    break;
+                }
                 case GI_TYPE_TAG_INT8:
                 {
                     gint64 number = 0;
@@ -650,6 +660,16 @@ void gel_type_info_closure_marshal(GClosure *gclosure,
                     }
                     break;
                 }
+                case GI_TYPE_TAG_GTYPE:
+                {
+                    GType type = G_TYPE_INVALID;
+                    if(gel_context_eval_params(context, __FUNCTION__,
+                        &n_values, &values, &tmp_list, "G", &type))
+                    {
+                        inputs[n_inputs].v_size = type;
+                    }
+                    break;
+                }
                 case GI_TYPE_TAG_UTF8:
                 {
                     gchar *string = 0;
@@ -674,6 +694,16 @@ void gel_type_info_closure_marshal(GClosure *gclosure,
                                 &n_values, &values, &tmp_list, "O", &object))
                             {
                                 inputs[n_inputs].v_pointer = object;
+                            }
+                            break;
+                        }
+                        case GI_INFO_TYPE_BOXED:
+                        {
+                            void *boxed;
+                            if(gel_context_eval_params(context, __FUNCTION__,
+                                &n_values, &values, &tmp_list, "X", &boxed))
+                            {
+                                inputs[n_inputs].v_pointer = boxed;
                             }
                             break;
                         }
