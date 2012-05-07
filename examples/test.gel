@@ -11,11 +11,7 @@
 (set window "default-width" 320)
 (set window "default-height" 120)
 
-(connect window "hide"
-    (function (widget)
-        ((. Gtk main-quit))
-    )
-)
+(connect window "hide" (. Gtk main-quit))
 
 (define box (new (. Gtk VBox)))
 ((. window add) box)
