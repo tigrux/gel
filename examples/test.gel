@@ -9,7 +9,7 @@
 
 (define window (new (. Gtk Window)))
 
-# the string 'title' was defineined in the interpreter
+# the string 'title' was defined in the interpreter
 (set window "title" title)
 
 (set window "default-width" 320)
@@ -25,7 +25,7 @@
 (add window box)
 (set box "border-width" 12)
 
-# the function 'make-label' was defineined in the interpreter
+# the function 'make-label' was defined in the interpreter
 (define label (make-label))
 (add box label)
 
