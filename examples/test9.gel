@@ -1,20 +1,4 @@
 
-(macro field (name value)
-    (quote name) value
-)
-
-(macro get-field (attr)
-    (get self (quote name))
-)
-
-(macro set-field (attr value)
-    (set self (quote name) value)
-)
-
-(macro method (name args & body)
-    (quote name) (function args body)
-)
-
 (macro class (name args & body)
     (function name args
         (define self {})
@@ -23,6 +7,22 @@
             (get self attr)
         )
     )
+)
+
+(macro field (attr value)
+    (name attr) value
+)
+
+(macro get-field (attr)
+    (get self (name attr))
+)
+
+(macro set-field (attr value)
+    (set self (name attr) value)
+)
+
+(macro method (attr args & body)
+    (name attr) (function args body)
 )
 
 

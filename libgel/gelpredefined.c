@@ -678,7 +678,7 @@ void eval_(GClosure *self, GValue *return_value,
 
 
 static
-void quote_(GClosure *self, GValue *return_value,
+void name_(GClosure *self, GValue *return_value,
            guint n_values, const GValue *values, GelContext *context)
 {
     guint n_args = 1;
@@ -2104,7 +2104,7 @@ GHashTable* gel_make_default_symbols(void)
         CLOSURE(do),
         CLOSURE(let),
         CLOSURE(eval),
-        CLOSURE(quote),
+
 
         /* closures */
         CLOSURE(apply),  /* array */
@@ -2114,8 +2114,9 @@ GHashTable* gel_make_default_symbols(void)
         CLOSURE(array),
         CLOSURE(hash),
 
-        /* references */
-        CLOSURE(var), /* symbol */
+        /* symbols */
+        CLOSURE(var),
+        CLOSURE(name),
 
         /* accesors */
         CLOSURE(set), /* symbol variable array hash object */
