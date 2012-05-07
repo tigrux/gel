@@ -1,11 +1,7 @@
 
 (require Gtk)
 
-( (. Gtk init) )
-
-(function add (parent child)
-    (set parent "child" child)
-)
+((. Gtk init))
 
 (define window (new (. Gtk Window)))
 
@@ -17,24 +13,24 @@
 
 (connect window "hide"
     (function (widget)
-        ( (. Gtk main-quit) )
+        ((. Gtk main-quit))
     )
 )
 
 (define box (new (. Gtk VBox)))
-(add window box)
+((. window add) box)
 (set box "border-width" 12)
 
 # the function 'make-label' was defined in the interpreter
 (define label (make-label))
-(add box label)
+((. box add) label )
 
 (define button (new (. Gtk Button)))
-(add box button)
+((. box add) button)
 (set button "label" "Click me!")
 
 (define entry (new (. Gtk Entry)))
-(add box entry)
+((. box add) entry)
 
 (define counter 0)
 
@@ -47,7 +43,7 @@
     )
 )
 
-( (. window show-all) )
+((. window show-all))
 
-( (. Gtk main) )
+((. Gtk main))
 

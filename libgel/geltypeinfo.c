@@ -1,6 +1,7 @@
 #include <config.h>
 
 #include <geltypeinfo.h>
+#include <gelcontextprivate.h>
 #include <gelvalueprivate.h>
 #include <gelclosureprivate.h>
 
@@ -540,13 +541,150 @@ void gel_type_info_closure_marshal(GClosure *gclosure,
         types[i] = type;
     }
 
+    GList *tmp_list = NULL;
 
     for(guint i = 0; i < n_args; i++)
     {
+        GITypeInfo *type = types[i];
+
         if(!indirect_args[i])
-        {
-            // TODO
-        }
+            switch(g_type_info_get_tag(type))
+            {
+                case GI_TYPE_TAG_INT8:
+                {
+                    gint64 number = 0;
+                    if(gel_context_eval_params(context, __FUNCTION__,
+                        &n_values, &values, &tmp_list, "I", &number))
+                    {
+                        inputs[n_inputs].v_int8 = (gint8)number;
+                    }
+                    break;
+                }
+                case GI_TYPE_TAG_UINT8:
+                {
+                    gint64 number = 0;
+                    if(gel_context_eval_params(context, __FUNCTION__,
+                        &n_values, &values, &tmp_list, "I", &number))
+                    {
+                        inputs[n_inputs].v_uint8 = (guint8)number;
+                    }
+                    break;
+                }
+                case GI_TYPE_TAG_INT16:
+                {
+                    gint64 number = 0;
+                    if(gel_context_eval_params(context, __FUNCTION__,
+                        &n_values, &values, &tmp_list, "I", &number))
+                    {
+                        inputs[n_inputs].v_int16 = (gint16)number;
+                    }
+                    break;
+                }
+                case GI_TYPE_TAG_UINT16:
+                {
+                    gint64 number = 0;
+                    if(gel_context_eval_params(context, __FUNCTION__,
+                        &n_values, &values, &tmp_list, "I", &number))
+                    {
+                        inputs[n_inputs].v_uint16 = (guint16)number;
+                    }
+                    break;
+                }
+                case GI_TYPE_TAG_INT32:
+                {
+                    gint64 number = 0;
+                    if(gel_context_eval_params(context, __FUNCTION__,
+                        &n_values, &values, &tmp_list, "I", &number))
+                    {
+                        inputs[n_inputs].v_int32 = (gint32)number;
+                    }
+                    break;
+                }
+                case GI_TYPE_TAG_UINT32:
+                {
+                    gint64 number = 0;
+                    if(gel_context_eval_params(context, __FUNCTION__,
+                        &n_values, &values, &tmp_list, "I", &number))
+                    {
+                        inputs[n_inputs].v_uint32 = (guint32)number;
+                    }
+                    break;
+                }
+                case GI_TYPE_TAG_INT64:
+                {
+                    gint64 number = 0;
+                    if(gel_context_eval_params(context, __FUNCTION__,
+                        &n_values, &values, &tmp_list, "I", &number))
+                    {
+                        inputs[n_inputs].v_int8 = (gint64)number;
+                    }
+                    break;
+                }
+                case GI_TYPE_TAG_UINT64:
+                {
+                    gint64 number = 0;
+                    if(gel_context_eval_params(context, __FUNCTION__,
+                        &n_values, &values, &tmp_list, "I", &number))
+                    {
+                        inputs[n_inputs].v_uint8 = (guint64)number;
+                    }
+                    break;
+                }
+                case GI_TYPE_TAG_FLOAT:
+                {
+                    gdouble number = 0;
+                    if(gel_context_eval_params(context, __FUNCTION__,
+                        &n_values, &values, &tmp_list, "F", &number))
+                    {
+                        inputs[n_inputs].v_float = (gfloat)number;
+                    }
+                    break;
+                }
+                case GI_TYPE_TAG_DOUBLE:
+                {
+                    gdouble number = 0;
+                    if(gel_context_eval_params(context, __FUNCTION__,
+                        &n_values, &values, &tmp_list, "F", &number))
+                    {
+                        inputs[n_inputs].v_double = (gdouble)number;
+                    }
+                    break;
+                }
+                case GI_TYPE_TAG_UTF8:
+                {
+                    gchar *string = 0;
+                    if(gel_context_eval_params(context, __FUNCTION__,
+                        &n_values, &values, &tmp_list, "S", &string))
+                    {
+                        inputs[n_inputs].v_pointer = string;
+                    }
+                    break;
+                }
+                case GI_TYPE_TAG_INTERFACE:
+                {
+                    GIBaseInfo *iface_info = g_type_info_get_interface(type);
+                    GIInfoType iface_type = g_base_info_get_type(iface_info);
+
+                    switch(iface_type)
+                    {
+                        case GI_INFO_TYPE_OBJECT:
+                        {
+                            GObject *object;
+                            if(gel_context_eval_params(context, __FUNCTION__,
+                                &n_values, &values, &tmp_list, "O", &object))
+                            {
+                                inputs[n_inputs].v_pointer = object;
+                            }
+                            break;
+                        }
+                        default:
+                            break;
+                    }
+                    break;
+                }
+                default:
+                    break;
+            }
 
         switch(g_arg_info_get_direction(infos[i]))
         {
@@ -579,6 +717,7 @@ void gel_type_info_closure_marshal(GClosure *gclosure,
         g_base_info_unref(infos[i]);
     }
 
+    gel_value_list_free(tmp_list);
     g_free(outputs);
     g_free(inputs);
     g_free(indirect_args);
