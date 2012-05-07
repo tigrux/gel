@@ -324,10 +324,10 @@ gchar* gel_type_info_to_string(const GelTypeInfo *self)
 
 
 static
-gboolean gel_argument_to_value(const GArgument *arg, GITypeTag arg_tag,
+gboolean gel_argument_to_value(const GArgument *arg, GITypeTag tag,
                                GValue *value)
 {
-    switch(arg_tag)
+    switch(tag)
     {
         case GI_TYPE_TAG_BOOLEAN:
             g_value_init(value, G_TYPE_BOOLEAN);
@@ -493,12 +493,10 @@ void gel_type_info_closure_marshal(GClosure *gclosure,
     
     guint n_inputs = 0;
     guint n_outputs = 0;
-    guint first_input = 0;
 
     if(g_function_info_get_flags(function_info) & GI_FUNCTION_IS_METHOD)
     {
         inputs[0].v_pointer = object;
-        first_input++;
         n_inputs++;
     }
 
@@ -506,6 +504,7 @@ void gel_type_info_closure_marshal(GClosure *gclosure,
     {
         GIArgInfo *info = g_callable_info_get_arg(function_info, i);
         GITypeInfo *type = g_arg_info_get_type(info);
+
         switch(g_type_info_get_tag(type))
         {
             case GI_TYPE_TAG_ARRAY:
@@ -517,9 +516,10 @@ void gel_type_info_closure_marshal(GClosure *gclosure,
             }
             case GI_TYPE_TAG_INTERFACE:
             {
-                GIBaseInfo *interface_info = g_type_info_get_interface(info);
-                GIInfoType interface_type = g_base_info_get_type(interface_info);
-                switch(interface_type)
+                GIBaseInfo *iface_info = g_type_info_get_interface(type);
+                GIInfoType iface_type = g_base_info_get_type(iface_info);
+
+                switch(iface_type)
                 {
                     case GI_INFO_TYPE_CALLBACK:
                         indirect_args[g_arg_info_get_closure(info)] = TRUE;
@@ -528,30 +528,39 @@ void gel_type_info_closure_marshal(GClosure *gclosure,
                     default:
                         break;
                 }
-                g_base_info_unref(interface_info);
+
+                g_base_info_unref(iface_info);
                 break;
             }
             default:
                 break;
         }
+
         infos[i] = info;
         types[i] = type;
     }
 
+
     for(guint i = 0; i < n_args; i++)
     {
-        GIDirection dir = g_arg_info_get_direction(infos[i]);
-        if(dir == GI_DIRECTION_IN)
-            n_inputs++;
-        else
-        if(dir == GI_DIRECTION_OUT)
-            n_outputs++;
-        else
+        if(!indirect_args[i])
         {
-            n_inputs++;
-            n_outputs++;
+            // TODO
         }
-        // TODO
+
+        switch(g_arg_info_get_direction(infos[i]))
+        {
+            case GI_DIRECTION_IN:
+                n_inputs++;
+                break;
+            case GI_DIRECTION_OUT:
+                n_outputs++;
+                break;
+            case GI_DIRECTION_INOUT:
+                n_inputs++;
+                n_outputs++;
+                break;
+        }
     }
 
     GArgument return_arg = {0};
