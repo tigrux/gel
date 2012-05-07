@@ -106,13 +106,6 @@ void gel_value_free(GValue *value)
 }
 
 
-/**
- * gel_value_list_free:
- * @value_list: a #GList of #GValue
- *
- * Frees a #GList of #GValue.
- * This function is needed to free lists used by #gel_context_eval_params
- */
 void gel_value_list_free(GList *value_list)
 {
     g_list_foreach(value_list, (GFunc)gel_value_free, NULL);

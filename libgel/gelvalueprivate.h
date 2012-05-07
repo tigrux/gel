@@ -84,6 +84,7 @@ gboolean (*GelValuesLogic)(const GValue *l_value, const GValue *r_value);
 GValue* gel_value_new_from_boxed(GType type, gpointer boxed);
 GValue* gel_value_dup(const GValue *value);
 void gel_value_free(GValue *value);
+void gel_value_list_free(GList *value_list);
 
 GList* gel_args_from_array(const GValueArray *vars, gchar **variadic,
                            gchar **invalid);

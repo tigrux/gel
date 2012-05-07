@@ -41,7 +41,6 @@ gel_value_copy
 gel_value_to_boolean
 gel_value_repr
 gel_value_to_string
-gel_value_list_free
 gel_values_add
 gel_values_sub
 gel_values_mul
