@@ -87,7 +87,7 @@ GValue* gel_value_dup(const GValue *value);
 void gel_value_free(GValue *value);
 void gel_value_list_free(GList *value_list);
 
-GList* gel_args_from_array(const GValueArray *vars, gchar **variadic,
+GList* gel_args_from_array(const GelValueArray *vars, gchar **variadic,
                            gchar **invalid);
 
 GHashTable* gel_hash_table_new(void);
