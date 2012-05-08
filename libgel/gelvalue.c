@@ -126,7 +126,7 @@ gchar* gel_value_stringify(const GValue *value, gchar* (*str)(const GValue *))
         g_value_unset(&string_value);
     }
     else
-    if(GEL_VALUE_HOLDS(value, G_TYPE_VALUE_ARRAY))
+    if(GEL_VALUE_HOLDS(value, GEL_TYPE_VALUE_ARRAY))
     {
         const GelValueArray *array = gel_value_get_boxed(value);
         GString *buffer = g_string_new("(");
@@ -364,8 +364,8 @@ GType gel_value_simple_type(const GValue *value)
             if(GEL_VALUE_HOLDS(value, G_TYPE_ENUM)
                || GEL_VALUE_HOLDS(value, G_TYPE_FLAGS))
                 return G_TYPE_INT64;
-            if(GEL_VALUE_HOLDS(value, G_TYPE_VALUE_ARRAY))
-                return G_TYPE_VALUE_ARRAY;
+            if(GEL_VALUE_HOLDS(value, GEL_TYPE_VALUE_ARRAY))
+                return GEL_TYPE_VALUE_ARRAY;
             if(GEL_VALUE_HOLDS(value, G_TYPE_HASH_TABLE))
                 return G_TYPE_HASH_TABLE;
             if(g_value_fits_pointer(value))
@@ -506,7 +506,7 @@ gboolean gel_values_simple_add(const GValue *v1, const GValue *v2,
                 NULL));
             return TRUE;
         default:
-            if(type == G_TYPE_VALUE_ARRAY)
+            if(type == GEL_TYPE_VALUE_ARRAY)
             {
                 GelValueArray *a1 = gel_value_get_boxed(v1);
                 GelValueArray *a2 = gel_value_get_boxed(v2);
@@ -721,7 +721,7 @@ gboolean gel_values_can_cmp(const GValue *v1, const GValue *v2)
         case G_TYPE_BOOLEAN:
             return TRUE;
         default:
-            if(type == G_TYPE_VALUE_ARRAY)
+            if(type == GEL_TYPE_VALUE_ARRAY)
                 return TRUE;
             return FALSE;
     }
@@ -895,7 +895,7 @@ gint gel_values_cmp(const GValue *v1, const GValue *v2)
             break;
         }
         default:
-            if(simple_type == G_TYPE_VALUE_ARRAY)
+            if(simple_type == GEL_TYPE_VALUE_ARRAY)
             {
                 GelValueArray *a1 = gel_value_get_boxed(vv1);
                 GelValueArray *a2 = gel_value_get_boxed(vv2);

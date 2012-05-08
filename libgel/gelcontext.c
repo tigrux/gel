@@ -310,7 +310,7 @@ const GValue* gel_context_eval_into_value(GelContext *self,
             gel_error_unknown_symbol(self, __FUNCTION__, name);
     }
     else
-    if(type == G_TYPE_VALUE_ARRAY)
+    if(type == GEL_TYPE_VALUE_ARRAY)
     {
         GelValueArray *array = gel_value_get_boxed(value);
         const guint array_n_values = gel_value_array_get_n_values(array);

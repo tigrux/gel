@@ -1,6 +1,8 @@
 #ifndef __GEL_ARRAY_H__
 
 typedef GValueArray GelValueArray;
+
+#define GEL_TYPE_VALUE_ARRAY G_TYPE_VALUE_ARRAY
 #define gel_value_array_new g_value_array_new
 #define gel_value_array_copy g_value_array_copy
 #define gel_value_array_free g_value_array_free

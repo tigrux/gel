@@ -439,7 +439,7 @@ void array_filter(GClosure *closure, GelValueArray *array, GValue *return_value,
         g_value_unset(&tmp_value);
     }
 
-    g_value_init(return_value, G_TYPE_VALUE_ARRAY);
+    g_value_init(return_value, GEL_TYPE_VALUE_ARRAY);
     gel_value_take_boxed(return_value, result_array);
 
     gel_value_list_free(tmp_list);
@@ -528,7 +528,7 @@ void function_(GClosure *self, GValue *return_value,
         }
 
     type = GEL_VALUE_TYPE(values + 0);
-    if(type == G_TYPE_VALUE_ARRAY)
+    if(type == GEL_TYPE_VALUE_ARRAY)
     {
         vars = gel_value_get_boxed(values + 0);
         n_values--;
@@ -776,7 +776,7 @@ void map_(GClosure *self, GValue *return_value,
                 gel_value_array_free(array);
             }
 
-            g_value_init(return_value, G_TYPE_VALUE_ARRAY);
+            g_value_init(return_value, GEL_TYPE_VALUE_ARRAY);
             gel_value_take_boxed(return_value, result_array);
         }
     }
@@ -808,7 +808,7 @@ void array_(GClosure *self, GValue *return_value,
 
     if(i == n_values)
     {
-        g_value_init(return_value, G_TYPE_VALUE_ARRAY);
+        g_value_init(return_value, GEL_TYPE_VALUE_ARRAY);
         gel_value_take_boxed(return_value, array);
     }
 }
@@ -903,7 +903,7 @@ void set_(GClosure *self, GValue *return_value,
             &n_values, &values, &tmp_list, "V*", &value))
     {
         GType type = GEL_VALUE_TYPE(value);
-        if(type == G_TYPE_VALUE_ARRAY)
+        if(type == GEL_TYPE_VALUE_ARRAY)
         {
             GelValueArray *array = gel_value_get_boxed(value);
             array_set(array, return_value, n_values, values, context);
@@ -1257,7 +1257,7 @@ void append_(GClosure *self, GValue *return_value,
             &n_values, &values, &tmp_list, "V*", &value))
     {
         GType type = GEL_VALUE_TYPE(value);
-        if(type == G_TYPE_VALUE_ARRAY)
+        if(type == GEL_TYPE_VALUE_ARRAY)
         {
             GelValueArray *array = gel_value_get_boxed(value);
             array_append(array, return_value, n_values, values, context);
@@ -1294,7 +1294,7 @@ void get_(GClosure *self, GValue *return_value,
             &n_values, &values, &tmp_list, "V*", &value))
     {
         GType type = GEL_VALUE_TYPE(value);
-        if(type == G_TYPE_VALUE_ARRAY)
+        if(type == GEL_TYPE_VALUE_ARRAY)
         {
             GelValueArray *array = gel_value_get_boxed(value);
             array_get(array, return_value, n_values, values, context);
@@ -1338,7 +1338,7 @@ void remove_(GClosure *self, GValue *return_value,
             &n_values, &values, &tmp_list, "V*", &value))
     {
         GType type = GEL_VALUE_TYPE(value);
-        if(type == G_TYPE_VALUE_ARRAY)
+        if(type == GEL_TYPE_VALUE_ARRAY)
         {
             GelValueArray *array = gel_value_get_boxed(value);
             array_remove(array, return_value, n_values, values, context);
@@ -1375,7 +1375,7 @@ void size_(GClosure *self, GValue *return_value,
             &n_values, &values, &tmp_list, "V*", &value))
     {
         GType type = GEL_VALUE_TYPE(value);
-        if(type == G_TYPE_VALUE_ARRAY)
+        if(type == GEL_TYPE_VALUE_ARRAY)
         {
             GelValueArray *array = gel_value_get_boxed(value);
             array_size(array, return_value, n_values, values, context);
@@ -1414,7 +1414,7 @@ void find_(GClosure *self, GValue *return_value,
             &n_values, &values, &tmp_list, "CV", &closure, &value))
     {
         GType type = GEL_VALUE_TYPE(value);
-        if(type == G_TYPE_VALUE_ARRAY)
+        if(type == GEL_TYPE_VALUE_ARRAY)
         {
             GelValueArray *array = gel_value_get_boxed(value);
             array_find(closure, array, return_value, n_values, values, context);
@@ -1452,7 +1452,7 @@ void filter_(GClosure *self, GValue *return_value,
             &n_values, &values, &tmp_list, "CV", &closure, &value))
     {
         GType type = GEL_VALUE_TYPE(value);
-        if(type == G_TYPE_VALUE_ARRAY)
+        if(type == GEL_TYPE_VALUE_ARRAY)
         {
             GelValueArray *array = gel_value_get_boxed(value);
             array_filter(closure,
@@ -1526,7 +1526,7 @@ void sort_(GClosure *self, GValue *return_value,
         GelValueArray *result_array = gel_value_array_copy(array);
         gel_value_array_sort(result_array, (GCompareFunc)compare);
 
-        g_value_init(return_value, G_TYPE_VALUE_ARRAY);
+        g_value_init(return_value, GEL_TYPE_VALUE_ARRAY);
         g_value_take_boxed(return_value, result_array);
     }
 
@@ -1551,7 +1551,7 @@ void reverse_(GClosure *self, GValue *return_value,
         for(guint i = array_n_values; i > 0; i--)
             gel_value_array_append(result_array, array_values + (i-1));
 
-        g_value_init(return_value, G_TYPE_VALUE_ARRAY);
+        g_value_init(return_value, GEL_TYPE_VALUE_ARRAY);
         gel_value_take_boxed(return_value, result_array);
     }
 
@@ -1575,7 +1575,7 @@ void keys_(GClosure *self, GValue *return_value,
         for(GList *iter = keys; iter != NULL; iter = g_list_next(iter))
             gel_value_array_append(array, iter->data);
 
-        g_value_init(return_value, G_TYPE_VALUE_ARRAY);
+        g_value_init(return_value, GEL_TYPE_VALUE_ARRAY);
         gel_value_take_boxed(return_value, array);
         g_list_free(keys);
     }
@@ -1884,7 +1884,7 @@ void range_(GClosure *self, GValue *return_value,
             }
 
         g_value_unset(&value);
-        g_value_init(return_value, G_TYPE_VALUE_ARRAY);
+        g_value_init(return_value, GEL_TYPE_VALUE_ARRAY);
         gel_value_take_boxed(return_value, array);
     }
 

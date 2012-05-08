@@ -97,7 +97,7 @@ GelValueArray* gel_parse_scanner(GScanner *scanner, guint line, guint pos,
                     scanner->line, scanner->position, token, error);
                 if(inner_array != NULL)
                 {
-                    g_value_init(&value, G_TYPE_VALUE_ARRAY);
+                    g_value_init(&value, GEL_TYPE_VALUE_ARRAY);
                     gel_value_take_boxed(&value, inner_array);
                 }
                 else

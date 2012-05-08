@@ -113,7 +113,7 @@ void gel_closure_marshal(GelClosure *self, GValue *return_value,
             }
         }
 
-        GValue *value = gel_value_new_from_boxed(G_TYPE_VALUE_ARRAY, array);
+        GValue *value = gel_value_new_from_boxed(GEL_TYPE_VALUE_ARRAY, array);
         gel_context_define(context, self->variadic_arg, value);
     }
 
@@ -175,7 +175,7 @@ void gel_closure_bind_symbols_of_array(GelClosure *self, GelValueArray *array)
         const GValue *value = array_values + i;
         GType type = GEL_VALUE_TYPE(value);
 
-        if(type == G_TYPE_VALUE_ARRAY)
+        if(type == GEL_TYPE_VALUE_ARRAY)
         {
             GelValueArray *array = gel_value_get_boxed(value);
             gel_closure_bind_symbols_of_array(self, array);
