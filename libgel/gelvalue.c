@@ -206,6 +206,10 @@ gchar* gel_value_stringify(const GValue *value, gchar* (*str)(const GValue *))
     else
     if(GEL_VALUE_HOLDS(value, G_TYPE_GTYPE))
         result = g_strdup(g_type_name(gel_value_get_gtype(value)));
+    else
+    if(GEL_VALUE_HOLDS(value, G_TYPE_POINTER))
+        if(gel_value_peek_pointer(value) == NULL)
+            result = g_strdup("NULL");
 
     if(result == NULL)
     {
