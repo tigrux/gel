@@ -228,11 +228,11 @@ gboolean gel_context_eval(GelContext *self,
     g_return_val_if_fail(dest != NULL, FALSE);
 
     gboolean result = gel_context_eval_value(self, value, dest);
-    GError *context_error = self->error;
 
-    if(context_error != NULL)
+    if(self->error != NULL)
     {
-        g_propagate_error(error, context_error);
+        g_propagate_error(error, self->error);
+        self->error = NULL;
         result = FALSE;
     }
 
