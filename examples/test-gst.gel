@@ -1,21 +1,20 @@
+
 (require GLib)
 
 (require Gst)
-
 ((. Gst init))
 
-(define player ( (. Gst ElementFactory make) "playbin2" "player"))
+(define sample "/usr/share/example-content/Ubuntu_Free_Culture_Showcase/Josh Woodward - Swansong.ogg")
 
-(set player "uri" "file:///usr/share/sounds/ubuntu/stereo/message.ogg")
-
+(define factory-make (. Gst ElementFactory make))
+(define player (factory-make "playbin2" "player"))
+(set player "uri" (+ "file://" sample))
 ( (. player set-state) (. Gst State playing) )
-
-(define bus ((. player get-bus)))
-
-((. bus add-signal-watch))
 
 (define loop ((. GLib MainLoop new) NULL FALSE))
 
+(define bus ((. player get-bus)))
+((. bus add-signal-watch))
 (connect bus "message::eos" (. loop quit))
 
 ((. loop run))
