@@ -5,6 +5,7 @@
 #include <gelparser.h>
 #include <gelvalue.h>
 #include <gelclosure.h>
+#include <gelarray.h>
 
 #endif
 

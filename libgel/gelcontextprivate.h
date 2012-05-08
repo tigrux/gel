@@ -4,7 +4,6 @@
 #include <gelcontext.h>
 #include <gelvariable.h>
 #include <gelclosure.h>
-#include <gelclosureprivate.h>
 
 void gel_context_define_variable(GelContext *self,
                                  const gchar *name, GelVariable *variable);

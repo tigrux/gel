@@ -2,6 +2,7 @@
 #define __GEL_PARSER_H__
 
 #include <glib-object.h>
+#include <gelarray.h>
 
 /**
  * GEL_PARSE_ERROR:
@@ -38,23 +39,23 @@ GQuark gel_parse_error_quark(void);
 
 typedef enum _GelParseError
 {
-	GEL_PARSE_ERROR_UNKNOWN,
-	GEL_PARSE_ERROR_UNEXP_EOF,
-	GEL_PARSE_ERROR_UNEXP_EOF_IN_STRING,
-	GEL_PARSE_ERROR_UNEXP_EOF_IN_COMMENT,
-	GEL_PARSE_ERROR_NON_DIGIT_IN_CONST,
-	GEL_PARSE_ERROR_DIGIT_RADIX,
-	GEL_PARSE_ERROR_FLOAT_RADIX,
-	GEL_PARSE_ERROR_FLOAT_MALFORMED,
-	GEL_PARSE_ERROR_UNEXP_DELIM,
-	GEL_PARSE_ERROR_UNEXP_EOF_IN_ARRAY,
-	GEL_PARSE_ERROR_UNKNOWN_TOKEN,
+    GEL_PARSE_ERROR_UNKNOWN,
+    GEL_PARSE_ERROR_UNEXP_EOF,
+    GEL_PARSE_ERROR_UNEXP_EOF_IN_STRING,
+    GEL_PARSE_ERROR_UNEXP_EOF_IN_COMMENT,
+    GEL_PARSE_ERROR_NON_DIGIT_IN_CONST,
+    GEL_PARSE_ERROR_DIGIT_RADIX,
+    GEL_PARSE_ERROR_FLOAT_RADIX,
+    GEL_PARSE_ERROR_FLOAT_MALFORMED,
+    GEL_PARSE_ERROR_UNEXP_DELIM,
+    GEL_PARSE_ERROR_UNEXP_EOF_IN_ARRAY,
+    GEL_PARSE_ERROR_UNKNOWN_TOKEN,
     GEL_PARSE_ERROR_MACRO_MALFORMED,
     GEL_PARSE_ERROR_MACRO_ARGUMENTS
 } GelParseError;
 
-GValueArray* gel_parse_file(const gchar *file, GError **error);
-GValueArray* gel_parse_text(const gchar *text, guint text_len, GError **error);
+GelValueArray* gel_parse_file(const gchar *file, GError **error);
+GelValueArray* gel_parse_text(const gchar *text, guint text_len, GError **error);
 
 #endif
 

@@ -312,11 +312,11 @@ const GValue* gel_context_eval_into_value(GelContext *self,
     else
     if(type == G_TYPE_VALUE_ARRAY)
     {
-        GValueArray *array = gel_value_get_boxed(value);
-        const guint array_n_values = array->n_values;
+        GelValueArray *array = gel_value_get_boxed(value);
+        const guint array_n_values = gel_value_array_get_n_values(array);
         if(array_n_values > 0)
         {
-            const GValue *array_values = array->values;
+            const GValue *array_values = gel_value_array_get_values(array);
 
             GValue tmp_value = {0};
             const GValue *first_value =

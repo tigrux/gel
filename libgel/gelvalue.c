@@ -128,14 +128,14 @@ gchar* gel_value_stringify(const GValue *value, gchar* (*str)(const GValue *))
     else
     if(GEL_VALUE_HOLDS(value, G_TYPE_VALUE_ARRAY))
     {
-        const GValueArray *array = gel_value_get_boxed(value);
+        const GelValueArray *array = gel_value_get_boxed(value);
         GString *buffer = g_string_new("(");
-        const guint n_values = array->n_values;
+        const guint n_values = gel_value_array_get_n_values(array);
 
         if(n_values > 0)
         {
             guint last = n_values - 1;
-            const GValue *array_values = array->values;
+            const GValue *array_values = gel_value_array_get_values(array);
 
             for(guint i = 0; i <= last; i++)
             {
@@ -314,8 +314,9 @@ gboolean gel_value_to_boolean(const GValue *value)
         default:
             if(type == G_TYPE_ARRAY)
             {
-                GValueArray *array = gel_value_get_boxed(value);
-                result = (array != NULL && array->n_values != 0);
+                GelValueArray *array = gel_value_get_boxed(value);
+                result =
+                    (array != NULL && gel_value_array_get_n_values(array) != 0);
                 break;
             }
             else
@@ -421,15 +422,15 @@ GHashTable* gel_hash_table_new(void)
 }
 
 
-GList* gel_args_from_array(const GValueArray *vars, gchar **variadic,
+GList* gel_args_from_array(const GelValueArray *vars, gchar **variadic,
                            gchar **invalid)
 {
     gboolean next_is_variadic = FALSE;
     GList *args = NULL;
     gboolean failed = FALSE;
 
-    guint n_vars = vars->n_values;
-    const GValue *var_values = vars->values;
+    guint n_vars = gel_value_array_get_n_values(vars);
+    const GValue *var_values = gel_value_array_get_values(vars);
 
     for(guint i = 0; i < n_vars; i++)
     {
@@ -507,20 +508,21 @@ gboolean gel_values_simple_add(const GValue *v1, const GValue *v2,
         default:
             if(type == G_TYPE_VALUE_ARRAY)
             {
-                GValueArray *a1 = gel_value_get_boxed(v1);
-                GValueArray *a2 = gel_value_get_boxed(v2);
-                guint n1_values = a1->n_values;
-                guint n2_values = a2->n_values;
+                GelValueArray *a1 = gel_value_get_boxed(v1);
+                GelValueArray *a2 = gel_value_get_boxed(v2);
+                guint n1_values = gel_value_array_get_n_values(a1);
+                guint n2_values = gel_value_array_get_n_values(a2);
 
-                GValueArray *array = g_value_array_new(n1_values + n2_values);
+                GelValueArray *array =
+                    gel_value_array_new(n1_values + n2_values);
 
-                const GValue *a1_values = a1->values;
+                const GValue *a1_values = gel_value_array_get_values(a1);
                 for(guint i = 0; i < n1_values; i++)
-                    g_value_array_append(array, a1_values + i);
+                    gel_value_array_append(array, a1_values + i);
 
-                const GValue *a2_values = a2->values;
+                const GValue *a2_values = gel_value_array_get_values(a2);
                 for(guint i = 0; i < n2_values; i++)
-                    g_value_array_append(array, a2_values + i);
+                    gel_value_array_append(array, a2_values + i);
 
                 gel_value_take_boxed(dest_value, array);
                 return TRUE;
@@ -895,15 +897,15 @@ gint gel_values_cmp(const GValue *v1, const GValue *v2)
         default:
             if(simple_type == G_TYPE_VALUE_ARRAY)
             {
-                GValueArray *a1 = gel_value_get_boxed(vv1);
-                GValueArray *a2 = gel_value_get_boxed(vv2);
+                GelValueArray *a1 = gel_value_get_boxed(vv1);
+                GelValueArray *a2 = gel_value_get_boxed(vv2);
 
-                guint a1_n = a1->n_values;
-                guint a2_n = a2->n_values;
+                guint a1_n = gel_value_array_get_n_values(a1);
+                guint a2_n = gel_value_array_get_n_values(a2);
                 guint n_values = MIN(a1_n, a2_n);
 
-                GValue *a1_values = a1->values;
-                GValue *a2_values = a2->values;
+                GValue *a1_values = gel_value_array_get_values(a1);
+                GValue *a2_values = gel_value_array_get_values(a2);
 
                 guint i;
                 for(i = 0; i < n_values; i++)

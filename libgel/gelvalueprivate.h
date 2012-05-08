@@ -4,6 +4,7 @@
 #include <glib-object.h>
 
 #include <gelvariable.h>
+#include <gelarray.h>
 
 #ifndef GEL_VALUE_USE_MACRO
 #define GEL_VALUE_USE_MACRO 1

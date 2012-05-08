@@ -2,9 +2,10 @@
 #define __GEL_CLOSURE_H__
 
 #include <gelcontext.h>
+#include <gelarray.h>
 
 GClosure* gel_closure_new(const gchar *name, GList *args, gchar *variadic, 
-                          GValueArray *code, GelContext *context);
+                          GelValueArray *code, GelContext *context);
 
 GClosure* gel_closure_new_native(const gchar *name, GClosureMarshal marshal);
 

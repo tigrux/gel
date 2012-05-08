@@ -327,9 +327,9 @@ gboolean gel_context_eval_params_args(GelContext *self, const gchar *func,
         else
             if(GEL_VALUE_HOLDS(*values, G_TYPE_VALUE_ARRAY))
             {
-                GValueArray *array = gel_value_get_boxed(*values);
-                guint n_values = array->n_values;
-                const GValue *values = array->values;
+                GelValueArray *array = gel_value_get_boxed(*values);
+                guint n_values = gel_value_array_get_n_values(array);
+                const GValue *values = gel_value_array_get_values(array);
 
                 gel_context_eval_params_args(self,
                     func, &n_values, &values, list, node,  args);

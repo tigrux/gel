@@ -35,7 +35,8 @@ libgel_include_HEADERS = \
 	gelcontext.h \
 	gelparser.h \
 	gelvalue.h \
-	gelclosure.h
+	gelclosure.h \
+	gelarray.h
 
 noinst_HEADERS = \
 	gelcontextprivate.h \
