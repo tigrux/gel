@@ -1,4 +1,5 @@
 #ifndef __GEL_ARRAY_H__
+#define __GEL_ARRAY_H__
 
 typedef GValueArray GelValueArray;
 
