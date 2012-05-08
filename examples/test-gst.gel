@@ -1,7 +1,7 @@
 
 (require GLib)
-
 (require Gst)
+
 ((. Gst init))
 
 (define sample "/usr/share/example-content/Ubuntu_Free_Culture_Showcase/Josh Woodward - Swansong.ogg")
@@ -9,7 +9,7 @@
 (define factory-make (. Gst ElementFactory make))
 (define player (factory-make "playbin2" "player"))
 (set player "uri" (+ "file://" sample))
-( (. player set-state) (. Gst State playing) )
+((. player set-state) (. Gst State playing))
 
 (define loop ((. GLib MainLoop new) NULL))
 
