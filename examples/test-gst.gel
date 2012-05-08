@@ -11,7 +11,7 @@
 (set player "uri" (+ "file://" sample))
 ( (. player set-state) (. Gst State playing) )
 
-(define loop ((. GLib MainLoop new) NULL FALSE))
+(define loop ((. GLib MainLoop new) NULL))
 
 (define bus ((. player get-bus)))
 ((. bus add-signal-watch))
