@@ -2019,7 +2019,7 @@ void dot_(GClosure *self, GValue *return_value,
 
     const GelTypelib *typelib = NULL;
     const GelTypeInfo *type_info = NULL;
-    GObject *object = NULL;
+    void *instance = NULL;
 
     GType type = GEL_VALUE_TYPE(value);
     if(type == GEL_TYPE_TYPELIB)
@@ -2043,10 +2043,21 @@ void dot_(GClosure *self, GValue *return_value,
             gel_error_type_name_invalid(context,
                 __FUNCTION__, g_type_name(type));
         else
-            object = gel_value_get_object(value);
+            instance = gel_value_get_object(value);
     }
     else
-        gel_error_expected(context, __FUNCTION__, "typelib, type or object");
+    if(G_TYPE_IS_BOXED(type))
+    {
+        type_info = gel_type_info_from_gtype(type);
+        if(type_info == NULL)
+            gel_error_type_name_invalid(context,
+                __FUNCTION__, g_type_name(type));
+        else
+            instance = gel_value_get_boxed(value);
+    }
+    else
+        gel_error_expected(context, __FUNCTION__,
+            "typelib, type, boxed or object");
 
     if(GEL_IS_VALUE(&tmp_value))
         g_value_unset(&tmp_value);
@@ -2096,7 +2107,7 @@ void dot_(GClosure *self, GValue *return_value,
     }
 
     if(!failed && type_info != NULL)
-        gel_type_info_to_value(type_info, object, return_value);
+        gel_type_info_to_value(type_info, instance, return_value);
 }
 #endif
 
@@ -2214,6 +2225,10 @@ GHashTable* gel_make_default_symbols(void)
     variable = gel_variable_new(value, TRUE);
     g_hash_table_insert(symbols, g_strdup("FALSE"), variable);
 
+    value = gel_value_new_of_type(G_TYPE_POINTER);
+    gel_value_set_pointer(value, NULL);
+    variable = gel_variable_new(value, TRUE);
+    g_hash_table_insert(symbols, g_strdup("NULL"), variable);
     return symbols;
 }
 

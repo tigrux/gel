@@ -13,9 +13,9 @@ void gel_closure_close_over(GClosure *closure);
 typedef struct _GelIntrospectionClosure GelIntrospectionClosure;
 
 GClosure* gel_closure_new_introspection(const GelTypeInfo *info,
-                                        GObject *object);
+                                        void *instance);
 const GelTypeInfo* gel_introspection_closure_get_info(GelIntrospectionClosure *self);
-GObject* gel_introspection_closure_get_object(GelIntrospectionClosure *self);
+void* gel_introspection_closure_get_instance(GelIntrospectionClosure *self);
 #endif
 
 #endif

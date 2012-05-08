@@ -320,22 +320,20 @@ struct _GelIntrospectionClosure
     GClosure closure;
     gchar *name;
     const GelTypeInfo *info;
-    GObject *object;
+    void *instance;
 };
 
 
 static
 void gel_introspection_closure_finalize(void *data,
                                         GelIntrospectionClosure *self)
-{
-    if(self->object != NULL)
-        g_object_unref(self->object);
+{;
     g_free(self->name);
 }
 
 
 GClosure* gel_closure_new_introspection(const GelTypeInfo *info,
-                                        GObject *object)
+                                        void *instance)
 {
     GClosure *closure =
         g_closure_new_simple(sizeof (GelIntrospectionClosure), NULL);
@@ -343,17 +341,14 @@ GClosure* gel_closure_new_introspection(const GelTypeInfo *info,
     g_closure_set_marshal(closure,
         (GClosureMarshal)gel_type_info_closure_marshal);
 
-    g_closure_add_finalize_notifier(closure, object,
+    g_closure_add_finalize_notifier(closure, instance,
         (GClosureNotify)gel_introspection_closure_finalize);
 
     GelIntrospectionClosure *self = (GelIntrospectionClosure*)closure;
     self->name = gel_type_info_to_string(info);
     self->info = info;
 
-    if(object != NULL)
-        self->object = g_object_ref(object);
-    else
-        self->object = NULL;
+    self->instance = instance;
     return closure;
 }
 
@@ -364,9 +359,9 @@ const GelTypeInfo* gel_introspection_closure_get_info(GelIntrospectionClosure *s
 }
 
 
-GObject* gel_introspection_closure_get_object(GelIntrospectionClosure *self)
+void* gel_introspection_closure_get_instance(GelIntrospectionClosure *self)
 {
-    return self->object;
+    return self->instance;
 }
 #endif
 

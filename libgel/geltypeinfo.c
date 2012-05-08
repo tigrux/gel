@@ -325,9 +325,11 @@ gchar* gel_type_info_to_string(const GelTypeInfo *self)
 
 
 static
-gboolean gel_argument_to_value(const GArgument *arg, GITypeTag tag,
+gboolean gel_argument_to_value(const GArgument *arg, GITypeInfo *info,
                                GValue *value)
 {
+    GITypeTag tag = g_type_info_get_tag(info);
+
     switch(tag)
     {
         case GI_TYPE_TAG_BOOLEAN:
@@ -382,6 +384,32 @@ gboolean gel_argument_to_value(const GArgument *arg, GITypeTag tag,
             g_value_init(value, G_TYPE_STRING);
             g_value_set_string(value, arg->v_pointer);
             return TRUE;
+        case GI_TYPE_TAG_INTERFACE:
+        {
+            gboolean result = FALSE;
+            GIBaseInfo *base = g_type_info_get_interface(info);
+            GIInfoType type = g_base_info_get_type(base);
+
+            switch(type)
+            {
+                case GI_INFO_TYPE_OBJECT:
+                    g_value_init(value,
+                        g_registered_type_info_get_g_type(base));
+                    g_value_set_object(value, arg->v_pointer);
+                    result = TRUE;
+                    break;
+                case GI_INFO_TYPE_STRUCT:
+                    g_value_init(value,
+                        g_registered_type_info_get_g_type(base));
+                    g_value_set_boxed(value, arg->v_pointer);
+                    result = TRUE;
+                    break;
+                default:
+                    break;
+            }
+            g_base_info_unref(base);
+            return result;
+        }
         default:
             return FALSE;
     }
@@ -413,13 +441,12 @@ gboolean gel_type_info_constant_to_value(const GelTypeInfo *self,
 {
     GIBaseInfo *info = self->info;
     GITypeInfo *arg_info = g_constant_info_get_type(info);
-    GITypeTag arg_tag = g_type_info_get_tag(arg_info);
 
     GArgument argument = {0};
     g_constant_info_get_value(info, &argument);
 
     gboolean converted =
-        gel_argument_to_value(&argument, arg_tag, return_value);
+        gel_argument_to_value(&argument, arg_info, return_value);
 
     #if HAVE_G_CONSTANT_INFO_FREE_VALUE
     g_constant_info_free_value(info, &argument);
@@ -482,7 +509,7 @@ void gel_type_info_closure_marshal(GClosure *gclosure,
 {
     GelIntrospectionClosure *closure = (GelIntrospectionClosure *)gclosure;
     const GelTypeInfo *info = gel_introspection_closure_get_info(closure);
-    GObject *object = gel_introspection_closure_get_object(closure);
+    GObject *object = gel_introspection_closure_get_instance(closure);
     GIBaseInfo *function_info = info->info;
 
     guint n_args = g_callable_info_get_n_args(function_info);
@@ -549,7 +576,8 @@ void gel_type_info_closure_marshal(GClosure *gclosure,
         gboolean is_input = FALSE;
         gboolean is_output = FALSE;
 
-        switch(g_arg_info_get_direction(infos[i]))
+        GIDirection dir = g_arg_info_get_direction(infos[i]);
+        switch(dir)
         {
             case GI_DIRECTION_IN:
                 is_input = TRUE;
@@ -564,13 +592,16 @@ void gel_type_info_closure_marshal(GClosure *gclosure,
         }
 
         if(!indirect_args[i])
-            switch(g_type_info_get_tag(type))
+        {
+            GITypeTag tag = g_type_info_get_tag(type);
+
+            switch(tag)
             {
                 case GI_TYPE_TAG_BOOLEAN:
                 {
                     gboolean number = FALSE;
                     if(gel_context_eval_params(context, __FUNCTION__,
-                        &n_values, &values, &tmp_list, "B", &number))
+                        &n_values, &values, &tmp_list, "B*", &number))
                     {
                         if(is_input)
                         {
@@ -591,7 +622,7 @@ void gel_type_info_closure_marshal(GClosure *gclosure,
                 {
                     gint64 number = 0;
                     if(gel_context_eval_params(context, __FUNCTION__,
-                        &n_values, &values, &tmp_list, "I", &number))
+                        &n_values, &values, &tmp_list, "I*", &number))
                     {
                         if(is_input)
                         {
@@ -612,7 +643,7 @@ void gel_type_info_closure_marshal(GClosure *gclosure,
                 {
                     gint64 number = 0;
                     if(gel_context_eval_params(context, __FUNCTION__,
-                        &n_values, &values, &tmp_list, "I", &number))
+                        &n_values, &values, &tmp_list, "I*", &number))
                     {
                         if(is_input)
                         {
@@ -633,7 +664,7 @@ void gel_type_info_closure_marshal(GClosure *gclosure,
                 {
                     gint64 number = 0;
                     if(gel_context_eval_params(context, __FUNCTION__,
-                        &n_values, &values, &tmp_list, "I", &number))
+                        &n_values, &values, &tmp_list, "I*", &number))
                     {
                         if(is_input)
                         {
@@ -654,7 +685,7 @@ void gel_type_info_closure_marshal(GClosure *gclosure,
                 {
                     gint64 number = 0;
                     if(gel_context_eval_params(context, __FUNCTION__,
-                        &n_values, &values, &tmp_list, "I", &number))
+                        &n_values, &values, &tmp_list, "I*", &number))
                     {
                         if(is_input)
                         {
@@ -675,7 +706,7 @@ void gel_type_info_closure_marshal(GClosure *gclosure,
                 {
                     gint64 number = 0;
                     if(gel_context_eval_params(context, __FUNCTION__,
-                        &n_values, &values, &tmp_list, "I", &number))
+                        &n_values, &values, &tmp_list, "I*", &number))
                     {
                         if(is_input)
                         {
@@ -696,7 +727,7 @@ void gel_type_info_closure_marshal(GClosure *gclosure,
                 {
                     gint64 number = 0;
                     if(gel_context_eval_params(context, __FUNCTION__,
-                        &n_values, &values, &tmp_list, "I", &number))
+                        &n_values, &values, &tmp_list, "I*", &number))
                     {
                         
                         if(is_input)
@@ -718,7 +749,7 @@ void gel_type_info_closure_marshal(GClosure *gclosure,
                 {
                     gint64 number = 0;
                     if(gel_context_eval_params(context, __FUNCTION__,
-                        &n_values, &values, &tmp_list, "I", &number))
+                        &n_values, &values, &tmp_list, "I*", &number))
                     {
                         if(is_input)
                         {
@@ -739,7 +770,7 @@ void gel_type_info_closure_marshal(GClosure *gclosure,
                 {
                     gint64 number = 0;
                     if(gel_context_eval_params(context, __FUNCTION__,
-                        &n_values, &values, &tmp_list, "I", &number))
+                        &n_values, &values, &tmp_list, "I*", &number))
                     {
                         if(is_input)
                         {
@@ -760,7 +791,7 @@ void gel_type_info_closure_marshal(GClosure *gclosure,
                 {
                     gdouble number = 0;
                     if(gel_context_eval_params(context, __FUNCTION__,
-                        &n_values, &values, &tmp_list, "F", &number))
+                        &n_values, &values, &tmp_list, "F*", &number))
                     {
                         if(is_input)
                         {
@@ -781,7 +812,7 @@ void gel_type_info_closure_marshal(GClosure *gclosure,
                 {
                     gdouble number = 0;
                     if(gel_context_eval_params(context, __FUNCTION__,
-                        &n_values, &values, &tmp_list, "F", &number))
+                        &n_values, &values, &tmp_list, "F*", &number))
                     {
                         if(is_input)
                         {
@@ -802,7 +833,7 @@ void gel_type_info_closure_marshal(GClosure *gclosure,
                 {
                     GType type = G_TYPE_INVALID;
                     if(gel_context_eval_params(context, __FUNCTION__,
-                        &n_values, &values, &tmp_list, "G", &type))
+                        &n_values, &values, &tmp_list, "G*", &type))
                     {
                         if(is_input)
                         {
@@ -823,7 +854,7 @@ void gel_type_info_closure_marshal(GClosure *gclosure,
                 {
                     gchar *string = 0;
                     if(gel_context_eval_params(context, __FUNCTION__,
-                        &n_values, &values, &tmp_list, "S", &string))
+                        &n_values, &values, &tmp_list, "S*", &string))
                     {
                         if(is_input)
                         {
@@ -851,7 +882,7 @@ void gel_type_info_closure_marshal(GClosure *gclosure,
                         {
                             GObject *object;
                             if(gel_context_eval_params(context, __FUNCTION__,
-                                &n_values, &values, &tmp_list, "O", &object))
+                                &n_values, &values, &tmp_list, "O*", &object))
                             {
                                 if(is_input)
                                 {
@@ -872,7 +903,7 @@ void gel_type_info_closure_marshal(GClosure *gclosure,
                         {
                             void *boxed;
                             if(gel_context_eval_params(context, __FUNCTION__,
-                                &n_values, &values, &tmp_list, "X", &boxed))
+                                &n_values, &values, &tmp_list, "X*", &boxed))
                             {
                                 if(is_input)
                                 {
@@ -889,6 +920,27 @@ void gel_type_info_closure_marshal(GClosure *gclosure,
                                 goto end;
                             break;
                         }
+                        case GI_INFO_TYPE_ENUM:
+                        {
+                            gint64 number;
+                            if(gel_context_eval_params(context, __FUNCTION__,
+                                &n_values, &values, &tmp_list, "I*", &number))
+                            {
+                                if(is_input)
+                                {
+                                    if(is_output)
+                                    {
+                                        inputs[n_inputs].v_pointer = &number;
+                                        outputs[n_outputs].v_pointer = &number;
+                                    }
+                                    else
+                                        inputs[n_inputs].v_int64 = number;
+                                }
+                            }
+                            else
+                                goto end;
+                            break;
+                        }
                         default:
                             break;
                     }
@@ -897,6 +949,7 @@ void gel_type_info_closure_marshal(GClosure *gclosure,
                 default:
                     break;
             }
+        }
 
         if(is_input)
             n_inputs++;
@@ -910,9 +963,9 @@ void gel_type_info_closure_marshal(GClosure *gclosure,
         outputs, n_outputs,
         &return_arg, FALSE);
 
-    GITypeInfo *return_type = g_callable_info_get_return_type(function_info);
-    GITypeTag return_tag = g_type_info_get_tag(return_type);
-    gel_argument_to_value(&return_arg, return_tag, return_value);
+    GITypeInfo *return_info = g_callable_info_get_return_type(function_info);
+    gel_argument_to_value(&return_arg, return_info, return_value);
+    g_base_info_unref(return_info);
 
     end:
     for(guint i = 0; i < n_args; i++)
@@ -932,9 +985,9 @@ void gel_type_info_closure_marshal(GClosure *gclosure,
 
 static
 gboolean gel_type_info_function_to_value(const GelTypeInfo *self,
-                                         GObject *object, GValue *return_value)
+                                         void *instance, GValue *return_value)
 {
-    GClosure *closure = gel_closure_new_introspection(self, object);
+    GClosure *closure = gel_closure_new_introspection(self, instance);
 
     g_value_init(return_value, G_TYPE_CLOSURE);
     g_value_take_boxed(return_value, closure);
@@ -944,7 +997,7 @@ gboolean gel_type_info_function_to_value(const GelTypeInfo *self,
 
 
 gboolean gel_type_info_to_value(const GelTypeInfo *self,
-                                GObject *object, GValue *return_value)
+                                void *instance, GValue *return_value)
 {
     g_return_val_if_fail(self != NULL, FALSE);
 
@@ -959,12 +1012,12 @@ gboolean gel_type_info_to_value(const GelTypeInfo *self,
                 return TRUE;
             break;
         case GI_INFO_TYPE_PROPERTY:
-            if(object != NULL)
-                if(gel_type_info_property_to_value(self, object, return_value))
+            if(instance != NULL)
+                if(gel_type_info_property_to_value(self, instance, return_value))
                     return TRUE;
             break;
         case GI_INFO_TYPE_FUNCTION:
-            if(gel_type_info_function_to_value(self, object, return_value))
+            if(gel_type_info_function_to_value(self, instance, return_value))
                 return TRUE;
             break;
         default:
