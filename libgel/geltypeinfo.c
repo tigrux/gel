@@ -268,7 +268,7 @@ const GelTypeInfo* gel_type_info_lookup(const GelTypeInfo *self,
         child_info = g_hash_table_lookup(container_info->infos, name);
         if(child_info != NULL)
             break;
-            
+
         GIBaseInfo *base_info = container_info->info;
         if(GI_IS_OBJECT_INFO(base_info))
         {
@@ -491,7 +491,7 @@ void gel_type_info_closure_marshal(GClosure *gclosure,
     gboolean *indirect_args = g_new0(gboolean, n_args);
     GArgument *inputs = g_new0(GArgument, n_args + 1);
     GArgument *outputs = g_new0(GArgument, n_args);
-    
+
     guint n_inputs = 0;
     guint n_outputs = 0;
 
@@ -546,6 +546,22 @@ void gel_type_info_closure_marshal(GClosure *gclosure,
     for(guint i = 0; i < n_args; i++)
     {
         GITypeInfo *type = types[i];
+        gboolean is_input = FALSE;
+        gboolean is_output = FALSE;
+
+        switch(g_arg_info_get_direction(infos[i]))
+        {
+            case GI_DIRECTION_IN:
+                is_input = TRUE;
+                break;
+            case GI_DIRECTION_OUT:
+                is_output = TRUE;
+                break;
+            case GI_DIRECTION_INOUT:
+                is_input = TRUE;
+                is_output = TRUE;
+                break;
+        }
 
         if(!indirect_args[i])
             switch(g_type_info_get_tag(type))
@@ -556,8 +572,19 @@ void gel_type_info_closure_marshal(GClosure *gclosure,
                     if(gel_context_eval_params(context, __FUNCTION__,
                         &n_values, &values, &tmp_list, "B", &number))
                     {
-                        inputs[n_inputs].v_boolean = number;
+                        if(is_input)
+                        {
+                            if(is_output)
+                            {
+                                inputs[n_inputs].v_pointer = &number;
+                                outputs[n_outputs].v_pointer = &number;
+                            }
+                            else
+                                inputs[n_inputs].v_boolean = number;
+                        }
                     }
+                    else
+                        goto end;
                     break;
                 }
                 case GI_TYPE_TAG_INT8:
@@ -566,8 +593,19 @@ void gel_type_info_closure_marshal(GClosure *gclosure,
                     if(gel_context_eval_params(context, __FUNCTION__,
                         &n_values, &values, &tmp_list, "I", &number))
                     {
-                        inputs[n_inputs].v_int8 = (gint8)number;
+                        if(is_input)
+                        {
+                            if(is_output)
+                            {
+                                inputs[n_inputs].v_pointer = &number;
+                                outputs[n_outputs].v_pointer = &number;
+                            }
+                            else
+                                inputs[n_inputs].v_int8 = (gint8)number;
+                        }
                     }
+                    else
+                        goto end;
                     break;
                 }
                 case GI_TYPE_TAG_UINT8:
@@ -576,8 +614,19 @@ void gel_type_info_closure_marshal(GClosure *gclosure,
                     if(gel_context_eval_params(context, __FUNCTION__,
                         &n_values, &values, &tmp_list, "I", &number))
                     {
-                        inputs[n_inputs].v_uint8 = (guint8)number;
+                        if(is_input)
+                        {
+                            if(is_output)
+                            {
+                                inputs[n_inputs].v_pointer = &number;
+                                outputs[n_outputs].v_pointer = &number;
+                            }
+                            else
+                                inputs[n_inputs].v_uint8 = (guint8)number;
+                        }
                     }
+                    else
+                        goto end;
                     break;
                 }
                 case GI_TYPE_TAG_INT16:
@@ -586,8 +635,19 @@ void gel_type_info_closure_marshal(GClosure *gclosure,
                     if(gel_context_eval_params(context, __FUNCTION__,
                         &n_values, &values, &tmp_list, "I", &number))
                     {
-                        inputs[n_inputs].v_int16 = (gint16)number;
+                        if(is_input)
+                        {
+                            if(is_output)
+                            {
+                                inputs[n_inputs].v_pointer = &number;
+                                outputs[n_outputs].v_pointer = &number;
+                            }
+                            else
+                                inputs[n_inputs].v_int16 = (gint16)number;
+                        }
                     }
+                    else
+                        goto end;
                     break;
                 }
                 case GI_TYPE_TAG_UINT16:
@@ -596,8 +656,19 @@ void gel_type_info_closure_marshal(GClosure *gclosure,
                     if(gel_context_eval_params(context, __FUNCTION__,
                         &n_values, &values, &tmp_list, "I", &number))
                     {
-                        inputs[n_inputs].v_uint16 = (guint16)number;
+                        if(is_input)
+                        {
+                            if(is_output)
+                            {
+                                inputs[n_inputs].v_pointer = &number;
+                                outputs[n_outputs].v_pointer = &number;
+                            }
+                            else
+                                inputs[n_inputs].v_uint16 = (guint16)number;
+                        }
                     }
+                    else
+                        goto end;
                     break;
                 }
                 case GI_TYPE_TAG_INT32:
@@ -606,8 +677,19 @@ void gel_type_info_closure_marshal(GClosure *gclosure,
                     if(gel_context_eval_params(context, __FUNCTION__,
                         &n_values, &values, &tmp_list, "I", &number))
                     {
-                        inputs[n_inputs].v_int32 = (gint32)number;
+                        if(is_input)
+                        {
+                            if(is_output)
+                            {
+                                inputs[n_inputs].v_pointer = &number;
+                                outputs[n_outputs].v_pointer = &number;
+                            }
+                            else
+                                inputs[n_inputs].v_int32 = (gint32)number;
+                        }
                     }
+                    else
+                        goto end;
                     break;
                 }
                 case GI_TYPE_TAG_UINT32:
@@ -616,8 +698,20 @@ void gel_type_info_closure_marshal(GClosure *gclosure,
                     if(gel_context_eval_params(context, __FUNCTION__,
                         &n_values, &values, &tmp_list, "I", &number))
                     {
-                        inputs[n_inputs].v_uint32 = (guint32)number;
+                        
+                        if(is_input)
+                        {
+                            if(is_output)
+                            {
+                                inputs[n_inputs].v_pointer = &number;
+                                outputs[n_outputs].v_pointer = &number;
+                            }
+                            else
+                                inputs[n_inputs].v_uint32 = (guint32)number;
+                        }
                     }
+                    else
+                        goto end;
                     break;
                 }
                 case GI_TYPE_TAG_INT64:
@@ -626,8 +720,19 @@ void gel_type_info_closure_marshal(GClosure *gclosure,
                     if(gel_context_eval_params(context, __FUNCTION__,
                         &n_values, &values, &tmp_list, "I", &number))
                     {
-                        inputs[n_inputs].v_int8 = (gint64)number;
+                        if(is_input)
+                        {
+                            if(is_output)
+                            {
+                                inputs[n_inputs].v_pointer = &number;
+                                outputs[n_outputs].v_pointer = &number;
+                            }
+                            else
+                                inputs[n_inputs].v_int8 = number;
+                        }
                     }
+                    else
+                        goto end;
                     break;
                 }
                 case GI_TYPE_TAG_UINT64:
@@ -636,8 +741,19 @@ void gel_type_info_closure_marshal(GClosure *gclosure,
                     if(gel_context_eval_params(context, __FUNCTION__,
                         &n_values, &values, &tmp_list, "I", &number))
                     {
-                        inputs[n_inputs].v_uint8 = (guint64)number;
+                        if(is_input)
+                        {
+                            if(is_output)
+                            {
+                                inputs[n_inputs].v_pointer = &number;
+                                outputs[n_outputs].v_pointer = &number;
+                            }
+                            else
+                                inputs[n_inputs].v_uint64 = (guint64)number;
+                        }
                     }
+                    else
+                        goto end;
                     break;
                 }
                 case GI_TYPE_TAG_FLOAT:
@@ -646,8 +762,19 @@ void gel_type_info_closure_marshal(GClosure *gclosure,
                     if(gel_context_eval_params(context, __FUNCTION__,
                         &n_values, &values, &tmp_list, "F", &number))
                     {
-                        inputs[n_inputs].v_float = (gfloat)number;
+                        if(is_input)
+                        {
+                            if(is_output)
+                            {
+                                inputs[n_inputs].v_pointer = &number;
+                                outputs[n_outputs].v_pointer = &number;
+                            }
+                            else
+                                inputs[n_inputs].v_float = (gfloat)number;
+                        }
                     }
+                    else
+                        goto end;
                     break;
                 }
                 case GI_TYPE_TAG_DOUBLE:
@@ -656,8 +783,19 @@ void gel_type_info_closure_marshal(GClosure *gclosure,
                     if(gel_context_eval_params(context, __FUNCTION__,
                         &n_values, &values, &tmp_list, "F", &number))
                     {
-                        inputs[n_inputs].v_double = (gdouble)number;
+                        if(is_input)
+                        {
+                            if(is_output)
+                            {
+                                inputs[n_inputs].v_pointer = &number;
+                                outputs[n_outputs].v_pointer = &number;
+                            }
+                            else
+                                inputs[n_inputs].v_double = (gdouble)number;
+                        }
                     }
+                    else
+                        goto end;
                     break;
                 }
                 case GI_TYPE_TAG_GTYPE:
@@ -666,8 +804,19 @@ void gel_type_info_closure_marshal(GClosure *gclosure,
                     if(gel_context_eval_params(context, __FUNCTION__,
                         &n_values, &values, &tmp_list, "G", &type))
                     {
-                        inputs[n_inputs].v_size = type;
+                        if(is_input)
+                        {
+                            if(is_output)
+                            {
+                                inputs[n_inputs].v_pointer = &type;
+                                outputs[n_outputs].v_pointer = &type;
+                            }
+                            else
+                                inputs[n_inputs].v_size = type;
+                        }
                     }
+                    else
+                        goto end;
                     break;
                 }
                 case GI_TYPE_TAG_UTF8:
@@ -676,8 +825,19 @@ void gel_type_info_closure_marshal(GClosure *gclosure,
                     if(gel_context_eval_params(context, __FUNCTION__,
                         &n_values, &values, &tmp_list, "S", &string))
                     {
-                        inputs[n_inputs].v_pointer = string;
+                        if(is_input)
+                        {
+                            if(is_output)
+                            {
+                                inputs[n_inputs].v_pointer = &string;
+                                outputs[n_outputs].v_pointer = &string;
+                            }
+                            else
+                                inputs[n_inputs].v_pointer = string;
+                        }
                     }
+                    else
+                        goto end;
                     break;
                 }
                 case GI_TYPE_TAG_INTERFACE:
@@ -693,8 +853,19 @@ void gel_type_info_closure_marshal(GClosure *gclosure,
                             if(gel_context_eval_params(context, __FUNCTION__,
                                 &n_values, &values, &tmp_list, "O", &object))
                             {
-                                inputs[n_inputs].v_pointer = object;
+                                if(is_input)
+                                {
+                                    if(is_output)
+                                    {
+                                        inputs[n_inputs].v_pointer = &object;
+                                        outputs[n_outputs].v_pointer = &object;
+                                    }
+                                    else
+                                        inputs[n_inputs].v_pointer = object;
+                                }
                             }
+                            else
+                                goto end;
                             break;
                         }
                         case GI_INFO_TYPE_BOXED:
@@ -703,8 +874,19 @@ void gel_type_info_closure_marshal(GClosure *gclosure,
                             if(gel_context_eval_params(context, __FUNCTION__,
                                 &n_values, &values, &tmp_list, "X", &boxed))
                             {
-                                inputs[n_inputs].v_pointer = boxed;
+                                if(is_input)
+                                {
+                                    if(is_output)
+                                    {
+                                        inputs[n_inputs].v_pointer = &boxed;
+                                        outputs[n_outputs].v_pointer = &boxed;
+                                    }
+                                    else
+                                        inputs[n_inputs].v_pointer = boxed;
+                                }
                             }
+                            else
+                                goto end;
                             break;
                         }
                         default:
@@ -716,19 +898,10 @@ void gel_type_info_closure_marshal(GClosure *gclosure,
                     break;
             }
 
-        switch(g_arg_info_get_direction(infos[i]))
-        {
-            case GI_DIRECTION_IN:
-                n_inputs++;
-                break;
-            case GI_DIRECTION_OUT:
-                n_outputs++;
-                break;
-            case GI_DIRECTION_INOUT:
-                n_inputs++;
-                n_outputs++;
-                break;
-        }
+        if(is_input)
+            n_inputs++;
+        if(is_output)
+            n_outputs++;
     }
 
     GArgument return_arg = {0};
@@ -741,6 +914,7 @@ void gel_type_info_closure_marshal(GClosure *gclosure,
     GITypeTag return_tag = g_type_info_get_tag(return_type);
     gel_argument_to_value(&return_arg, return_tag, return_value);
 
+    end:
     for(guint i = 0; i < n_args; i++)
     {
         g_base_info_unref(types[i]);
