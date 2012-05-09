@@ -76,14 +76,7 @@ gboolean gel_context_eval_param(GelContext *self, const gchar *func,
             if(gel_context_error(self))
                 parsed = FALSE;
             else
-            if(!GEL_VALUE_HOLDS(result, GEL_TYPE_SYMBOL))
                 gel_args_pop(args, const GValue *) = result;
-            else
-            {
-                gel_error_value_not_of_type(self,
-                    func, *values, G_TYPE_VALUE);
-                parsed = FALSE;
-            }
             break;
         case 'a':
             if(GEL_VALUE_HOLDS(*values, GEL_TYPE_ARRAY))
