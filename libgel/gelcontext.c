@@ -310,13 +310,13 @@ const GValue* gel_context_eval_into_value(GelContext *self,
             gel_error_unknown_symbol(self, __FUNCTION__, name);
     }
     else
-    if(type == GEL_TYPE_VALUE_ARRAY)
+    if(type == GEL_TYPE_ARRAY)
     {
-        GelValueArray *array = gel_value_get_boxed(value);
-        const guint array_n_values = gel_value_array_get_n_values(array);
+        GelArray *array = gel_value_get_boxed(value);
+        const guint array_n_values = gel_array_get_n_values(array);
         if(array_n_values > 0)
         {
-            const GValue *array_values = gel_value_array_get_values(array);
+            const GValue *array_values = gel_array_get_values(array);
 
             GValue tmp_value = {0};
             const GValue *first_value =

@@ -126,16 +126,16 @@ gchar* gel_value_stringify(const GValue *value, gchar* (*str)(const GValue *))
         g_value_unset(&string_value);
     }
     else
-    if(GEL_VALUE_HOLDS(value, GEL_TYPE_VALUE_ARRAY))
+    if(GEL_VALUE_HOLDS(value, GEL_TYPE_ARRAY))
     {
-        const GelValueArray *array = gel_value_get_boxed(value);
+        const GelArray *array = gel_value_get_boxed(value);
         GString *buffer = g_string_new("(");
-        const guint n_values = gel_value_array_get_n_values(array);
+        const guint n_values = gel_array_get_n_values(array);
 
         if(n_values > 0)
         {
             guint last = n_values - 1;
-            const GValue *array_values = gel_value_array_get_values(array);
+            const GValue *array_values = gel_array_get_values(array);
 
             for(guint i = 0; i <= last; i++)
             {
@@ -318,9 +318,9 @@ gboolean gel_value_to_boolean(const GValue *value)
         default:
             if(type == G_TYPE_ARRAY)
             {
-                GelValueArray *array = gel_value_get_boxed(value);
+                GelArray *array = gel_value_get_boxed(value);
                 result =
-                    (array != NULL && gel_value_array_get_n_values(array) != 0);
+                    (array != NULL && gel_array_get_n_values(array) != 0);
                 break;
             }
             else
@@ -368,8 +368,8 @@ GType gel_value_simple_type(const GValue *value)
             if(GEL_VALUE_HOLDS(value, G_TYPE_ENUM)
                || GEL_VALUE_HOLDS(value, G_TYPE_FLAGS))
                 return G_TYPE_INT64;
-            if(GEL_VALUE_HOLDS(value, GEL_TYPE_VALUE_ARRAY))
-                return GEL_TYPE_VALUE_ARRAY;
+            if(GEL_VALUE_HOLDS(value, GEL_TYPE_ARRAY))
+                return GEL_TYPE_ARRAY;
             if(GEL_VALUE_HOLDS(value, G_TYPE_HASH_TABLE))
                 return G_TYPE_HASH_TABLE;
             if(g_value_fits_pointer(value))
@@ -426,15 +426,15 @@ GHashTable* gel_hash_table_new(void)
 }
 
 
-GList* gel_args_from_array(const GelValueArray *vars, gchar **variadic,
+GList* gel_args_from_array(const GelArray *vars, gchar **variadic,
                            gchar **invalid)
 {
     gboolean next_is_variadic = FALSE;
     GList *args = NULL;
     gboolean failed = FALSE;
 
-    guint n_vars = gel_value_array_get_n_values(vars);
-    const GValue *var_values = gel_value_array_get_values(vars);
+    guint n_vars = gel_array_get_n_values(vars);
+    const GValue *var_values = gel_array_get_values(vars);
 
     for(guint i = 0; i < n_vars; i++)
     {
@@ -510,23 +510,23 @@ gboolean gel_values_simple_add(const GValue *v1, const GValue *v2,
                 NULL));
             return TRUE;
         default:
-            if(type == GEL_TYPE_VALUE_ARRAY)
+            if(type == GEL_TYPE_ARRAY)
             {
-                GelValueArray *a1 = gel_value_get_boxed(v1);
-                GelValueArray *a2 = gel_value_get_boxed(v2);
-                guint n1_values = gel_value_array_get_n_values(a1);
-                guint n2_values = gel_value_array_get_n_values(a2);
+                GelArray *a1 = gel_value_get_boxed(v1);
+                GelArray *a2 = gel_value_get_boxed(v2);
+                guint n1_values = gel_array_get_n_values(a1);
+                guint n2_values = gel_array_get_n_values(a2);
 
-                GelValueArray *array =
-                    gel_value_array_new(n1_values + n2_values);
+                GelArray *array =
+                    gel_array_new(n1_values + n2_values);
 
-                const GValue *a1_values = gel_value_array_get_values(a1);
+                const GValue *a1_values = gel_array_get_values(a1);
                 for(guint i = 0; i < n1_values; i++)
-                    gel_value_array_append(array, a1_values + i);
+                    gel_array_append(array, a1_values + i);
 
-                const GValue *a2_values = gel_value_array_get_values(a2);
+                const GValue *a2_values = gel_array_get_values(a2);
                 for(guint i = 0; i < n2_values; i++)
-                    gel_value_array_append(array, a2_values + i);
+                    gel_array_append(array, a2_values + i);
 
                 gel_value_take_boxed(dest_value, array);
                 return TRUE;
@@ -725,7 +725,7 @@ gboolean gel_values_can_cmp(const GValue *v1, const GValue *v2)
         case G_TYPE_BOOLEAN:
             return TRUE;
         default:
-            if(type == GEL_TYPE_VALUE_ARRAY)
+            if(type == GEL_TYPE_ARRAY)
                 return TRUE;
             return FALSE;
     }
@@ -899,17 +899,17 @@ gint gel_values_cmp(const GValue *v1, const GValue *v2)
             break;
         }
         default:
-            if(simple_type == GEL_TYPE_VALUE_ARRAY)
+            if(simple_type == GEL_TYPE_ARRAY)
             {
-                GelValueArray *a1 = gel_value_get_boxed(vv1);
-                GelValueArray *a2 = gel_value_get_boxed(vv2);
+                GelArray *a1 = gel_value_get_boxed(vv1);
+                GelArray *a2 = gel_value_get_boxed(vv2);
 
-                guint a1_n = gel_value_array_get_n_values(a1);
-                guint a2_n = gel_value_array_get_n_values(a2);
+                guint a1_n = gel_array_get_n_values(a1);
+                guint a2_n = gel_array_get_n_values(a2);
                 guint n_values = MIN(a1_n, a2_n);
 
-                GValue *a1_values = gel_value_array_get_values(a1);
-                GValue *a2_values = gel_value_array_get_values(a2);
+                GValue *a1_values = gel_array_get_values(a1);
+                GValue *a2_values = gel_array_get_values(a2);
 
                 guint i;
                 for(i = 0; i < n_values; i++)

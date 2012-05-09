@@ -9,7 +9,7 @@ struct _GelMacro
     gchar *name;
     GList *args;
     gchar *variadic;
-    GelValueArray *code;
+    GelArray *code;
 };
 
 
@@ -17,7 +17,7 @@ static GHashTable *macros_HASH = NULL;
 
 
 GelMacro* gel_macro_new(const gchar *name,
-                        GList *args, gchar *variadic, GelValueArray *code)
+                        GList *args, gchar *variadic, GelArray *code)
 {
     GelMacro *self = g_slice_new0(GelMacro);
 
@@ -36,7 +36,7 @@ void gel_macro_free(GelMacro *self)
     g_list_foreach(self->args, (GFunc)g_free, NULL);
     g_list_free(self->args);
     g_free(self->variadic);
-    gel_value_array_free(self->code);
+    gel_array_free(self->code);
     g_slice_free(GelMacro, self);
 }
 
@@ -62,7 +62,7 @@ void gel_macros_free(void)
 
 static
 void gel_macros_insert(const gchar *name, GList *args, gchar *variadic,
-                       GelValueArray *code)
+                       GelArray *code)
 {
     g_return_if_fail(macros_HASH != NULL);
 
@@ -80,13 +80,13 @@ GelMacro* gel_macros_lookup(const gchar *name)
 
 
 static
-GelValueArray* gel_macro_map_code(const GelMacro *self,
-                                 GHashTable *hash, GelValueArray *array,
+GelArray* gel_macro_map_code(const GelMacro *self,
+                                 GHashTable *hash, GelArray *array,
                                  GError **error)
 {
-    GValue *values = gel_value_array_get_values(array);
-    guint n_values = gel_value_array_get_n_values(array);
-    GelValueArray *code = gel_value_array_new(n_values);
+    GValue *values = gel_array_get_values(array);
+    guint n_values = gel_array_get_n_values(array);
+    GelArray *code = gel_array_new(n_values);
 
     for(guint i = 0; i < n_values; i++)
     {
@@ -100,38 +100,38 @@ GelValueArray* gel_macro_map_code(const GelMacro *self,
             if(g_strcmp0(name, self->variadic) != 0)
             {
                 if(value != NULL)
-                    gel_value_array_append(code, value);
+                    gel_array_append(code, value);
                 else
-                    gel_value_array_append(code, values + i);
+                    gel_array_append(code, values + i);
             }
             else
-            if(GEL_VALUE_HOLDS(value, GEL_TYPE_VALUE_ARRAY))
+            if(GEL_VALUE_HOLDS(value, GEL_TYPE_ARRAY))
             {
-                GelValueArray *var_array = gel_value_get_boxed(value);
-                guint var_n_values = gel_value_array_get_n_values(var_array);
-                GValue *var_values = gel_value_array_get_values(var_array);
+                GelArray *var_array = gel_value_get_boxed(value);
+                guint var_n_values = gel_array_get_n_values(var_array);
+                GValue *var_values = gel_array_get_values(var_array);
 
                 for(guint i = 0; i < var_n_values; i++)
-                    gel_value_array_append(code, var_values + i);
+                    gel_array_append(code, var_values + i);
             }
         }
         else
-        if(type == GEL_TYPE_VALUE_ARRAY)
+        if(type == GEL_TYPE_ARRAY)
         {
-            GelValueArray *array = gel_value_get_boxed(values + i);
-            GelValueArray *new_array =
+            GelArray *array = gel_value_get_boxed(values + i);
+            GelArray *new_array =
                 gel_macro_map_code(self, hash, array, error);
 
             GValue tmp_value = {0};
-            g_value_init(&tmp_value, GEL_TYPE_VALUE_ARRAY);
+            g_value_init(&tmp_value, GEL_TYPE_ARRAY);
 
             gel_value_take_boxed(&tmp_value, new_array);
-            gel_value_array_append(code, &tmp_value);
+            gel_array_append(code, &tmp_value);
 
             g_value_unset(&tmp_value);
         }
         else
-            gel_value_array_append(code, values + i);
+            gel_array_append(code, values + i);
     }
 
     return code;
@@ -139,7 +139,7 @@ GelValueArray* gel_macro_map_code(const GelMacro *self,
 
 
 static
-GelValueArray* gel_macro_invoke(const GelMacro *self,
+GelArray* gel_macro_invoke(const GelMacro *self,
                               guint n_values, const GValue *values,
                               GError **error)
 {
@@ -180,16 +180,16 @@ GelValueArray* gel_macro_invoke(const GelMacro *self,
     if(is_variadic)
     {
         guint array_n_values = n_values - i;
-        GelValueArray *array = gel_value_array_new(array_n_values);
+        GelArray *array = gel_array_new(array_n_values);
 
         for(guint j = 0; i < n_values; i++, j++)
-            gel_value_array_append(array, values + i);
+            gel_array_append(array, values + i);
 
-        GValue *value = gel_value_new_from_boxed(GEL_TYPE_VALUE_ARRAY, array);
+        GValue *value = gel_value_new_from_boxed(GEL_TYPE_ARRAY, array);
         g_hash_table_insert(mappings, self->variadic, value);
     }
 
-    GelValueArray *code =
+    GelArray *code =
         gel_macro_map_code(self, mappings, self->code, error);
     g_hash_table_unref(mappings);
 
@@ -197,13 +197,13 @@ GelValueArray* gel_macro_invoke(const GelMacro *self,
 }
 
 
-GelValueArray* gel_macro_code_from_value(GValue *pre_value, GError **error)
+GelArray* gel_macro_code_from_value(GValue *pre_value, GError **error)
 {
-    if(GEL_VALUE_TYPE(pre_value) == GEL_TYPE_VALUE_ARRAY)
+    if(GEL_VALUE_TYPE(pre_value) == GEL_TYPE_ARRAY)
     {
-        GelValueArray *array = gel_value_get_boxed(pre_value);
-        GValue *values = gel_value_array_get_values(array);
-        guint n_values = gel_value_array_get_n_values(array);
+        GelArray *array = gel_value_get_boxed(pre_value);
+        GValue *values = gel_array_get_values(array);
+        guint n_values = gel_array_get_n_values(array);
 
         GType type = GEL_VALUE_TYPE(values + 0);
         if(type != GEL_TYPE_SYMBOL)
@@ -228,7 +228,7 @@ GelValueArray* gel_macro_code_from_value(GValue *pre_value, GError **error)
             symbol = gel_value_get_boxed(values + 0);
             name = gel_symbol_get_name(symbol);
 
-            GelValueArray *vars = gel_value_get_boxed(values + 1);
+            GelArray *vars = gel_value_get_boxed(values + 1);
             gchar *variadic = NULL;
             gchar *invalid = NULL;
             GList* args = gel_args_from_array(vars, &variadic, &invalid);
@@ -245,12 +245,12 @@ GelValueArray* gel_macro_code_from_value(GValue *pre_value, GError **error)
             n_values -= 2;
             values += 2;
 
-            GelValueArray *code = gel_value_array_new(n_values);
+            GelArray *code = gel_array_new(n_values);
             for(guint i = 0; i < n_values; i++)
-                gel_value_array_append(code, values + i);
+                gel_array_append(code, values + i);
 
             gel_macros_insert(name, args, variadic, code);
-            return gel_value_array_new(0);
+            return gel_array_new(0);
         }
         else
         {

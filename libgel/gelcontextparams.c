@@ -86,12 +86,12 @@ gboolean gel_context_eval_param(GelContext *self, const gchar *func,
             }
             break;
         case 'a':
-            if(GEL_VALUE_HOLDS(*values, GEL_TYPE_VALUE_ARRAY))
+            if(GEL_VALUE_HOLDS(*values, GEL_TYPE_ARRAY))
                 gel_args_pop(args, void *) = gel_value_get_boxed(*values);
             else
             {
                 gel_error_value_not_of_type(self,
-                    func, *values, GEL_TYPE_VALUE_ARRAY);
+                    func, *values, GEL_TYPE_ARRAY);
                 parsed = FALSE;
             }
             break;
@@ -102,12 +102,12 @@ gboolean gel_context_eval_param(GelContext *self, const gchar *func,
             if(gel_context_error(self))
                 parsed = FALSE;
             else
-            if(GEL_VALUE_HOLDS(result, GEL_TYPE_VALUE_ARRAY))
+            if(GEL_VALUE_HOLDS(result, GEL_TYPE_ARRAY))
                 gel_args_pop(args, void *) = gel_value_get_boxed(result);
             else
             {
                 gel_error_value_not_of_type(self,
-                    func, result, GEL_TYPE_VALUE_ARRAY);
+                    func, result, GEL_TYPE_ARRAY);
                 parsed = FALSE;
             }
             break;
@@ -325,11 +325,11 @@ gboolean gel_context_eval_params_args(GelContext *self, const gchar *func,
                 func, n_values, values, list, format, args);
         }
         else
-            if(GEL_VALUE_HOLDS(*values, GEL_TYPE_VALUE_ARRAY))
+            if(GEL_VALUE_HOLDS(*values, GEL_TYPE_ARRAY))
             {
-                GelValueArray *array = gel_value_get_boxed(*values);
-                guint n_values = gel_value_array_get_n_values(array);
-                const GValue *values = gel_value_array_get_values(array);
+                GelArray *array = gel_value_get_boxed(*values);
+                guint n_values = gel_array_get_n_values(array);
+                const GValue *values = gel_array_get_values(array);
 
                 gel_context_eval_params_args(self,
                     func, &n_values, &values, list, node,  args);
@@ -337,7 +337,7 @@ gboolean gel_context_eval_params_args(GelContext *self, const gchar *func,
             else
             {
                 gel_error_value_not_of_type(self,
-                    func, *values, GEL_TYPE_VALUE_ARRAY);
+                    func, *values, GEL_TYPE_ARRAY);
                 parsed = FALSE;
             }
 

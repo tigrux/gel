@@ -39,7 +39,7 @@ int main(int argc, char *argv[])
     GError *error = NULL;
 
     /* parsing a file returns an array of values, unless an error occurs */
-    GelValueArray *parsed_array = gel_parse_file(argv[1], &error);
+    GelArray *parsed_array = gel_parse_file(argv[1], &error);
 
     /* if an error occurred when parsing ... */
     if(error != NULL)
@@ -64,9 +64,9 @@ int main(int argc, char *argv[])
     gel_context_define(context, "title", title_value);
 
     /* for each value obtained during the parsing ... */
-    for(guint i = 0; i < gel_value_array_get_n_values(parsed_array); i++)
+    for(guint i = 0; i < gel_array_get_n_values(parsed_array); i++)
     {
-        GValue *iter_value = gel_value_array_get_values(parsed_array) + i;
+        GValue *iter_value = gel_array_get_values(parsed_array) + i;
 
         /* ... print a representation of the value to be evaluated */
         gchar *value_repr = gel_value_repr(iter_value);
@@ -96,7 +96,7 @@ int main(int argc, char *argv[])
     }
 
     /* free the resources before exit */
-    gel_value_array_free(parsed_array);
+    gel_array_free(parsed_array);
     gel_context_free(context);
 
     return 0;

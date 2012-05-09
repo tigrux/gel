@@ -54,8 +54,8 @@ typedef enum _GelParseError
     GEL_PARSE_ERROR_MACRO_ARGUMENTS
 } GelParseError;
 
-GelValueArray* gel_parse_file(const gchar *file, GError **error);
-GelValueArray* gel_parse_text(const gchar *text, guint text_len, GError **error);
+GelArray* gel_parse_file(const gchar *file, GError **error);
+GelArray* gel_parse_text(const gchar *text, guint text_len, GError **error);
 
 #endif
 

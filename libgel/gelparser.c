@@ -15,8 +15,8 @@
  * @title: GelParser
  * @include: gel.h
  *
- * Functions to convert input (plain text or files) into #GelValueArray.
- * The resulting #GelValueArray can be used to feed a #GelContext.
+ * Functions to convert input (plain text or files) into #GelArray.
+ * The resulting #GelArray can be used to feed a #GelContext.
  */
 
 GQuark gel_parse_error_quark(void)
@@ -38,10 +38,10 @@ const gchar *scanner_errors[] = {
 
 
 static
-GelValueArray* gel_parse_scanner(GScanner *scanner, guint line, guint pos,
+GelArray* gel_parse_scanner(GScanner *scanner, guint line, guint pos,
                                gchar delim, GError **error)
 {
-    GelValueArray *array = gel_value_array_new(ARRAY_N_PREALLOCATED);
+    GelArray *array = gel_array_new(ARRAY_N_PREALLOCATED);
 
     const gchar *pre_symbol = NULL;
     switch(delim)
@@ -60,7 +60,7 @@ GelValueArray* gel_parse_scanner(GScanner *scanner, guint line, guint pos,
     {
         const GValue *pre_value = gel_value_lookup_predefined(pre_symbol);
         if(pre_value != NULL)
-            gel_value_array_append(array, pre_value);
+            gel_array_append(array, pre_value);
     }
 
     gboolean failed = FALSE;
@@ -93,11 +93,11 @@ GelValueArray* gel_parse_scanner(GScanner *scanner, guint line, guint pos,
             case '{':
             {
                 g_scanner_get_next_token(scanner);
-                GelValueArray *inner_array = gel_parse_scanner(scanner,
+                GelArray *inner_array = gel_parse_scanner(scanner,
                     scanner->line, scanner->position, token, error);
                 if(inner_array != NULL)
                 {
-                    g_value_init(&value, GEL_TYPE_VALUE_ARRAY);
+                    g_value_init(&value, GEL_TYPE_ARRAY);
                     gel_value_take_boxed(&value, inner_array);
                 }
                 else
@@ -215,19 +215,19 @@ GelValueArray* gel_parse_scanner(GScanner *scanner, guint line, guint pos,
     
         if(G_IS_VALUE(&value))
         {
-            GelValueArray *code = gel_macro_code_from_value(&value, error);
+            GelArray *code = gel_macro_code_from_value(&value, error);
             if(code != NULL)
             {
-                GValue *code_values = gel_value_array_get_values(code);
-                guint code_n_values = gel_value_array_get_n_values(code);
+                GValue *code_values = gel_array_get_values(code);
+                guint code_n_values = gel_array_get_n_values(code);
 
                 for(guint i = 0; i < code_n_values; i++)
-                    gel_value_array_append(array, code_values + i);
+                    gel_array_append(array, code_values + i);
 
-                gel_value_array_free(code);
+                gel_array_free(code);
             }
             else
-                gel_value_array_append(array, &value);
+                gel_array_append(array, &value);
 
             g_value_unset(&value);
         }
@@ -235,7 +235,7 @@ GelValueArray* gel_parse_scanner(GScanner *scanner, guint line, guint pos,
 
     if(failed)
     {
-        gel_value_array_free(array);
+        gel_array_free(array);
         array = NULL;
     }
 
@@ -250,13 +250,13 @@ GelValueArray* gel_parse_scanner(GScanner *scanner, guint line, guint pos,
  *
  * Reads the content of @file and then pass the content to #gel_parse_string
  *
- * Returns: A #GelValueArray with the parsed value literals
+ * Returns: A #GelArray with the parsed value literals
  */
-GelValueArray* gel_parse_file(const gchar *file, GError **error)
+GelArray* gel_parse_file(const gchar *file, GError **error)
 {
     gchar *content = NULL;
     gsize content_len = 0;
-    GelValueArray *array = NULL;
+    GelArray *array = NULL;
 
     if(g_file_get_contents(file, &content, &content_len, error))
     {
@@ -281,9 +281,9 @@ GelValueArray* gel_parse_file(const gchar *file, GError **error)
  *
  * #gel_context_eval_value considers array literals as closure's invokes.
  *
- * Returns: A #GelValueArray with the parsed value literals.
+ * Returns: A #GelArray with the parsed value literals.
  */
-GelValueArray* gel_parse_text(const gchar *text, guint text_len, GError **error)
+GelArray* gel_parse_text(const gchar *text, guint text_len, GError **error)
 {
     gel_macros_new();
     GScanner *scanner = g_scanner_new(NULL);
@@ -298,7 +298,7 @@ GelValueArray* gel_parse_text(const gchar *text, guint text_len, GError **error)
     config->store_int64 = TRUE;
 
     g_scanner_input_text(scanner, text, text_len);
-    GelValueArray *array = gel_parse_scanner(scanner, 0, 0, 0, error);
+    GelArray *array = gel_parse_scanner(scanner, 0, 0, 0, error);
 
     g_scanner_destroy(scanner);
     gel_macros_free();

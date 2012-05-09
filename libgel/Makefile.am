@@ -23,7 +23,8 @@ libgel_la_SOURCES = \
 	gelvalue.c \
 	gelsymbol.c \
 	gelvariable.c \
-	gelmacro.c
+	gelmacro.c \
+	gelarray.c
 
 if HAVE_GOBJECT_INTROSPECTION
     libgel_la_SOURCES += geltypeinfo.c geltypelib.c

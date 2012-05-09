@@ -39,7 +39,7 @@ struct _GelClosure
     GList *args;
     gchar *variadic_arg;
     GHashTable *args_hash;
-    GelValueArray *code;
+    GelArray *code;
 };
 
 
@@ -96,10 +96,10 @@ void gel_closure_marshal(GelClosure *self, GValue *return_value,
     if(is_variadic)
     {
         guint array_n_values = n_values - i;
-        GelValueArray *array = gel_value_array_new(array_n_values);
+        GelArray *array = gel_array_new(array_n_values);
 
-        gel_value_array_set_n_values(array,  array_n_values);
-        GValue *array_values = gel_value_array_get_values(array);
+        gel_array_set_n_values(array,  array_n_values);
+        GValue *array_values = gel_array_get_values(array);
 
         for(guint j = 0; i < n_values; i++, j++)
         {
@@ -108,20 +108,20 @@ void gel_closure_marshal(GelClosure *self, GValue *return_value,
 
             if(gel_context_error(invocation_context))
             {
-                gel_value_array_free(array);
+                gel_array_free(array);
                 goto end;
             }
         }
 
-        GValue *value = gel_value_new_from_boxed(GEL_TYPE_VALUE_ARRAY, array);
+        GValue *value = gel_value_new_from_boxed(GEL_TYPE_ARRAY, array);
         gel_context_define(context, self->variadic_arg, value);
     }
 
-    guint code_n_values = gel_value_array_get_n_values(self->code);
+    guint code_n_values = gel_array_get_n_values(self->code);
     if(code_n_values > 0)
     {
         guint last = code_n_values - 1;
-        const GValue *code_values = gel_value_array_get_values(self->code);
+        const GValue *code_values = gel_array_get_values(self->code);
 
         for(guint i = 0; i <= last; i++)
         {
@@ -159,25 +159,25 @@ void gel_closure_finalize(void *data, GelClosure *self)
         g_free(self->variadic_arg);
 
     g_hash_table_unref(self->args_hash);
-    gel_value_array_free(self->code);
+    gel_array_free(self->code);
     gel_context_free(self->context);
 }
 
 
 static
-void gel_closure_bind_symbols_of_array(GelClosure *self, GelValueArray *array)
+void gel_closure_bind_symbols_of_array(GelClosure *self, GelArray *array)
 {
-    guint array_n_values = gel_value_array_get_n_values(array);
-    GValue *array_values = gel_value_array_get_values(array);
+    guint array_n_values = gel_array_get_n_values(array);
+    GValue *array_values = gel_array_get_values(array);
 
     for(guint i = 0; i < array_n_values; i++)
     {
         const GValue *value = array_values + i;
         GType type = GEL_VALUE_TYPE(value);
 
-        if(type == GEL_TYPE_VALUE_ARRAY)
+        if(type == GEL_TYPE_ARRAY)
         {
-            GelValueArray *array = gel_value_get_boxed(value);
+            GelArray *array = gel_value_get_boxed(value);
             gel_closure_bind_symbols_of_array(self, array);
         }
         else
@@ -211,7 +211,7 @@ void gel_closure_close_over(GClosure *closure)
  * @name: name of the closure.
  * @args: #GList of strings with the closure argument names.
  * @variadic: name of the argument to hold the array of remaining args
- * @code: #GelValueArray with the code of the closure.
+ * @code: #GelArray with the code of the closure.
  * @context: #GelContext where to define a #GClosure.
  *
  * Creates a new #GClosure written in Gel
@@ -224,7 +224,7 @@ void gel_closure_close_over(GClosure *closure)
  * Returns: a new #GClosure
  */
 GClosure* gel_closure_new(const gchar *name, GList *args, gchar *variadic, 
-                          GelValueArray *code, GelContext *context)
+                          GelArray *code, GelContext *context)
 {
     g_return_val_if_fail(context != NULL, NULL);
     g_return_val_if_fail(code != NULL, NULL);
