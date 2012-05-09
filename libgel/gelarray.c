@@ -22,7 +22,7 @@ GelArray* gel_array_copy(GelArray *array)
 
     for(guint i = 0; i < n_values; i++)
     {
-        GValue zero = G_VALUE_INIT;
+        GValue zero = {0};
         g_array_append_val(copy, zero);
         gel_value_copy(values + i, copy_values + i);
     }
@@ -68,7 +68,7 @@ GValue* gel_array_get_values(const GelArray *array)
 GelArray* gel_array_append(GelArray *array, const GValue *value)
 {
     guint n_values = gel_array_get_n_values(array);
-    GValue zero = G_VALUE_INIT;
+    GValue zero = {0};
     g_array_append_val(array, zero);
 
     GValue *values = gel_array_get_values(array);
