@@ -102,17 +102,17 @@ GType gel_type_info_get_type(void)
 
 
 static
-void gel_type_info_insert_multiple(GelTypeInfo *self,
+void gel_type_info_insert_multiple(GelTypeInfo *self, GIBaseInfo *base,
                                    gint (*get_n_nodes)(GIBaseInfo *info),
                                    GIBaseInfo* (*get_node)(GIBaseInfo *info,
                                                            gint n))
 {
-    guint n = get_n_nodes(self->info);
+    guint n = get_n_nodes(base);
     for(guint i = 0; i < n; i++)
     {
-        GIBaseInfo *info = get_node(self->info, i);
-        const gchar *base_info_name = g_base_info_get_name(info);
-        gchar *name = g_strdelimit(g_strdup(base_info_name), "_", '-');
+        GIBaseInfo *info = get_node(base, i);
+        const gchar *base_name = g_base_info_get_name(info);
+        gchar *name = g_strdelimit(g_strdup(base_name), "_", '-');
         GelTypeInfo *node = gel_type_info_new(info);
         node->container = self;
         g_hash_table_insert(self->infos, name, node);
@@ -177,49 +177,57 @@ GelTypeInfo* gel_type_info_new(GIBaseInfo *info)
 
     switch(g_base_info_get_type(info))
     {
-        case GI_INFO_TYPE_INTERFACE:
-            gel_type_info_insert_multiple(self,
-                g_interface_info_get_n_methods,
-                g_interface_info_get_method);
-
-            gel_type_info_insert_multiple(self,
-                g_interface_info_get_n_constants,
-                g_interface_info_get_constant);
-
-            gel_type_info_insert_multiple(self,
-                g_interface_info_get_n_properties,
-                g_interface_info_get_property);
-            break;
-
         case GI_INFO_TYPE_OBJECT:
-            gel_type_info_insert_multiple(self,
+            gel_type_info_insert_multiple(self, info,
                 g_object_info_get_n_methods,
                 g_object_info_get_method);
 
-            gel_type_info_insert_multiple(self,
+            gel_type_info_insert_multiple(self, info,
                 g_object_info_get_n_constants,
                 g_object_info_get_constant);
 
-            gel_type_info_insert_multiple(self,
+            gel_type_info_insert_multiple(self, info,
                 g_object_info_get_n_properties,
                 g_object_info_get_property);
+
+            guint n_ifaces = g_object_info_get_n_interfaces(info);
+            for(guint i = 0; i < n_ifaces; i++)
+            {
+                GIInterfaceInfo *iface_info =
+                    g_object_info_get_interface(info, i);
+
+                gel_type_info_insert_multiple(self, iface_info,
+                    g_interface_info_get_n_methods,
+                    g_interface_info_get_method);
+
+                gel_type_info_insert_multiple(self, iface_info,
+                    g_interface_info_get_n_properties,
+                    g_interface_info_get_property);
+
+                gel_type_info_insert_multiple(self, iface_info,
+                    g_interface_info_get_n_constants,
+                    g_interface_info_get_constant);
+
+                g_base_info_unref(iface_info);
+            }
+
             break;
 
         case GI_INFO_TYPE_STRUCT:
-            gel_type_info_insert_multiple(self,
+            gel_type_info_insert_multiple(self, info,
                 g_struct_info_get_n_methods,
                 g_struct_info_get_method);
             break;
 
         case GI_INFO_TYPE_FLAGS:
         case GI_INFO_TYPE_ENUM:
-            gel_type_info_insert_multiple(self,
+            gel_type_info_insert_multiple(self, info,
                 g_enum_info_get_n_values,
                 g_enum_info_get_value);
             break;
 
         case GI_INFO_TYPE_UNION:
-            gel_type_info_insert_multiple(self,
+            gel_type_info_insert_multiple(self, info,
                 g_union_info_get_n_methods,
                 g_union_info_get_method);
             break;
@@ -380,6 +388,7 @@ gboolean gel_argument_to_value(const GArgument *arg, GITypeInfo *info,
             g_value_init(value, G_TYPE_GTYPE);
             gel_value_set_gtype(value, arg->v_uint32);
             return TRUE;
+        case GI_TYPE_TAG_FILENAME:
         case GI_TYPE_TAG_UTF8:
             g_value_init(value, G_TYPE_STRING);
             g_value_set_string(value, arg->v_pointer);
