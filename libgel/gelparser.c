@@ -65,13 +65,14 @@ GelArray* gel_parse_scanner(GScanner *scanner, guint line, guint pos,
 
     gboolean failed = FALSE;
     gboolean parsing = TRUE;
+    gboolean quoted = FALSE;
 
     while(parsing && !failed)
     {
         GValue value = {0};
         const gchar *name = NULL;
-        guint token = g_scanner_peek_next_token(scanner);
 
+        guint token = g_scanner_peek_next_token(scanner);
         switch(token)
         {
             case G_TOKEN_IDENTIFIER:
@@ -159,6 +160,10 @@ GelArray* gel_parse_scanner(GScanner *scanner, guint line, guint pos,
                     scanner->line, scanner->position));
                 failed = TRUE;
                 break;
+            case '\'':
+                quoted = TRUE;
+                g_scanner_get_next_token(scanner);
+                break;
             default:
                 g_propagate_error(error, g_error_new(
                     GEL_PARSE_ERROR, GEL_PARSE_ERROR_UNKNOWN_TOKEN,
@@ -212,9 +217,22 @@ GelArray* gel_parse_scanner(GScanner *scanner, guint line, guint pos,
                 gel_value_take_boxed(&value, symbol);
             }
         }
-    
+
         if(G_IS_VALUE(&value))
         {
+            if(quoted)
+            {
+                GelArray *quoted_array = gel_array_new(2);
+                gel_array_append(quoted_array,
+                    gel_value_lookup_predefined("quote"));
+                gel_array_append(quoted_array, &value);
+
+                g_value_unset(&value);
+                g_value_init(&value, GEL_TYPE_ARRAY);
+                gel_value_take_boxed(&value, quoted_array);
+                quoted = FALSE;
+            }
+
             GelArray *code = gel_macro_code_from_value(&value, error);
             if(code != NULL)
             {
@@ -296,6 +314,7 @@ GelArray* gel_parse_text(const gchar *text, guint text_len, GError **error)
     config->cpair_comment_single = "#\n";
     config->scan_identifier_1char = TRUE;
     config->store_int64 = TRUE;
+    config->scan_string_sq = FALSE;
 
     g_scanner_input_text(scanner, text, text_len);
     GelArray *array = gel_parse_scanner(scanner, 0, 0, 0, error);
