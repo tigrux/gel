@@ -33,7 +33,7 @@
 )
 
 (for iter primes
-    (print "Primes(" (index-of iter primes) ") =" iter)
+    (print (str "Primes(" (index-of iter primes) ") = " iter))
 )
 
 
@@ -66,7 +66,7 @@
 )
 
 (for i (range 10 0)
-    (print "Fibonacci(" i ") =" (fibonacci i))
+    (print (str "Fibonacci(" i ") = " (fibonacci i)))
 )
 
 

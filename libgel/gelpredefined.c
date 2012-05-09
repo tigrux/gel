@@ -1896,15 +1896,42 @@ static
 void print_(GClosure *self, GValue *return_value,
             guint n_values, const GValue *values, GelContext *context)
 {
-    guint n_args = 1;
-    if(n_values < n_args)
+    if(n_values > 0)
     {
-        gel_error_needs_at_least_n_arguments(context, __FUNCTION__, n_args);
-        return;
-    }
+        guint last = n_values - 1;
+        for(guint i = 0; i <= last; i++)
+        {
+            GValue tmp_value = {0};
+            const GValue *value =
+                gel_context_eval_into_value(context, values + i, &tmp_value);
 
-    guint last = n_values - 1;
-    for(guint i = 0; i <= last; i++)
+            if(!gel_context_error(context))
+            {
+                if(GEL_IS_VALUE(value))
+                {
+                    gchar *value_string = gel_value_to_string(value);
+                    g_print("%s%s", value_string, i == last ? "" : " ");
+                    g_free(value_string);
+                }
+
+                if(GEL_IS_VALUE(&tmp_value))
+                    g_value_unset(&tmp_value);
+            }
+            else
+                break;
+        }
+    }
+    g_print("\n");
+}
+
+
+static
+void str_(GClosure *self, GValue *return_value,
+          guint n_values, const GValue *values, GelContext *context)
+{
+    GString *buffer = g_string_new("");
+
+    for(guint i = 0; i < n_values; i++)
     {
         GValue tmp_value = {0};
         const GValue *value =
@@ -1915,34 +1942,19 @@ void print_(GClosure *self, GValue *return_value,
             if(GEL_IS_VALUE(value))
             {
                 gchar *value_string = gel_value_to_string(value);
-                g_print("%s%s", value_string, i == last ? "" : " ");
+                g_string_append_printf(buffer, "%s", value_string);
                 g_free(value_string);
             }
+
             if(GEL_IS_VALUE(&tmp_value))
                 g_value_unset(&tmp_value);
         }
         else
             break;
     }
-    g_print("\n");
-}
-
-
-static
-void str_(GClosure *self, GValue *return_value,
-          guint n_values, const GValue *values, GelContext *context)
-{
-    GList *tmp_list = NULL;
-    GValue *value;
-
-    if(gel_context_eval_params(context, __FUNCTION__,
-            &n_values, &values, &tmp_list, "V", &value))
-    {
-        g_value_init(return_value, G_TYPE_STRING);
-        g_value_take_string(return_value, gel_value_to_string(value));
-    }
-
-    g_list_free(tmp_list);
+ 
+    g_value_init(return_value, G_TYPE_STRING);
+    gel_value_take_string(return_value, g_string_free(buffer, FALSE));
 }
 
 
