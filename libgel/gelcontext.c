@@ -189,6 +189,7 @@ void gel_context_free(GelContext *self)
             gel_context_set_error(self->outer, self->error);
         else
             g_error_free(self->error);
+        self->error = NULL;
     }
 
 #if GEL_CONTEXT_USE_POOL
@@ -362,8 +363,6 @@ gboolean gel_context_error(const GelContext* self)
 
 void gel_context_set_error(GelContext* self, GError *error)
 {
-    g_warn_if_fail(self->error == NULL);
-
     if(self->error != NULL)
         g_error_free(self->error);
     self->error = error;

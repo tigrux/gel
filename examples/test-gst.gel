@@ -2,7 +2,7 @@
 (require Gtk)
 (require Gst)
 
-((. Gst init))
+((. Gst init) [])
 
 (def sample "/usr/share/example-content/Ubuntu_Free_Culture_Showcase/Josh Woodward - Swansong.ogg")
 

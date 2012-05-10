@@ -4,6 +4,7 @@
 #include <gelcontextprivate.h>
 #include <gelvalueprivate.h>
 #include <gelclosureprivate.h>
+#include <gelerrors.h>
 
 
 struct _GelTypeInfo
@@ -525,6 +526,7 @@ void gel_type_info_closure_marshal(GClosure *gclosure,
                                    guint n_values, const GValue *values,
                                    GelContext *context)
 {
+    context = gel_context_validate(context);
     GelIntrospectionClosure *closure = (GelIntrospectionClosure *)gclosure;
     const GelTypeInfo *info = gel_introspection_closure_get_info(closure);
     GObject *object = gel_introspection_closure_get_instance(closure);
@@ -536,15 +538,10 @@ void gel_type_info_closure_marshal(GClosure *gclosure,
     gboolean *indirect_args = g_new0(gboolean, n_args);
     GArgument *inputs = g_new0(GArgument, n_args + 1);
     GArgument *outputs = g_new0(GArgument, n_args);
+    GList *tmp_list = NULL;
 
     guint n_inputs = 0;
     guint n_outputs = 0;
-
-    if(g_function_info_get_flags(function_info) & GI_FUNCTION_IS_METHOD)
-    {
-        inputs[0].v_pointer = object;
-        n_inputs++;
-    }
 
     for(guint i = 0; i < n_args; i++)
     {
@@ -586,7 +583,23 @@ void gel_type_info_closure_marshal(GClosure *gclosure,
         types[i] = type;
     }
 
-    GList *tmp_list = NULL;
+    guint n_expected_args = 0;
+    for(guint i = 0; i < n_args; i++)
+        if(!indirect_args[i])
+            n_expected_args++;
+
+    if(n_values < n_expected_args)
+    {
+        gel_error_needs_n_arguments(context,
+            gel_closure_get_name(gclosure), n_expected_args);
+        goto end;
+    }
+
+    if(g_function_info_get_flags(function_info) & GI_FUNCTION_IS_METHOD)
+    {
+        inputs[0].v_pointer = object;
+        n_inputs++;
+    }
 
     for(guint i = 0; i < n_args; i++)
     {

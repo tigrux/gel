@@ -1,7 +1,7 @@
 
 (require Gtk)
 
-((. Gtk init))
+((. Gtk init) [])
 
 (def window (new (. Gtk Window)))
 

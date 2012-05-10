@@ -2,8 +2,8 @@
 (require Gtk)
 (require Gst)
 
-((. Gtk init))
-((. Gst init))
+((. Gtk init) [])
+((. Gst init) [])
 
 (def window
     (new (. Gtk Window)
