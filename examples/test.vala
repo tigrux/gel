@@ -12,15 +12,23 @@ int main(string[] args) {
         return 1;
     }
 
-    ValueArray parsed_array;
-    try {
-        // parsing a file returns an array of values
-        parsed_array = Gel.parse_file(args[1]);
+    string content;
+    size_t content_len;
+
+    try
+    {
+            GLib.FileUtils.get_contents(args[0], out content, out content_len);
     }
     catch(FileError error) {
         print("Error reading '%s'\n", args[1]);
         print("%s\n", error.message);
         return 1;
+    }
+
+    GLib.Array<GLib.Value> parsed_array;
+    try {
+        // parsing a file returns an array of values
+        parsed_array = Gel.parse_text(content, content_len);
     }
     catch(Gel.ParseError error) {
         print("Error parsing '%s'\n", args[1]);
@@ -43,7 +51,7 @@ int main(string[] args) {
     context.define("title", "Hello Gtk from Gel");
 
     // for each value obtained during the parsing:
-    foreach(Value iter_value in parsed_array.values) {
+    foreach(Value iter_value in parsed_array) {
         // print a representation of the value to be evaluated
         print("\n%s ?\n", Gel.Value.repr(iter_value));
 

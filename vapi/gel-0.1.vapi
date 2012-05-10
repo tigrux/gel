@@ -51,8 +51,7 @@ namespace Gel {
 	    MACRO_ARGUMENTS
     }
 
-    public GLib.ValueArray parse_file(string file) throws GLib.FileError, ParseError;
-    public GLib.ValueArray parse_text(string text, uint text_len) throws ParseError;
+    public GLib.Array<GLib.Value> parse_text(string text, size_t text_len) throws ParseError;
 
     namespace Value {
         bool copy(GLib.Value src_value, out GLib.Value dest_value);

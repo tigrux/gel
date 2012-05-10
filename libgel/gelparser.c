@@ -262,31 +262,6 @@ GelArray* gel_parse_scanner(GScanner *scanner, guint line, guint pos,
 
 
 /**
- * gel_parse_file:
- * @file: path to a file
- * @error: return location for a #GError, or NULL
- *
- * Reads the content of @file and then pass the content to #gel_parse_string
- *
- * Returns: A #GelArray with the parsed value literals
- */
-GelArray* gel_parse_file(const gchar *file, GError **error)
-{
-    gchar *content = NULL;
-    gsize content_len = 0;
-    GelArray *array = NULL;
-
-    if(g_file_get_contents(file, &content, &content_len, error))
-    {
-        array = gel_parse_text(content, content_len, error);
-        g_free(content);
-    }
-
-    return array;
-}
-
-
-/**
  * gel_parse_text:
  * @text: text to parse
  * @text_len: length of the content to parse, or -1 if it is zero terminated.
@@ -301,7 +276,7 @@ GelArray* gel_parse_file(const gchar *file, GError **error)
  *
  * Returns: A #GelArray with the parsed value literals.
  */
-GelArray* gel_parse_text(const gchar *text, guint text_len, GError **error)
+GelArray* gel_parse_text(const gchar *text, gsize text_len, GError **error)
 {
     gel_macros_new();
     GScanner *scanner = g_scanner_new(NULL);
@@ -316,7 +291,7 @@ GelArray* gel_parse_text(const gchar *text, guint text_len, GError **error)
     config->store_int64 = TRUE;
     config->scan_string_sq = FALSE;
 
-    g_scanner_input_text(scanner, text, text_len);
+    g_scanner_input_text(scanner, text, (guint)text_len);
     GelArray *array = gel_parse_scanner(scanner, 0, 0, 0, error);
 
     g_scanner_destroy(scanner);

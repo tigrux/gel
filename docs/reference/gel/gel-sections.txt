@@ -24,7 +24,6 @@ gel_context_get_type
 <FILE>gelparser</FILE>
 GelParseError
 GEL_PARSE_ERROR
-gel_parse_file
 gel_parse_text
 </SECTION>
 

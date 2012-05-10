@@ -36,16 +36,26 @@ int main(int argc, char *argv[])
         return 1;
     }
 
+    gchar *text = NULL;
+    gsize text_len = 0;
+    const gchar *filename = argv[1];
     GError *error = NULL;
 
-    /* parsing a file returns an array of values, unless an error occurs */
-    GelArray *parsed_array = gel_parse_file(argv[1], &error);
+    g_file_get_contents(filename, &text, &text_len, &error);
+    if(error != NULL)
+    {
+        g_print("There was an error reading '%s'\n", filename);
+        g_print("%s\n", error->message);
+        g_error_free(error);
+        return 1;
+    }
 
-    /* if an error occurred when parsing ... */
+    /* parsing a file returns an array of values, unless an error occurs */
+    GelArray *parsed_array = gel_parse_text(text, text_len, &error);
     if(error != NULL)
     {
         /* ... then print information about the error */
-        g_print("There was an error parsing '%s'\n", argv[1]);
+        g_print("There was an error parsing '%s'\n", filename);
         g_print("%s\n", error->message);
         g_error_free(error);
         return 1;
@@ -66,16 +76,16 @@ int main(int argc, char *argv[])
     /* for each value obtained during the parsing ... */
     for(guint i = 0; i < gel_array_get_n_values(parsed_array); i++)
     {
-        GValue *iter_value = gel_array_get_values(parsed_array) + i;
+        GValue *value = gel_array_get_values(parsed_array) + i;
 
         /* ... print a representation of the value to be evaluated */
-        gchar *value_repr = gel_value_repr(iter_value);
+        gchar *value_repr = gel_value_repr(value);
         g_print("\n%s ?\n", value_repr);
         g_free(value_repr);
 
         GValue result_value = {0};
         /* if the evaluation yields a value ... */
-        if(gel_context_eval(context, iter_value, &result_value, &error))
+        if(gel_context_eval(context, value, &result_value, &error))
         {
             /* ... then print the value obtained from the evaluation */
             gchar *value_string = gel_value_to_string(&result_value);
@@ -88,7 +98,7 @@ int main(int argc, char *argv[])
         if(error != NULL)
         {
             /* ... then print information about the error */
-            g_print("There was an error evaluating '%s'\n", argv[1]);
+            g_print("There was an error evaluating '%s'\n", filename);
             g_print("%s\n", error->message);
             g_error_free(error);
             break;
@@ -96,6 +106,7 @@ int main(int argc, char *argv[])
     }
 
     /* free the resources before exit */
+    g_free(text);
     gel_array_free(parsed_array);
     gel_context_free(context);
 
