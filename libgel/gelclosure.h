@@ -5,7 +5,8 @@
 #include <gelarray.h>
 
 GClosure* gel_closure_new(const gchar *name, GList *args, gchar *variadic, 
-                          GelArray *code, GelContext *context);
+                          guint n_values, const GValue *values,
+                          GelContext *context);
 
 GClosure* gel_closure_new_native(const gchar *name, GClosureMarshal marshal);
 

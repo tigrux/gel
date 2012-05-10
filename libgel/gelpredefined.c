@@ -514,12 +514,9 @@ void defn_(GClosure *self, GValue *return_value,
 
         if(invalid == NULL)
         {
-            GelArray *code = gel_array_new(n_values);
-            for(guint i = 0; i < n_values; i++)
-                gel_array_append(code, values + i);
-
             GClosure *closure =
-                gel_closure_new(name, args, variadic, code, context);
+                gel_closure_new(name,
+                    args, variadic, n_values, values, context);
 
             g_closure_ref(self);
             g_closure_sink(self);
@@ -555,16 +552,11 @@ void fn_(GClosure *self, GValue *return_value,
 
         if(invalid == NULL)
         {
-            GelArray *code = gel_array_new(n_values);
-            for(guint i = 0; i < n_values; i++)
-                gel_array_append(code, values + i);
-
-            GClosure *closure =
-                gel_closure_new(NULL, args, variadic, code, context);
+            GClosure *closure = gel_closure_new(NULL,
+                args, variadic, n_values, values, context);
 
             g_closure_ref(self);
             g_closure_sink(self);
-
             gel_closure_close_over(closure);
 
             g_value_init(return_value, G_TYPE_CLOSURE);

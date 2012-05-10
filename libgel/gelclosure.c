@@ -211,7 +211,8 @@ void gel_closure_close_over(GClosure *closure)
  * @name: name of the closure.
  * @args: #GList of strings with the closure argument names.
  * @variadic: name of the argument to hold the array of remaining args
- * @code: #GelArray with the code of the closure.
+ * @n_values: the length of the @values array
+ * @values: array of #GValue to use as code
  * @context: #GelContext where to define a #GClosure.
  *
  * Creates a new #GClosure written in Gel
@@ -224,10 +225,10 @@ void gel_closure_close_over(GClosure *closure)
  * Returns: a new #GClosure
  */
 GClosure* gel_closure_new(const gchar *name, GList *args, gchar *variadic, 
-                          GelArray *code, GelContext *context)
+                          guint n_values, const GValue *values,
+                          GelContext *context)
 {
     g_return_val_if_fail(context != NULL, NULL);
-    g_return_val_if_fail(code != NULL, NULL);
 
     GClosure *closure = g_closure_new_simple(sizeof(GelClosure), NULL);
 
@@ -251,6 +252,10 @@ GClosure* gel_closure_new(const gchar *name, GList *args, gchar *variadic,
     gel_context_set_outer(closure_context, context);
 
     static guint counter = 0;
+
+    GelArray *code = gel_array_new(n_values);
+    for(guint i = 0; i < n_values; i++)
+        gel_array_append(code, values + i);
 
     self->name = name ? g_strdup(name) : g_strdup_printf("lambda%u", counter++);
     self->args = args;
