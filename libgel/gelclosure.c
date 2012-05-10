@@ -264,6 +264,9 @@ GClosure* gel_closure_new(const gchar *name, GList *args, gchar *variadic,
     self->code = code;
     self->context = closure_context;
 
+    g_closure_ref(closure);
+    g_closure_sink(closure);
+
     return closure;
 }
 

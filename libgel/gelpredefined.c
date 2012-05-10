@@ -515,14 +515,10 @@ void defn_(GClosure *self, GValue *return_value,
         if(invalid == NULL)
         {
             GClosure *closure =
-                gel_closure_new(name,
-                    args, variadic, n_values, values, context);
+                gel_closure_new(name, args, variadic,
+                    n_values, values, context);
 
-            g_closure_ref(self);
-            g_closure_sink(self);
-
-            GValue *value =
-                gel_value_new_from_boxed(G_TYPE_CLOSURE, closure);
+            GValue *value = gel_value_new_from_boxed(G_TYPE_CLOSURE, closure);
 
             gel_context_define(context, name, value);
             gel_closure_close_over(closure);
@@ -552,11 +548,10 @@ void fn_(GClosure *self, GValue *return_value,
 
         if(invalid == NULL)
         {
-            GClosure *closure = gel_closure_new(NULL,
-                args, variadic, n_values, values, context);
+            GClosure *closure =
+                gel_closure_new(NULL, args, variadic,
+                    n_values, values, context);
 
-            g_closure_ref(self);
-            g_closure_sink(self);
             gel_closure_close_over(closure);
 
             g_value_init(return_value, G_TYPE_CLOSURE);
