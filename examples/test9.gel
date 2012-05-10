@@ -1,9 +1,9 @@
 
 (macro class (name args & body)
-    (function name args
-        (define self {})
+    (defn name args
+        (def self {})
         (append self body)
-        (function (attr)
+        (fn (attr)
             (get self attr)
         )
     )
@@ -22,7 +22,7 @@
 )
 
 (macro method (attr args & body)
-    (name attr) (function args body)
+    (name attr) (fn args body)
 )
 
 
@@ -49,7 +49,7 @@
 )
 
 
-(define mary (Person "Maria" 35))
+(def mary (Person "Maria" 35))
 
 (print "My name is" (mary "name") "and I'm" (mary "age"))
 ( (mary "greet") "Hanna")

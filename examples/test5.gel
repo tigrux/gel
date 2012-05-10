@@ -1,7 +1,7 @@
 
-(define colors ["red" "green" "blue"])
+(def colors ["red" "green" "blue"])
 
-(function palette ()
+(defn palette ()
     (var colors)
 )
 

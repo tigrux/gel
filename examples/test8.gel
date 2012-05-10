@@ -1,6 +1,6 @@
 
-(function comp (& functions)
-    (function (& args)
+(defn comp (& functions)
+    (fn (& args)
         (for f (reverse functions)
             (set args (apply f args))
         )
@@ -8,14 +8,14 @@
     )
 )
 
-(define K ["a" "b" "c"])
-(define V [1 2 3])
+(def K ["a" "b" "c"])
+(def V [1 2 3])
 
 ((comp hash + map) array K V)
 
 
-(function partial(f & partial-args)
-    (function (& args)
+(defn partial(f & partial-args)
+    (fn (& args)
         (apply f (+ partial-args args))
     )
 )

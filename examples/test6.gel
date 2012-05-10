@@ -1,5 +1,5 @@
 
-(define fundamentals
+(def fundamentals
     {
         "e" 2.718281828459045
         "pi" 3.141592653589793
@@ -21,9 +21,9 @@
 
 (keys fundamentals)
 
-(function values (h)
+(defn values (h)
     (map
-        (function (k)
+        (fn (k)
             (get h k)
         )
         (keys h)
@@ -33,8 +33,8 @@
 (values fundamentals)
 
 
-(function comp (& functions)
-    (function (& result)
+(defn comp (& functions)
+    (fn (& result)
         (for f (reverse functions)
             (set result (apply f result))
         )
@@ -42,13 +42,13 @@
     )
 )
 
-(define arabics [1000 900 500 400 100 90 50 40 10 9 5 4 1])
-(define romans ["M" "CM" "D" "CD" "C" "XC" "L" "XL" "X" "IX" "V" "IV" "I"])
-(define romans-from-arabigs ((comp hash + map) array arabics romans))
+(def arabics [1000 900 500 400 100 90 50 40 10 9 5 4 1])
+(def romans ["M" "CM" "D" "CD" "C" "XC" "L" "XL" "X" "IX" "V" "IV" "I"])
+(def romans-from-arabigs ((comp hash + map) array arabics romans))
 
 (apply +
     (map
-        (function (i)
+        (fn (i)
             (get romans-from-arabigs i)
         )
         [1000 900 50 10 10 5 1 1]

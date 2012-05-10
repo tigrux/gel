@@ -1,17 +1,17 @@
 
 (let (a 20 b (/ a 2) c (/ b 2) )
-    (define result (+ a b c))
+    (def result (+ a b c))
     result
 )
 
 
-(function primes-lesser-than (top)
-    (define primes [2])
-    (define n 3)
-    (function can-divide-n (i)
+(defn primes-lesser-than (top)
+    (def primes [2])
+    (def n 3)
+    (defn can-divide-n (i)
         (= (% n i) 0)
     )
-    (function none-prime (predicate)
+    (defn none-prime (predicate)
         (= (find predicate primes) -1)
     )
     (while (< n top)
@@ -23,10 +23,10 @@
     primes
 )
 
-(define primes (primes-lesser-than 100))
+(def primes (primes-lesser-than 100))
 
-(function index-of (value values)
-    (function equal-to-value (i)
+(defn index-of (value values)
+    (defn equal-to-value (i)
         (= i value)
     )
     (find equal-to-value values)
@@ -41,18 +41,18 @@
 (print "The last prime is" (get primes -1))
 
 
-(function factorial (n)
+(defn factorial (n)
     (if (<= n 0)
         1
         (* n (factorial (- n 1)))
     )
 )
 
-(define n 10)
+(def n 10)
 (print "Factorial of" n "is" (factorial n))
 (print n "is" (if (= (% n 2) 0) "even" "odd"))
 
-(function fibonacci (n)
+(defn fibonacci (n)
     (cond
         (= n 0)
             0
@@ -70,7 +70,7 @@
 )
 
 
-(function how-many-days-have? (month)
+(defn how-many-days-have? (month)
     (case month
         ("January" "March" "May" "July" "August" "October" "December")
             31
@@ -83,7 +83,7 @@
     )
 )
 
-(define month-I-was-born "December")
+(def month-I-was-born "December")
 
 (print month-I-was-born "has" (how-many-days-have? month-I-was-born) "days")
 

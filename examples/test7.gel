@@ -1,16 +1,16 @@
 
-(function Person (name age)
-    (define self {})
+(defn Person (name age)
+    (def self {})
     (append self
         "name" name
         "age" age
         "greet"
-            (function (name-of-person)
+            (fn (name-of-person)
                 (print "Nice to meet you" name-of-person)
                 (print "I am" (get self "name"))
             )
         "set"
-            (function (attr value)
+            (fn (attr value)
                 (case attr
                     ("age")
                         (do
@@ -22,12 +22,12 @@
                 )
             )
     )
-    (function (s)
+    (fn (s)
         (get self s)
     )
 )
 
-(define mary (Person "Maria" 35))
+(def mary (Person "Maria" 35))
 
 (print "My name is" (mary "name") "and I'm" (mary "age"))
 ( (mary "greet") "Hanna")

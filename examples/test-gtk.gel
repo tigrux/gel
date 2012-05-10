@@ -3,7 +3,7 @@
 
 ((. Gtk init))
 
-(define window (new (. Gtk Window)))
+(def window (new (. Gtk Window)))
 
 # the string 'title' was defined in the interpreter
 (set window "title" title)
@@ -13,25 +13,25 @@
 
 (connect window "hide" (. Gtk main-quit))
 
-(define box (new (. Gtk VBox)))
+(def box (new (. Gtk VBox)))
 ((. window add) box)
 (set box "border-width" 12)
 
 # the function 'make-label' was defined in the interpreter
-(define label (make-label))
+(def label (make-label))
 ((. box add) label )
 
-(define button (new (. Gtk Button)))
+(def button (new (. Gtk Button)))
 ((. box add) button)
 (set button "label" "Click me!")
 
-(define entry (new (. Gtk Entry)))
+(def entry (new (. Gtk Entry)))
 ((. box add) entry)
 
-(define counter 0)
+(def counter 0)
 
 (connect button "clicked"
-    (function (widget)
+    (fn (widget)
         (set widget "label" "Thanks!")
         (set counter (+ counter 1))
         (set entry "text" counter)

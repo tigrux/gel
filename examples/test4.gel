@@ -1,18 +1,18 @@
 
-(function generate-primes ()
-    (define primes [])
-    (define candidate 2)
+(defn generate-primes ()
+    (def primes [])
+    (def candidate 2)
 
-    (function none-prime (predicate)
+    (defn none-prime (predicate)
         (= (find predicate primes) -1)
     )
 
-    (function can-divide-candidate (i)
+    (defn can-divide-candidate (i)
         (= (% candidate i) 0)
     )
 
-    (function ()
-        (define calculated-prime 0)
+    (fn ()
+        (def calculated-prime 0)
         (while (= calculated-prime 0)
             (if (none-prime can-divide-candidate)
                 (do
@@ -26,7 +26,7 @@
     )
 )
 
-(define next-prime (generate-primes))
+(def next-prime (generate-primes))
 
 (for i (range 1 12)
     (print i "=" (next-prime))
