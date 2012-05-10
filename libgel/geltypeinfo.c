@@ -334,10 +334,9 @@ gchar* gel_type_info_to_string(const GelTypeInfo *self)
 
 static
 gboolean gel_argument_to_value(const GArgument *arg, GITypeInfo *info,
-                               GValue *value)
+                               GITransfer transfer, GValue *value)
 {
     GITypeTag tag = g_type_info_get_tag(info);
-
     switch(tag)
     {
         case GI_TYPE_TAG_BOOLEAN:
@@ -391,7 +390,10 @@ gboolean gel_argument_to_value(const GArgument *arg, GITypeInfo *info,
         case GI_TYPE_TAG_FILENAME:
         case GI_TYPE_TAG_UTF8:
             g_value_init(value, G_TYPE_STRING);
-            g_value_set_string(value, arg->v_pointer);
+            if(transfer == GI_TRANSFER_EVERYTHING)
+                g_value_take_string(value, arg->v_pointer);
+            else
+                g_value_set_string(value, arg->v_pointer);
             return TRUE;
         case GI_TYPE_TAG_INTERFACE:
         {
@@ -404,13 +406,19 @@ gboolean gel_argument_to_value(const GArgument *arg, GITypeInfo *info,
                 case GI_INFO_TYPE_OBJECT:
                     g_value_init(value,
                         g_registered_type_info_get_g_type(base));
-                    g_value_set_object(value, arg->v_pointer);
+                    if(transfer == GI_TRANSFER_EVERYTHING)
+                        g_value_take_object(value, arg->v_pointer);
+                    else
+                        g_value_set_object(value, arg->v_pointer);
                     result = TRUE;
                     break;
                 case GI_INFO_TYPE_STRUCT:
                     g_value_init(value,
                         g_registered_type_info_get_g_type(base));
-                    g_value_set_boxed(value, arg->v_pointer);
+                    if(transfer == GI_TRANSFER_EVERYTHING)
+                        g_value_take_boxed(value, arg->v_pointer);
+                    else
+                        g_value_set_boxed(value, arg->v_pointer);
                     result = TRUE;
                     break;
                 default:
@@ -455,7 +463,8 @@ gboolean gel_type_info_constant_to_value(const GelTypeInfo *self,
     g_constant_info_get_value(info, &argument);
 
     gboolean converted =
-        gel_argument_to_value(&argument, arg_info, return_value);
+        gel_argument_to_value(&argument,
+            arg_info, GI_TRANSFER_NOTHING, return_value);
 
     #if HAVE_G_CONSTANT_INFO_FREE_VALUE
     g_constant_info_free_value(info, &argument);
@@ -973,7 +982,8 @@ void gel_type_info_closure_marshal(GClosure *gclosure,
         &return_arg, FALSE);
 
     GITypeInfo *return_info = g_callable_info_get_return_type(function_info);
-    gel_argument_to_value(&return_arg, return_info, return_value);
+    GITransfer transfer = g_callable_info_get_caller_owns(function_info);
+    gel_argument_to_value(&return_arg, return_info, transfer, return_value);
     g_base_info_unref(return_info);
 
     end:
