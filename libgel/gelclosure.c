@@ -251,11 +251,11 @@ GClosure* gel_closure_new(const gchar *name, GList *args, gchar *variadic,
     GelContext *closure_context = gel_context_dup(context);
     gel_context_set_outer(closure_context, context);
 
-    static guint counter = 0;
-
     GelArray *code = gel_array_new(n_values);
     for(guint i = 0; i < n_values; i++)
         gel_array_append(code, values + i);
+
+    static guint counter = 0;
 
     self->name = name ? g_strdup(name) : g_strdup_printf("lambda%u", counter++);
     self->args = args;
