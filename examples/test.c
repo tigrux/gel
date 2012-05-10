@@ -106,9 +106,9 @@ int main(int argc, char *argv[])
     }
 
     /* free the resources before exit */
-    g_free(text);
-    gel_array_free(parsed_array);
     gel_context_free(context);
+    gel_array_free(parsed_array);
+    g_free(text);
 
     return 0;
 }
