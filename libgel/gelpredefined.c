@@ -1605,9 +1605,9 @@ void new_(GClosure *self, GValue *return_value,
           guint n_values, const GValue *values, GelContext *context)
 {
     guint n_args = 1;
-    if(n_values != n_args)
+    if(n_values < n_args)
     {
-        gel_error_needs_n_arguments(context, __FUNCTION__, n_args);
+        gel_error_needs_at_least_n_arguments(context, __FUNCTION__, n_args);
         return;
     }
 
@@ -1636,7 +1636,26 @@ void new_(GClosure *self, GValue *return_value,
         g_value_init(return_value, type);
         if(G_TYPE_IS_INSTANTIATABLE(type))
         {
-            GObject *new_object = g_object_new(type, NULL);
+            n_values--;
+            values++;
+
+            guint n_params = n_values/2;
+            GParameter *params = g_new0(GParameter, n_params);
+            for(guint i = 0; i < n_params; i++)
+            {
+                params[i].name = gel_value_to_string(values++);
+                gel_context_eval_value(context, values++, &params[i].value);
+            }
+
+            GObject *new_object = g_object_newv(type, n_params, params);
+
+            for(guint i = 0; i < n_params; i++)
+            {
+                g_free((gchar *)params[i].name);
+                g_value_unset(&params[i].value);
+            }
+            g_free(params);
+
             if(G_IS_INITIALLY_UNOWNED(new_object))
                 g_object_ref_sink(new_object);
             gel_value_take_object(return_value, new_object);
