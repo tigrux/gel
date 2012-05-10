@@ -36,9 +36,9 @@ int main(int argc, char *argv[])
         return 1;
     }
 
+    const gchar *filename = argv[1];
     gchar *text = NULL;
     gsize text_len = 0;
-    const gchar *filename = argv[1];
     GError *error = NULL;
 
     g_file_get_contents(filename, &text, &text_len, &error);
