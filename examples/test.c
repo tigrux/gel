@@ -58,6 +58,7 @@ int main(int argc, char *argv[])
         g_print("There was an error parsing '%s'\n", filename);
         g_print("%s\n", error->message);
         g_error_free(error);
+        g_free(text);
         return 1;
     }
 
@@ -94,7 +95,6 @@ int main(int argc, char *argv[])
             g_value_unset(&result_value);
         }
         else
-        /* else if an error occurred when evaluating ... */
         if(error != NULL)
         {
             /* ... then print information about the error */
