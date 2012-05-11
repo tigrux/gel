@@ -58,7 +58,7 @@ GScanner* gel_scanner_new(void)
 
 static
 GelArray* gel_parse_scanner(GScanner *scanner, guint line, guint pos,
-                               gchar delim, GError **error)
+                            gchar delim, GError **error)
 {
     GelArray *array = gel_array_new(ARRAY_N_PREALLOCATED);
 

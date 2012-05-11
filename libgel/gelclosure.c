@@ -141,7 +141,6 @@ void gel_closure_marshal(GelClosure *self, GValue *return_value,
     }
 
     end:
-
     if(gel_context_error(context))
         gel_context_transfer_error(context, invocation_context);
     gel_context_free(context);  
