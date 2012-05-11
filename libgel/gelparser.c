@@ -38,6 +38,25 @@ const gchar *scanner_errors[] = {
 
 
 static
+GScanner* gel_scanner_new(void)
+{
+    GScanner *scanner = g_scanner_new(NULL);
+    GScannerConfig *config = scanner->config;
+
+    config->cset_identifier_first =
+        G_CSET_a_2_z G_CSET_A_2_Z "=_+-*/%!&<>.";
+    config->cset_identifier_nth =
+        G_CSET_a_2_z G_CSET_A_2_Z "=_+-*/%!&<>.?" G_CSET_DIGITS;
+    config->cpair_comment_single = "#\n";
+    config->scan_identifier_1char = TRUE;
+    config->store_int64 = TRUE;
+    config->scan_string_sq = FALSE;
+
+    return scanner;
+}
+
+
+static
 GelArray* gel_parse_scanner(GScanner *scanner, guint line, guint pos,
                                gchar delim, GError **error)
 {
@@ -179,9 +198,7 @@ GelArray* gel_parse_scanner(GScanner *scanner, guint line, guint pos,
             guint len = strlen(name);
             if(name[0] == '-' && len > 1)
             {
-                GScanner *num_scanner = g_scanner_new(NULL);
-                num_scanner->config->store_int64 = TRUE;
-
+                GScanner *num_scanner = gel_scanner_new();
                 g_scanner_input_text(num_scanner, name+1, len-1);
                 guint num_token = g_scanner_get_next_token(num_scanner);
 
@@ -267,9 +284,7 @@ GelArray* gel_parse_scanner(GScanner *scanner, guint line, guint pos,
  * @text_len: length of the content to parse, or -1 if it is zero terminated.
  * @error: return location for a #GError, or NULL
  *
- * Uses a #GScanner to parse @content, operators are replaced with their
- * corresponding functions (add for +, mul for *, etc). Characters [ ] are
- * used to build array literals. Integers are considered #gint64 literals,
+ * Uses a #GScanner to parse @content. Integers are considered #gint64 literals,
  * strings are #gchararray literals and floats are #gdouble literals.
  *
  * #gel_context_eval_value considers array literals as closure's invokes.
@@ -278,24 +293,14 @@ GelArray* gel_parse_scanner(GScanner *scanner, guint line, guint pos,
  */
 GelArray* gel_parse_text(const gchar *text, gsize text_len, GError **error)
 {
+    GScanner *scanner = gel_scanner_new();
     gel_macros_new();
-    GScanner *scanner = g_scanner_new(NULL);
-    GScannerConfig *config = scanner->config;
-
-    config->cset_identifier_first =
-        G_CSET_a_2_z G_CSET_A_2_Z "=_+-*/%!&<>.";
-    config->cset_identifier_nth =
-        G_CSET_a_2_z G_CSET_A_2_Z "=_+-*/%!&<>.?" G_CSET_DIGITS;
-    config->cpair_comment_single = "#\n";
-    config->scan_identifier_1char = TRUE;
-    config->store_int64 = TRUE;
-    config->scan_string_sq = FALSE;
 
     g_scanner_input_text(scanner, text, (guint)text_len);
     GelArray *array = gel_parse_scanner(scanner, 0, 0, 0, error);
 
-    g_scanner_destroy(scanner);
     gel_macros_free();
+    g_scanner_destroy(scanner);
 
     return array;
 }
