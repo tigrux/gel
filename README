@@ -8,14 +8,14 @@ The Code is very small, just 3 public modules, and a few more of support.
 What makes Gel different is that everything is implemented in GLib:
 - Symbols are GValues.
 - Functions are GClosures.
-- Arrays are GValueArray.
+- Arrays are GArray.
 - Objects are instantiated by type name.
 - Parsing is done with GScanner.
 - Symbols are resolved using GHashTables.
-- Arithmetic and logic are exposed as functions that take GValues.
+- Arithmetic and logic are exposed as functions that take GValue.
 
 Bindings for Vala are provided (see examples/test.vala)
-Support for gobject-introspection is currently in early stage.
+Support for gobject-introspection is currently is not complete but works.
 
 However, the project is not mature yet, so speed or elegance is not a
 priority yet. The current goal is to prevent memory leaks and provide
