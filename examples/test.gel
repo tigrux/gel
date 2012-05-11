@@ -57,9 +57,12 @@
 (connect quit-button "clicked" (. Gtk main-quit))
 
 ((. window add) box)
-((. box pack-start) label TRUE TRUE 12)
-((. box pack-start) chooser-button FALSE FALSE 12)
-((. box pack-start) quit-button FALSE FALSE 12)
+
+(let (box-pack (. box pack-start))
+    (for widget [label chooser-button quit-button]
+        (box-pack widget TRUE TRUE 12)
+    )
+)
 
 ((. window show-all))
 
