@@ -27,7 +27,7 @@ GEL_PARSER_ERROR
 GelParser
 gel_parser_new
 gel_parser_free
-gel_parser_input_text
+gel_parser_parse_text
 </SECTION>
 
 <SECTION>

@@ -54,7 +54,7 @@ int main(int argc, char *argv[])
 
     /* parsing a file returns an array of values, unless an error occurs */
     GelArray *parsed_array =
-        gel_parser_input_text(parser, text, text_len, &error);
+        gel_parser_parse_text(parser, text, text_len, &error);
     if(error != NULL)
     {
         /* ... then print information about the error */

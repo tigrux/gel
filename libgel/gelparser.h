@@ -60,7 +60,7 @@ typedef struct _GelParser GelParser;
 GelParser* gel_parser_new(void);
 void gel_parser_free(GelParser *self);
 
-GelArray* gel_parser_input_text(GelParser *self,
+GelArray* gel_parser_parse_text(GelParser *self,
                                 const gchar *text, gsize text_len,
                                 GError **error);
 

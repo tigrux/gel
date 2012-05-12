@@ -404,7 +404,7 @@ GelArray* gel_parser_scan(GelParser *self, guint line, guint pos,
 
 
 /**
- * gel_parser_input_text:
+ * gel_parser_parse_text:
  * @self: #GelParser to pass text
  * @text: text to parse
  * @text_len: length of the content to parse, or -1 if it is zero terminated.
@@ -417,7 +417,7 @@ GelArray* gel_parser_scan(GelParser *self, guint line, guint pos,
  *
  * Returns: A #GelArray with the parsed value literals.
  */
-GelArray* gel_parser_input_text(GelParser *self,
+GelArray* gel_parser_parse_text(GelParser *self,
                                 const gchar *text, gsize text_len,
                                 GError **error)
 {
