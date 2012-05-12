@@ -29,7 +29,6 @@ GTK_DOC_CHECK([1.14],[--flavour no-tmpl])
 AC_CONFIG_FILES([
 	Makefile
 	libgel/Makefile
-	vapi/Makefile
 	examples/Makefile
 	gel-0.1.pc
 	docs/Makefile
