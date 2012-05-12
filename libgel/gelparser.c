@@ -386,19 +386,20 @@ GelArray* gel_parser_scan(GelParser *self, GValue *param_value,
                 GValue *code_values = gel_array_get_values(code);
                 guint code_n_values = gel_array_get_n_values(code);
 
-                for(guint i = 0; i < code_n_values; i++)
-                    gel_array_append(array, code_values + i);
+                if(array != NULL)
+                    for(guint i = 0; i < code_n_values; i++)
+                        gel_array_append(array, code_values + i);
 
                 gel_array_free(code);
             }
             else
-            if(array != NULL)
-                gel_array_append(array, &value);
-            else
-            {
-                gel_value_copy(&value, param_value);
-                parsing = FALSE;
-            }
+                if(array != NULL)
+                    gel_array_append(array, &value);
+                else
+                {
+                    gel_value_copy(&value, param_value);
+                    parsing = FALSE;
+                }
 
             g_value_unset(&value);
         }
