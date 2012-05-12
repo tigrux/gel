@@ -100,12 +100,15 @@ GelParser* gel_parser_new(void)
  */
 void gel_parser_free(GelParser *self)
 {
+    g_return_if_fail(self != NULL);
+
     g_scanner_destroy(self->scanner);
     g_hash_table_unref(self->macros);
     g_slice_free(GelParser, self);
 }
 
 
+static
 GelArray* gel_parser_macro_code_from_value(GelParser *self,
                                            GValue *pre_value, GError **error)
 {
@@ -418,7 +421,10 @@ GelArray* gel_parser_input_text(GelParser *self,
                                 const gchar *text, gsize text_len,
                                 GError **error)
 {
+    g_return_val_if_fail(self != NULL, NULL);
+
     g_scanner_input_text(self->scanner, text, (guint)text_len);
+
     return gel_parser_scan(self, 0, 0, 0, error);
 }
 
