@@ -308,10 +308,11 @@ GelArray* gel_parser_scan(GelParser *self, GValue *param_value,
                 failed = TRUE;
                 break;
             case '\'':
-                quoted = TRUE;
                 g_scanner_get_next_token(scanner);
+                quoted = TRUE;
                 break;
             default:
+                g_scanner_get_next_token(scanner);
                 g_propagate_error(error, g_error_new(
                     GEL_PARSER_ERROR, GEL_PARSER_ERROR_UNKNOWN_TOKEN,
                     "Unknown token '%c' (%d) at line %u, char %u",
