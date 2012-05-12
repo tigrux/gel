@@ -1,10 +1,12 @@
 #ifndef __GEL_ARRAY_H__
 #define __GEL_ARRAY_H__
 
+#include <config.h>
+
 #include <glib-object.h>
 
 #ifndef GEL_ARRAY_USE_GARRAY
-#define GEL_ARRAY_USE_GARRAY 1
+#define GEL_ARRAY_USE_GARRAY 0
 #endif
 
 #if GEL_ARRAY_USE_GARRAY

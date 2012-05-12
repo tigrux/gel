@@ -8,7 +8,10 @@
 
 GelArray* gel_array_new(guint n_prealloced)
 {
-    return g_array_sized_new(FALSE, TRUE, sizeof(GValue), n_prealloced);
+    GelArray *array =
+        g_array_sized_new(FALSE, TRUE, sizeof(GValue), n_prealloced);
+    g_array_set_clear_func(array, (GDestroyNotify)g_value_unset);
+    return array;
 }
 
 
@@ -33,16 +36,6 @@ GelArray* gel_array_copy(GelArray *array)
 
 void gel_array_free(GelArray *array)
 {
-    GValue *values = gel_array_get_values(array);
-    guint n_values = gel_array_get_n_values(array);
-
-    for(guint i = 0; i < n_values; i++)
-    {
-        GValue *value = values + i;
-        if(GEL_IS_VALUE(value))
-            g_value_unset(value);
-    }
-
     g_array_unref(array);
 }
 
@@ -80,13 +73,6 @@ GelArray* gel_array_append(GelArray *array, const GValue *value)
 
 GelArray* gel_array_remove(GelArray *array, guint index)
 {
-
-    GValue *values = gel_array_get_values(array);
-
-    GValue *value = values + index;
-    if(GEL_IS_VALUE(value))
-        g_value_unset(value);
-
     return g_array_remove_index(array, index);
 }
 
