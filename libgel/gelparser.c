@@ -180,11 +180,15 @@ GelArray* gel_parser_macro_code_from_value(GelParser *self,
 
 
 static
-GelArray* gel_parser_scan(GelParser *self, guint line, guint pos,
+GelArray* gel_parser_scan(GelParser *self, GValue *param_value,
+                          guint line, guint pos,
                           gchar delim, GError **error)
 {
     GScanner *scanner = self->scanner;
-    GelArray *array = gel_array_new(ARRAY_N_PREALLOCATED);
+    GelArray *array = NULL;
+
+    if(line != 0)
+        array = gel_array_new(ARRAY_N_PREALLOCATED);
 
     const gchar *pre_symbol = NULL;
     switch(delim)
@@ -237,7 +241,7 @@ GelArray* gel_parser_scan(GelParser *self, guint line, guint pos,
             case '{':
             {
                 g_scanner_get_next_token(scanner);
-                GelArray *inner_array = gel_parser_scan(self,
+                GelArray *inner_array = gel_parser_scan(self, NULL,
                         scanner->line, scanner->position, token, error);
                 if(inner_array != NULL)
                 {
@@ -387,44 +391,78 @@ GelArray* gel_parser_scan(GelParser *self, guint line, guint pos,
                 gel_array_free(code);
             }
             else
+            if(array != NULL)
                 gel_array_append(array, &value);
+            else
+            {
+                gel_value_copy(&value, param_value);
+                parsing = FALSE;
+            }
 
             g_value_unset(&value);
         }
     }
 
     if(failed)
-    {
-        gel_array_free(array);
-        array = NULL;
-    }
+        if(array != NULL)
+        {
+            gel_array_free(array);
+            array = NULL;
+        }
 
     return array;
 }
 
 
 /**
- * gel_parser_parse_text:
- * @self: #GelParser to pass text
+ * gel_parser_next_value:
+ * @self: a #GelParser
+ * @value: address of a #GValue to store the result
+ * @error: @error: return location for a #GError, or NULL
+ *
+ * Obtains the next #GValue parsed by the #GelParser
+ *
+ * Returns: #TRUE if a value was obtained, #FALSE otherwise
+ */
+gboolean gel_parser_next_value(GelParser *self, GValue *value, GError **error)
+{
+    g_return_val_if_fail(self != NULL, FALSE);
+    g_return_val_if_fail(value != NULL, FALSE);
+
+    if(GEL_IS_VALUE(value))
+        g_value_unset(value);
+    gel_parser_scan(self, value, 0, 0, 0, error);
+
+    return GEL_IS_VALUE(value);
+}
+
+/**
+ * gel_parser_input_text:
+ * @self: a #GelParser
  * @text: text to parse
  * @text_len: length of the content to parse, or -1 if it is zero terminated.
- * @error: return location for a #GError, or NULL
  *
- * Uses a #GScanner to parse @content. Integers are considered #gint64 literals,
- * strings are #gchararray literals and floats are #gdouble literals.
+ * Prepares the scanner associated to the #GelParser @self to scan a text
  *
- * #gel_context_eval_value considers array literals as closure's invokes.
- *
- * Returns: A #GelArray with the parsed value literals.
  */
-GelArray* gel_parser_parse_text(GelParser *self,
-                                const gchar *text, gsize text_len,
-                                GError **error)
+void gel_parser_input_text(GelParser *self, const gchar *text, gsize text_len)
 {
-    g_return_val_if_fail(self != NULL, NULL);
+    g_return_if_fail(self != NULL);
 
     g_scanner_input_text(self->scanner, text, (guint)text_len);
+}
 
-    return gel_parser_scan(self, 0, 0, 0, error);
+/**
+ * gel_parser_input_file:
+ * @self: a #GelParser
+ * @fd: a file descriptor
+ *
+ * Prepares the scanner associated to the #GelParser @self to scan a file
+ */
+void gel_parser_input_file(GelParser *self, gint fd)
+{
+    g_return_if_fail(self != NULL);
+
+    g_scanner_input_file(self->scanner, fd);
 }
 

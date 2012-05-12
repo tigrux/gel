@@ -60,9 +60,10 @@ typedef struct _GelParser GelParser;
 GelParser* gel_parser_new(void);
 void gel_parser_free(GelParser *self);
 
-GelArray* gel_parser_parse_text(GelParser *self,
-                                const gchar *text, gsize text_len,
-                                GError **error);
+void gel_parser_input_text(GelParser *self, const gchar *text, gsize text_len);
+void gel_parser_input_file(GelParser *self, gint fd);
+
+gboolean gel_parser_next_value(GelParser *self, GValue *value, GError **error);
 
 #endif
 
