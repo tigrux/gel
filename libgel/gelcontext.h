@@ -1,5 +1,5 @@
-#ifndef GEL_TYPE_CONTEXT
-#define GEL_TYPE_CONTEXT (gel_context_get_type())
+#ifndef __GEL_CONTEXT_H__
+#define __GEL_CONTEXT_H__
 
 #include <glib-object.h>
 
@@ -42,7 +42,6 @@ typedef enum _GelContextError
 } GelContextError;
 
 typedef struct _GelContext GelContext;
-GType gel_context_get_type(void) G_GNUC_CONST;
 
 /**
  * GelFunction:

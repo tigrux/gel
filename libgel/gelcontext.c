@@ -36,27 +36,11 @@ GQuark gel_context_error_quark(void)
 }
 
 
-GType gel_context_get_type(void)
-{
-    static volatile gsize once = 0;
-    static GType type = G_TYPE_INVALID;
-
-    if(g_once_init_enter(&once))
-    {
-        type = g_boxed_type_register_static("GelContext",
-                (GBoxedCopyFunc)gel_context_dup,
-                (GBoxedFreeFunc)gel_context_free);
-        g_once_init_leave(&once, 1);
-    }
-
-    return type;
-}
-
-
 #if GEL_CONTEXT_USE_POOL
 static guint contexts_COUNT;
 static GList *contexts_POOL;
 #endif
+
 
 static GelContext *context_SOLITON;
 
