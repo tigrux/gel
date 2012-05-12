@@ -35,26 +35,25 @@
     )
 )
 
-(def player ((. Gst ElementFactory make) "playbin2" "player"))
+(let (player ((. Gst ElementFactory make) "playbin2" "player"))
+    (let (bus ((. player get-bus)))
+        ((. bus add-signal-watch))
+        (connect bus "message::eos" (. Gtk main-quit))
+    )
 
-(let (bus ((. player get-bus)))
-    ((. bus add-signal-watch))
-    (connect bus "message::eos" (. Gtk main-quit))
-)
-
-(connect window "hide" (. Gtk main-quit))
-
-(connect chooser-button "file-set"
-    (fn (w)
-        (set chooser-button "sensitive" FALSE)
-        (let (filename ((. chooser-button get-filename)))
-            (set player "uri" (+ "file://" filename))
-            ((. player set-state) (. Gst State playing))
+    (connect chooser-button "file-set"
+        (fn (w)
+            (set chooser-button "sensitive" FALSE)
+            (let (filename ((. chooser-button get-filename)))
+                (set player "uri" (+ "file://" filename))
+                ((. player set-state) (. Gst State playing))
+            )
         )
     )
 )
 
 (connect quit-button "clicked" (. Gtk main-quit))
+(connect window "hide" (. Gtk main-quit))
 
 ((. window add) box)
 
