@@ -19,7 +19,7 @@
  * The resulting #GelArray can be used to feed a #GelContext.
  */
 
-GQuark gel_parse_error_quark(void)
+GQuark gel_parser_error_quark(void)
 {
     return g_quark_from_static_string("gel-parse-error");
 }
@@ -56,10 +56,131 @@ GScanner* gel_scanner_new(void)
 }
 
 
-static
-GelArray* gel_parse_scanner(GScanner *scanner, guint line, guint pos,
-                            gchar delim, GError **error)
+/**
+ * SECTION:gelparser
+ * @short_description: Class used to parse text
+ * @title: GelParser
+ * @include: gel.h
+ *
+ * #GelParser is a class used to parse text.
+ */
+
+struct _GelParser
 {
+    GScanner *scanner;
+    GHashTable *macros;
+};
+
+
+/**
+ * gel_parser_new:
+ *
+ * Creates a #GelParser
+ *
+ * Returns: A new #GelParser
+ */
+GelParser* gel_parser_new(void)
+{
+    GelParser *self = g_slice_new0(GelParser);
+
+    self->scanner = gel_scanner_new();
+    self->macros = g_hash_table_new_full(
+        g_str_hash, g_str_equal,
+        g_free, (GDestroyNotify)gel_macro_free);
+
+    return self;
+}
+
+
+/**
+ * gel_parser_free:
+ * @self: #GelParser to free
+ *
+ * Releases resources of @self
+ */
+void gel_parser_free(GelParser *self)
+{
+    g_scanner_destroy(self->scanner);
+    g_hash_table_unref(self->macros);
+    g_slice_free(GelParser, self);
+}
+
+
+GelArray* gel_parser_macro_code_from_value(GelParser *self,
+                                           GValue *pre_value, GError **error)
+{
+    if(GEL_VALUE_TYPE(pre_value) == GEL_TYPE_ARRAY)
+    {
+        GelArray *array = gel_value_get_boxed(pre_value);
+        GValue *values = gel_array_get_values(array);
+        guint n_values = gel_array_get_n_values(array);
+
+        GType type = GEL_VALUE_TYPE(values + 0);
+        if(type != GEL_TYPE_SYMBOL)
+            return NULL;
+
+        GelSymbol *symbol = gel_value_get_boxed(values + 0);
+        const gchar *name = gel_symbol_get_name(symbol);
+
+        n_values--;
+        values++;
+
+        if(g_strcmp0(name, "macro") == 0)
+        {
+            if(n_values < 2)
+            {
+                g_propagate_error(error, g_error_new(
+                    GEL_PARSER_ERROR, GEL_PARSER_ERROR_MACRO_MALFORMED,
+                    "Macro: expected arguments and code"));
+                return NULL;
+            }
+
+            symbol = gel_value_get_boxed(values + 0);
+            name = gel_symbol_get_name(symbol);
+
+            GelArray *vars = gel_value_get_boxed(values + 1);
+            gchar *variadic = NULL;
+            gchar *invalid = NULL;
+            GList* args = gel_args_from_array(vars, &variadic, &invalid);
+
+            if(invalid != NULL)
+            {
+                g_propagate_error(error, g_error_new(
+                    GEL_PARSER_ERROR, GEL_PARSER_ERROR_MACRO_MALFORMED,
+                    "Macro: '%s' is an invalid argument name", invalid));
+                g_free(invalid);
+                return NULL;
+            }
+
+            n_values -= 2;
+            values += 2;
+
+            GelArray *code = gel_array_new(n_values);
+            for(guint i = 0; i < n_values; i++)
+                gel_array_append(code, values + i);
+
+            g_hash_table_insert(self->macros,
+                g_strdup(name), gel_macro_new(args, variadic, code));
+
+            return gel_array_new(0);
+        }
+        else
+        {
+            GelMacro *macro = g_hash_table_lookup(self->macros, name);
+            if(macro != NULL)
+                return gel_macro_invoke(macro, name, n_values, values, error);
+        }
+    }
+
+    return NULL;
+}
+
+
+static
+GelArray* gel_parser_scan(GelParser *self, guint line, guint pos,
+                          gchar delim, GError **error)
+{
+    GScanner *scanner = self->scanner;
     GelArray *array = gel_array_new(ARRAY_N_PREALLOCATED);
 
     const gchar *pre_symbol = NULL;
@@ -113,8 +234,8 @@ GelArray* gel_parse_scanner(GScanner *scanner, guint line, guint pos,
             case '{':
             {
                 g_scanner_get_next_token(scanner);
-                GelArray *inner_array = gel_parse_scanner(scanner,
-                    scanner->line, scanner->position, token, error);
+                GelArray *inner_array = gel_parser_scan(self,
+                        scanner->line, scanner->position, token, error);
                 if(inner_array != NULL)
                 {
                     g_value_init(&value, GEL_TYPE_ARRAY);
@@ -132,7 +253,7 @@ GelArray* gel_parse_scanner(GScanner *scanner, guint line, guint pos,
                    (delim == '{' && token != '}'))
                 {
                     g_propagate_error(error, g_error_new(
-                        GEL_PARSE_ERROR, GEL_PARSE_ERROR_UNEXP_DELIM,
+                        GEL_PARSER_ERROR, GEL_PARSER_ERROR_UNEXP_DELIM,
                         "Cannot close '%c' at line %u, char %u "
                         "with '%c' at line %u, char %u",
                         delim, line, pos, token,
@@ -143,7 +264,7 @@ GelArray* gel_parse_scanner(GScanner *scanner, guint line, guint pos,
                 if(delim == 0)
                 {
                     g_propagate_error(error, g_error_new(
-                        GEL_PARSE_ERROR, GEL_PARSE_ERROR_UNEXP_DELIM,
+                        GEL_PARSER_ERROR, GEL_PARSER_ERROR_UNEXP_DELIM,
                         "Unexpected '%c' at line %u, char %u",
                         token, scanner->next_line, scanner->next_position));
                     failed = TRUE;
@@ -158,7 +279,7 @@ GelArray* gel_parse_scanner(GScanner *scanner, guint line, guint pos,
                 if(line != 0)
                 {
                     g_propagate_error(error, g_error_new(
-                        GEL_PARSE_ERROR, GEL_PARSE_ERROR_UNEXP_EOF_IN_ARRAY,
+                        GEL_PARSER_ERROR, GEL_PARSER_ERROR_UNEXP_EOF_IN_ARRAY,
                         "'%c' opened at line %u, char %u was not closed",
                         delim, line, pos));
                     failed = TRUE;
@@ -173,7 +294,7 @@ GelArray* gel_parse_scanner(GScanner *scanner, guint line, guint pos,
             case G_TOKEN_ERROR:
                 g_scanner_get_next_token(scanner);
                 g_propagate_error(error, g_error_new(
-                    GEL_PARSE_ERROR, scanner->value.v_error,
+                    GEL_PARSER_ERROR, scanner->value.v_error,
                     "%s at line %u, char %u",
                     scanner_errors[scanner->value.v_error],
                     scanner->line, scanner->position));
@@ -185,7 +306,7 @@ GelArray* gel_parse_scanner(GScanner *scanner, guint line, guint pos,
                 break;
             default:
                 g_propagate_error(error, g_error_new(
-                    GEL_PARSE_ERROR, GEL_PARSE_ERROR_UNKNOWN_TOKEN,
+                    GEL_PARSER_ERROR, GEL_PARSER_ERROR_UNKNOWN_TOKEN,
                     "Unknown token '%c' (%d) at line %u, char %u",
                     token, token, scanner->next_line, scanner->next_position));
                 failed = TRUE;
@@ -250,7 +371,8 @@ GelArray* gel_parse_scanner(GScanner *scanner, guint line, guint pos,
                 quoted = FALSE;
             }
 
-            GelArray *code = gel_macro_code_from_value(&value, error);
+            GelArray *code =
+                gel_parser_macro_code_from_value(self, &value, error);
             if(code != NULL)
             {
                 GValue *code_values = gel_array_get_values(code);
@@ -279,7 +401,8 @@ GelArray* gel_parse_scanner(GScanner *scanner, guint line, guint pos,
 
 
 /**
- * gel_parse_text:
+ * gel_parser_input_text:
+ * @self: #GelParser to pass text
  * @text: text to parse
  * @text_len: length of the content to parse, or -1 if it is zero terminated.
  * @error: return location for a #GError, or NULL
@@ -291,17 +414,11 @@ GelArray* gel_parse_scanner(GScanner *scanner, guint line, guint pos,
  *
  * Returns: A #GelArray with the parsed value literals.
  */
-GelArray* gel_parse_text(const gchar *text, gsize text_len, GError **error)
+GelArray* gel_parser_input_text(GelParser *self,
+                                const gchar *text, gsize text_len,
+                                GError **error)
 {
-    GScanner *scanner = gel_scanner_new();
-    gel_macros_new();
-
-    g_scanner_input_text(scanner, text, (guint)text_len);
-    GelArray *array = gel_parse_scanner(scanner, 0, 0, 0, error);
-
-    gel_macros_free();
-    g_scanner_destroy(scanner);
-
-    return array;
+    g_scanner_input_text(self->scanner, text, (guint)text_len);
+    return gel_parser_scan(self, 0, 0, 0, error);
 }
 

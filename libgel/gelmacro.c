@@ -13,15 +13,10 @@ struct _GelMacro
 };
 
 
-static GHashTable *macros_HASH = NULL;
-
-
-GelMacro* gel_macro_new(const gchar *name,
-                        GList *args, gchar *variadic, GelArray *code)
+GelMacro* gel_macro_new(GList *args, gchar *variadic, GelArray *code)
 {
     GelMacro *self = g_slice_new0(GelMacro);
 
-    self->name = g_strdup(name);
     self->args = args;
     self->variadic = variadic;
     self->code = code;
@@ -32,7 +27,6 @@ GelMacro* gel_macro_new(const gchar *name,
 
 void gel_macro_free(GelMacro *self)
 {
-    g_free(self->name);
     g_list_foreach(self->args, (GFunc)g_free, NULL);
     g_list_free(self->args);
     g_free(self->variadic);
@@ -41,48 +35,10 @@ void gel_macro_free(GelMacro *self)
 }
 
 
-void gel_macros_new(void)
-{
-    g_return_if_fail(macros_HASH == NULL);
-
-    macros_HASH = g_hash_table_new_full(
-        g_str_hash, g_str_equal,
-        g_free, (GDestroyNotify)gel_macro_free);
-}
-
-
-void gel_macros_free(void)
-{
-    g_return_if_fail(macros_HASH != NULL);
-
-    g_hash_table_unref(macros_HASH);
-    macros_HASH = NULL;
-}
-
-
-static
-void gel_macros_insert(const gchar *name, GList *args, gchar *variadic,
-                       GelArray *code)
-{
-    g_return_if_fail(macros_HASH != NULL);
-
-    g_hash_table_insert(macros_HASH,
-        g_strdup(name), gel_macro_new(name, args, variadic, code));
-}
-
-
-GelMacro* gel_macros_lookup(const gchar *name)
-{
-    g_return_val_if_fail(macros_HASH != NULL, NULL);
-
-    return g_hash_table_lookup(macros_HASH, name);
-}
-
-
 static
 GelArray* gel_macro_map_code(const GelMacro *self,
-                                 GHashTable *hash, GelArray *array,
-                                 GError **error)
+                             GHashTable *mappings, GelArray *array,
+                             GError **error)
 {
     GValue *values = gel_array_get_values(array);
     guint n_values = gel_array_get_n_values(array);
@@ -95,7 +51,7 @@ GelArray* gel_macro_map_code(const GelMacro *self,
         {
             GelSymbol *symbol = gel_value_get_boxed(values + i);
             const gchar *name = gel_symbol_get_name(symbol);
-            GValue *value = g_hash_table_lookup(hash, name);
+            GValue *value = g_hash_table_lookup(mappings, name);
 
             if(g_strcmp0(name, self->variadic) != 0)
             {
@@ -120,7 +76,7 @@ GelArray* gel_macro_map_code(const GelMacro *self,
         {
             GelArray *array = gel_value_get_boxed(values + i);
             GelArray *new_array =
-                gel_macro_map_code(self, hash, array, error);
+                gel_macro_map_code(self, mappings, array, error);
 
             GValue tmp_value = {0};
             g_value_init(&tmp_value, GEL_TYPE_ARRAY);
@@ -138,10 +94,9 @@ GelArray* gel_macro_map_code(const GelMacro *self,
 }
 
 
-static
-GelArray* gel_macro_invoke(const GelMacro *self,
-                              guint n_values, const GValue *values,
-                              GError **error)
+GelArray* gel_macro_invoke(const GelMacro *self, const gchar *name,
+                           guint n_values, const GValue *values,
+                           GError **error)
 {
     guint n_args = g_list_length(self->args);
     gboolean is_variadic = (self->variadic != NULL);
@@ -151,9 +106,9 @@ GelArray* gel_macro_invoke(const GelMacro *self,
         if(n_values < n_args)
         {
             g_propagate_error(error, g_error_new(
-                GEL_PARSE_ERROR, GEL_PARSE_ERROR_MACRO_ARGUMENTS,
+                GEL_PARSER_ERROR, GEL_PARSER_ERROR_MACRO_ARGUMENTS,
                 "Macro %s: requires at least %u arguments, got %u",
-                self->name, n_args, n_values));
+                name, n_args, n_values));
             return NULL;
         }
     }
@@ -161,9 +116,9 @@ GelArray* gel_macro_invoke(const GelMacro *self,
     if(n_values != n_args)
     {
         g_propagate_error(error, g_error_new(
-            GEL_PARSE_ERROR, GEL_PARSE_ERROR_MACRO_ARGUMENTS,
+            GEL_PARSER_ERROR, GEL_PARSER_ERROR_MACRO_ARGUMENTS,
             "Macro %s: requires %u arguments, got %u",
-            self->name, n_args, n_values));
+            name, n_args, n_values));
         return NULL;
     }
 
@@ -194,72 +149,5 @@ GelArray* gel_macro_invoke(const GelMacro *self,
     g_hash_table_unref(mappings);
 
     return code;
-}
-
-
-GelArray* gel_macro_code_from_value(GValue *pre_value, GError **error)
-{
-    if(GEL_VALUE_TYPE(pre_value) == GEL_TYPE_ARRAY)
-    {
-        GelArray *array = gel_value_get_boxed(pre_value);
-        GValue *values = gel_array_get_values(array);
-        guint n_values = gel_array_get_n_values(array);
-
-        GType type = GEL_VALUE_TYPE(values + 0);
-        if(type != GEL_TYPE_SYMBOL)
-            return NULL;
-
-        GelSymbol *symbol = gel_value_get_boxed(values + 0);
-        const gchar *name = gel_symbol_get_name(symbol);
-
-        n_values--;
-        values++;
-
-        if(g_strcmp0(name, "macro") == 0)
-        {
-            if(n_values < 2)
-            {
-                g_propagate_error(error, g_error_new(
-                    GEL_PARSE_ERROR, GEL_PARSE_ERROR_MACRO_MALFORMED,
-                    "Macro: expected arguments and code"));
-                return NULL;
-            }
-
-            symbol = gel_value_get_boxed(values + 0);
-            name = gel_symbol_get_name(symbol);
-
-            GelArray *vars = gel_value_get_boxed(values + 1);
-            gchar *variadic = NULL;
-            gchar *invalid = NULL;
-            GList* args = gel_args_from_array(vars, &variadic, &invalid);
-
-            if(invalid != NULL)
-            {
-                g_propagate_error(error, g_error_new(
-                    GEL_PARSE_ERROR, GEL_PARSE_ERROR_MACRO_MALFORMED,
-                    "Macro: '%s' is an invalid argument name", invalid));
-                g_free(invalid);
-                return NULL;
-            }
-
-            n_values -= 2;
-            values += 2;
-
-            GelArray *code = gel_array_new(n_values);
-            for(guint i = 0; i < n_values; i++)
-                gel_array_append(code, values + i);
-
-            gel_macros_insert(name, args, variadic, code);
-            return gel_array_new(0);
-        }
-        else
-        {
-            GelMacro *macro = gel_macros_lookup(name);
-            if(macro != NULL)
-                return gel_macro_invoke(macro, n_values, values, error);
-        }
-    }
-
-    return NULL;
 }
 

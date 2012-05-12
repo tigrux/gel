@@ -22,9 +22,12 @@ gel_context_get_type
 
 <SECTION>
 <FILE>gelparser</FILE>
-GelParseError
-GEL_PARSE_ERROR
-gel_parse_text
+GelParserError
+GEL_PARSER_ERROR
+GelParser
+gel_parser_new
+gel_parser_free
+gel_parser_input_text
 </SECTION>
 
 <SECTION>
