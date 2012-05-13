@@ -49,14 +49,6 @@ AC_SEARCH_LIBS(g_constant_info_free_value,
               Define to 1 if g_constant_info_free_value is provided)
 )
 
-AC_SEARCH_LIBS(g_array_set_clear_func,
-    glib-2.0,
-    AC_DEFINE(GEL_ARRAY_USE_GARRAY, 1,
-              Define to 1 if g_array_set_clear_func is provided),
-    AC_DEFINE(GEL_ARRAY_USE_GARRAY, 0,
-              Define to 0 if g_array_set_clear_func is not provided)
-)
-
 AM_CONDITIONAL(HAVE_GOBJECT_INTROSPECTION, test $HAVE_GOBJECT_INTROSPECTION = 1)
 
 AC_OUTPUT

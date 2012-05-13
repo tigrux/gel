@@ -17,8 +17,6 @@ gel_context_remove
 gel_context_eval
 gel_context_clear_error
 gel_context_error
-<SUBSECTION Private>
-gel_context_get_type
 </SECTION>
 
 <SECTION>
@@ -39,6 +37,22 @@ gel_parser_get_values
 gel_closure_get_name
 gel_closure_new
 gel_closure_new_native
+</SECTION>
+
+<SECTION>
+<FILE>gelarray</FILE>
+GEL_ARRAY_USE_GARRAY
+GEL_TYPE_ARRAY
+GelArray
+gel_array_new
+gel_array_free
+gel_array_append
+gel_array_copy
+gel_array_get_n_values
+gel_array_get_values
+gel_array_remove
+gel_array_set_n_values
+gel_array_sort
 </SECTION>
 
 <SECTION>
