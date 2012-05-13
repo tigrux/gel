@@ -69,6 +69,7 @@ struct _GelParser
 {
     GScanner *scanner;
     GHashTable *macros;
+    GList *next;
 };
 
 
@@ -180,15 +181,24 @@ GelArray* gel_parser_macro_code_from_value(GelParser *self,
 
 
 static
-GelArray* gel_parser_scan(GelParser *self, GValue *param_value,
+GelArray* gel_parser_scan(GelParser *self, GValue *dest_value,
                           guint line, guint pos,
                           gchar delim, GError **error)
 {
     GScanner *scanner = self->scanner;
     GelArray *array = NULL;
 
-    if(line != 0)
+    if(dest_value == NULL)
         array = gel_array_new(ARRAY_N_PREALLOCATED);
+    else
+    if(self->next != NULL)
+    {
+        GValue *next_value = self->next->data;
+        gel_value_copy(next_value, dest_value);
+        self->next = g_list_delete_link(self->next, self->next);
+        gel_value_free(next_value);
+        return NULL;
+    }
 
     const gchar *pre_symbol = NULL;
     switch(delim)
@@ -389,6 +399,18 @@ GelArray* gel_parser_scan(GelParser *self, GValue *param_value,
                 if(array != NULL)
                     for(guint i = 0; i < code_n_values; i++)
                         gel_array_append(array, code_values + i);
+                else
+                if(code_n_values > 0)
+                {
+                    gel_value_copy(code_values + 0, dest_value);
+                    parsing = FALSE;
+
+                    for(guint i = 1; i < code_n_values; i++)
+                    {
+                        GValue *next_value = gel_value_dup(code_values + i);
+                        self->next = g_list_append(self->next, next_value);
+                    }
+                }
 
                 gel_array_free(code);
             }
@@ -397,7 +419,7 @@ GelArray* gel_parser_scan(GelParser *self, GValue *param_value,
                     gel_array_append(array, &value);
                 else
                 {
-                    gel_value_copy(&value, param_value);
+                    gel_value_copy(&value, dest_value);
                     parsing = FALSE;
                 }
 
