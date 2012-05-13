@@ -36,7 +36,8 @@ libgel_include_HEADERS = \
 	gelcontext.h \
 	gelparser.h \
 	gelvalue.h \
-	gelclosure.h
+	gelclosure.h \
+	gelarray.h
 
 noinst_HEADERS = \
 	gelcontextprivate.h \
@@ -45,8 +46,7 @@ noinst_HEADERS = \
 	gelsymbol.h \
 	gelerrors.h \
 	gelvariable.h \
-	gelmacro.h \
-	gelarray.h
+	gelmacro.h
 
 if HAVE_GOBJECT_INTROSPECTION
     noinst_HEADERS += geltypeinfo.h geltypelib.h
