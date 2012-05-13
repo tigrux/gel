@@ -64,6 +64,7 @@ void gel_parser_input_text(GelParser *self, const gchar *text, gsize text_len);
 void gel_parser_input_file(GelParser *self, gint fd);
 
 gboolean gel_parser_next_value(GelParser *self, GValue *value, GError **error);
+GelArray* gel_parser_get_values(GelParser *self, GError **error);
 
 #endif
 
