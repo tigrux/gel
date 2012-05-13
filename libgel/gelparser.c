@@ -442,7 +442,7 @@ GelArray* gel_parser_scan(GelParser *self, GValue *dest_value,
  * gel_parser_next_value:
  * @self: a #GelParser
  * @value: address of a #GValue to store the result
- * @error: @error: return location for a #GError, or NULL
+ * @error: return location for a #GError, or NULL
  *
  * Obtains the next #GValue parsed by the #GelParser
  *
@@ -473,6 +473,22 @@ gboolean gel_parser_next_value(GelParser *self, GValue *value, GError **error)
     return result;
 }
 
+
+/**
+ * gel_parser_get_values:
+ * @self: a #GelParser
+ * @error: return location for a #GError, or NULL
+ *
+ * Obtains an array of parser #GValue
+ *
+ * Returns: an array of parsed #GValue
+ */
+GelArray* gel_parser_get_values(GelParser *self, GError **error)
+{
+    return gel_parser_scan(self, NULL, 0, 0, 0, error);
+}
+
+
 /**
  * gel_parser_input_text:
  * @self: a #GelParser
@@ -488,6 +504,7 @@ void gel_parser_input_text(GelParser *self, const gchar *text, gsize text_len)
 
     g_scanner_input_text(self->scanner, text, (guint)text_len);
 }
+
 
 /**
  * gel_parser_input_file:
