@@ -529,64 +529,16 @@ void gel_type_info_closure_marshal(GClosure *gclosure,
     context = gel_context_validate(context);
     GelIntrospectionClosure *closure = (GelIntrospectionClosure *)gclosure;
     const GelTypeInfo *info = gel_introspection_closure_get_info(closure);
-    GObject *object = gel_introspection_closure_get_instance(closure);
     GIBaseInfo *function_info = info->info;
 
+    GIArgInfo *arg_info = NULL;
+    GITypeInfo *arg_type = NULL;
+
     guint n_args = g_callable_info_get_n_args(function_info);
-    GIArgInfo **infos = g_new0(GIArgInfo *, n_args);
-    GITypeInfo **types = g_new0(GITypeInfo *, n_args);
-    gboolean *indirect_args = g_new0(gboolean, n_args);
     GArgument *inputs = g_new0(GArgument, n_args + 1);
     GArgument *outputs = g_new0(GArgument, n_args);
     GList *tmp_list = NULL;
-
-    guint n_inputs = 0;
-    guint n_outputs = 0;
-
-    for(guint i = 0; i < n_args; i++)
-    {
-        GIArgInfo *info = g_callable_info_get_arg(function_info, i);
-        GITypeInfo *type = g_arg_info_get_type(info);
-
-        switch(g_type_info_get_tag(type))
-        {
-            case GI_TYPE_TAG_ARRAY:
-            {
-                gint length_index = g_type_info_get_array_length(type);
-                if(length_index != -1)
-                    indirect_args[length_index] = TRUE;
-                break;
-            }
-            case GI_TYPE_TAG_INTERFACE:
-            {
-                GIBaseInfo *iface_info = g_type_info_get_interface(type);
-                GIInfoType iface_type = g_base_info_get_type(iface_info);
-
-                switch(iface_type)
-                {
-                    case GI_INFO_TYPE_CALLBACK:
-                        indirect_args[g_arg_info_get_closure(info)] = TRUE;
-                        indirect_args[g_arg_info_get_destroy(info)] = TRUE;
-                        break;
-                    default:
-                        break;
-                }
-
-                g_base_info_unref(iface_info);
-                break;
-            }
-            default:
-                break;
-        }
-
-        infos[i] = info;
-        types[i] = type;
-    }
-
-    guint n_expected_args = 0;
-    for(guint i = 0; i < n_args; i++)
-        if(!indirect_args[i])
-            n_expected_args++;
+    guint n_expected_args = gel_introspection_closure_get_n_args(closure);
 
     if(n_values < n_expected_args)
     {
@@ -595,6 +547,10 @@ void gel_type_info_closure_marshal(GClosure *gclosure,
         goto end;
     }
 
+    guint n_inputs = 0;
+    guint n_outputs = 0;
+
+    GObject *object = gel_introspection_closure_get_instance(closure);
     if(g_function_info_get_flags(function_info) & GI_FUNCTION_IS_METHOD)
     {
         inputs[0].v_pointer = object;
@@ -603,11 +559,13 @@ void gel_type_info_closure_marshal(GClosure *gclosure,
 
     for(guint i = 0; i < n_args; i++)
     {
-        GITypeInfo *type = types[i];
+        arg_info = g_callable_info_get_arg(function_info, i);
+        arg_type = g_arg_info_get_type(arg_info);
+
         gboolean is_input = FALSE;
         gboolean is_output = FALSE;
 
-        GIDirection dir = g_arg_info_get_direction(infos[i]);
+        GIDirection dir = g_arg_info_get_direction(arg_info);
         switch(dir)
         {
             case GI_DIRECTION_IN:
@@ -622,11 +580,11 @@ void gel_type_info_closure_marshal(GClosure *gclosure,
                 break;
         }
 
-        if(!indirect_args[i])
+        if(gel_introspection_closure_arg_is_expected(closure, i))
         {
-            GITypeTag tag = g_type_info_get_tag(type);
+            GITypeTag arg_tag = g_type_info_get_tag(arg_type);
 
-            switch(tag)
+            switch(arg_tag)
             {
                 case GI_TYPE_TAG_BOOLEAN:
                 {
@@ -904,7 +862,8 @@ void gel_type_info_closure_marshal(GClosure *gclosure,
                 }
                 case GI_TYPE_TAG_INTERFACE:
                 {
-                    GIBaseInfo *iface_info = g_type_info_get_interface(type);
+                    GIBaseInfo *iface_info =
+                        g_type_info_get_interface(arg_type);
                     GIInfoType iface_type = g_base_info_get_type(iface_info);
 
                     switch(iface_type)
@@ -986,6 +945,12 @@ void gel_type_info_closure_marshal(GClosure *gclosure,
             n_inputs++;
         if(is_output)
             n_outputs++;
+
+        g_base_info_unref(arg_info);
+        arg_info = NULL;
+
+        g_base_info_unref(arg_type);
+        arg_type = NULL;
     }
 
     GArgument return_arg = {0};
@@ -1000,18 +965,13 @@ void gel_type_info_closure_marshal(GClosure *gclosure,
     g_base_info_unref(return_info);
 
     end:
-    for(guint i = 0; i < n_args; i++)
-    {
-        g_base_info_unref(types[i]);
-        g_base_info_unref(infos[i]);
-    }
-
+    if(arg_info != NULL)
+        g_base_info_unref(arg_info);
+    if(arg_type != NULL)
+        g_base_info_unref(arg_type);
     gel_list_free(tmp_list);
     g_free(outputs);
     g_free(inputs);
-    g_free(indirect_args);
-    g_free(types);
-    g_free(infos);
 }
 
 
@@ -1019,7 +979,56 @@ static
 gboolean gel_type_info_function_to_value(const GelTypeInfo *self,
                                          void *instance, GValue *return_value)
 {
-    GClosure *closure = gel_closure_new_introspection(self, instance);
+    GIBaseInfo *function_info = self->info;
+
+    guint n_args = g_callable_info_get_n_args(function_info);
+    gboolean *indirect_args = g_new0(gboolean, n_args);
+
+    for(guint i = 0; i < n_args; i++)
+    {
+        GIArgInfo *arg_info = g_callable_info_get_arg(function_info, i);
+        GITypeInfo *arg_type = g_arg_info_get_type(arg_info);
+
+        switch(g_type_info_get_tag(arg_type))
+        {
+            case GI_TYPE_TAG_ARRAY:
+            {
+                gint length_index = g_type_info_get_array_length(arg_type);
+                if(length_index != -1)
+                    indirect_args[length_index] = TRUE;
+                break;
+            }
+            case GI_TYPE_TAG_INTERFACE:
+            {
+                GIBaseInfo *iface_info = g_type_info_get_interface(arg_type);
+                GIInfoType iface_type = g_base_info_get_type(iface_info);
+
+                switch(iface_type)
+                {
+                    case GI_INFO_TYPE_CALLBACK:
+                        indirect_args[g_arg_info_get_closure(arg_info)] = TRUE;
+                        indirect_args[g_arg_info_get_destroy(arg_info)] = TRUE;
+                        break;
+                    default:
+                        break;
+                }
+
+                g_base_info_unref(iface_info);
+                break;
+            }
+            default:
+                break;
+        }
+
+        g_base_info_unref(arg_info);
+        arg_info = NULL;
+
+        g_base_info_unref(arg_type);
+        arg_type = NULL;
+    }
+
+    GClosure *closure =
+        gel_closure_new_introspection(self, n_args, indirect_args,  instance);
 
     g_value_init(return_value, G_TYPE_CLOSURE);
     g_value_take_boxed(return_value, closure);

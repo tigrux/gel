@@ -322,24 +322,29 @@ GClosure* gel_closure_new_native(const gchar *name, GClosureMarshal marshal)
 
 
 #ifdef HAVE_GOBJECT_INTROSPECTION
+
 struct _GelIntrospectionClosure
 {
     GClosure closure;
     gchar *name;
     const GelTypeInfo *info;
     void *instance;
+    guint n_args;
+    gboolean *indirect_args;
 };
 
 
 static
 void gel_introspection_closure_finalize(void *data,
                                         GelIntrospectionClosure *self)
-{;
+{
     g_free(self->name);
+    g_free(self->indirect_args);
 }
 
 
 GClosure* gel_closure_new_introspection(const GelTypeInfo *info,
+                                        guint n_args, gboolean *indirect_args,
                                         void *instance)
 {
     GClosure *closure =
@@ -351,11 +356,18 @@ GClosure* gel_closure_new_introspection(const GelTypeInfo *info,
     g_closure_add_finalize_notifier(closure, instance,
         (GClosureNotify)gel_introspection_closure_finalize);
 
+    guint n_expected_args = 0;
+    for(guint i = 0; i < n_args; i++)
+        if(!indirect_args[i])
+            n_expected_args++;
+
     GelIntrospectionClosure *self = (GelIntrospectionClosure*)closure;
     self->name = gel_type_info_to_string(info);
     self->info = info;
-
+    self->n_args = n_expected_args;
     self->instance = instance;
+    self->indirect_args = indirect_args;
+
     return closure;
 }
 
@@ -366,10 +378,24 @@ const GelTypeInfo* gel_introspection_closure_get_info(GelIntrospectionClosure *s
 }
 
 
-void* gel_introspection_closure_get_instance(GelIntrospectionClosure *self)
+void* gel_introspection_closure_get_instance(const GelIntrospectionClosure *self)
 {
     return self->instance;
 }
+
+
+guint gel_introspection_closure_get_n_args(const GelIntrospectionClosure *self)
+{
+    return self->n_args;
+}
+
+
+gboolean gel_introspection_closure_arg_is_expected(const GelIntrospectionClosure *self,
+                                                   guint arg_index)
+{
+    return !self->indirect_args[arg_index];
+}
+
 #endif
 
 

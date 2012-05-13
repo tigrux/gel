@@ -8,6 +8,7 @@ typedef struct _GelTypeInfo GelTypeInfo;
 GType gel_type_info_get_type(void) G_GNUC_CONST;
 
 GelTypeInfo* gel_type_info_new(GIBaseInfo *info);
+
 GelTypeInfo* gel_type_info_ref(GelTypeInfo *self);
 void gel_type_info_unref(GelTypeInfo *self);
 
