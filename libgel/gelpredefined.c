@@ -105,7 +105,7 @@ void array_set(GelArray *array, GValue *return_value,
         gel_value_copy(value, gel_array_get_values(array) + index);
     }
 
-    gel_value_list_free(tmp_list);
+    gel_list_free(tmp_list);
 }
 
 
@@ -121,7 +121,7 @@ void hash_set(GHashTable *hash, GValue *return_value,
             &n_values, &values, &tmp_list, "VV", &key, &value))
         g_hash_table_insert(hash, gel_value_dup(key), gel_value_dup(value));
 
-    gel_value_list_free(tmp_list);
+    gel_list_free(tmp_list);
 }
 
 
@@ -157,7 +157,7 @@ void object_set(GObject *object, GValue *return_value,
                 gel_error_no_such_property(context, __FUNCTION__, name);
         }
 
-    gel_value_list_free(tmp_list);
+    gel_list_free(tmp_list);
 }
 
 
@@ -184,7 +184,7 @@ void array_get(GelArray *array, GValue *return_value,
         gel_value_copy(gel_array_get_values(array) + index, return_value);
     }
 
-    gel_value_list_free(tmp_list);
+    gel_list_free(tmp_list);
 }
 
 
@@ -205,7 +205,7 @@ void hash_get(GHashTable *hash, GValue *return_value,
             gel_error_invalid_key(context, __FUNCTION__, key);
     }
 
-    gel_value_list_free(tmp_list);
+    gel_list_free(tmp_list);
 }
 
 
@@ -232,7 +232,7 @@ void object_get(GObject *object, GValue *return_value,
                 gel_error_no_such_property(context, __FUNCTION__, name);
         }
 
-    gel_value_list_free(tmp_list);
+    gel_list_free(tmp_list);
 }
 
 
@@ -258,7 +258,7 @@ void array_append(GelArray *array, GValue *return_value,
     }
 
     end:
-    gel_value_list_free(tmp_list);
+    gel_list_free(tmp_list);
 }
 
 
@@ -284,7 +284,7 @@ void hash_append(GHashTable *hash, GValue *return_value,
     else
         gel_error_expected(context, __FUNCTION__, "an even number of values");
 
-    gel_value_list_free(tmp_list);
+    gel_list_free(tmp_list);
 }
 
 
@@ -311,7 +311,7 @@ void array_remove(GelArray *array, GValue *return_value,
         gel_array_remove(array, index);
     }
 
-    gel_value_list_free(tmp_list);
+    gel_list_free(tmp_list);
 }
 
 
@@ -333,7 +333,7 @@ void hash_remove(GHashTable *hash, GValue *return_value,
         }
     }
 
-    gel_value_list_free(tmp_list);
+    gel_list_free(tmp_list);
 }
 
 
@@ -346,7 +346,7 @@ void array_size(GelArray *array, GValue *return_value,
     g_value_init(return_value, G_TYPE_INT64);
     gel_value_set_int64(return_value, gel_array_get_n_values(array));
 
-    gel_value_list_free(tmp_list);
+    gel_list_free(tmp_list);
 }
 
 
@@ -360,7 +360,7 @@ void hash_size(GHashTable *hash, GValue *return_value,
     guint result = g_hash_table_size(hash);
     gel_value_set_int64(return_value, result);
 
-    gel_value_list_free(tmp_list);
+    gel_list_free(tmp_list);
 }
 
 
@@ -386,7 +386,7 @@ void array_find(GClosure *closure, GelArray *array, GValue *return_value,
     g_value_init(return_value, G_TYPE_INT64);
     gel_value_set_int64(return_value, result);
 
-    gel_value_list_free(tmp_list);
+    gel_list_free(tmp_list);
 }
 
 
@@ -415,7 +415,7 @@ void hash_find(GClosure *closure, GHashTable *hash, GValue *return_value,
         g_value_unset(&value);
     }
 
-    gel_value_list_free(tmp_list);
+    gel_list_free(tmp_list);
 }
 
 
@@ -442,7 +442,7 @@ void array_filter(GClosure *closure, GelArray *array, GValue *return_value,
     g_value_init(return_value, GEL_TYPE_ARRAY);
     gel_value_take_boxed(return_value, result_array);
 
-    gel_value_list_free(tmp_list);
+    gel_list_free(tmp_list);
 }
 
 
@@ -472,7 +472,7 @@ void hash_filter(GClosure *closure, GHashTable *hash, GValue *return_value,
     g_value_init(return_value, G_TYPE_HASH_TABLE);
     gel_value_take_boxed(return_value, result_hash);
 
-    gel_value_list_free(tmp_list);
+    gel_list_free(tmp_list);
 }
 
 
@@ -493,7 +493,7 @@ void def_(GClosure *self, GValue *return_value,
             gel_context_define(context, name, gel_value_dup(value));
     }
 
-    gel_value_list_free(tmp_list);
+    gel_list_free(tmp_list);
 }
 
 
@@ -643,7 +643,7 @@ void let_(GClosure *self, GValue *return_value,
                 "an even number of values in bindings");
     }
 
-    gel_value_list_free(tmp_list);
+    gel_list_free(tmp_list);
 }
 
 
@@ -723,7 +723,7 @@ void apply_(GClosure *self, GValue *return_value,
             gel_array_get_values(array),
             context);
 
-    gel_value_list_free(tmp_list);
+    gel_list_free(tmp_list);
 }
 
 
@@ -787,7 +787,7 @@ void map_(GClosure *self, GValue *return_value,
         }
     }
 
-    gel_value_list_free(tmp_list);
+    gel_list_free(tmp_list);
 }
 
 
@@ -848,7 +848,7 @@ void hash_(GClosure *self, GValue *return_value,
         gel_value_take_boxed(return_value, hash);
     }
 
-    gel_value_list_free(tmp_list);
+    gel_list_free(tmp_list);
 }
 
 
@@ -931,7 +931,7 @@ void set_(GClosure *self, GValue *return_value,
                 __FUNCTION__, "array, hash or object");
     }
 
-    gel_value_list_free(tmp_list);
+    gel_list_free(tmp_list);
 }
 
 
@@ -1278,7 +1278,7 @@ void append_(GClosure *self, GValue *return_value,
             gel_error_expected(context, __FUNCTION__, "array or hash");
     }
 
-    gel_value_list_free(tmp_list);
+    gel_list_free(tmp_list);
 }
 
 
@@ -1322,7 +1322,7 @@ void get_(GClosure *self, GValue *return_value,
                 __FUNCTION__, "array, hash or object");
     }
 
-    gel_value_list_free(tmp_list);
+    gel_list_free(tmp_list);
 }
 
 
@@ -1359,7 +1359,7 @@ void remove_(GClosure *self, GValue *return_value,
             gel_error_expected(context, __FUNCTION__, "array or hash");
     }
 
-    gel_value_list_free(tmp_list);
+    gel_list_free(tmp_list);
 }
 
 
@@ -1396,7 +1396,7 @@ void size_(GClosure *self, GValue *return_value,
             gel_error_expected(context, __FUNCTION__, "array or hash");
     }
 
-    gel_value_list_free(tmp_list);
+    gel_list_free(tmp_list);
 }
 
 
@@ -1435,7 +1435,7 @@ void find_(GClosure *self, GValue *return_value,
             gel_error_expected(context, __FUNCTION__, "array or hash");
     }
 
-    gel_value_list_free(tmp_list);
+    gel_list_free(tmp_list);
 }
 
 
@@ -1474,7 +1474,7 @@ void filter_(GClosure *self, GValue *return_value,
             gel_error_expected(context, __FUNCTION__, "array or hash");
     }
 
-    gel_value_list_free(tmp_list);
+    gel_list_free(tmp_list);
 }
 
 
@@ -1494,7 +1494,7 @@ void compare_(GClosure *self, GValue *return_value,
         gel_value_set_int64(return_value, gel_values_cmp(v1, v2));
     }
 
-    gel_value_list_free(tmp_list);
+    gel_list_free(tmp_list);
 }
 
 
@@ -1536,7 +1536,7 @@ void sort_(GClosure *self, GValue *return_value,
         g_value_take_boxed(return_value, result_array);
     }
 
-    gel_value_list_free(tmp_list);
+    gel_list_free(tmp_list);
 }
 
 
@@ -1586,7 +1586,7 @@ void keys_(GClosure *self, GValue *return_value,
         g_list_free(keys);
     }
 
-    gel_value_list_free(tmp_list);
+    gel_list_free(tmp_list);
 }
 
 
@@ -1683,7 +1683,7 @@ void connect_(GClosure *self, GValue *return_value,
                 __FUNCTION__, values + 0, G_TYPE_OBJECT);
     }
 
-    gel_value_list_free(tmp_list);
+    gel_list_free(tmp_list);
 }
 
 
@@ -1743,7 +1743,7 @@ void cond_(GClosure *self, GValue *return_value,
                 }
         }
 
-    gel_value_list_free(tmp_list);
+    gel_list_free(tmp_list);
 }
 
 
@@ -1792,7 +1792,7 @@ void case_(GClosure *self, GValue *return_value,
                 }
             }
 
-    gel_value_list_free(tmp_list);
+    gel_list_free(tmp_list);
 }
 
 
@@ -1876,7 +1876,7 @@ void for_(GClosure *self, GValue *return_value,
         gel_context_free(loop_context);
     }
 
-    gel_value_list_free(tmp_list);
+    gel_list_free(tmp_list);
 }
 
 
@@ -1913,7 +1913,7 @@ void range_(GClosure *self, GValue *return_value,
         gel_value_take_boxed(return_value, array);
     }
 
-    gel_value_list_free(tmp_list);
+    gel_list_free(tmp_list);
 }
 
 
@@ -2029,7 +2029,7 @@ void require_(GClosure *self, GValue *return_value,
     g_value_init(return_value, G_TYPE_BOOLEAN);
     gel_value_set_boolean(return_value, ns != NULL);
 
-    gel_value_list_free(tmp_list);
+    gel_list_free(tmp_list);
 }
 
 

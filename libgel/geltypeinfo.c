@@ -1006,7 +1006,7 @@ void gel_type_info_closure_marshal(GClosure *gclosure,
         g_base_info_unref(infos[i]);
     }
 
-    gel_value_list_free(tmp_list);
+    gel_list_free(tmp_list);
     g_free(outputs);
     g_free(inputs);
     g_free(indirect_args);
