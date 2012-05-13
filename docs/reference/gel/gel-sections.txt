@@ -31,6 +31,7 @@ gel_parser_free
 gel_parser_input_text
 gel_parser_input_file
 gel_parser_next_value
+gel_parser_get_values
 </SECTION>
 
 <SECTION>
