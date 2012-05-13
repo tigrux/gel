@@ -106,10 +106,10 @@ void gel_value_free(GValue *value)
 }
 
 
-void gel_list_free(GList *value_list)
+void gel_list_free(GList *list)
 {
-    g_list_foreach(value_list, (GFunc)gel_value_free, NULL);
-    g_list_free(value_list);
+    g_list_foreach(list, (GFunc)gel_value_free, NULL);
+    g_list_free(list);
 }
 
 
