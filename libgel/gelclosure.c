@@ -90,7 +90,7 @@ void gel_closure_marshal(GelClosure *self, GValue *return_value,
             goto end;
         }
         else
-            gel_context_define(context, arg_name, value);
+            gel_context_define_value(context, arg_name, value);
     }
 
     if(is_variadic)
@@ -114,7 +114,7 @@ void gel_closure_marshal(GelClosure *self, GValue *return_value,
         }
 
         GValue *value = gel_value_new_from_boxed(GEL_TYPE_ARRAY, array);
-        gel_context_define(context, self->variadic_arg, value);
+        gel_context_define_value(context, self->variadic_arg, value);
     }
 
     guint code_n_values = gel_array_get_n_values(self->code);

@@ -67,7 +67,9 @@ void gel_context_free(GelContext *self);
 
 GValue* gel_context_lookup(const GelContext *self, const gchar *name);
 
-void gel_context_define(GelContext *self, const gchar *name, GValue *value);
+void gel_context_define(GelContext *self, const gchar *name, GType type, ...);
+void gel_context_define_value(GelContext *self,
+                              const gchar *name, GValue *value);
 void gel_context_define_object(GelContext *self, const gchar *name,
                                GObject *object);
 void gel_context_define_function(GelContext *self, const gchar *name,

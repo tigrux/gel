@@ -7,6 +7,8 @@
 #include <gelvariable.h>
 #include <gelclosure.h>
 
+#include <gobject/gvaluecollector.h>
+
 #ifndef GEL_CONTEXT_USE_POOL
 #define GEL_CONTEXT_USE_POOL 1
 #endif
@@ -444,16 +446,16 @@ void gel_context_define_variable(GelContext *self,
 
 
 /**
- * gel_context_define:
- * @self: #GelContext where to insert the symbol
- * @name: name of the symbol to insert
- * @value: value of the symbol to insert
+ * gel_context_define_value:
+ * @self: #GelContext where to define the symbol
+ * @name: name of the symbol to define
+ * @value: value of the symbol to define
  *
- * Inserts a new symbol to @self with the name given by @name.
+ * defines a new symbol with the name given by @name.
  * @self takes ownership of @value so it should not be freed or unset.
  */
-void gel_context_define(GelContext *self,
-                        const gchar *name, GValue *value)
+void gel_context_define_value(GelContext *self,
+                              const gchar *name, GValue *value)
 {
     g_return_if_fail(self != NULL);
     g_return_if_fail(name != NULL);
@@ -465,10 +467,43 @@ void gel_context_define(GelContext *self,
 
 
 /**
+ * gel_context_define:
+ * @self: #GelContext where to define the value
+ * @name: name of the symbol to define
+ * @type: the #GType of the value to define
+ * @...: the value of the first object, as a literal
+ *
+ * A wrapper for #gel_context_define that calls @marshal when
+ * @self evaluates a call to a function named @name.
+ */
+void gel_context_define(GelContext *self, const gchar *name, GType type, ...)
+{
+    va_list value_va;
+    va_start(value_va, type);
+
+    GValue *value = g_new0(GValue, 1);
+    gchar *error = NULL;
+
+    G_VALUE_COLLECT_INIT(value, type, value_va, 0, &error);
+
+    if(error == NULL)
+        gel_context_define_value(self, name, value);
+    else
+    {
+        g_warning("Error defining '%s': %s", name, error);
+        g_free(error);
+        g_free(value);
+    }
+
+    va_end(value_va);
+}
+
+
+/**
  * gel_context_define_object:
- * @self: #GelContext where to insert the object
- * @name: name of the symbol to insert
- * @object: object to insert
+ * @self: #GelContext where to define the object
+ * @name: name of the symbol to define
+ * @object: object to define
  *
  * A wrapper for #gel_context_define.
  * @self takes ownership of @object so it should not be freed or unset.
@@ -486,14 +521,14 @@ void gel_context_define_object(GelContext *self, const gchar *name,
         g_object_ref_sink(object);
 
     gel_value_take_object(value, object);
-    gel_context_define(self, name, value);
+    gel_context_define_value(self, name, value);
 }
 
 
 /**
  * gel_context_define_function:
- * @self: #GelContext where to insert the function
- * @name: name of the symbol to insert
+ * @self: #GelContext where to define the function
+ * @name: name of the symbol to define
  * @function: a #GelFunction to invoke
  * @user_data: extra data to pass to @function
  *
@@ -513,7 +548,7 @@ void gel_context_define_function(GelContext *self, const gchar *name,
     closure->data = user_data;
 
     gel_value_take_boxed(value, closure);
-    gel_context_define(self, name, value);
+    gel_context_define_value(self, name, value);
 }
 
 

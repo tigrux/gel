@@ -490,7 +490,7 @@ void def_(GClosure *self, GValue *return_value,
         if(gel_context_get_variable(context, name) != NULL)
             gel_error_symbol_exists(context, __FUNCTION__, name);
         else
-            gel_context_define(context, name, gel_value_dup(value));
+            gel_context_define_value(context, name, gel_value_dup(value));
     }
 
     gel_list_free(tmp_list);
@@ -520,7 +520,7 @@ void defn_(GClosure *self, GValue *return_value,
 
             GValue *value = gel_value_new_from_boxed(G_TYPE_CLOSURE, closure);
 
-            gel_context_define(context, name, value);
+            gel_context_define_value(context, name, value);
             gel_closure_close_over(closure);
         }
         else
@@ -625,7 +625,7 @@ void let_(GClosure *self, GValue *return_value,
                 if(gel_context_eval_params(let_context, __FUNCTION__,
                         &binding_n_values, &binding_values,
                         &tmp_list, "sV*", &name, &value))
-                    gel_context_define(let_context, name, gel_value_dup(value));
+                    gel_context_define_value(let_context, name, gel_value_dup(value));
                 else
                     failed = TRUE;
             }
@@ -1855,7 +1855,7 @@ void for_(GClosure *self, GValue *return_value,
 
         GelContext *loop_context = gel_context_new_with_outer(context);
         GValue *iter_value = gel_value_new();
-        gel_context_define(loop_context, iter_name, iter_value);
+        gel_context_define_value(loop_context, iter_name, iter_value);
 
         gboolean running = TRUE;
 
@@ -2019,7 +2019,7 @@ void require_(GClosure *self, GValue *return_value,
             if(ns != NULL)
             {
                 GValue *value = gel_value_new_from_boxed(GEL_TYPE_TYPELIB, ns);
-                gel_context_define(context, namespace_, value);
+                gel_context_define_value(context, namespace_, value);
             }    
         }
         else

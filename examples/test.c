@@ -62,11 +62,7 @@ int main(int argc, char *argv[])
     
     context = gel_context_new();
 
-    GValue *title_value = g_new0(GValue, 1);
-    g_value_init(title_value, G_TYPE_STRING);
-    g_value_set_static_string(title_value, "Hello Gtk from Gel");
-    
-    gel_context_define(context, "title", title_value);
+    gel_context_define(context, "title", G_TYPE_STRING, "Hello Gtk from Gel");
     gel_context_define_function(context, "make-label", make_label, NULL);
 
     gboolean running = TRUE;
@@ -121,7 +117,8 @@ int main(int argc, char *argv[])
             running = FALSE;
     }
 
-    g_free(text);
+    if(text != NULL)
+        g_free(text);
     gel_parser_free(parser);
     gel_context_free(context);
 

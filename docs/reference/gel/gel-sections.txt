@@ -9,6 +9,7 @@ gel_context_dup
 gel_context_free
 gel_context_lookup
 gel_context_define
+gel_context_define_value
 gel_context_define_object
 GelFunction
 gel_context_define_function
