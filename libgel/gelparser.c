@@ -446,7 +446,7 @@ GelArray* gel_parser_scan(GelParser *self, GValue *dest_value,
  *
  * Obtains the next #GValue parsed by the #GelParser
  *
- * Returns: #TRUE if a value was obtained, #FALSE otherwise
+ * Returns: #TRUE if a value was obtained, #FALSE if an error occured
  */
 gboolean gel_parser_next_value(GelParser *self, GValue *value, GError **error)
 {
@@ -455,9 +455,22 @@ gboolean gel_parser_next_value(GelParser *self, GValue *value, GError **error)
 
     if(GEL_IS_VALUE(value))
         g_value_unset(value);
-    gel_parser_scan(self, value, 0, 0, 0, error);
 
-    return GEL_IS_VALUE(value);
+    gboolean result = FALSE;
+    GError *parsed_error = NULL;
+
+    gel_parser_scan(self, value, 0, 0, 0, &parsed_error);
+
+    if(parsed_error != NULL)
+    {
+        g_propagate_error(error, parsed_error);
+        if(GEL_IS_VALUE(value))
+            g_value_unset(value);
+    }
+    else
+        result = GEL_IS_VALUE(value);
+
+    return result;
 }
 
 /**
