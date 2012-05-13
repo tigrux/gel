@@ -1,5 +1,6 @@
 SUBDIRS = \
 	libgel \
+	bin \
 	examples \
 	docs
 
