@@ -8,4 +8,4 @@ Description: GLib Extensible Language
 Requires: @PACKAGE_REQUIRES@
 Version: @PACKAGE_VERSION@
 Libs: -L@libdir@ -lgel
-Cflags: -I@includedir@/gel-0.1
+Cflags: -I@includedir@/gel-1.0

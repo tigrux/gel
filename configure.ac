@@ -35,7 +35,7 @@ AC_CONFIG_FILES([
 	bin/Makefile
 	libgel/Makefile
 	examples/Makefile
-	gel-0.1.pc
+	gel-1.0.pc
 	docs/Makefile
 	docs/reference/Makefile
 	docs/reference/gel/Makefile

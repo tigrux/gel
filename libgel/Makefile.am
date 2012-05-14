@@ -1,5 +1,5 @@
 lib_LTLIBRARIES = libgel.la
-lib_VERSION = 0:1:0
+lib_VERSION = 1:0:0
 
 libgel_la_CPPFLAGS = -Wall -Werror -ggdb
 
@@ -30,7 +30,7 @@ if HAVE_GOBJECT_INTROSPECTION
     libgel_la_SOURCES += geltypeinfo.c geltypelib.c
 endif
 
-libgel_includedir = $(includedir)/gel-0.1
+libgel_includedir = $(includedir)/gel-1.0
 libgel_include_HEADERS = \
 	gel.h \
 	gelcontext.h \
