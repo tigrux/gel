@@ -49,7 +49,6 @@ int main(int argc, char *argv[])
         {
             GValue result_value = {0};
 
-
             if(!interactive)
             {
                 gchar *value_repr = gel_value_repr(&value);
