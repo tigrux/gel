@@ -291,6 +291,7 @@ GelArray* gel_parser_scan(GelParser *self, GValue *dest_value,
             case ')':
             case ']':
             case '}':
+                g_scanner_get_next_token(scanner);
                 if((delim == '(' && token != ')') ||
                    (delim == '[' && token != ']') ||
                    (delim == '{' && token != '}'))
@@ -313,10 +314,7 @@ GelArray* gel_parser_scan(GelParser *self, GValue *dest_value,
                     failed = TRUE;
                 }
                 else
-                {
-                    g_scanner_get_next_token(scanner);
                     parsing = FALSE;
-                }
                 break;
             case G_TOKEN_EOF:
                 if(line != 0)
