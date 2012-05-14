@@ -47,7 +47,7 @@ struct _GelArrayIter
 };
 
 
-void gel_array_iterator(GelArray *self, GelArrayIter *iter);
+void gel_array_iter_init(GelArrayIter *iter, GelArray *array);
 GValue* gel_array_iter_next_value(GelArrayIter *iter);
 
 #endif

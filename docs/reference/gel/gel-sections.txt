@@ -53,8 +53,8 @@ gel_array_get_values
 gel_array_remove
 gel_array_set_n_values
 gel_array_sort
-gel_array_iterator
 GelArrayIter
+gel_array_iter_init
 gel_array_iter_next_value
 </SECTION>
 

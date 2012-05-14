@@ -181,18 +181,18 @@ GelArray* gel_array_sort(GelArray *self, GCompareFunc compare_func)
  */
 
 /**
- * gel_array_iterator:
- * @self: a #GelArray to associate to an #GelArrayIter
+ * gel_array_iter_init:
  * @iter: a #GelArrayIter to initialize
+ * @array: a #GelArray to associate to an #GelArrayIter
  *
- * Initializes the #GelArrayIter @iter and associates it with @self
+ * Initializes the #GelArrayIter @iter and associates it with @array
  */
-void gel_array_iterator(GelArray *self, GelArrayIter *iter)
+void gel_array_iter_init(GelArrayIter *iter, GelArray *array)
 {
-    g_return_if_fail(self != NULL);
     g_return_if_fail(iter != NULL);
+    g_return_if_fail(array != NULL);
 
-    iter->array = self;
+    iter->array = array;
     iter->index = 0;
 }
 

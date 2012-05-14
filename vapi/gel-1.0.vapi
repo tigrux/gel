@@ -11,6 +11,7 @@ namespace Gel {
 
     public struct ArrayIter
     {
+        public void init(Array array);
         public unowned GLib.Value? next_value();
     }
 
@@ -24,7 +25,11 @@ namespace Gel {
         public unowned Array append(GLib.Value value);
         public unowned Array remove(uint index);
         public unowned Array sort(GLib.CompareFunc compare_func);
-        public ArrayIter iterator();
+        public ArrayIter iterator() {
+            ArrayIter iter;
+            iter.init(this);
+            return iter;
+        }
     }
 
     public errordomain ParserError {
