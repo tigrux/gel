@@ -648,6 +648,13 @@ void let_(GClosure *self, GValue *return_value,
 
 
 static
+void macro_(GClosure *self, GValue *return_value,
+            guint n_values, const GValue *values, GelContext *context)
+{
+}
+
+
+static
 void eval_(GClosure *self, GValue *return_value,
            guint n_values, const GValue *values, GelContext *context)
 {
@@ -2164,6 +2171,7 @@ GHashTable* gel_make_default_symbols(void)
         CLOSURE(fn),
         CLOSURE(do),
         CLOSURE(let),
+        CLOSURE(macro),
         CLOSURE(eval),
         CLOSURE(quote),
 

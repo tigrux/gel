@@ -192,7 +192,7 @@ GelArray* gel_parser_macro_code_from_value(GelParser *self,
             g_hash_table_insert(self->macros,
                 g_strdup(name), gel_macro_new(args, variadic, code));
 
-            return gel_array_new(0);
+            return NULL;
         }
         else
         {
