@@ -5,10 +5,12 @@ int main(int argc, char *argv[])
 {
     const gchar *filename = NULL;
     gboolean interactive = FALSE;
+    gboolean active = FALSE;
     gchar *text = NULL;
 
     g_type_init();
     GelParser *parser = gel_parser_new();
+    GelContext *context = gel_context_new();
 
     if(argc > 1)
     {
@@ -17,28 +19,27 @@ int main(int argc, char *argv[])
 
         filename = argv[1];
         if(g_file_get_contents(filename, &text, &text_len, &read_error))
+        {
             gel_parser_input_text(parser, text, text_len);
+            active = TRUE;
+        }
         else
         {
             g_print("Error reading '%s'\n", filename);
             g_print("%s\n", read_error->message);
             g_error_free(read_error);
-            gel_parser_free(parser);
-            return 1;
         }
     }
     else
     {
         g_print("Entering Gel in interactive mode\n");
+        gel_parser_input_file(parser, fileno(stdin));
         filename = "<stdin>";
         interactive = TRUE;
-        gel_parser_input_file(parser, fileno(stdin));
+        active = TRUE;
     }
-    
-    GelContext *context = gel_context_new();
 
-    gboolean running = TRUE;
-    while(running)
+    while(active)
     {
         if(interactive)
             g_print("gel> ");
@@ -47,8 +48,6 @@ int main(int argc, char *argv[])
         GError *parse_error = NULL;
         if(gel_parser_next_value(parser, &value, &parse_error))
         {
-            GValue result_value = {0};
-
             if(!interactive)
             {
                 gchar *value_repr = gel_value_repr(&value);
@@ -56,6 +55,7 @@ int main(int argc, char *argv[])
                 g_free(value_repr);
             }
 
+            GValue result_value = {0};
             GError *context_error = NULL;
             if(gel_context_eval(context, &value, &result_value, &context_error))
             {
@@ -71,7 +71,7 @@ int main(int argc, char *argv[])
                     g_print("%s\n", context_error->message);
                     g_error_free(context_error);
                     if(!interactive)
-                        running = FALSE;
+                        active = FALSE;
                 }
 
             g_value_unset(&value);
@@ -83,10 +83,10 @@ int main(int argc, char *argv[])
                 g_print("%s\n", parse_error->message);
                 g_error_free(parse_error);
                 if(!interactive)
-                    running = FALSE;
+                    active = FALSE;
             }
             else
-                running = FALSE;
+                active = FALSE;
     }
 
     if(text != NULL)

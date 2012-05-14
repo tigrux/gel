@@ -20,7 +20,6 @@ void make_label(GClosure *closure, GValue *return_value,
     g_value_take_object(return_value, label);
 }
 
-
 int main(int argc, char *argv[])
 {
     g_type_init();
