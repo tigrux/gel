@@ -4,8 +4,8 @@ libdir=@libdir@
 includedir=@includedir@
 
 Name: gel
-Description: glib-embedded-language
-Requires: gobject-2.0 gobject-introspection-1.0
+Description: glib-extensible-language
+Requires: gobject-2.0
 Version: @PACKAGE_VERSION@
 Libs: -L@libdir@ -lgel
 Cflags: -I@includedir@/gel-0.1
