@@ -1,6 +1,7 @@
 SUBDIRS = \
 	libgel \
 	bin \
+	vapi \
 	examples \
 	docs
 

@@ -34,6 +34,7 @@ AC_CONFIG_FILES([
 	Makefile
 	bin/Makefile
 	libgel/Makefile
+	vapi/Makefile
 	examples/Makefile
 	gel-1.0.pc
 	docs/Makefile
