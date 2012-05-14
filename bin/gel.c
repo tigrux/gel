@@ -14,10 +14,9 @@ int main(int argc, char *argv[])
 
     if(argc > 1)
     {
+        filename = argv[1];
         gsize text_len = 0;
         GError *read_error = NULL;
-
-        filename = argv[1];
         if(g_file_get_contents(filename, &text, &text_len, &read_error))
         {
             gel_parser_input_text(parser, text, text_len);
