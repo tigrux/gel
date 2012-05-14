@@ -5,7 +5,7 @@ GEL_CONTEXT_ERROR
 GelContext
 gel_context_new
 gel_context_new_with_outer
-gel_context_dup
+gel_context_copy
 gel_context_free
 gel_context_lookup
 gel_context_define
@@ -53,6 +53,9 @@ gel_array_get_values
 gel_array_remove
 gel_array_set_n_values
 gel_array_sort
+gel_array_iterator
+GelArrayIter
+gel_array_iter_next_value
 </SECTION>
 
 <SECTION>

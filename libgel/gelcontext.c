@@ -126,14 +126,14 @@ GelContext* gel_context_validate(GelContext *context)
 
 
 /**
- * gel_context_dup:
- * @self: #GelContext to duplicate
+ * gel_context_copy:
+ * @self: #GelContext to copy
  *
- * Constructs a duplicate of @self
+ * Constructs a copy of @self
  *
- * Returns: a #GelContext that is a duplicate of @self
+ * Returns: a #GelContext that is a copy of @self
  */
-GelContext* gel_context_dup(const GelContext *self)
+GelContext* gel_context_copy(const GelContext *self)
 {
     g_return_val_if_fail(self != NULL, NULL);
 

@@ -39,5 +39,16 @@ typedef GValueArray GelArray;
 
 #endif
 
+typedef struct _GelArrayIter GelArrayIter;
+struct _GelArrayIter
+{
+    GelArray *array;
+    guint index;
+};
+
+
+void gel_array_iterator(GelArray *self, GelArrayIter *iter);
+GValue* gel_array_iter_next_value(GelArrayIter *iter);
+
 #endif
 

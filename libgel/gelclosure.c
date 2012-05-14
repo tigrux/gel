@@ -247,7 +247,7 @@ GClosure* gel_closure_new(const gchar *name, GList *args, gchar *variadic,
     if(variadic != NULL)
         g_hash_table_insert(args_hash, (void *)variadic, (void *)variadic);
 
-    GelContext *closure_context = gel_context_dup(context);
+    GelContext *closure_context = gel_context_copy(context);
     gel_context_set_outer(closure_context, context);
 
     GelArray *code = gel_array_new(n_values);

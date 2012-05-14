@@ -9,6 +9,11 @@ namespace Gel {
         GLib.Value[] param_values,
         Gel.Context? invocation_context);
 
+    public struct ArrayIter
+    {
+        public unowned GLib.Value? next_value();
+    }
+
     [Compact]
     public class Array {
         public Array(uint n_prealloced);
@@ -19,6 +24,7 @@ namespace Gel {
         public unowned Array append(GLib.Value value);
         public unowned Array remove(uint index);
         public unowned Array sort(GLib.CompareFunc compare_func);
+        public ArrayIter iterator();
     }
 
     public errordomain ParserError {

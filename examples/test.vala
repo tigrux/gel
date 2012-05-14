@@ -55,8 +55,8 @@ int main(string[] args) {
     context.define("title", typeof(string), "Hello Gtk from Gel");
 
     // for each value obtained during the parsing:
-    for(uint i = 0; i < array.get_n_values(); i++) {
-        unowned Value iter_value = array.get_values()[i];
+    foreach(unowned Value? iter_value in array) {
+        //unowned Value iter_value = array.get_values()[i];
         // print a representation of the value to be evaluated
         print("\n%s ?\n", Gel.Value.repr(iter_value));
 

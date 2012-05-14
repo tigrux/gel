@@ -171,5 +171,54 @@ GelArray* gel_array_sort(GelArray *self, GCompareFunc compare_func)
 }
 
 
+/**
+ * GelArrayIter:
+ * @array: a #GelArray to iterate
+ * @index: the current index
+ * 
+ * A #GelArrayIter represents an iterator that can be used to iterate over the elements of a #GelArray.
+   #GelArrayIter structures are typically allocated on the stack and then initialized with #gel_array_iterator.
+ */
+
+/**
+ * gel_array_iterator:
+ * @self: a #GelArray to associate to an #GelArrayIter
+ * @iter: a #GelArrayIter to initialize
+ *
+ * Initializes the #GelArrayIter @iter and associates it with @self
+ */
+void gel_array_iterator(GelArray *self, GelArrayIter *iter)
+{
+    g_return_if_fail(self != NULL);
+    g_return_if_fail(iter != NULL);
+
+    iter->array = self;
+    iter->index = 0;
+}
+
+
+/**
+ * gel_array_iter_next_value:
+ * @iter: an associated #GelArrayIter
+ *
+ * Retrieves the #GValue associated to the current index and advances.
+ *
+ * Returns: the next #GValue of the array associated to @iter
+ */
+GValue* gel_array_iter_next_value(GelArrayIter *iter)
+{
+    g_return_val_if_fail(iter != NULL, NULL);
+
+    GValue *result = NULL;
+
+    if(iter->index < gel_array_get_n_values(iter->array))
+    {
+        result =  gel_array_get_values(iter->array) + iter->index;
+        iter->index++;
+    }
+
+    return result;
+}
+
 #endif
 

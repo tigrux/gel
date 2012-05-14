@@ -62,7 +62,7 @@ typedef void (*GelFunction)(GClosure *closure, GValue *return_value,
 
 GelContext* gel_context_new(void);
 GelContext* gel_context_new_with_outer(GelContext *outer);
-GelContext* gel_context_dup(const GelContext *self);
+GelContext* gel_context_copy(const GelContext *self);
 void gel_context_free(GelContext *self);
 
 GValue* gel_context_lookup(const GelContext *self, const gchar *name);
