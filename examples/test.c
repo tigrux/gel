@@ -23,15 +23,6 @@ void make_label(GClosure *closure, GValue *return_value,
 
 int main(int argc, char *argv[])
 {
-    int status = 1;
-    const gchar *filename = argv[1];
-    gchar *text = NULL;
-    gsize text_len = 0;
-    GError *error = NULL;
-    GelParser *parser = NULL;
-    GelArray *array = NULL;
-    GelContext *context = NULL;
-
     g_type_init();
 
     if(argc < 2)
@@ -40,44 +31,46 @@ int main(int argc, char *argv[])
         return 1;
     }
 
-    if(g_file_get_contents(filename, &text, &text_len, &error))
-    {
-        parser = gel_parser_new();
-        gel_parser_input_text(parser, text, text_len);
-    }
-    else
-        if(error != NULL)
-        {
-            g_print("Error reading '%s'\n", filename);
-            g_print("%s\n", error->message);
-            goto free_and_exit;
-        }
+    gchar *text = NULL;
+    gsize text_len = 0;
+    GError *error = NULL;
+    g_file_get_contents(argv[1], &text, &text_len, &error);
 
-    array = gel_parser_get_values(parser, &error);
     if(error != NULL)
     {
-        g_print("Error parsing '%s'\n", filename);
+        g_print("Error reading '%s'\n", argv[1]);
         g_print("%s\n", error->message);
-        goto free_and_exit;
+        g_error_free(error);
+        return 1;
     }
 
-    context = gel_context_new();
-    /* These values are defined just as a demonstration */
+    GelParser *parser = gel_parser_new();
+    gel_parser_input_text(parser, text, text_len);
+    GelArray *array = gel_parser_get_values(parser, &error);
+
+    if(error != NULL)
+    {
+        g_print("Error parsing '%s'\n", argv[1]);
+        g_print("%s\n", error->message);
+        g_error_free(error);
+        g_free(text);
+        gel_parser_free(parser);
+        return 1;
+    }
+
+    GelContext *context = gel_context_new();
     gel_context_define(context, "title", G_TYPE_STRING, "Hello Gtk from Gel");
     gel_context_define_function(context, "make-label", make_label, NULL);
 
-    const guint n_values = gel_array_get_n_values(array);
-    const GValue *values = gel_array_get_values(array);
-
-    for(guint i = 0; i < n_values; i++)
+    for(guint i = 0; i < gel_array_get_n_values(array); i++)
     {
-        const GValue *value = values + i;
-        GValue result_value = {0};
+        GValue *value = gel_array_get_values(array) + i;
 
         gchar *value_repr = gel_value_repr(value);
         g_print("\n%s ?\n", value_repr);
         g_free(value_repr);
 
+        GValue result_value = {0};
         if(gel_context_eval(context, value, &result_value, &error))
         {
             gchar *value_string = gel_value_to_string(&result_value);
@@ -88,25 +81,21 @@ int main(int argc, char *argv[])
         else
             if(error != NULL)
             {
-                g_print("Error evaluating '%s'\n", filename);
+                g_print("Error evaluating '%s'\n", argv[1]);
                 g_print("%s\n", error->message);
-                goto free_and_exit;
+                g_error_free(error);
+                g_free(text);
+                gel_parser_free(parser);
+                gel_array_free(array);
+                gel_context_free(context);
+                return 1;
             }
     }
-    status = 0;
 
-    free_and_exit:
-    if(text != NULL)
-        g_free(text);
-    if(error != NULL)
-        g_error_free(error);
-    if(array != NULL)
-        gel_array_free(array);
-    if(parser != NULL)
-        gel_parser_free(parser);
-    if(context != NULL)
-        gel_context_free(context);
-
-    return status;
+    g_free(text);
+    gel_parser_free(parser);
+    gel_array_free(array);
+    gel_context_free(context);
+    return 0;
 }
 
