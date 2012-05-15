@@ -15,16 +15,14 @@ void make_label(GLib.Closure closure, out GLib.Value return_value)
 
 
 int main(string[] args) {
-    if(args.length != 2) {
+    if(args.length < 2) {
         printerr("%s requires an argument\n", args[0]);
         return 1;
     }
 
     string content;
     size_t content_len;
-
-    try
-    {
+    try {
         GLib.FileUtils.get_contents(args[1], out content, out content_len);
     }
     catch(FileError error) {
