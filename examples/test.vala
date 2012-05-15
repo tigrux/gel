@@ -36,9 +36,9 @@ int main(string[] args) {
     Gel.Parser parser = new Gel.Parser();
     parser.input_text(content, content_len);
 
-    Gel.Array array;
+    Gel.Array parsed_array;
     try {
-        array = parser.get_values();
+        parsed_array = parser.get_values();
     }
     catch(Gel.ParserError error) {
         print("Error parsing '%s'\n", args[1]);
@@ -47,14 +47,14 @@ int main(string[] args) {
     }
 
     Gel.Context context = new Gel.Context();
-    context.define_function("make-label", make_label);
     context.define("title", typeof(string), "Hello Gtk from Gel");
+    context.define_function("make-label", make_label);
 
-    foreach(Value value in array) {
-        print("\n%s ?\n", Gel.Value.repr(value));
+    foreach(Value parsed_value in parsed_array) {
+        print("\n%s ?\n", Gel.Value.repr(parsed_value));
         try {
             GLib.Value result_value;
-            if(context.eval(value, out result_value))
+            if(context.eval(parsed_value, out result_value))
                 print("= %s\n", Gel.Value.to_string(result_value));
         }
         catch(Gel.ContextError error) {

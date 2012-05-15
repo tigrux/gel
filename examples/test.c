@@ -15,9 +15,8 @@ void make_label(GClosure *closure, GValue *return_value,
                 GelContext *invocation_context, gpointer user_data)
 {
     GType label_t = g_type_from_name("GtkLabel");
-    g_value_init(return_value, label_t);
-
     GObject *label = g_object_new(label_t, "label", "Label made in C", NULL);
+    g_value_init(return_value, label_t);
     g_value_take_object(return_value, label);
 }
 
@@ -45,7 +44,8 @@ int main(int argc, char *argv[])
 
     GelParser *parser = gel_parser_new();
     gel_parser_input_text(parser, text, text_len);
-    GelArray *array = gel_parser_get_values(parser, &error);
+
+    GelArray *parsed_array = gel_parser_get_values(parser, &error);
     if(error != NULL)
     {
         g_print("Error parsing '%s'\n", argv[1]);
@@ -60,18 +60,18 @@ int main(int argc, char *argv[])
     gel_context_define(context, "title", G_TYPE_STRING, "Hello Gtk from Gel");
     gel_context_define_function(context, "make-label", make_label, NULL);
 
-    GelArrayIter iter = {0};
-    gel_array_iterator(array, &iter);
-    while(gel_array_iter_next(&iter))
+    GelArrayIter parsed_iter = {0};
+    gel_array_iterator(parsed_array, &parsed_iter);
+    while(gel_array_iter_next(&parsed_iter))
     {
-        GValue *value = gel_array_iter_get(&iter);
+        GValue *parsed_value = gel_array_iter_get(&parsed_iter);
 
-        gchar *value_repr = gel_value_repr(value);
+        gchar *value_repr = gel_value_repr(parsed_value);
         g_print("\n%s ?\n", value_repr);
         g_free(value_repr);
 
         GValue result_value = {0};
-        if(gel_context_eval(context, value, &result_value, &error))
+        if(gel_context_eval(context, parsed_value, &result_value, &error))
         {
             gchar *value_string = gel_value_to_string(&result_value);
             g_print("= %s\n", value_string);
@@ -86,7 +86,7 @@ int main(int argc, char *argv[])
                 g_error_free(error);
                 g_free(text);
                 gel_parser_free(parser);
-                gel_array_free(array);
+                gel_array_free(parsed_array);
                 gel_context_free(context);
                 return 1;
             }
@@ -94,7 +94,7 @@ int main(int argc, char *argv[])
 
     g_free(text);
     gel_parser_free(parser);
-    gel_array_free(array);
+    gel_array_free(parsed_array);
     gel_context_free(context);
     return 0;
 }
