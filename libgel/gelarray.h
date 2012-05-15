@@ -44,11 +44,12 @@ struct _GelArrayIter
 {
     GelArray *array;
     guint index;
+    GValue *value;
 };
 
-
-void gel_array_iter_init(GelArrayIter *iter, GelArray *array);
-GValue* gel_array_iter_next_value(GelArrayIter *iter);
+void gel_array_iterator(GelArray *self, GelArrayIter *iter);
+gboolean gel_array_iter_next(GelArrayIter *iter);
+GValue* gel_array_iter_get(GelArrayIter *iter);
 
 #endif
 

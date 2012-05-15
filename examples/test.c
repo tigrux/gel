@@ -8,6 +8,7 @@
 #include <stdio.h>
 #include <gel.h>
 
+
 /* this function will be made available to the script */
 void make_label(GClosure *closure, GValue *return_value,
                 guint n_param_values, GValue *param_values,
@@ -20,10 +21,10 @@ void make_label(GClosure *closure, GValue *return_value,
     g_value_take_object(return_value, label);
 }
 
+
 int main(int argc, char *argv[])
 {
     g_type_init();
-
     if(argc < 2)
     {
         g_print("%s: requires an argument\n", argv[0]);
@@ -34,7 +35,6 @@ int main(int argc, char *argv[])
     gsize text_len = 0;
     GError *error = NULL;
     g_file_get_contents(argv[1], &text, &text_len, &error);
-
     if(error != NULL)
     {
         g_print("Error reading '%s'\n", argv[1]);
@@ -46,7 +46,6 @@ int main(int argc, char *argv[])
     GelParser *parser = gel_parser_new();
     gel_parser_input_text(parser, text, text_len);
     GelArray *array = gel_parser_get_values(parser, &error);
-
     if(error != NULL)
     {
         g_print("Error parsing '%s'\n", argv[1]);
@@ -61,9 +60,11 @@ int main(int argc, char *argv[])
     gel_context_define(context, "title", G_TYPE_STRING, "Hello Gtk from Gel");
     gel_context_define_function(context, "make-label", make_label, NULL);
 
-    for(guint i = 0; i < gel_array_get_n_values(array); i++)
+    GelArrayIter iter = {0};
+    gel_array_iterator(array, &iter);
+    while(gel_array_iter_next(&iter))
     {
-        GValue *value = gel_array_get_values(array) + i;
+        GValue *value = gel_array_iter_get(&iter);
 
         gchar *value_repr = gel_value_repr(value);
         g_print("\n%s ?\n", value_repr);

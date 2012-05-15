@@ -170,55 +170,73 @@ GelArray* gel_array_sort(GelArray *self, GCompareFunc compare_func)
     return self;
 }
 
+#endif
 
 /**
  * GelArrayIter:
  * @array: a #GelArray to iterate
  * @index: the current index
+ * @value: the #GValue at the current position
  * 
  * A #GelArrayIter represents an iterator that can be used to iterate over the elements of a #GelArray.
    #GelArrayIter structures are typically allocated on the stack and then initialized with #gel_array_iterator.
  */
 
 /**
- * gel_array_iter_init:
+ * gel_array_iterator:
+ * @self: a #GelArray to associate to an #GelArrayIter
  * @iter: a #GelArrayIter to initialize
- * @array: a #GelArray to associate to an #GelArrayIter
  *
- * Initializes the #GelArrayIter @iter and associates it with @array
+ * Initializes the #GelArrayIter @iter and associates it to @self
  */
-void gel_array_iter_init(GelArrayIter *iter, GelArray *array)
+void gel_array_iterator(GelArray *self, GelArrayIter *iter)
 {
+    g_return_if_fail(self != NULL);
     g_return_if_fail(iter != NULL);
-    g_return_if_fail(array != NULL);
 
-    iter->array = array;
+    iter->array = self;
     iter->index = 0;
+    iter->value = NULL;
 }
 
 
 /**
- * gel_array_iter_next_value:
- * @iter: an associated #GelArrayIter
+ * gel_array_iter_next:
+ * @iter: a #GelArrayIter to advance
  *
- * Retrieves the #GValue associated to the current index and advances.
+ * Advances @iter to the next position in the associated array
  *
- * Returns: the next #GValue of the array associated to @iter
+ * Returns: #TRUE if there is a next position available, #FALSE otherwise
  */
-GValue* gel_array_iter_next_value(GelArrayIter *iter)
+gboolean gel_array_iter_next(GelArrayIter *iter)
 {
-    g_return_val_if_fail(iter != NULL, NULL);
-
-    GValue *result = NULL;
+    g_return_val_if_fail(iter != NULL, FALSE);
 
     if(iter->index < gel_array_get_n_values(iter->array))
     {
-        result =  gel_array_get_values(iter->array) + iter->index;
+        iter->value = gel_array_get_values(iter->array) + iter->index;
         iter->index++;
     }
+    else
+        iter->value = NULL;
 
-    return result;
+    return iter->value != NULL;
 }
 
-#endif
+
+/**
+ * gel_array_iter_get:
+ * @iter: a #GelArrayIter to get a #GValue
+ *
+ * Retrieves the #GValue in the current position of @iter
+ *
+ * Returns: a #GValue if the iter has not reached the end, #NULL otherwise
+ */
+GValue* gel_array_iter_get(GelArrayIter *iter)
+{
+    g_return_val_if_fail(iter != NULL, FALSE);
+    g_return_val_if_fail(iter->value != NULL, FALSE);
+
+    return iter->value;
+}
 

@@ -11,8 +11,13 @@ namespace Gel {
 
     public struct ArrayIter
     {
+        public unowned Array array;
+        public uint index;
+        public unowned GLib.Value? value;
+
         public void init(Array array);
-        public unowned GLib.Value? next_value();
+        public bool next();
+        public unowned GLib.Value? get();
     }
 
     [Compact]
@@ -25,11 +30,7 @@ namespace Gel {
         public unowned Array append(GLib.Value value);
         public unowned Array remove(uint index);
         public unowned Array sort(GLib.CompareFunc compare_func);
-        public ArrayIter iterator() {
-            ArrayIter iter;
-            iter.init(this);
-            return iter;
-        }
+        public ArrayIter iterator();
     }
 
     public errordomain ParserError {
@@ -86,10 +87,9 @@ namespace Gel {
 
     namespace Value {
         bool copy(GLib.Value src_value, out GLib.Value dest_value);
-        string repr(GLib.Value? value);
-        string to_string(GLib.Value? value);
-        bool to_boolean(GLib.Value? value);
-
+        string repr(GLib.Value value);
+        string to_string(GLib.Value value);
+        bool to_boolean(GLib.Value value);
     }
 
     namespace Values {

@@ -54,8 +54,9 @@ gel_array_remove
 gel_array_set_n_values
 gel_array_sort
 GelArrayIter
-gel_array_iter_init
-gel_array_iter_next_value
+gel_array_iterator
+gel_array_iter_next
+gel_array_iter_get
 </SECTION>
 
 <SECTION>
