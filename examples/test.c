@@ -30,13 +30,14 @@ int main(int argc, char *argv[])
         return 1;
     }
 
+    gchar *filename = argv[1];
     gchar *text = NULL;
     gsize text_len = 0;
     GError *error = NULL;
-    g_file_get_contents(argv[1], &text, &text_len, &error);
+    g_file_get_contents(filename, &text, &text_len, &error);
     if(error != NULL)
     {
-        g_print("Error reading '%s'\n", argv[1]);
+        g_print("Error reading '%s'\n", filename);
         g_print("%s\n", error->message);
         g_error_free(error);
         return 1;
@@ -48,7 +49,7 @@ int main(int argc, char *argv[])
     GelArray *parsed_array = gel_parser_get_values(parser, &error);
     if(error != NULL)
     {
-        g_print("Error parsing '%s'\n", argv[1]);
+        g_print("Error parsing '%s'\n", filename);
         g_print("%s\n", error->message);
         g_error_free(error);
         g_free(text);
@@ -70,18 +71,18 @@ int main(int argc, char *argv[])
         g_print("\n%s ?\n", value_repr);
         g_free(value_repr);
 
-        GValue result_value = {0};
-        if(gel_context_eval(context, parsed_value, &result_value, &error))
+        GValue evaluated_value = {0};
+        if(gel_context_eval(context, parsed_value, &evaluated_value, &error))
         {
-            gchar *value_string = gel_value_to_string(&result_value);
-            g_print("= %s\n", value_string);
-            g_free(value_string);
-            g_value_unset(&result_value);
+            gchar *evaluated_string = gel_value_to_string(&evaluated_value);
+            g_print("= %s\n", evaluated_string);
+            g_free(evaluated_string);
+            g_value_unset(&evaluated_value);
         }
         else
             if(error != NULL)
             {
-                g_print("Error evaluating '%s'\n", argv[1]);
+                g_print("Error evaluating '%s'\n", filename);
                 g_print("%s\n", error->message);
                 g_error_free(error);
                 g_free(text);
