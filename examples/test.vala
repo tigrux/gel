@@ -36,6 +36,7 @@ int main(string[] args) {
 
         foreach(Value parsed_value in parser) {
             print("\n%s ?\n", Gel.Value.repr(parsed_value));
+
             Value evaluated_value;
             if(context.eval(parsed_value, out evaluated_value))
                 print("= %s\n", Gel.Value.to_string(evaluated_value));
