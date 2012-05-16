@@ -4,7 +4,7 @@
 
 ((. Gst init) [])
 
-(def sample "/usr/share/checkbox/data/audio/Ogg_Vorbis_Audio.oga")
+(def sample "/usr/share/sounds/ubuntu/stereo/desktop-login.ogg")
 
 (def player ((. Gst ElementFactory make) "playbin2" "player"))
 (set player "uri" (+ "file://" sample))
