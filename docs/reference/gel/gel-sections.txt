@@ -30,6 +30,11 @@ gel_parser_input_text
 gel_parser_input_file
 gel_parser_next_value
 gel_parser_get_values
+GelParserIter
+gel_parser_iterator
+gel_parser_iter_destroy
+gel_parser_iter_get
+gel_parser_iter_next
 </SECTION>
 
 <SECTION>

@@ -1,13 +1,13 @@
 /*
     An example interpreter that uses the API provided by Gel (libgel).
     The goal is to show how simple is to use libgel
-    to provide scripting to any program based on glib.
+    to provide scripting to any program based on 
     It's still work in progress.
 */
 
 
 /* this function will be made available to the script */
-void make_label(GLib.Closure closure, out GLib.Value return_value)
+void make_label(Closure closure, out Value return_value)
 {
     Type label_t = Type.from_name("GtkLabel");
     return_value = Object.new(label_t, "label", "Label made in Vala");
@@ -15,53 +15,48 @@ void make_label(GLib.Closure closure, out GLib.Value return_value)
 
 
 int main(string[] args) {
+    string program = args[0];
+    string filename = args[1];
+
     if(args.length < 2) {
-        printerr("%s requires an argument\n", args[0]);
+        printerr("%s requires an argument\n", program);
         return 1;
     }
 
-    string content;
-    size_t content_len;
     try {
-        GLib.FileUtils.get_contents(args[1], out content, out content_len);
+        string content;
+        size_t content_len;
+        FileUtils.get_contents(filename, out content, out content_len);
+
+        Gel.Parser parser = new Gel.Parser();
+        parser.input_text(content, content_len);
+
+        Gel.Context context = new Gel.Context();
+        context.define("title", typeof(string), "Hello Gtk from Gel");
+        context.define_function("make-label", make_label);
+
+        foreach(Value parsed_value in parser) {
+            print("\n%s ?\n", Gel.Value.repr(parsed_value));
+            Value evaluated_value;
+            if(context.eval(parsed_value, out evaluated_value))
+                print("= %s\n", Gel.Value.to_string(evaluated_value));
+        }
     }
     catch(FileError error) {
-        print("Error reading '%s'\n", args[1]);
+        print("Error reading '%s'\n", filename);
         print("%s\n", error.message);
         return 1;
-    }
-
-    Gel.Parser parser = new Gel.Parser();
-    parser.input_text(content, content_len);
-
-    Gel.Array parsed_array;
-    try {
-        parsed_array = parser.get_values();
     }
     catch(Gel.ParserError error) {
-        print("Error parsing '%s'\n", args[1]);
+        print("Error parsing '%s'\n", filename);
         print("%s\n", error.message);
         return 1;
     }
-
-    Gel.Context context = new Gel.Context();
-    context.define("title", typeof(string), "Hello Gtk from Gel");
-    context.define_function("make-label", make_label);
-
-    foreach(Value parsed_value in parsed_array) {
-        print("\n%s ?\n", Gel.Value.repr(parsed_value));
-        try {
-            GLib.Value result_value;
-            if(context.eval(parsed_value, out result_value))
-                print("= %s\n", Gel.Value.to_string(result_value));
-        }
-        catch(Gel.ContextError error) {
-            print("Error evaluating '%s'\n", args[1]);
-            print("%s\n", error.message);
-            return 1;
-        }
+    catch(Gel.ContextError error) {
+        print("Error evaluating '%s'\n", filename);
+        print("%s\n", error.message);
+        return 1;
     }
-
     return 0;
 }
 

@@ -11,11 +11,10 @@ namespace Gel {
 
     public struct ArrayIter
     {
-        public unowned Array array;
-        public uint index;
         public unowned GLib.Value? value;
+        public uint index;
+        public unowned Array array;
 
-        public void init(Array array);
         public bool next();
         public unowned GLib.Value? get();
     }
@@ -50,12 +49,22 @@ namespace Gel {
     }
 
     [Compact]
+    public struct ParserIter {
+        GLib.Value value;
+        public unowned Parser parser;
+
+        public bool next() throws ParserError;
+        public unowned GLib.Value? get();
+    }
+
+    [Compact]
     public class Parser {
         public Parser();
         public void input_text(string text, size_t text_len);
         public void input_file(int fd);
         public bool next_value(out GLib.Value value) throws ParserError;
         public Gel.Array get_values() throws ParserError;
+        public ParserIter iterator();
     }
 
     public errordomain ContextError {

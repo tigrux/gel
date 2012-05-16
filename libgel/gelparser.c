@@ -544,3 +544,83 @@ void gel_parser_input_file(GelParser *self, gint fd)
     g_scanner_input_file(self->scanner, fd);
 }
 
+
+/**
+ * GelParserIter:
+ * @value: the #GValue of the last parsing
+ * @parser: a #GelParser to use as iterable
+ * 
+ * a #GelParserIter represents an iterator that can be used to get elements
+ * from a parser, once at a time.
+ */
+
+/**
+ * gel_parser_iterator:
+ * @self: a #GelParser to associate to a #GelParserIter
+ * @iter: a #GelParserIter to initialize
+ *
+ * Initializes the #GelParserIter @iter and associates it to @self
+ */
+void gel_parser_iterator(GelParser *self, GelParserIter *iter)
+{
+    g_return_if_fail(self != NULL);
+    g_return_if_fail(iter != NULL);
+
+    memset(iter, 0, sizeof(*iter));
+    iter->parser = self;
+}
+
+
+/**
+ * gel_parser_iter_destroy:
+ * @iter: a #GelParserIter to release its resources
+ *
+ * Releases resources associated to @iter
+ *
+ */
+void gel_parser_iter_destroy(GelParserIter *iter)
+{
+    g_return_if_fail(iter != NULL);
+
+    if(GEL_IS_VALUE(&iter->value))
+        g_value_unset(&iter->value);
+}
+
+
+/**
+ * gel_parser_iter_next:
+ * @iter: a #GelParserIter
+ * @error: return location for a #GError, or NULL
+ *
+ * Retrieves a parsed value from the associated parser.
+ * If the parsing fails, @error will point to a #GelParserError
+ *
+ * Returns: #TRUE if the parsed succeded, #FALSE otherwise.
+ */
+gboolean gel_parser_iter_next(GelParserIter *iter, GError **error)
+{
+    g_return_val_if_fail(iter != NULL, FALSE);
+
+    gel_parser_iter_destroy(iter);
+    return gel_parser_next_value(iter->parser, &iter->value, error);
+}
+
+
+/**
+ * gel_parser_iter_get:
+ * @iter: a #GelParserIter
+ *
+ * Retrieves the value stored from the previous parsing.
+ *
+ * Returns: a #GValue or #NULL if no value is available
+ */
+GValue* gel_parser_iter_get(GelParserIter *iter)
+{
+    g_return_val_if_fail(iter != NULL, NULL);
+
+    GValue *value = &iter->value;
+    if(GEL_IS_VALUE(value))
+        return value;
+    return NULL;
+}
+

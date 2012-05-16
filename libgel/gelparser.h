@@ -39,5 +39,18 @@ void gel_parser_input_file(GelParser *self, gint fd);
 gboolean gel_parser_next_value(GelParser *self, GValue *value, GError **error);
 GelArray* gel_parser_get_values(GelParser *self, GError **error);
 
+typedef struct _GelParserIter GelParserIter;
+
+struct _GelParserIter
+{
+    GValue value;
+    GelParser *parser;
+};
+
+void gel_parser_iterator(GelParser *self, GelParserIter *iter);
+void gel_parser_iter_destroy(GelParserIter *iter);
+gboolean gel_parser_iter_next(GelParserIter *iter, GError **error);
+GValue* gel_parser_iter_get(GelParserIter *iter);
+
 #endif
 
