@@ -42,9 +42,9 @@ typedef GValueArray GelArray;
 typedef struct _GelArrayIter GelArrayIter;
 struct _GelArrayIter
 {
-    GelArray *array;
-    guint index;
     GValue *value;
+    guint index;
+    GelArray *array;
 };
 
 void gel_array_iterator(GelArray *self, GelArrayIter *iter);
