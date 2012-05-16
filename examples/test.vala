@@ -42,21 +42,12 @@ int main(string[] args) {
                 print("= %s\n", Gel.Value.to_string(evaluated_value));
         }
     }
-    catch(FileError error) {
-        print("Error reading '%s'\n", filename);
-        print("%s\n", error.message);
+    catch(Error e) {
+        print("Error of domain %s\n", e.domain.to_string());
+        print("%s\n", e.message);
         return 1;
     }
-    catch(Gel.ParserError error) {
-        print("Error parsing '%s'\n", filename);
-        print("%s\n", error.message);
-        return 1;
-    }
-    catch(Gel.ContextError error) {
-        print("Error evaluating '%s'\n", filename);
-        print("%s\n", error.message);
-        return 1;
-    }
+
     return 0;
 }
 
