@@ -26,7 +26,8 @@ int main(int argc, char *argv[])
     g_type_init();
     if(argc < 2)
     {
-        g_print("%s: requires an argument\n", argv[0]);
+        gchar *program = argv[0];
+        g_print("%s: requires an argument\n", program);
         return 1;
     }
 

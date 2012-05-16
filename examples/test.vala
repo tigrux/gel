@@ -15,15 +15,14 @@ void make_label(Closure closure, out Value return_value)
 
 
 int main(string[] args) {
-    string program = args[0];
-    string filename = args[1];
-
     if(args.length < 2) {
+        string program = args[0];
         printerr("%s requires an argument\n", program);
         return 1;
     }
 
     try {
+        string filename = args[1];
         string content;
         size_t content_len;
         FileUtils.get_contents(filename, out content, out content_len);
