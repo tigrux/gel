@@ -1524,8 +1524,8 @@ void sort_(GClosure *self, GValue *return_value,
 
             GValue tmp_value = {0};
             g_closure_invoke(closure, &tmp_value, 2,
-            gel_array_get_values(pair),
-            context);
+                gel_array_get_values(pair),
+                context);
 
             gboolean result = gel_value_to_boolean(&tmp_value) ? -1 : 1;
 
