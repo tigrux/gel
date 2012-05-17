@@ -81,7 +81,7 @@ namespace Gel {
     public class Context {
         public Context();
         public Context.with_outer(Gel.Context outer);
-        public Context dup();
+        public Context copy();
         public unowned GLib.Value lookup(string name);
         public void define(string name, GLib.Type type, ...);
         public void define_value(string name, owned GLib.Value? value);
