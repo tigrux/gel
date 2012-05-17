@@ -5,10 +5,6 @@
 
 typedef struct _GelMacro GelMacro;
 
-void gel_macros_new(void);
-
-void gel_macros_free(void);
-
 GelMacro* gel_macro_new(GList *args, gchar *variadic, GelArray *code);
 
 void gel_macro_free(GelMacro *self);
