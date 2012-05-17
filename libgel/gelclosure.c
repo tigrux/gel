@@ -317,6 +317,9 @@ GClosure* gel_closure_new_native(const gchar *name, GClosureMarshal marshal)
     g_closure_set_marshal(closure, (GClosureMarshal)gel_native_closure_marshal);
     g_closure_add_finalize_notifier(closure, dup_name, (GClosureNotify)g_free);
 
+    g_closure_ref(closure);
+    g_closure_sink(closure);
+
     return closure;
 }
 
@@ -367,6 +370,9 @@ GClosure* gel_closure_new_introspection(const GelTypeInfo *info,
     self->n_args = n_expected_args;
     self->instance = instance;
     self->indirect_args = indirect_args;
+
+    g_closure_ref(closure);
+    g_closure_sink(closure);
 
     return closure;
 }
