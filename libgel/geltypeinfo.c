@@ -1005,9 +1005,14 @@ gboolean gel_type_info_function_to_value(const GelTypeInfo *self,
 
                 switch(iface_type)
                 {
+                    gint index;
                     case GI_INFO_TYPE_CALLBACK:
-                        indirect_args[g_arg_info_get_closure(arg_info)] = TRUE;
-                        indirect_args[g_arg_info_get_destroy(arg_info)] = TRUE;
+                        index = g_arg_info_get_closure(arg_info);
+                        if(index != -1)
+                            indirect_args[index] = TRUE;
+                        index = g_arg_info_get_destroy(arg_info);
+                        if(index != -1)
+                            indirect_args[index] = TRUE;
                         break;
                     default:
                         break;
