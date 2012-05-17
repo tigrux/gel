@@ -31,7 +31,7 @@ gel_parser_input_file
 gel_parser_next_value
 gel_parser_get_values
 GelParserIter
-gel_parser_iterator
+gel_parser_iter_init
 gel_parser_iter_destroy
 gel_parser_iter_get
 gel_parser_iter_next
@@ -59,7 +59,7 @@ gel_array_remove
 gel_array_set_n_values
 gel_array_sort
 GelArrayIter
-gel_array_iterator
+gel_array_iter_init
 gel_array_iter_next
 gel_array_iter_get
 </SECTION>

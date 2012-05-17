@@ -550,24 +550,26 @@ void gel_parser_input_file(GelParser *self, gint fd)
  * @value: the #GValue of the last parsing
  * @parser: a #GelParser to use as iterable
  * 
- * a #GelParserIter represents an iterator that can be used to get elements
+ * a #GelParserIter represents an iterator that can be used to get elements.
+ * #GelParserIter structures are typically allocated on the stack and then
+ * initialized with #gel_parser_iter_init.
  * from a parser, once at a time.
  */
 
 /**
- * gel_parser_iterator:
- * @self: a #GelParser to associate to a #GelParserIter
+ * gel_parser_iter_init:
  * @iter: a #GelParserIter to initialize
+ * @parser: a #GelParser to associate to a #GelParserIter
  *
- * Initializes the #GelParserIter @iter and associates it to @self
+ * Initializes the #GelParserIter @iter and associates it to @parser
  */
-void gel_parser_iterator(GelParser *self, GelParserIter *iter)
+void gel_parser_iter_init(GelParserIter *iter, GelParser *parser)
 {
-    g_return_if_fail(self != NULL);
+    g_return_if_fail(parser != NULL);
     g_return_if_fail(iter != NULL);
 
     memset(iter, 0, sizeof(*iter));
-    iter->parser = self;
+    iter->parser = parser;
 }
 
 

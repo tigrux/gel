@@ -47,7 +47,7 @@ struct _GelParserIter
     GelParser *parser;
 };
 
-void gel_parser_iterator(GelParser *self, GelParserIter *iter);
+void gel_parser_iter_init(GelParserIter *iter, GelParser *parser);
 void gel_parser_iter_destroy(GelParserIter *iter);
 gboolean gel_parser_iter_next(GelParserIter *iter, GError **error);
 GValue* gel_parser_iter_get(GelParserIter *iter);

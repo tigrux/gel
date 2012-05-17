@@ -63,7 +63,7 @@ int main(int argc, char *argv[])
     gel_context_define_function(context, "make-label", make_label, NULL);
 
     GelArrayIter parsed_iter = {0};
-    gel_array_iterator(parsed_array, &parsed_iter);
+    gel_array_iter_init(&parsed_iter, parsed_array);
     while(gel_array_iter_next(&parsed_iter))
     {
         GValue *parsed_value = gel_array_iter_get(&parsed_iter);

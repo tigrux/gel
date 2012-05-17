@@ -29,6 +29,7 @@ namespace Gel {
         public unowned Array append(GLib.Value value);
         public unowned Array remove(uint index);
         public unowned Array sort(GLib.CompareFunc compare_func);
+        [CCode (cname="gel_array_iter_init", instance_pos=-1)]
         public ArrayIter iterator();
     }
 
@@ -64,6 +65,7 @@ namespace Gel {
         public void input_file(int fd);
         public bool next_value(out GLib.Value value) throws ParserError;
         public Gel.Array get_values() throws ParserError;
+        [CCode (cname="gel_parser_iter_init", instance_pos=-1)]
         public ParserIter iterator();
     }
 
