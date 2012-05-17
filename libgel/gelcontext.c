@@ -22,6 +22,39 @@
  * #GelContext is a class where symbols are stored and evaluated.
  */
 
+/**
+ * GEL_CONTEXT_ERROR:
+ *
+ * Error domain for errors reported by #gel_context_eval.
+ * Errors in this domain will be from the #GelContextError enumeration.
+ * See #GError for information on error domains.
+ */
+
+/**
+ * GelContextError:
+ * @GEL_CONTEXT_ERROR_ARGUMENTS: wrong arguments
+ * @GEL_CONTEXT_ERROR_UNKNOWN_SYMBOL: unknown symbol
+ * @GEL_CONTEXT_ERROR_SYMBOL_EXISTS: symbol exists and canot be redefined
+ * @GEL_CONTEXT_ERROR_TYPE: wrong value type
+ * @GEL_CONTEXT_ERROR_PROPERTY: wrong property
+ * @GEL_CONTEXT_ERROR_INDEX: invalid index
+ * @GEL_CONTEXT_ERROR_KEY: invalid key
+ *
+ * Error codes reported by #gel_context_eval
+ */
+
+/**
+ * GelFunction:
+ * @closure: The #GClosure to which this function is assigned as marshal
+ * @return_value: The #GValue to store the return value, may be #NULL
+ * @n_param_values: The number of parameters
+ * @param_values: An array of #GValue with the parameters.
+ * @invocation_context: The #GelContext for which this function is invoked, may be #NULL
+ * @user_data: user data passed during the call to #gel_context_define_function
+ *
+ * This type is used as the marshal of native closures.
+ * It is basically a #GClosureMarshal with its arguments used to pass specific information.
+ */
 
 struct _GelContext
 {
