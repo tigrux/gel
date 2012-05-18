@@ -43,8 +43,8 @@ typedef struct _GelParserIter GelParserIter;
 
 struct _GelParserIter
 {
-    GValue value;
     GelParser *parser;
+    GValue value;
 };
 
 void gel_parser_iter_init(GelParserIter *iter, GelParser *parser);

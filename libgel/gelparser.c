@@ -547,8 +547,8 @@ void gel_parser_input_file(GelParser *self, gint fd)
 
 /**
  * GelParserIter:
- * @value: the #GValue of the last parsing
  * @parser: a #GelParser to use as iterable
+ * @value: the #GValue of the last parsing
  * 
  * a #GelParserIter represents an iterator that can be used to get elements.
  * #GelParserIter structures are typically allocated on the stack and then

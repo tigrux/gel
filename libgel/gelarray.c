@@ -174,9 +174,9 @@ GelArray* gel_array_sort(GelArray *self, GCompareFunc compare_func)
 
 /**
  * GelArrayIter:
+ * @array: a #GelArray to iterate
  * @value: the #GValue at the current index
  * @index: the current index
- * @array: a #GelArray to iterate
  * 
  * A #GelArrayIter represents an iterator that can be used to iterate over the elements of a #GelArray.
  * #GelArrayIter structures are typically allocated on the stack and then
