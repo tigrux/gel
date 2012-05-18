@@ -47,7 +47,7 @@
 
 GQuark gel_parser_error_quark(void)
 {
-    return g_quark_from_static_string("gel-parse-error");
+    return g_quark_from_static_string("gel-parser-error");
 }
 
 static
