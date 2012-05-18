@@ -251,7 +251,8 @@ void array_append(GelArray *array, GValue *return_value,
         if(gel_context_error(context))
             goto end;
 
-        gel_array_append(array, value);
+        if(GEL_IS_VALUE(value))
+            gel_array_append(array, value);
 
         if(GEL_IS_VALUE(&tmp_value))
             g_value_unset(&tmp_value);
@@ -814,7 +815,9 @@ void array_(GClosure *self, GValue *return_value,
         if(gel_context_error(context))
             break;
 
-        gel_array_append(array, value);
+        if(GEL_IS_VALUE(value))
+            gel_array_append(array, value);
+
         if(GEL_IS_VALUE(&tmp_value))
             g_value_unset(&tmp_value);
     }
@@ -824,6 +827,8 @@ void array_(GClosure *self, GValue *return_value,
         g_value_init(return_value, GEL_TYPE_ARRAY);
         gel_value_take_boxed(return_value, array);
     }
+    else
+        gel_array_free(array);
 }
 
 
@@ -1540,7 +1545,7 @@ void sort_(GClosure *self, GValue *return_value,
         gel_array_sort(result_array, (GCompareFunc)compare);
 
         g_value_init(return_value, GEL_TYPE_ARRAY);
-        g_value_take_boxed(return_value, result_array);
+        gel_value_take_boxed(return_value, result_array);
     }
 
     gel_list_free(tmp_list);
