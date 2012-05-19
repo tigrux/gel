@@ -12,6 +12,7 @@ gel_context_define
 gel_context_define_value
 gel_context_define_object
 GelFunction
+gel_context_eval_params
 gel_context_define_function
 gel_context_remove
 gel_context_eval
@@ -82,5 +83,6 @@ gel_values_eq
 gel_values_le
 gel_values_lt
 gel_values_ne
+gel_list_free
 </SECTION>
 

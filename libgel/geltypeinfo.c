@@ -2,6 +2,7 @@
 
 #include <geltypeinfo.h>
 #include <gelcontextprivate.h>
+#include <gelvalue.h>
 #include <gelvalueprivate.h>
 #include <gelclosureprivate.h>
 #include <gelerrors.h>

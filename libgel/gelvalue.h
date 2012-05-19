@@ -23,5 +23,7 @@ gint gel_values_le(const GValue *v1, const GValue *v2);
 gint gel_values_lt(const GValue *v1, const GValue *v2);
 gint gel_values_ne(const GValue *v1, const GValue *v2);
 
+void gel_list_free(GList *list);
+
 #endif
 

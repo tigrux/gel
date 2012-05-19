@@ -46,6 +46,10 @@ gboolean gel_context_remove(GelContext *self, const gchar *name);
 gboolean gel_context_eval(GelContext *self, const GValue *value, GValue *dest,
                           GError **error);
 
+gboolean gel_context_eval_params(GelContext *self, const gchar *func,
+                                 guint *n_values, const GValue **values,
+                                 GList **list, const gchar *format, ...);
+
 gboolean gel_context_error(const GelContext* self);
 void gel_context_clear_error(GelContext* self);
 
