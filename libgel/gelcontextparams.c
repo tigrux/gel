@@ -280,15 +280,20 @@ gboolean gel_context_eval_params_args(GelContext *self, const gchar *func,
     g_return_val_if_fail(values != NULL, FALSE);
 
     gboolean exact = TRUE;
+    
+    guint n_args = g_node_n_children(format_node);
 
-    GNode *last_child = g_node_last_child(format_node);
-    if(g_node_get_int(last_child) == '*')
+    if(n_args > 0)
     {
-        exact = FALSE;
-        g_node_destroy(last_child);
+        GNode *last_child = g_node_last_child(format_node);
+        if(g_node_get_int(last_child) == '*')
+        {
+            exact = FALSE;
+            g_node_destroy(last_child);
+            n_args--;
+        }
     }
 
-    guint n_args = g_node_n_children(format_node);
 
     if(exact && n_args != *n_values)
     {
