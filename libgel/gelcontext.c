@@ -220,6 +220,7 @@ void gel_context_free(GelContext *self)
     {
         g_list_foreach(contexts_POOL, (GFunc)gel_context_dispose, NULL);
         g_list_free(contexts_POOL);
+        contexts_POOL = 0;
     }
 #else
     gel_context_dispose(self);
