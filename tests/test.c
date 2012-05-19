@@ -23,21 +23,21 @@ void make_label(GClosure *closure, GValue *return_value,
 
 int main(int argc, char *argv[])
 {
-    gchar *content = NULL;
-    GError *error = NULL;
-    GelParser *parser = NULL;
-    GelContext *context = NULL;
-    int status = 1;
-
     g_type_init();
     if(argc < 2)
     {
         gchar *program = argv[0];
         g_print("%s: requires an argument\n", program);
-        goto finally;
+        return 1;
     }
 
+    gchar *content = NULL;
+    GError *error = NULL;
+    GelParser *parser = NULL;
+    GelContext *context = NULL;
+    int status = 1;
     gchar *filename = argv[1];
+
     gsize content_len;
     g_file_get_contents(filename, &content, &content_len, &error);
     if(error != NULL)
@@ -73,8 +73,6 @@ int main(int argc, char *argv[])
                 goto finally;
     }
 
-    status = 0;
-
     finally:
     if(error != NULL)
     {
@@ -82,6 +80,8 @@ int main(int argc, char *argv[])
         g_print("%s\n", error->message);
         g_error_free(error);
     }
+    else
+        status = 0;
 
     if(content != NULL)
         g_free(content);
