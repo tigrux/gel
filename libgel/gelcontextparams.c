@@ -374,6 +374,23 @@ gboolean gel_context_eval_params_args(GelContext *self, const gchar *func,
 }
 
 
+/**
+ * gel_context_eval_params:
+ * @self: a #GelContext to evaluate
+ * @func: the name of function that is evaluating, for debug
+ * @n_values: the number of #GValue to evaluate
+ * @values: the array of #GValue to evaluate
+ * @list: the location of a #GList to keep the temporary values
+ * @format: a string that indicates the types of the values
+ * @...: The return location for the respective variables
+ * 
+ * Evaluates an array of #GValue and store the results.
+ * Any temporary values will be stored in @list.
+ * The list must be freed with @gel_list_free.
+ *
+ * Returns: #TRUE if all the values were evaluated, #FALSE otherwise
+ */
+
 gboolean gel_context_eval_params(GelContext *self,const gchar *func,
                                  guint *n_values, const GValue **values,
                                  GList **list, const gchar *format, ...)
