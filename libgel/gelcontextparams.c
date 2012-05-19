@@ -169,9 +169,17 @@ gboolean gel_context_eval_param(GelContext *self, const gchar *func,
                 gel_args_pop(args, gint64) = gel_value_get_int64(result);
             else
             {
-                gel_error_value_not_of_type(self,
-                    func, result, G_TYPE_INT64);
-                parsed = FALSE;
+                GValue tmp = {0};
+                g_value_init(&tmp, G_TYPE_INT64);
+                if(g_value_transform(result, &tmp))
+                    gel_args_pop(args, gint64) = gel_value_get_int64(&tmp);
+                else
+                {
+                    gel_error_value_not_of_type(self,
+                        func, result, G_TYPE_INT64);
+                    parsed = FALSE;
+                }
+                g_value_unset(&tmp);
             }
             break;
         case 'F':
@@ -185,9 +193,17 @@ gboolean gel_context_eval_param(GelContext *self, const gchar *func,
                 gel_args_pop(args, gdouble) = gel_value_get_double(result);
             else
             {
-                gel_error_value_not_of_type(self,
-                    func, result, G_TYPE_DOUBLE);
-                parsed = FALSE;
+                GValue tmp = {0};
+                g_value_init(&tmp, G_TYPE_DOUBLE);
+                if(g_value_transform(result, &tmp))
+                    gel_args_pop(args, gdouble) = gel_value_get_double(&tmp);
+                else
+                {
+                    gel_error_value_not_of_type(self, 
+                        func, result, G_TYPE_DOUBLE);
+                    parsed = FALSE;
+                }
+                g_value_unset(&tmp);
             }
             break;
         case 'G':
