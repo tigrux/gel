@@ -81,7 +81,6 @@ void rotate_(GClosure *closure, GValue *return_value,
 
 gboolean on_draw(GtkWidget *widget, cairo_t *cairo, App *self)
 {
-    g_print("test\n");
     GtkTextBuffer *textbuffer = NULL;
     g_object_get(self->textview, "buffer", &textbuffer, NULL);
 
