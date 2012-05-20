@@ -12,12 +12,21 @@
 
 (def bus ((. player get-bus)))
 ((. bus add-signal-watch))
+
 (connect bus "message::eos"
     (fn (b m)
         ((. player set-state) (. Gst State null))
         ((. Gtk main-quit))
     )
 )
+
+(connect bus "message::error"
+    (fn (b m)
+        (print "An error occurred")
+        ((. Gtk main-quit))
+    )
+)
+
 
 ((. Gtk main))
 
