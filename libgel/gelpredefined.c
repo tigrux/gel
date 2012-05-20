@@ -1908,13 +1908,13 @@ void range_(GClosure *self, GValue *return_value,
         g_value_init(&value, G_TYPE_INT64);
 
         if(last > first)
-            for(gint64 i = first; i <= last; i++)
+            for(gint64 i = first; i < last; i++)
             {
                 gel_value_set_int64(&value, i);
                 gel_array_append(array, &value);
             }
         else
-            for(gint64 i = first; i >= last; i--)
+            for(gint64 i = first; i > last; i--)
             {
                 gel_value_set_int64(&value, i);
                 gel_array_append(array, &value);
