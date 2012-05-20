@@ -6,7 +6,7 @@
 (color 100 25 50)
 (for i (range 0 8)
 	(line 200)
-	(rotate 225)
+	(turn 225)
 )</property>
   </object>
   <object class="GtkWindow" id="window">

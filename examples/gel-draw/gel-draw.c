@@ -64,9 +64,9 @@ void line_(GClosure *closure, GValue *return_value,
 }
 
 
-void rotate_(GClosure *closure, GValue *return_value,
-             guint n_values, const GValue *values,
-             GelContext *context, App *self)
+void turn_(GClosure *closure, GValue *return_value,
+           guint n_values, const GValue *values,
+           GelContext *context, App *self)
 {
     GList *tmp_list = NULL;
     gdouble a;
@@ -150,7 +150,7 @@ int main(int argc, gchar *argv[])
     gel_context_define_function(self.context, "color", (GelFunction)color_, &self);
     gel_context_define_function(self.context, "move", (GelFunction)move_, &self);
     gel_context_define_function(self.context, "line", (GelFunction)line_, &self);
-    gel_context_define_function(self.context, "rotate", (GelFunction)rotate_, &self);
+    gel_context_define_function(self.context, "turn", (GelFunction)turn_, &self);
 
     gtk_widget_show_all(GTK_WIDGET(self.window));
     gtk_builder_connect_signals(builder, &self);
