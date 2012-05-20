@@ -46,10 +46,10 @@ GelArray* gel_macro_map_code(const GelMacro *self,
 
     for(guint i = 0; i < n_values; i++)
     {
-        GType type = GEL_VALUE_TYPE(values + i);
+        GType type = G_VALUE_TYPE(values + i);
         if(type == GEL_TYPE_SYMBOL)
         {
-            GelSymbol *symbol = gel_value_get_boxed(values + i);
+            GelSymbol *symbol = g_value_get_boxed(values + i);
             const gchar *name = gel_symbol_get_name(symbol);
             GValue *value = g_hash_table_lookup(mappings, name);
 
@@ -61,9 +61,9 @@ GelArray* gel_macro_map_code(const GelMacro *self,
                     gel_array_append(code, values + i);
             }
             else
-            if(GEL_VALUE_HOLDS(value, GEL_TYPE_ARRAY))
+            if(G_VALUE_HOLDS(value, GEL_TYPE_ARRAY))
             {
-                GelArray *var_array = gel_value_get_boxed(value);
+                GelArray *var_array = g_value_get_boxed(value);
                 guint var_n_values = gel_array_get_n_values(var_array);
                 GValue *var_values = gel_array_get_values(var_array);
 
@@ -74,14 +74,14 @@ GelArray* gel_macro_map_code(const GelMacro *self,
         else
         if(type == GEL_TYPE_ARRAY)
         {
-            GelArray *array = gel_value_get_boxed(values + i);
+            GelArray *array = g_value_get_boxed(values + i);
             GelArray *new_array =
                 gel_macro_map_code(self, mappings, array, error);
 
             GValue tmp_value = {0};
             g_value_init(&tmp_value, GEL_TYPE_ARRAY);
 
-            gel_value_take_boxed(&tmp_value, new_array);
+            g_value_take_boxed(&tmp_value, new_array);
             gel_array_append(code, &tmp_value);
 
             g_value_unset(&tmp_value);

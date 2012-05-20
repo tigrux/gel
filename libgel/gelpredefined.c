@@ -29,10 +29,10 @@ void symbol_set(GValue *return_value,
     GValue tmp1_value = {0};
     GValue tmp2_value = {0};
 
-    GType type = GEL_VALUE_TYPE(values + 0);
+    GType type = G_VALUE_TYPE(values + 0);
     if(type == GEL_TYPE_SYMBOL)
     {
-        GelSymbol *symbol = gel_value_get_boxed(values + 0);
+        GelSymbol *symbol = g_value_get_boxed(values + 0);
         dest_value = gel_symbol_get_value(symbol);
         if(dest_value == NULL)
         {
@@ -48,9 +48,9 @@ void symbol_set(GValue *return_value,
         if(gel_context_error(context))
             goto end;
 
-        if(GEL_VALUE_HOLDS(value, GEL_TYPE_VARIABLE))
+        if(G_VALUE_HOLDS(value, GEL_TYPE_VARIABLE))
         {
-            GelVariable *dest_variable = gel_value_get_boxed(value);
+            GelVariable *dest_variable = g_value_get_boxed(value);
             dest_value = gel_variable_get_value(dest_variable);
         }
     }
@@ -75,10 +75,10 @@ void symbol_set(GValue *return_value,
         gel_error_expected(context, __FUNCTION__, "symbol or variable");
 
     end:
-    if(GEL_IS_VALUE(&tmp1_value))
+    if(G_IS_VALUE(&tmp1_value))
         g_value_unset(&tmp1_value);
 
-    if(GEL_IS_VALUE(&tmp2_value))
+    if(G_IS_VALUE(&tmp2_value))
         g_value_unset(&tmp2_value);
 }
 
@@ -251,10 +251,10 @@ void array_append(GelArray *array, GValue *return_value,
         if(gel_context_error(context))
             goto end;
 
-        if(GEL_IS_VALUE(value))
+        if(G_IS_VALUE(value))
             gel_array_append(array, value);
 
-        if(GEL_IS_VALUE(&tmp_value))
+        if(G_IS_VALUE(&tmp_value))
             g_value_unset(&tmp_value);
     }
 
@@ -345,7 +345,7 @@ void array_size(GelArray *array, GValue *return_value,
     GList *tmp_list = NULL;
 
     g_value_init(return_value, G_TYPE_INT64);
-    gel_value_set_int64(return_value, gel_array_get_n_values(array));
+    g_value_set_int64(return_value, gel_array_get_n_values(array));
 
     gel_list_free(tmp_list);
 }
@@ -359,7 +359,7 @@ void hash_size(GHashTable *hash, GValue *return_value,
 
     g_value_init(return_value, G_TYPE_INT64);
     guint result = g_hash_table_size(hash);
-    gel_value_set_int64(return_value, result);
+    g_value_set_int64(return_value, result);
 
     gel_list_free(tmp_list);
 }
@@ -385,7 +385,7 @@ void array_find(GClosure *closure, GelArray *array, GValue *return_value,
     }
 
     g_value_init(return_value, G_TYPE_INT64);
-    gel_value_set_int64(return_value, result);
+    g_value_set_int64(return_value, result);
 
     gel_list_free(tmp_list);
 }
@@ -441,7 +441,7 @@ void array_filter(GClosure *closure, GelArray *array, GValue *return_value,
     }
 
     g_value_init(return_value, GEL_TYPE_ARRAY);
-    gel_value_take_boxed(return_value, result_array);
+    g_value_take_boxed(return_value, result_array);
 
     gel_list_free(tmp_list);
 }
@@ -471,7 +471,7 @@ void hash_filter(GClosure *closure, GHashTable *hash, GValue *return_value,
     }
 
     g_value_init(return_value, G_TYPE_HASH_TABLE);
-    gel_value_take_boxed(return_value, result_hash);
+    g_value_take_boxed(return_value, result_hash);
 
     gel_list_free(tmp_list);
 }
@@ -584,10 +584,10 @@ void do_(GClosure *self, GValue *return_value,
         if(gel_context_error(context))
             return;
 
-        if(i == last && GEL_IS_VALUE(value))
+        if(i == last && G_IS_VALUE(value))
             gel_value_copy(value, return_value);
 
-        if(GEL_IS_VALUE(&tmp_value))
+        if(G_IS_VALUE(&tmp_value))
             g_value_unset(&tmp_value);
     }
 }
@@ -703,10 +703,10 @@ void name_(GClosure *self, GValue *return_value,
         return;
     }
 
-    GType type = GEL_VALUE_TYPE(values + 0);
+    GType type = G_VALUE_TYPE(values + 0);
     if(type == GEL_TYPE_SYMBOL)
     {
-        const GelSymbol *symbol = gel_value_get_boxed(values + 0);
+        const GelSymbol *symbol = g_value_get_boxed(values + 0);
         const gchar *name = gel_symbol_get_name(symbol);
         g_value_init(return_value, G_TYPE_STRING);
         g_value_set_string(return_value, name);
@@ -781,7 +781,7 @@ void map_(GClosure *self, GValue *return_value,
                     gel_array_get_values(array),
                     context);
 
-                if(GEL_IS_VALUE(&tmp_value))
+                if(G_IS_VALUE(&tmp_value))
                 {
                     gel_array_append(result_array, &tmp_value);
                     g_value_unset(&tmp_value);
@@ -791,7 +791,7 @@ void map_(GClosure *self, GValue *return_value,
             }
 
             g_value_init(return_value, GEL_TYPE_ARRAY);
-            gel_value_take_boxed(return_value, result_array);
+            g_value_take_boxed(return_value, result_array);
         }
     }
 
@@ -815,17 +815,17 @@ void array_(GClosure *self, GValue *return_value,
         if(gel_context_error(context))
             break;
 
-        if(GEL_IS_VALUE(value))
+        if(G_IS_VALUE(value))
             gel_array_append(array, value);
 
-        if(GEL_IS_VALUE(&tmp_value))
+        if(G_IS_VALUE(&tmp_value))
             g_value_unset(&tmp_value);
     }
 
     if(i == n_values)
     {
         g_value_init(return_value, GEL_TYPE_ARRAY);
-        gel_value_take_boxed(return_value, array);
+        g_value_take_boxed(return_value, array);
     }
     else
         gel_array_free(array);
@@ -857,7 +857,7 @@ void hash_(GClosure *self, GValue *return_value,
     if(n_values == 0)
     {
         g_value_init(return_value, G_TYPE_HASH_TABLE);
-        gel_value_take_boxed(return_value, hash);
+        g_value_take_boxed(return_value, hash);
     }
 
     gel_list_free(tmp_list);
@@ -875,9 +875,9 @@ void var_(GClosure *self, GValue *return_value,
         return;
     }
 
-    if(GEL_VALUE_HOLDS(values, GEL_TYPE_SYMBOL))
+    if(G_VALUE_HOLDS(values, GEL_TYPE_SYMBOL))
     {
-        GelSymbol *symbol = gel_value_get_boxed(values);
+        GelSymbol *symbol = g_value_get_boxed(values);
         GelVariable *variable = gel_symbol_get_variable(symbol);
         if(variable != NULL)
         {
@@ -920,22 +920,22 @@ void set_(GClosure *self, GValue *return_value,
     if(gel_context_eval_params(context, __FUNCTION__,
             &n_values, &values, &tmp_list, "V*", &value))
     {
-        GType type = GEL_VALUE_TYPE(value);
+        GType type = G_VALUE_TYPE(value);
         if(type == GEL_TYPE_ARRAY)
         {
-            GelArray *array = gel_value_get_boxed(value);
+            GelArray *array = g_value_get_boxed(value);
             array_set(array, return_value, n_values, values, context);
         }
         else
         if(type == G_TYPE_HASH_TABLE)
         {
-            GHashTable *hash = gel_value_get_boxed(value);
+            GHashTable *hash = g_value_get_boxed(value);
             hash_set(hash, return_value, n_values, values, context);
         }
         else
         if(G_TYPE_IS_OBJECT(type))
         {
-            GObject *object = gel_value_get_object(value);
+            GObject *object = g_value_get_object(value);
             object_set(object, return_value, n_values, values, context);
         }
         else
@@ -982,9 +982,9 @@ void arithmetic(GClosure *self, GValue *return_value,
             gel_error_incompatible(context, f, v0, v1);
     }
 
-    if(GEL_IS_VALUE(&tmp1))
+    if(G_IS_VALUE(&tmp1))
         g_value_unset(&tmp1);
-    if(GEL_IS_VALUE(&tmp2))
+    if(G_IS_VALUE(&tmp2))
         g_value_unset(&tmp2);
 
     for(guint i = 2; i < n_values && running; i++)
@@ -1006,9 +1006,9 @@ void arithmetic(GClosure *self, GValue *return_value,
                 gel_error_incompatible(context, f, v1, v);
         }
 
-        if(GEL_IS_VALUE(v1))
+        if(G_IS_VALUE(v1))
             g_value_unset(v1);
-        if(GEL_IS_VALUE(&tmp1))
+        if(G_IS_VALUE(&tmp1))
             g_value_unset(&tmp1);
 
         if(gel_context_error(context))
@@ -1020,7 +1020,7 @@ void arithmetic(GClosure *self, GValue *return_value,
 
     if(running)
         gel_value_copy(v2, return_value);
-    if(GEL_IS_VALUE(v2))
+    if(G_IS_VALUE(v2))
         g_value_unset(v2);
 }
 
@@ -1115,16 +1115,16 @@ void logic(GClosure *self, GValue *return_value,
         else
             failed = TRUE;
 
-        if(GEL_IS_VALUE(&tmp1))
+        if(G_IS_VALUE(&tmp1))
             g_value_unset(&tmp1);
-        if(GEL_IS_VALUE(&tmp2))
+        if(G_IS_VALUE(&tmp2))
             g_value_unset(&tmp2);
     }
 
     if(!failed)
     {
         g_value_init(return_value, G_TYPE_BOOLEAN);
-        gel_value_set_boolean(return_value, result == 1 ? TRUE : FALSE);
+        g_value_set_boolean(return_value, result == 1 ? TRUE : FALSE);
     }
 }
 
@@ -1160,7 +1160,7 @@ void and_(GClosure *self, GValue *return_value,
         else
             failed = TRUE;
 
-        if(GEL_IS_VALUE(&tmp_value))
+        if(G_IS_VALUE(&tmp_value))
             g_value_unset(&tmp_value);
     }
 }
@@ -1197,7 +1197,7 @@ void or_(GClosure *self, GValue *return_value,
         else
             failed = TRUE;
 
-        if(GEL_IS_VALUE(&tmp_value))
+        if(G_IS_VALUE(&tmp_value))
             g_value_unset(&tmp_value);
     }
 }
@@ -1274,16 +1274,16 @@ void append_(GClosure *self, GValue *return_value,
     if(gel_context_eval_params(context, __FUNCTION__,
             &n_values, &values, &tmp_list, "V*", &value))
     {
-        GType type = GEL_VALUE_TYPE(value);
+        GType type = G_VALUE_TYPE(value);
         if(type == GEL_TYPE_ARRAY)
         {
-            GelArray *array = gel_value_get_boxed(value);
+            GelArray *array = g_value_get_boxed(value);
             array_append(array, return_value, n_values, values, context);
         }
         else
         if(type == G_TYPE_HASH_TABLE)
         {
-            GHashTable *hash = gel_value_get_boxed(value);
+            GHashTable *hash = g_value_get_boxed(value);
             hash_append(hash, return_value, n_values, values, context);
         }
         else
@@ -1311,22 +1311,22 @@ void get_(GClosure *self, GValue *return_value,
     if(gel_context_eval_params(context, __FUNCTION__,
             &n_values, &values, &tmp_list, "V*", &value))
     {
-        GType type = GEL_VALUE_TYPE(value);
+        GType type = G_VALUE_TYPE(value);
         if(type == GEL_TYPE_ARRAY)
         {
-            GelArray *array = gel_value_get_boxed(value);
+            GelArray *array = g_value_get_boxed(value);
             array_get(array, return_value, n_values, values, context);
         }
         else
         if(type == G_TYPE_HASH_TABLE)
         {
-            GHashTable *hash = gel_value_get_boxed(value);
+            GHashTable *hash = g_value_get_boxed(value);
             hash_get(hash, return_value, n_values, values, context);
         }
         else
         if(G_TYPE_IS_OBJECT(type))
         {
-            GObject *object = gel_value_get_object(value);
+            GObject *object = g_value_get_object(value);
             object_get(object, return_value, n_values, values, context);
         }
         else
@@ -1355,16 +1355,16 @@ void remove_(GClosure *self, GValue *return_value,
     if(gel_context_eval_params(context, __FUNCTION__,
             &n_values, &values, &tmp_list, "V*", &value))
     {
-        GType type = GEL_VALUE_TYPE(value);
+        GType type = G_VALUE_TYPE(value);
         if(type == GEL_TYPE_ARRAY)
         {
-            GelArray *array = gel_value_get_boxed(value);
+            GelArray *array = g_value_get_boxed(value);
             array_remove(array, return_value, n_values, values, context);
         }
         else
         if(type == G_TYPE_HASH_TABLE)
         {
-            GHashTable *hash = gel_value_get_boxed(value);
+            GHashTable *hash = g_value_get_boxed(value);
             hash_remove(hash, return_value, n_values, values, context);
         }
         else
@@ -1392,16 +1392,16 @@ void size_(GClosure *self, GValue *return_value,
     if(gel_context_eval_params(context, __FUNCTION__,
             &n_values, &values, &tmp_list, "V*", &value))
     {
-        GType type = GEL_VALUE_TYPE(value);
+        GType type = G_VALUE_TYPE(value);
         if(type == GEL_TYPE_ARRAY)
         {
-            GelArray *array = gel_value_get_boxed(value);
+            GelArray *array = g_value_get_boxed(value);
             array_size(array, return_value, n_values, values, context);
         }
         else
         if(type == G_TYPE_HASH_TABLE)
         {
-            GHashTable *hash = gel_value_get_boxed(value);
+            GHashTable *hash = g_value_get_boxed(value);
             hash_size(hash, return_value, n_values, values, context);
         }
         else
@@ -1431,16 +1431,16 @@ void find_(GClosure *self, GValue *return_value,
     if(gel_context_eval_params(context, __FUNCTION__,
             &n_values, &values, &tmp_list, "CV", &closure, &value))
     {
-        GType type = GEL_VALUE_TYPE(value);
+        GType type = G_VALUE_TYPE(value);
         if(type == GEL_TYPE_ARRAY)
         {
-            GelArray *array = gel_value_get_boxed(value);
+            GelArray *array = g_value_get_boxed(value);
             array_find(closure, array, return_value, n_values, values, context);
         }
         else
         if(type == G_TYPE_HASH_TABLE)
         {
-            GHashTable *hash = gel_value_get_boxed(value);
+            GHashTable *hash = g_value_get_boxed(value);
             hash_find(closure, hash, return_value, n_values, values, context);
         }
         else
@@ -1469,17 +1469,17 @@ void filter_(GClosure *self, GValue *return_value,
     if(gel_context_eval_params(context, __FUNCTION__,
             &n_values, &values, &tmp_list, "CV", &closure, &value))
     {
-        GType type = GEL_VALUE_TYPE(value);
+        GType type = G_VALUE_TYPE(value);
         if(type == GEL_TYPE_ARRAY)
         {
-            GelArray *array = gel_value_get_boxed(value);
+            GelArray *array = g_value_get_boxed(value);
             array_filter(closure,
                 array, return_value, n_values, values, context);
         }
         else
         if(type == G_TYPE_HASH_TABLE)
         {
-            GHashTable *hash = gel_value_get_boxed(value);
+            GHashTable *hash = g_value_get_boxed(value);
             hash_filter(closure, hash, return_value, n_values, values, context);
         }
         else
@@ -1503,7 +1503,7 @@ void compare_(GClosure *self, GValue *return_value,
             &n_values, &values, &tmp_list, "VV", &v1, &v2))
     {
         g_value_init(return_value, G_TYPE_INT64);
-        gel_value_set_int64(return_value, gel_values_cmp(v1, v2));
+        g_value_set_int64(return_value, gel_values_cmp(v1, v2));
     }
 
     gel_list_free(tmp_list);
@@ -1534,7 +1534,7 @@ void sort_(GClosure *self, GValue *return_value,
 
             gboolean result = gel_value_to_boolean(&tmp_value) ? -1 : 1;
 
-            if(GEL_IS_VALUE(&tmp_value))
+            if(G_IS_VALUE(&tmp_value))
                 g_value_unset(&tmp_value);
             gel_array_free(pair);
 
@@ -1545,7 +1545,7 @@ void sort_(GClosure *self, GValue *return_value,
         gel_array_sort(result_array, (GCompareFunc)compare);
 
         g_value_init(return_value, GEL_TYPE_ARRAY);
-        gel_value_take_boxed(return_value, result_array);
+        g_value_take_boxed(return_value, result_array);
     }
 
     gel_list_free(tmp_list);
@@ -1570,7 +1570,7 @@ void reverse_(GClosure *self, GValue *return_value,
             gel_array_append(result_array, array_values + (i-1));
 
         g_value_init(return_value, GEL_TYPE_ARRAY);
-        gel_value_take_boxed(return_value, result_array);
+        g_value_take_boxed(return_value, result_array);
     }
 
 }
@@ -1594,7 +1594,7 @@ void keys_(GClosure *self, GValue *return_value,
             gel_array_append(array, iter->data);
 
         g_value_init(return_value, GEL_TYPE_ARRAY);
-        gel_value_take_boxed(return_value, array);
+        g_value_take_boxed(return_value, array);
         g_list_free(keys);
     }
 
@@ -1620,17 +1620,17 @@ void new_(GClosure *self, GValue *return_value,
 
     GType type = G_TYPE_INVALID;
 
-    GType value_type = GEL_VALUE_TYPE(value);
+    GType value_type = G_VALUE_TYPE(value);
     if(value_type == G_TYPE_STRING)
     {
-        const gchar *type_name = gel_value_get_string(value);
+        const gchar *type_name = g_value_get_string(value);
         type = g_type_from_name(type_name);
         if(type == G_TYPE_INVALID)
             gel_error_type_name_invalid(context, __FUNCTION__, type_name);
     }
     else
     if(value_type == G_TYPE_GTYPE)
-        type = gel_value_get_gtype(&tmp_value);
+        type = g_value_get_gtype(&tmp_value);
     else
         gel_error_expected(context, __FUNCTION__, "typename or type");
 
@@ -1661,11 +1661,11 @@ void new_(GClosure *self, GValue *return_value,
 
             if(G_IS_INITIALLY_UNOWNED(new_object))
                 g_object_ref_sink(new_object);
-            gel_value_take_object(return_value, new_object);
+            g_value_take_object(return_value, new_object);
         }
     }
 
-    if(GEL_IS_VALUE(&tmp_value))
+    if(G_IS_VALUE(&tmp_value))
         g_value_unset(&tmp_value);
 }
 
@@ -1688,7 +1688,7 @@ void connect_(GClosure *self, GValue *return_value,
             guint connect_id =
                 g_signal_connect_closure(object,
                     signal, g_closure_ref(callback), FALSE);
-            gel_value_set_int64(return_value, connect_id);
+            g_value_set_int64(return_value, connect_id);
         }
         else
             gel_error_value_not_of_type(context,
@@ -1721,7 +1721,7 @@ void if_(GClosure *self, GValue *return_value,
         if(n_values > 2)
             gel_context_eval_value(context, values + 2, return_value);
 
-    if(GEL_IS_VALUE(&tmp_value))
+    if(G_IS_VALUE(&tmp_value))
         g_value_unset(&tmp_value);
 }
 
@@ -1843,7 +1843,7 @@ void while_(GClosure *self, GValue *return_value,
         if(gel_context_error(loop_context))
             running = FALSE;
 
-        if(GEL_IS_VALUE(&tmp_value))
+        if(G_IS_VALUE(&tmp_value))
             g_value_unset(&tmp_value);
     }
 
@@ -1880,7 +1880,7 @@ void for_(GClosure *self, GValue *return_value,
             if(gel_context_error(loop_context))
                 running = FALSE;
 
-            if(GEL_IS_VALUE(&tmp_value))
+            if(G_IS_VALUE(&tmp_value))
                 g_value_unset(&tmp_value);
             g_value_unset(iter_value);
         }
@@ -1910,19 +1910,19 @@ void range_(GClosure *self, GValue *return_value,
         if(last > first)
             for(gint64 i = first; i < last; i++)
             {
-                gel_value_set_int64(&value, i);
+                g_value_set_int64(&value, i);
                 gel_array_append(array, &value);
             }
         else
             for(gint64 i = first; i > last; i--)
             {
-                gel_value_set_int64(&value, i);
+                g_value_set_int64(&value, i);
                 gel_array_append(array, &value);
             }
 
         g_value_unset(&value);
         g_value_init(return_value, GEL_TYPE_ARRAY);
-        gel_value_take_boxed(return_value, array);
+        g_value_take_boxed(return_value, array);
     }
 
     gel_list_free(tmp_list);
@@ -1944,14 +1944,14 @@ void print_(GClosure *self, GValue *return_value,
 
             if(!gel_context_error(context))
             {
-                if(GEL_IS_VALUE(value))
+                if(G_IS_VALUE(value))
                 {
                     gchar *value_string = gel_value_to_string(value);
                     g_print("%s%s", value_string, i == last ? "" : " ");
                     g_free(value_string);
                 }
 
-                if(GEL_IS_VALUE(&tmp_value))
+                if(G_IS_VALUE(&tmp_value))
                     g_value_unset(&tmp_value);
             }
             else
@@ -1976,14 +1976,14 @@ void str_(GClosure *self, GValue *return_value,
 
         if(!gel_context_error(context))
         {
-            if(GEL_IS_VALUE(value))
+            if(G_IS_VALUE(value))
             {
                 gchar *value_string = gel_value_to_string(value);
                 g_string_append_printf(buffer, "%s", value_string);
                 g_free(value_string);
             }
 
-            if(GEL_IS_VALUE(&tmp_value))
+            if(G_IS_VALUE(&tmp_value))
                 g_value_unset(&tmp_value);
         }
         else
@@ -1991,7 +1991,7 @@ void str_(GClosure *self, GValue *return_value,
     }
  
     g_value_init(return_value, G_TYPE_STRING);
-    gel_value_take_string(return_value, g_string_free(buffer, FALSE));
+    g_value_take_string(return_value, g_string_free(buffer, FALSE));
 }
 
 
@@ -2006,7 +2006,7 @@ void type_(GClosure *self, GValue *return_value,
             &n_values, &values, &tmp_list, "V", &value))
     {
         g_value_init(return_value, G_TYPE_GTYPE);
-        gel_value_set_gtype(return_value, GEL_VALUE_TYPE(value));
+        g_value_set_gtype(return_value, G_VALUE_TYPE(value));
     }
 
     g_list_free(tmp_list);
@@ -2039,7 +2039,7 @@ void require_(GClosure *self, GValue *return_value,
     }
 
     g_value_init(return_value, G_TYPE_BOOLEAN);
-    gel_value_set_boolean(return_value, ns != NULL);
+    g_value_set_boolean(return_value, ns != NULL);
 
     gel_list_free(tmp_list);
 }
@@ -2070,16 +2070,16 @@ void dot_(GClosure *self, GValue *return_value,
     const GelTypeInfo *type_info = NULL;
     void *instance = NULL;
 
-    GType type = GEL_VALUE_TYPE(value);
+    GType type = G_VALUE_TYPE(value);
     if(type == GEL_TYPE_TYPELIB)
-        typelib = gel_value_get_boxed(value);
+        typelib = g_value_get_boxed(value);
     else
     if(type == GEL_TYPE_TYPEINFO)
-        type_info = gel_value_get_boxed(value);
+        type_info = g_value_get_boxed(value);
     else
     if(type == G_TYPE_GTYPE)
     {
-        type_info = gel_type_info_from_gtype(gel_value_get_gtype(value));
+        type_info = gel_type_info_from_gtype(g_value_get_gtype(value));
         if(type_info == NULL)
             gel_error_type_name_invalid(context,
                 __FUNCTION__, g_type_name(type));
@@ -2092,7 +2092,7 @@ void dot_(GClosure *self, GValue *return_value,
             gel_error_type_name_invalid(context,
                 __FUNCTION__, g_type_name(type));
         else
-            instance = gel_value_get_object(value);
+            instance = g_value_get_object(value);
     }
     else
     if(G_TYPE_IS_BOXED(type))
@@ -2102,13 +2102,13 @@ void dot_(GClosure *self, GValue *return_value,
             gel_error_type_name_invalid(context,
                 __FUNCTION__, g_type_name(type));
         else
-            instance = gel_value_get_boxed(value);
+            instance = g_value_get_boxed(value);
     }
     else
         gel_error_expected(context, __FUNCTION__,
             "typelib, type, boxed or object");
 
-    if(GEL_IS_VALUE(&tmp_value))
+    if(G_IS_VALUE(&tmp_value))
         g_value_unset(&tmp_value);
 
     if(type_info == NULL && typelib == NULL)
@@ -2120,16 +2120,16 @@ void dot_(GClosure *self, GValue *return_value,
     {
         const gchar *name = NULL;
         value = values + 0;
-        type = GEL_VALUE_TYPE(value);
+        type = G_VALUE_TYPE(value);
 
         if(type == GEL_TYPE_SYMBOL)
         {
-            GelSymbol *symbol = gel_value_get_boxed(value);
+            GelSymbol *symbol = g_value_get_boxed(value);
             name = gel_symbol_get_name(symbol);
         }
         else
         if(type == G_TYPE_STRING)
-            name = gel_value_get_string(value);
+            name = g_value_get_string(value);
 
         if(name != NULL)
         {
@@ -2267,17 +2267,17 @@ GHashTable* gel_make_default_symbols(void)
     }
 
     value = gel_value_new_of_type(G_TYPE_BOOLEAN);
-    gel_value_set_boolean(value, TRUE);
+    g_value_set_boolean(value, TRUE);
     variable = gel_variable_new(value, TRUE);
     g_hash_table_insert(symbols, g_strdup("TRUE"), variable);
 
     value = gel_value_new_of_type(G_TYPE_BOOLEAN);
-    gel_value_set_boolean(value, FALSE);
+    g_value_set_boolean(value, FALSE);
     variable = gel_variable_new(value, TRUE);
     g_hash_table_insert(symbols, g_strdup("FALSE"), variable);
 
     value = gel_value_new_of_type(G_TYPE_POINTER);
-    gel_value_set_pointer(value, NULL);
+    g_value_set_pointer(value, NULL);
     variable = gel_variable_new(value, TRUE);
     g_hash_table_insert(symbols, g_strdup("NULL"), variable);
     return symbols;

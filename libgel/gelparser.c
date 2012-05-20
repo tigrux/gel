@@ -139,17 +139,17 @@ static
 GelArray* gel_parser_macro_code_from_value(GelParser *self,
                                            GValue *pre_value, GError **error)
 {
-    if(GEL_VALUE_TYPE(pre_value) == GEL_TYPE_ARRAY)
+    if(G_VALUE_TYPE(pre_value) == GEL_TYPE_ARRAY)
     {
-        GelArray *array = gel_value_get_boxed(pre_value);
+        GelArray *array = g_value_get_boxed(pre_value);
         GValue *values = gel_array_get_values(array);
         guint n_values = gel_array_get_n_values(array);
 
-        GType type = GEL_VALUE_TYPE(values + 0);
+        GType type = G_VALUE_TYPE(values + 0);
         if(type != GEL_TYPE_SYMBOL)
             return NULL;
 
-        GelSymbol *symbol = gel_value_get_boxed(values + 0);
+        GelSymbol *symbol = g_value_get_boxed(values + 0);
         const gchar *name = gel_symbol_get_name(symbol);
 
         n_values--;
@@ -165,10 +165,10 @@ GelArray* gel_parser_macro_code_from_value(GelParser *self,
                 return NULL;
             }
 
-            symbol = gel_value_get_boxed(values + 0);
+            symbol = g_value_get_boxed(values + 0);
             name = gel_symbol_get_name(symbol);
 
-            GelArray *vars = gel_value_get_boxed(values + 1);
+            GelArray *vars = g_value_get_boxed(values + 1);
             gchar *variadic = NULL;
             gchar *invalid = NULL;
             GList* args = gel_args_from_array(vars, &variadic, &invalid);
@@ -265,12 +265,12 @@ GelArray* gel_parser_scan(GelParser *self, GValue *dest_value,
             case G_TOKEN_FLOAT:
                 g_scanner_get_next_token(scanner);
                 g_value_init(&value, G_TYPE_DOUBLE);
-                gel_value_set_double(&value, (gdouble)scanner->value.v_float);
+                g_value_set_double(&value, (gdouble)scanner->value.v_float);
                 break;
             case G_TOKEN_INT:
                 g_scanner_get_next_token(scanner);
                 g_value_init(&value, G_TYPE_INT64);
-                gel_value_set_int64(&value, (gint64)scanner->value.v_int64);
+                g_value_set_int64(&value, (gint64)scanner->value.v_int64);
                 break;
             case '(':
             case '[':
@@ -282,7 +282,7 @@ GelArray* gel_parser_scan(GelParser *self, GValue *dest_value,
                 if(inner_array != NULL)
                 {
                     g_value_init(&value, GEL_TYPE_ARRAY);
-                    gel_value_take_boxed(&value, inner_array);
+                    g_value_take_boxed(&value, inner_array);
                 }
                 else
                     failed = TRUE;
@@ -372,13 +372,13 @@ GelArray* gel_parser_scan(GelParser *self, GValue *dest_value,
                 {
                     case G_TOKEN_FLOAT:
                         g_value_init(&value, G_TYPE_DOUBLE);
-                        gel_value_set_double(&value,
+                        g_value_set_double(&value,
                             -(gdouble)num_scanner->value.v_float);
                         is_number = TRUE;
                         break;
                     case G_TOKEN_INT:
                         g_value_init(&value, G_TYPE_INT64);
-                        gel_value_set_int64(&value,
+                        g_value_set_int64(&value,
                             -(gint64)num_scanner->value.v_int64);
                         is_number = TRUE;
                         break;
@@ -394,7 +394,7 @@ GelArray* gel_parser_scan(GelParser *self, GValue *dest_value,
                 GelVariable *variable = gel_variable_lookup_predefined(name);
                 GelSymbol *symbol = gel_symbol_new(name, variable);
                 g_value_init(&value, GEL_TYPE_SYMBOL);
-                gel_value_take_boxed(&value, symbol);
+                g_value_take_boxed(&value, symbol);
             }
         }
 
@@ -409,7 +409,7 @@ GelArray* gel_parser_scan(GelParser *self, GValue *dest_value,
 
                 g_value_unset(&value);
                 g_value_init(&value, GEL_TYPE_ARRAY);
-                gel_value_take_boxed(&value, quoted_array);
+                g_value_take_boxed(&value, quoted_array);
                 quoted = FALSE;
             }
 
@@ -477,7 +477,7 @@ gboolean gel_parser_next_value(GelParser *self, GValue *value, GError **error)
     g_return_val_if_fail(self != NULL, FALSE);
     g_return_val_if_fail(value != NULL, FALSE);
 
-    if(GEL_IS_VALUE(value))
+    if(G_IS_VALUE(value))
         g_value_unset(value);
 
     gboolean result = FALSE;
@@ -488,11 +488,11 @@ gboolean gel_parser_next_value(GelParser *self, GValue *value, GError **error)
     if(parsed_error != NULL)
     {
         g_propagate_error(error, parsed_error);
-        if(GEL_IS_VALUE(value))
+        if(G_IS_VALUE(value))
             g_value_unset(value);
     }
     else
-        result = GEL_IS_VALUE(value);
+        result = G_IS_VALUE(value);
 
     return result;
 }
@@ -584,7 +584,7 @@ void gel_parser_iter_destroy(GelParserIter *iter)
 {
     g_return_if_fail(iter != NULL);
 
-    if(GEL_IS_VALUE(&iter->value))
+    if(G_IS_VALUE(&iter->value))
         g_value_unset(&iter->value);
 }
 
@@ -621,7 +621,7 @@ GValue* gel_parser_iter_get(GelParserIter *iter)
     g_return_val_if_fail(iter != NULL, NULL);
 
     GValue *value = &iter->value;
-    if(GEL_IS_VALUE(value))
+    if(G_IS_VALUE(value))
         return value;
     return NULL;
 }

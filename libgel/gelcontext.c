@@ -266,11 +266,11 @@ gboolean gel_context_eval_value(GelContext *self,
 {
     const GValue *result = gel_context_eval_into_value(self, value, dest);
 
-    if(GEL_IS_VALUE(result))
+    if(G_IS_VALUE(result))
     {
         if(result != dest)
         {
-            if(GEL_IS_VALUE(dest))
+            if(G_IS_VALUE(dest))
                 g_value_unset(dest);
             gel_value_copy(result, dest);
         }
@@ -289,9 +289,9 @@ const GValue* gel_context_eval_param_into_value(GelContext *self,
         gel_context_eval_into_value(self, value, out_value);
 
     if(!gel_context_error(self))
-        if(GEL_VALUE_HOLDS(result_value, GEL_TYPE_VARIABLE))
+        if(G_VALUE_HOLDS(result_value, GEL_TYPE_VARIABLE))
         {
-            const GelVariable *variable = gel_value_get_boxed(result_value);
+            const GelVariable *variable = g_value_get_boxed(result_value);
             if(variable != NULL)
             {
                 const GValue *value = gel_variable_get_value(variable);
@@ -313,11 +313,11 @@ const GValue* gel_context_eval_into_value(GelContext *self,
     g_return_val_if_fail(out_value != NULL, NULL);
 
     const GValue *result = NULL;
-    GType type = GEL_VALUE_TYPE(value);
+    GType type = G_VALUE_TYPE(value);
 
     if(type == GEL_TYPE_SYMBOL)
     {
-        const GelSymbol *symbol = gel_value_get_boxed(value);
+        const GelSymbol *symbol = g_value_get_boxed(value);
         const gchar *name = gel_symbol_get_name(symbol);
 
         const GelVariable *variable = gel_context_get_variable(self, name);
@@ -333,7 +333,7 @@ const GValue* gel_context_eval_into_value(GelContext *self,
     else
     if(type == GEL_TYPE_ARRAY)
     {
-        GelArray *array = gel_value_get_boxed(value);
+        GelArray *array = g_value_get_boxed(value);
         const guint array_n_values = gel_array_get_n_values(array);
         if(array_n_values > 0)
         {
@@ -345,15 +345,15 @@ const GValue* gel_context_eval_into_value(GelContext *self,
 
 
             if(!gel_context_error(self))
-                if(GEL_VALUE_HOLDS(first_value, G_TYPE_CLOSURE))
+                if(G_VALUE_HOLDS(first_value, G_TYPE_CLOSURE))
                 {
-                    GClosure *closure = gel_value_get_boxed(first_value);
+                    GClosure *closure = g_value_get_boxed(first_value);
                     g_closure_invoke(closure,
                         out_value, array_n_values - 1 , array_values + 1, self);
                     result = out_value;
                 }
 
-            if(GEL_IS_VALUE(&tmp_value))
+            if(G_IS_VALUE(&tmp_value))
                 g_value_unset(&tmp_value);
         }
     }
@@ -554,7 +554,7 @@ void gel_context_define_object(GelContext *self, const gchar *name,
     if(G_IS_INITIALLY_UNOWNED(object))
         g_object_ref_sink(object);
 
-    gel_value_take_object(value, object);
+    g_value_take_object(value, object);
     gel_context_define_value(self, name, value);
 }
 
@@ -581,7 +581,7 @@ void gel_context_define_function(GelContext *self, const gchar *name,
             g_strdup(name), (GClosureMarshal)function);
     closure->data = user_data;
 
-    gel_value_take_boxed(value, closure);
+    g_value_take_boxed(value, closure);
     gel_context_define_value(self, name, value);
 }
 

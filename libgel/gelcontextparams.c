@@ -79,8 +79,8 @@ gboolean gel_context_eval_param(GelContext *self, const gchar *func,
                 gel_args_pop(args, const GValue *) = result;
             break;
         case 'a':
-            if(GEL_VALUE_HOLDS(*values, GEL_TYPE_ARRAY))
-                gel_args_pop(args, void *) = gel_value_get_boxed(*values);
+            if(G_VALUE_HOLDS(*values, GEL_TYPE_ARRAY))
+                gel_args_pop(args, void *) = g_value_get_boxed(*values);
             else
             {
                 gel_error_value_not_of_type(self,
@@ -95,8 +95,8 @@ gboolean gel_context_eval_param(GelContext *self, const gchar *func,
             if(gel_context_error(self))
                 parsed = FALSE;
             else
-            if(GEL_VALUE_HOLDS(result, GEL_TYPE_ARRAY))
-                gel_args_pop(args, void *) = gel_value_get_boxed(result);
+            if(G_VALUE_HOLDS(result, GEL_TYPE_ARRAY))
+                gel_args_pop(args, void *) = g_value_get_boxed(result);
             else
             {
                 gel_error_value_not_of_type(self,
@@ -111,8 +111,8 @@ gboolean gel_context_eval_param(GelContext *self, const gchar *func,
             if(gel_context_error(self))
                 parsed = FALSE;
             else
-            if(GEL_VALUE_HOLDS(result, G_TYPE_HASH_TABLE))
-                gel_args_pop(args, void *) = gel_value_get_boxed(result);
+            if(G_VALUE_HOLDS(result, G_TYPE_HASH_TABLE))
+                gel_args_pop(args, void *) = g_value_get_boxed(result);
             else
             {
                 gel_error_value_not_of_type(self,
@@ -121,9 +121,9 @@ gboolean gel_context_eval_param(GelContext *self, const gchar *func,
             }
             break;
         case 's':
-            if(GEL_VALUE_HOLDS(*values, GEL_TYPE_SYMBOL))
+            if(G_VALUE_HOLDS(*values, GEL_TYPE_SYMBOL))
             {
-                GelSymbol *symbol = gel_value_get_boxed(*values);
+                GelSymbol *symbol = g_value_get_boxed(*values);
                 gel_args_pop(args, const gchar *) = gel_symbol_get_name(symbol);
             }
             else
@@ -140,8 +140,8 @@ gboolean gel_context_eval_param(GelContext *self, const gchar *func,
             if(gel_context_error(self))
                 parsed = FALSE;
             else
-            if(GEL_VALUE_HOLDS(result, G_TYPE_STRING))
-                gel_args_pop(args, const gchar *) = gel_value_get_string(result);
+            if(G_VALUE_HOLDS(result, G_TYPE_STRING))
+                gel_args_pop(args, const gchar *) = g_value_get_string(result);
             else
             {
                 gel_error_value_not_of_type(self,
@@ -165,14 +165,14 @@ gboolean gel_context_eval_param(GelContext *self, const gchar *func,
             if(gel_context_error(self))
                 parsed = FALSE;
             else
-            if(GEL_VALUE_HOLDS(result, G_TYPE_INT64))
-                gel_args_pop(args, gint64) = gel_value_get_int64(result);
+            if(G_VALUE_HOLDS(result, G_TYPE_INT64))
+                gel_args_pop(args, gint64) = g_value_get_int64(result);
             else
             {
                 GValue tmp = {0};
                 g_value_init(&tmp, G_TYPE_INT64);
                 if(g_value_transform(result, &tmp))
-                    gel_args_pop(args, gint64) = gel_value_get_int64(&tmp);
+                    gel_args_pop(args, gint64) = g_value_get_int64(&tmp);
                 else
                 {
                     gel_error_value_not_of_type(self,
@@ -189,14 +189,14 @@ gboolean gel_context_eval_param(GelContext *self, const gchar *func,
             if(gel_context_error(self))
                 parsed = FALSE;
             else
-            if(GEL_VALUE_HOLDS(result, G_TYPE_DOUBLE))
-                gel_args_pop(args, gdouble) = gel_value_get_double(result);
+            if(G_VALUE_HOLDS(result, G_TYPE_DOUBLE))
+                gel_args_pop(args, gdouble) = g_value_get_double(result);
             else
             {
                 GValue tmp = {0};
                 g_value_init(&tmp, G_TYPE_DOUBLE);
                 if(g_value_transform(result, &tmp))
-                    gel_args_pop(args, gdouble) = gel_value_get_double(&tmp);
+                    gel_args_pop(args, gdouble) = g_value_get_double(&tmp);
                 else
                 {
                     gel_error_value_not_of_type(self, 
@@ -213,8 +213,8 @@ gboolean gel_context_eval_param(GelContext *self, const gchar *func,
             if(gel_context_error(self))
                 parsed = FALSE;
             else
-            if(GEL_VALUE_HOLDS(result, G_TYPE_GTYPE))
-                gel_args_pop(args, GType) = gel_value_get_gtype(result);
+            if(G_VALUE_HOLDS(result, G_TYPE_GTYPE))
+                gel_args_pop(args, GType) = g_value_get_gtype(result);
             else
             {
                 gel_error_value_not_of_type(self,
@@ -229,8 +229,8 @@ gboolean gel_context_eval_param(GelContext *self, const gchar *func,
             if(gel_context_error(self))
                 parsed = FALSE;
             else
-            if(GEL_VALUE_HOLDS(result, G_TYPE_OBJECT))
-                gel_args_pop(args, GObject *) = gel_value_get_object(result);
+            if(G_VALUE_HOLDS(result, G_TYPE_OBJECT))
+                gel_args_pop(args, GObject *) = g_value_get_object(result);
             else
             {
                 gel_error_value_not_of_type(self,
@@ -245,8 +245,8 @@ gboolean gel_context_eval_param(GelContext *self, const gchar *func,
             if(gel_context_error(self))
                 parsed = FALSE;
             else
-            if(GEL_VALUE_HOLDS(result, G_TYPE_BOXED))
-                gel_args_pop(args, void *) = gel_value_get_boxed(result);
+            if(G_VALUE_HOLDS(result, G_TYPE_BOXED))
+                gel_args_pop(args, void *) = g_value_get_boxed(result);
             else
             {
                 gel_error_value_not_of_type(self,
@@ -261,8 +261,8 @@ gboolean gel_context_eval_param(GelContext *self, const gchar *func,
             if(gel_context_error(self))
                 parsed = FALSE;
             else
-            if(GEL_VALUE_HOLDS(result, G_TYPE_CLOSURE))
-                gel_args_pop(args, GClosure *) = gel_value_get_boxed(result);
+            if(G_VALUE_HOLDS(result, G_TYPE_CLOSURE))
+                gel_args_pop(args, GClosure *) = g_value_get_boxed(result);
             else
             {
                 gel_error_value_not_of_type(self,
@@ -339,9 +339,9 @@ gboolean gel_context_eval_params_args(GelContext *self, const gchar *func,
                 func, n_values, values, list, format, args);
         }
         else
-            if(GEL_VALUE_HOLDS(*values, GEL_TYPE_ARRAY))
+            if(G_VALUE_HOLDS(*values, GEL_TYPE_ARRAY))
             {
-                GelArray *array = gel_value_get_boxed(*values);
+                GelArray *array = g_value_get_boxed(*values);
                 guint n_values = gel_array_get_n_values(array);
                 const GValue *values = gel_array_get_values(array);
 

@@ -132,10 +132,10 @@ void gel_closure_marshal(GelClosure *self, GValue *return_value,
             if(gel_context_error(context))
                 goto end;
 
-            if(i == last && return_value != NULL && GEL_IS_VALUE(value))
+            if(i == last && return_value != NULL && G_IS_VALUE(value))
                 gel_value_copy(value, return_value);
 
-            if(GEL_IS_VALUE(&tmp_value))
+            if(G_IS_VALUE(&tmp_value))
                 g_value_unset(&tmp_value);
         }
     }
@@ -172,17 +172,17 @@ void gel_closure_bind_symbols_of_array(GelClosure *self, GelArray *array)
     for(guint i = 0; i < array_n_values; i++)
     {
         const GValue *value = array_values + i;
-        GType type = GEL_VALUE_TYPE(value);
+        GType type = G_VALUE_TYPE(value);
 
         if(type == GEL_TYPE_ARRAY)
         {
-            GelArray *array = gel_value_get_boxed(value);
+            GelArray *array = g_value_get_boxed(value);
             gel_closure_bind_symbols_of_array(self, array);
         }
         else
         if(type == GEL_TYPE_SYMBOL)
         {
-            GelSymbol *symbol = gel_value_get_boxed(value);
+            GelSymbol *symbol = g_value_get_boxed(value);
             const gchar *name = gel_symbol_get_name(symbol);
             const GelContext *context = self->context;
 

@@ -79,7 +79,7 @@ void gel_error_invalid_value_for_property(GelContext *context, const gchar *f,
     gel_context_set_error(context, g_error_new(
         GEL_CONTEXT_ERROR, GEL_CONTEXT_ERROR_PROPERTY,
         "%s: '%s' of type '%s' is invalid for property '%s' of type '%s'",
-        f, value_string, GEL_VALUE_TYPE_NAME(value),
+        f, value_string, G_VALUE_TYPE_NAME(value),
         pspec->name, g_type_name(pspec->value_type)));
 
     g_free(value_string);
