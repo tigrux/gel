@@ -2,57 +2,34 @@
 <interface>
   <!-- interface-requires gtk+ 3.0 -->
   <object class="GtkTextBuffer" id="textbuffer1">
-    <property name="text" translatable="yes">(move 100 200)
+    <property name="text" translatable="yes">
+(move 100 200)
 (color 100 25 50)
 (for i (range 0 8)
 	(line 200)
 	(turn 225)
-)</property>
+)
+</property>
   </object>
   <object class="GtkWindow" id="window">
-    <property name="can_focus">False</property>
     <property name="title" translatable="yes">Drawing with Gtk, Cairo and Gel</property>
     <property name="resizable">False</property>
     <signal name="hide" handler="gtk_main_quit" swapped="no"/>
     <child>
-      <object class="GtkGrid" id="grid1">
-        <property name="visible">True</property>
-        <property name="can_focus">False</property>
+      <object class="GtkGrid" id="grid">
         <child>
           <object class="GtkToolbar" id="toolbar1">
-            <property name="visible">True</property>
-            <property name="can_focus">False</property>
             <child>
               <object class="GtkToolButton" id="toolbutton1">
-                <property name="use_action_appearance">False</property>
-                <property name="visible">True</property>
-                <property name="can_focus">False</property>
-                <property name="use_action_appearance">False</property>
-                <property name="label" translatable="yes">toolbutton1</property>
-                <property name="use_underline">True</property>
                 <property name="stock_id">gtk-execute</property>
                 <signal name="clicked" handler="gtk_widget_queue_draw" object="drawingarea" swapped="yes"/>
               </object>
-              <packing>
-                <property name="expand">False</property>
-                <property name="homogeneous">True</property>
-              </packing>
             </child>
             <child>
               <object class="GtkToolButton" id="toolbutton2">
-                <property name="use_action_appearance">False</property>
-                <property name="visible">True</property>
-                <property name="can_focus">False</property>
-                <property name="use_action_appearance">False</property>
-                <property name="label" translatable="yes">toolbutton2</property>
-                <property name="use_underline">True</property>
                 <property name="stock_id">gtk-quit</property>
                 <signal name="clicked" handler="gtk_main_quit" swapped="no"/>
               </object>
-              <packing>
-                <property name="expand">False</property>
-                <property name="homogeneous">True</property>
-              </packing>
             </child>
           </object>
           <packing>
@@ -69,16 +46,12 @@
             <property name="label_xalign">0.5</property>
             <property name="shadow_type">etched-out</property>
             <child>
-              <object class="GtkScrolledWindow" id="scrolledwindow1">
+              <object class="GtkScrolledWindow" id="scrolledwindow">
                 <property name="width_request">400</property>
                 <property name="height_request">0</property>
                 <property name="visible">True</property>
-                <property name="can_focus">True</property>
-                <property name="shadow_type">in</property>
                 <child>
                   <object class="GtkTextView" id="textview">
-                    <property name="visible">True</property>
-                    <property name="can_focus">True</property>
                     <property name="buffer">textbuffer1</property>
                   </object>
                 </child>
@@ -86,8 +59,6 @@
             </child>
             <child type="label">
               <object class="GtkLabel" id="label1">
-                <property name="visible">True</property>
-                <property name="can_focus">False</property>
                 <property name="label" translatable="yes">&lt;b&gt;Script&lt;/b&gt;</property>
                 <property name="use_markup">True</property>
               </object>
@@ -102,24 +73,15 @@
         </child>
         <child>
           <object class="GtkFrame" id="frame2">
-            <property name="visible">True</property>
-            <property name="can_focus">False</property>
-            <property name="label_xalign">0.5</property>
-            <property name="shadow_type">etched-out</property>
             <child>
               <object class="GtkDrawingArea" id="drawingarea">
                 <property name="width_request">400</property>
                 <property name="height_request">400</property>
-                <property name="visible">True</property>
-                <property name="app_paintable">True</property>
-                <property name="can_focus">False</property>
                 <signal name="draw" handler="on_draw" swapped="no"/>
               </object>
             </child>
             <child type="label">
               <object class="GtkLabel" id="label2">
-                <property name="visible">True</property>
-                <property name="can_focus">False</property>
                 <property name="label" translatable="yes">&lt;b&gt;Drawing&lt;/b&gt;</property>
                 <property name="use_markup">True</property>
               </object>
@@ -134,8 +96,6 @@
         </child>
         <child>
           <object class="GtkLabel" id="label">
-            <property name="visible">True</property>
-            <property name="can_focus">False</property>
           </object>
           <packing>
             <property name="left_attach">0</property>
