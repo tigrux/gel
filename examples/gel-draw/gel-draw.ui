@@ -41,8 +41,6 @@
         </child>
         <child>
           <object class="GtkFrame" id="frame1">
-            <property name="visible">True</property>
-            <property name="can_focus">False</property>
             <property name="label_xalign">0.5</property>
             <property name="shadow_type">etched-out</property>
             <child>
@@ -73,6 +71,8 @@
         </child>
         <child>
           <object class="GtkFrame" id="frame2">
+            <property name="label_xalign">0.5</property>
+            <property name="shadow_type">etched-out</property>
             <child>
               <object class="GtkDrawingArea" id="drawingarea">
                 <property name="width_request">400</property>
