@@ -73,7 +73,7 @@ GScanner* gel_scanner_new(void)
         G_CSET_a_2_z G_CSET_A_2_Z "=_+-*/%!&<>.";
     config->cset_identifier_nth =
         G_CSET_a_2_z G_CSET_A_2_Z "=_+-*/%!&<>.?" G_CSET_DIGITS;
-    config->cpair_comment_single = "#\n";
+    config->cset_skip_characters = " \t\n,";
     config->scan_identifier_1char = TRUE;
     config->store_int64 = TRUE;
     config->scan_string_sq = FALSE;
