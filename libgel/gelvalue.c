@@ -250,13 +250,17 @@ gchar* gel_value_stringify(const GValue *value, gchar* (*str)(const GValue *))
  */
 gchar* gel_value_repr(const GValue *value)
 {
+    gchar *result = NULL;
+
     g_return_val_if_fail(value != NULL, NULL);
     g_return_val_if_fail(G_IS_VALUE(value), NULL);
 
     if(G_VALUE_HOLDS(value, G_TYPE_STRING))
-        return g_strdup_printf("\"%s\"", g_value_get_string(value));
+        result = g_strdup_printf("\"%s\"", g_value_get_string(value));
+    else
+        result = gel_value_stringify(value, gel_value_repr);
 
-    return gel_value_stringify(value, gel_value_repr);
+    return result;
 }
 
 
@@ -270,16 +274,20 @@ gchar* gel_value_repr(const GValue *value)
  */
 gchar* gel_value_to_string(const GValue *value)
 {
+    gchar *result = NULL;
+
     if(value == NULL)
-        return g_strdup("NULL");
-
+        result = g_strdup("NULL");
+    else
     if(!G_IS_VALUE(value))
-        return g_strdup("VOID");
-
+        result = g_strdup("VOID");
+    else
     if(G_VALUE_HOLDS(value, G_TYPE_STRING))
-        return g_strdup(g_value_get_string(value));
+        result = g_strdup(g_value_get_string(value));
+    else
+        result = gel_value_stringify(value, gel_value_to_string);
 
-    return gel_value_stringify(value, gel_value_to_string);
+    return result;
 }
 
 
@@ -682,36 +690,37 @@ GType gel_values_simple_transform(const GValue *v1, const GValue *v2,
     g_return_val_if_fail(v1 != NULL, FALSE);
     g_return_val_if_fail(v2 != NULL, FALSE);
 
+    GType result = G_TYPE_INVALID;
     GType simple_type = gel_values_simple_type(v1, v2);
 
-    if(simple_type == G_TYPE_INVALID)
-        return G_TYPE_INVALID;
-
-    if(G_VALUE_TYPE(v1) == simple_type && G_VALUE_TYPE(v2) == simple_type)
+    if(simple_type != G_TYPE_INVALID)
     {
-        *vvv1 = v1;
-        *vvv2 = v2;
-        return simple_type;
+        if(G_VALUE_TYPE(v1) == simple_type && G_VALUE_TYPE(v2) == simple_type)
+        {
+            *vvv1 = v1;
+            *vvv2 = v2;
+            result = simple_type;
+        }
+        else
+        {
+            g_value_init(vv1, simple_type);
+            g_value_init(vv2, simple_type);
+
+            if(!g_value_transform(v1, vv1))
+                g_value_unset(vv1);
+            else
+            if(g_value_transform(v2, vv2))
+                result = simple_type;
+            else
+            {
+                g_value_unset(vv1);
+                g_value_unset(vv2);
+            }
+
+            *vvv1 = vv1;
+            *vvv2 = vv2;
+        }
     }
-
-
-    g_value_init(vv1, simple_type);
-    g_value_init(vv2, simple_type);
-
-    GType result = G_TYPE_INVALID;
-    if(!g_value_transform(v1, vv1))
-        g_value_unset(vv1);
-    else
-    if(g_value_transform(v2, vv2))
-        result = simple_type;
-    else
-    {
-        g_value_unset(vv1);
-        g_value_unset(vv2);
-    }
-
-    *vvv1 = vv1;
-    *vvv2 = vv2;
 
     return result;
 }
