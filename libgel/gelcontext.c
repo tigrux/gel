@@ -496,7 +496,7 @@ void gel_context_define_value(GelContext *self,
     g_return_if_fail(value != NULL);
 
     g_hash_table_insert(self->variables,
-        g_strdup(name), gel_variable_new(value, TRUE));
+        g_strdup(name), gel_variable_new(value));
 }
 
 

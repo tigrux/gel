@@ -2262,23 +2262,23 @@ GHashTable* gel_make_default_symbols(void)
     {
         GClosure *closure = gel_closure_new_native(c->name, c->marshal);
         value = gel_value_new_from_boxed(G_TYPE_CLOSURE, closure);
-        variable = gel_variable_new(value, TRUE);
+        variable = gel_variable_new(value);
         g_hash_table_insert(symbols, g_strdup(c->name), variable);
     }
 
     value = gel_value_new_of_type(G_TYPE_BOOLEAN);
     g_value_set_boolean(value, TRUE);
-    variable = gel_variable_new(value, TRUE);
+    variable = gel_variable_new(value);
     g_hash_table_insert(symbols, g_strdup("TRUE"), variable);
 
     value = gel_value_new_of_type(G_TYPE_BOOLEAN);
     g_value_set_boolean(value, FALSE);
-    variable = gel_variable_new(value, TRUE);
+    variable = gel_variable_new(value);
     g_hash_table_insert(symbols, g_strdup("FALSE"), variable);
 
     value = gel_value_new_of_type(G_TYPE_POINTER);
     g_value_set_pointer(value, NULL);
-    variable = gel_variable_new(value, TRUE);
+    variable = gel_variable_new(value);
     g_hash_table_insert(symbols, g_strdup("NULL"), variable);
     return symbols;
 }
