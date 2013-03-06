@@ -64,35 +64,15 @@ void gel_value_copy(const GValue *src_value, GValue *dest_value)
 
     GType dest_type = G_VALUE_TYPE(dest_value);
     if(src_type == dest_type)
-        switch(src_type)
-        {
-            case G_TYPE_BOOLEAN:
-                g_value_set_boolean(dest_value,
-                    g_value_get_boolean(src_value));
-                break;
-            case G_TYPE_INT64:
-                g_value_set_int64(dest_value,
-                    g_value_get_int64(src_value));
-                break;
-            case G_TYPE_POINTER:
-                g_value_set_pointer(dest_value,
-                    g_value_peek_pointer(src_value));
-                break;
-            case G_TYPE_DOUBLE:
-                g_value_set_double(dest_value,
-                    g_value_get_double(src_value));
-                break;
-            default:
-                g_value_copy(src_value, dest_value);
-        }
+        g_value_copy(src_value, dest_value);
     else
-        if(!g_value_transform(src_value, dest_value))
-        {
-            if(G_IS_VALUE(dest_value))
-                g_value_unset(dest_value);
-            g_value_init(dest_value, src_type);
-            g_value_copy(src_value, dest_value);
-        }
+    if(!g_value_transform(src_value, dest_value))
+    {
+        if(G_IS_VALUE(dest_value))
+            g_value_unset(dest_value);
+        g_value_init(dest_value, src_type);
+        g_value_copy(src_value, dest_value);
+    }
 }
 
 
